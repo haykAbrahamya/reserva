@@ -1,0 +1,185 @@
+@use 'variables' as *;
+
+/* Dedicated keyframes (uniquely named, :global so they aren't hashed) */
+:global {
+  @keyframes more-scrim-in  { from { opacity: 0 }                  to { opacity: 1 } }
+  @keyframes more-scrim-out { from { opacity: 1 }                  to { opacity: 0 } }
+  @keyframes more-sheet-in  { from { transform: translateY(100%) } to { transform: translateY(0) } }
+  @keyframes more-sheet-out { from { transform: translateY(0) }    to { transform: translateY(100%) } }
+}
+
+/* Hidden on desktop */
+@media (min-width: 769px) {
+  .tabbar { display: none !important; }
+  .fab    { display: none !important; }
+}
+
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid $line-1;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 8px));
+  z-index: 30;
+}
+
+[data-theme="dark"] .tabbar {
+  background: rgba(18, 17, 16, 0.9);
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  color: $fg-2;
+  font-size: 10px;
+  font-weight: 500;
+  font-family: $font-sans;
+  padding: 6px 4px;
+  min-height: 48px;
+  text-decoration: none;
+  border: none;
+  background: none;
+  transition: transform 0.12s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:active { transform: scale(0.92); }
+  &.active { color: $accent; }
+}
+
+.icon { display: block; flex-shrink: 0; }
+
+/* FAB */
+.fab {
+  position: fixed;
+  right: 16px;
+  bottom: calc(72px + env(safe-area-inset-bottom, 8px));
+  width: 52px;
+  height: 52px;
+  border-radius: 26px;
+  background: $accent;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(168, 120, 75, 0.4);
+  cursor: pointer;
+  border: none;
+  z-index: 31;
+  transition: transform 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:active {
+    transform: scale(0.92);
+    box-shadow: 0 4px 12px rgba(168, 120, 75, 0.3);
+  }
+}
+
+/* ── More / profile bottom sheet ── */
+.moreScrim {
+  position: fixed;
+  inset: 0;
+  background: var(--scrim);
+  z-index: 40;
+  animation: more-scrim-in 0.22s ease both;
+  &.closing { animation: more-scrim-out 0.26s ease both; }
+}
+
+.moreSheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $bg-1;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 40px rgba(20,17,14,0.18);
+  z-index: 41;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  will-change: transform;
+  animation: more-sheet-in 0.34s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+  overflow: hidden;
+  &.closing { animation: more-sheet-out 0.28s cubic-bezier(0.4, 0, 1, 1) both; }
+}
+
+.sheetGrab {
+  width: 40px;
+  height: 4px;
+  background: $line-2;
+  border-radius: 2px;
+  margin: 10px auto 0;
+}
+
+.sheetUser {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-bottom: 1px solid $line-1;
+}
+
+.sheetUserName  { font-size: 15px; font-weight: 600; color: $fg-0; }
+.sheetUserEmail { font-size: 12px; color: $fg-2; margin-top: 1px; }
+.sheetUserRole  {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: $accent-soft;
+  color: $accent;
+  margin-top: 4px;
+}
+
+.sheetItems { padding: 8px 12px; }
+
+.sheetItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 12px;
+  border-radius: $r-2;
+  cursor: pointer;
+  font-family: $font-sans;
+  font-size: 15px;
+  font-weight: 500;
+  color: $fg-0;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  transition: background 0.12s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover, &:active { background: $bg-2; }
+  &.danger { color: $danger; }
+
+  .sheetItemIcon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: $bg-2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &.danger .sheetItemIcon { background: $danger-soft; color: $danger; }
+}
+
+.sheetDivider {
+  height: 1px;
+  background: $line-1;
+  margin: 4px 12px;
+}

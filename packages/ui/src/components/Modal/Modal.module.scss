@@ -1,0 +1,145 @@
+@use '../../styles/variables' as *;
+
+/* â”€â”€ Keyframes â€” must be :global so CSS Modules doesn't hash the names â”€â”€ */
+:global {
+  @keyframes overlay-in  { from { opacity: 0 }                                               to { opacity: 1 } }
+  @keyframes overlay-out { from { opacity: 1 }                                               to { opacity: 0 } }
+  @keyframes modal-in    { from { opacity: 0; transform: scale(0.96) translateY(8px) }       to { opacity: 1; transform: none } }
+  @keyframes modal-out   { from { opacity: 1; transform: none }                              to { opacity: 0; transform: scale(0.96) translateY(8px) } }
+  /* Full slide from off-screen right â€” matches the specialist dashboard feel */
+  @keyframes drawer-in   { from { transform: translateX(100%) }                             to { transform: translateX(0) } }
+  @keyframes drawer-out  { from { transform: translateX(0) }                                to { transform: translateX(100%) } }
+  @keyframes sheet-in    { from { transform: translateY(100%) }                             to { transform: translateY(0) } }
+  @keyframes sheet-out   { from { transform: translateY(0) }                                to { transform: translateY(100%) } }
+}
+
+/* â”€â”€ Overlay / backdrop â”€â”€ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--scrim);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: overlay-in 0.22s ease both;
+  &.closing { animation: overlay-out 0.24s ease both; }
+}
+
+/* â”€â”€ Desktop modal (centered) â”€â”€ */
+.modal {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  box-shadow: $shadow-3;
+  width: min(560px, 92vw);
+  max-height: 88vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  will-change: transform, opacity;
+  animation: modal-in 0.32s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+  &.closing { animation: modal-out 0.24s cubic-bezier(0.4, 0, 1, 1) both; }
+
+  &.lg { width: min(720px, 92vw); }
+  &.sm { width: min(400px, 92vw); }
+}
+
+/* â”€â”€ Desktop side drawer â”€â”€ */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(440px, 92vw);
+  background: $bg-1;
+  border-left: 1px solid $line-1;
+  box-shadow: $shadow-3;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  will-change: transform;
+  animation: drawer-in 0.34s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+  &.closing { animation: drawer-out 0.28s cubic-bezier(0.4, 0, 1, 1) both; }
+}
+
+/* â”€â”€ Mobile bottom sheet â”€â”€ */
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: calc(94vh - env(safe-area-inset-top, 0px));
+  background: $bg-1;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 40px rgba(20, 17, 14, 0.22);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  will-change: transform;
+  animation: sheet-in 0.34s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  &.closing { animation: sheet-out 0.28s cubic-bezier(0.4, 0, 1, 1) both; }
+}
+
+/* Grab handle */
+.grab {
+  width: 40px;
+  height: 4px;
+  background: $line-2;
+  border-radius: 2px;
+  margin: 10px auto 0;
+  flex-shrink: 0;
+}
+
+/* â”€â”€ Shared inner parts â”€â”€ */
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 22px;
+  border-bottom: 1px solid $line-1;
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: $font-serif;
+  font-size: 22px;
+  margin: 0;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 12px;
+  color: $fg-2;
+  margin: 4px 0 0;
+}
+
+.body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 22px;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 22px;
+  border-top: 1px solid $line-1;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .footer {
+    flex-direction: column-reverse;
+    gap: 8px;
+    button { width: 100%; justify-content: center; }
+  }
+}

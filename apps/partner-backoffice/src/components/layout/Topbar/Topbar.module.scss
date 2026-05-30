@@ -1,0 +1,75 @@
+@use 'variables' as *;
+
+.topbar {
+  height: $topbar-h;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  background: $bg-0;
+  border-bottom: 1px solid $line-1;
+  flex-shrink: 0;
+}
+
+/* Desktop: hide mobile-only elements */
+@media (min-width: 769px) {
+  .mobileLogo { display: none !important; }
+}
+
+/* Mobile-only logo */
+.mobileLogo {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.mobileLogoIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: $accent;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-serif;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+  font-weight: 300;
+}
+
+.mobileTitle {
+  font-family: $font-serif;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: $fg-0;
+  line-height: 1;
+}
+
+/* Desktop breadcrumb */
+.breadcrumb {
+  font-size: 13px;
+  color: $fg-2;
+}
+
+.spacer { flex: 1; }
+
+/* Search — hidden for now */
+.search { display: none; }
+
+/* Divider between bell and user */
+.divider {
+  width: 1px;
+  height: 22px;
+  background: $line-1;
+  flex-shrink: 0;
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .topbar     { padding: 0 16px; gap: 10px; }
+  .mobileLogo { display: flex; }
+  .breadcrumb { display: none; }
+  .divider    { display: none; }
+}

@@ -1,0 +1,62 @@
+@use 'variables' as *;
+
+.toggle {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border-radius: $r-1;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  box-shadow: $shadow-1;
+  color: $fg-1;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+
+  &:hover {
+    background: $bg-2;
+    border-color: $line-strong;
+    color: $fg-0;
+  }
+  &:active { transform: scale(0.94); }
+}
+
+/* Both icons stacked; we slide/rotate between them */
+.iconWrap {
+  position: relative;
+  width: 16px;
+  height: 16px;
+}
+
+.icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.4s cubic-bezier(0.22, 0.86, 0.23, 1), opacity 0.3s ease;
+}
+
+/* Sun visible in light, slides up & fades when switching to dark */
+.sun {
+  transform: translateY(0) rotate(0deg);
+  opacity: 1;
+}
+.dark .sun {
+  transform: translateY(-130%) rotate(-90deg);
+  opacity: 0;
+}
+
+/* Moon hidden in light (below), slides into place in dark */
+.moon {
+  transform: translateY(130%) rotate(90deg);
+  opacity: 0;
+}
+.dark .moon {
+  transform: translateY(0) rotate(0deg);
+  opacity: 1;
+}

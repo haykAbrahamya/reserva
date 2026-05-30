@@ -1,0 +1,39 @@
+@use '../../styles/variables' as *;
+
+.wrap { width: 100%; overflow-x: auto; }
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: $fg-2;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 10px var(--pad-x);
+  border-bottom: 1px solid $line-1;
+  background: $bg-0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+.td {
+  padding: var(--pad-y) var(--pad-x);
+  border-bottom: 1px solid $line-1;
+  vertical-align: middle;
+}
+
+.tr {
+  cursor: pointer;
+  transition: background .1s;
+
+  &:hover { background: $bg-2; }
+  &.selected { background: $accent-soft; }
+}

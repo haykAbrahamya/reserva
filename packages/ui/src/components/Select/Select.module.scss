@@ -1,0 +1,133 @@
+@use '../../styles/variables' as *;
+
+.wrap { position: relative; }
+
+.trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+  background: $bg-1;
+  border: 1px solid $line-2;
+  border-radius: $r-1;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+  font-family: $font-sans;
+  font-size: $text-md;
+  color: $fg-0;
+  min-height: $row-h;
+  padding: 0 $pad-x;
+
+  &.sm { height: 30px; min-height: 30px; padding: 0 10px; font-size: 12px; }
+
+  &.open {
+    border-color: $accent;
+    box-shadow: 0 0 0 3px $accent-soft;
+  }
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .placeholder { color: $fg-3; }
+  .text        { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+
+  .chevron {
+    color: $fg-2;
+    flex-shrink: 0;
+    transition: transform .18s;
+    &.rotated { transform: rotate(180deg); }
+  }
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: $bg-1;
+  border: 1px solid $line-2;
+  border-radius: $r-2;
+  box-shadow: $shadow-3;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  animation: pop 0.14s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+}
+
+/* â”€â”€ Search box (sticky header) â”€â”€ */
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 9px;
+  margin-bottom: 4px;
+  background: $bg-2;
+  border: 1px solid $line-1;
+  border-radius: 7px;
+
+  .searchIcon { color: $fg-3; flex-shrink: 0; }
+
+  .searchInput {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: $font-sans;
+    font-size: 13px;
+    color: $fg-0;
+    &::placeholder { color: $fg-3; }
+  }
+}
+
+/* â”€â”€ Scrollable list â”€â”€ */
+.list {
+  max-height: 240px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* â”€â”€ Option â”€â”€ */
+.option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+
+  // keyboard / hover highlight
+  &.active { background: $bg-2; }
+
+  &.selected {
+    background: $accent-soft;
+    .optLabel { font-weight: 600; color: $accent-strong; }
+  }
+
+  // keep selected option visually distinct even when keyboard-highlighted
+  &.selected.active { background: $accent-soft; }
+
+  .optLabel { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .optSub   { font-size: 11px; color: $fg-2; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .check    { color: $accent; flex-shrink: 0; margin-left: auto; }
+}
+
+/* â”€â”€ Search match highlight â”€â”€ */
+.mark {
+  background: transparent;
+  color: $accent;
+  font-weight: 700;
+}
+
+/* â”€â”€ Empty state â”€â”€ */
+.empty {
+  padding: 16px 10px;
+  text-align: center;
+  font-size: 12px;
+  color: $fg-3;
+}

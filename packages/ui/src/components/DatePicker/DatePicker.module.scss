@@ -1,0 +1,207 @@
+@use '../../styles/variables' as *;
+
+:global {
+  @keyframes datepicker-in {
+    from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+    to   { opacity: 1; transform: none; }
+  }
+}
+
+/* â”€â”€ Trigger â”€â”€ */
+.trigger {
+  width: 100%;
+  min-height: $row-h;
+  padding: 0 $pad-x;
+  background: $bg-1;
+  border: 1.5px solid $line-2;
+  border-radius: $r-1;
+  color: $fg-0;
+  font-family: $font-sans;
+  font-size: $text-md;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  text-align: left;
+
+  &.open {
+    border-color: $accent;
+    box-shadow: 0 0 0 3px $accent-soft;
+  }
+
+  &.placeholder { color: $fg-3; }
+
+  .calIcon { color: $fg-3; flex-shrink: 0; transition: color 0.15s; }
+  &.open .calIcon { color: $accent; }
+}
+
+/* â”€â”€ Popover â”€â”€ */
+.popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 300;
+  background: $bg-1;
+  border: 1px solid $line-2;
+  border-radius: $r-2;
+  box-shadow: $shadow-3;
+  padding: 12px;
+  min-width: 280px;
+  animation: datepicker-in 0.16s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+  user-select: none;
+}
+
+/* â”€â”€ Header: month navigation â”€â”€ */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.monthLabel {
+  font-family: $font-serif;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  color: $fg-0;
+  flex: 1;
+  text-align: center;
+}
+
+.navBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+  flex-shrink: 0;
+
+  &:hover { background: $bg-2; border-color: $line-strong; }
+  &:active { transform: scale(0.94); }
+}
+
+/* â”€â”€ Weekday labels â”€â”€ */
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 4px;
+}
+
+.weekday {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: $font-mono;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: $fg-3;
+  padding: 4px 0;
+}
+
+/* â”€â”€ Day grid â”€â”€ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: $fg-0;
+  background: transparent;
+  border: none;
+  font-family: $font-sans;
+  transition: background 0.1s, color 0.1s;
+
+  &:hover:not(.selected):not(.disabled) { background: $bg-2; }
+
+  &.today:not(.selected) {
+    color: $accent;
+    font-weight: 700;
+    // subtle dot indicator
+    position: relative;
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 3px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: $accent;
+    }
+  }
+
+  &.selected {
+    background: $fg-0;
+    color: $bg-1;
+    font-weight: 600;
+  }
+
+  &.otherMonth { color: $fg-3; }
+
+  &.disabled {
+    color: $fg-3;
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+}
+
+/* â”€â”€ Footer: Today shortcut â”€â”€ */
+.footer {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid $line-1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.todayBtn {
+  font-size: 12px;
+  font-weight: 500;
+  color: $accent;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-family: $font-sans;
+  transition: background 0.12s;
+  &:hover { background: $accent-soft; }
+}
+
+.clearBtn {
+  font-size: 12px;
+  font-weight: 500;
+  color: $fg-2;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-family: $font-sans;
+  transition: background 0.12s;
+  &:hover { background: $bg-2; }
+}
+
+/* â”€â”€ Wrap for relative positioning â”€â”€ */
+.wrap { position: relative; }

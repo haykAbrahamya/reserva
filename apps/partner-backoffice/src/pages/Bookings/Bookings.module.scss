@@ -1,0 +1,130 @@
+@use 'variables' as *;
+
+.page { padding: 28px; animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both; }
+
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.h1   { font-family: $font-serif; font-size: 32px; letter-spacing: -0.022em; margin: 0 0 4px; }
+.sub  { font-size: 13px; color: $fg-2; margin: 0; }
+
+/* ── Status filter chips ── */
+.filters {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.filterChip {
+  flex-shrink: 0;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-1;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  font-family: $font-sans;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  &:hover  { background: $bg-2; border-color: $line-strong; }
+  &.active { background: $accent-soft; border-color: $accent; color: $fg-0; }
+}
+
+/* ── Desktop table ── */
+.tableWrap {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  box-shadow: $shadow-1;
+  overflow: hidden;
+}
+
+.clientInfo  { display: flex; align-items: center; gap: 10px; }
+.clientName  { font-size: 13px; font-weight: 500; }
+.clientPhone { font-size: 11px; color: $fg-2; }
+.svcName     { font-size: 13px; font-weight: 500; }
+.svcDur      { font-size: 11px; color: $fg-2; }
+.specialistName { font-size: 13px; }
+.price       { font-family: $font-mono; font-size: 13px; }
+
+/* ── Drawer ── */
+.drawerSection { margin-bottom: 20px; }
+.drawerLabel   { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: $fg-2; margin-bottom: 8px; }
+.drawerValue   { font-size: 14px; color: $fg-0; }
+.statusActions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ── Mobile card list ── */
+.cardList { display: flex; flex-direction: column; gap: 0; }
+
+.dateGroup { margin-bottom: 4px; }
+
+.dateHeader {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $fg-2;
+  padding: 12px 4px 6px;
+}
+
+.bookingCard {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  box-shadow: $shadow-1;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  &:active { background: $bg-2; }
+}
+
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.cardTime {
+  font-family: $font-serif;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: $fg-0;
+  line-height: 1.1;
+}
+
+.cardDate { font-size: 11px; color: $fg-2; margin-top: 1px; }
+
+.cardClient { font-size: 14px; font-weight: 500; color: $fg-0; margin-bottom: 3px; }
+.cardPhone  { font-size: 12px; color: $fg-2; }
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid $line-1;
+}
+
+.cardSvc  { font-size: 12px; color: $fg-1; font-weight: 500; }
+.cardSpec { font-size: 11px; color: $fg-2; margin-top: 1px; }
+.cardPrice { font-family: $font-mono; font-size: 12px; color: $fg-2; white-space: nowrap; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .page { padding: 16px; }
+  .h1   { font-size: 26px; }
+}

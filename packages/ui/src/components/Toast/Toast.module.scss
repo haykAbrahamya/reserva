@@ -1,0 +1,18 @@
+@use '../../styles/variables' as *;
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: $fg-0;
+  color: $bg-1;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: $shadow-2;
+  z-index: 2000;
+  animation: slide-up 0.3s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+  white-space: nowrap;
+}

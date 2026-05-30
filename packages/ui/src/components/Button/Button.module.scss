@@ -1,0 +1,87 @@
+@use '../../styles/variables' as *;
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: $font-sans;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s, transform .1s, box-shadow .15s;
+  user-select: none;
+  white-space: nowrap;
+  border: 1px solid;
+  text-decoration: none;
+
+  &:active { transform: translateY(1px); }
+
+  // Sizes
+  &.md {
+    height: $row-h;
+    padding: 0 $pad-x;
+    font-size: $text-md;
+    border-radius: $r-1;
+  }
+
+  &.sm {
+    height: 30px;
+    padding: 0 10px;
+    font-size: 12px;
+    border-radius: 5px;
+  }
+
+  // Icon-only (square)
+  &.icon {
+    &.md { width: $row-h; padding: 0; justify-content: center; }
+    &.sm { width: 30px; padding: 0; justify-content: center; }
+  }
+
+  // Variants
+  &.default {
+    background: $bg-1;
+    border-color: $line-2;
+    color: $fg-0;
+    box-shadow: $shadow-1;
+    &:hover { background: $bg-2; border-color: $line-strong; }
+  }
+
+  &.primary {
+    background: $fg-0;
+    border-color: $fg-0;
+    color: $bg-1;
+    &:hover { background: $fg-1; border-color: $fg-1; }
+  }
+
+  &.accent {
+    background: $accent;
+    border-color: $accent;
+    color: #fff;
+    &:hover { background: $accent-strong; border-color: $accent-strong; }
+  }
+
+  &.ghost {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    color: $fg-2;
+    &:hover {
+      background: $bg-3;
+      color: $fg-0;
+      border-color: $line-2;
+    }
+  }
+
+  // Icon-only ghost buttons get a stronger, more obvious hover affordance
+  &.ghost.icon:hover {
+    background: $accent-soft;
+    color: $accent;
+    border-color: rgba(168, 120, 75, 0.22);
+  }
+
+  &.danger {
+    background: transparent;
+    border-color: $danger-soft;
+    color: $danger;
+    &:hover { background: $danger-soft; border-color: $danger; }
+  }
+}

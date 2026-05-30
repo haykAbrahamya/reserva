@@ -1,0 +1,54 @@
+// SCSS aliases for CSS custom properties
+// Use these in .module.scss files so editors get autocomplete;
+// the actual values live in tokens.css and are resolved at runtime.
+
+$bg-0: var(--bg-0);
+$bg-1: var(--bg-1);
+$bg-2: var(--bg-2);
+$bg-3: var(--bg-3);
+$bg-4: var(--bg-4);
+
+$fg-0: var(--fg-0);
+$fg-1: var(--fg-1);
+$fg-2: var(--fg-2);
+$fg-3: var(--fg-3);
+$fg-on-accent: var(--fg-on-accent);
+
+$line-1: var(--line-1);
+$line-2: var(--line-2);
+$line-strong: var(--line-strong);
+
+$accent: var(--accent);
+$accent-soft: var(--accent-soft);
+$accent-strong: var(--accent-strong);
+
+$success: var(--success);
+$success-soft: var(--success-soft);
+$warn: var(--warn);
+$warn-soft: var(--warn-soft);
+$danger: var(--danger);
+$danger-soft: var(--danger-soft);
+$info: var(--info);
+$info-soft: var(--info-soft);
+
+$r-1: var(--r-1);
+$r-2: var(--r-2);
+$r-3: var(--r-3);
+$shadow-1: var(--shadow-1);
+$shadow-2: var(--shadow-2);
+$shadow-3: var(--shadow-3);
+
+$font-sans: var(--font-sans);
+$font-serif: var(--font-serif);
+$font-mono: var(--font-mono);
+
+$row-h: var(--row-h);
+$pad-x: var(--pad-x);
+$pad-y: var(--pad-y);
+$text-sm: var(--text-sm);
+$text-md: var(--text-md);
+$text-lg: var(--text-lg);
+
+$sidebar-w: var(--sidebar-w);
+$sidebar-w-col: var(--sidebar-w-col);
+$topbar-h: var(--topbar-h);

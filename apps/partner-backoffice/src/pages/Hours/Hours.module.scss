@@ -1,0 +1,178 @@
+@use 'variables' as *;
+
+.page { padding: 28px; animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both; }
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.h1   { font-family: $font-serif; font-size: 32px; letter-spacing: -0.022em; margin: 0 0 4px; }
+.sub  { font-size: 13px; color: $fg-2; margin: 0; }
+
+/* ── Two-col layout ── */
+.layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+/* ── Specialist list (left) ── */
+.spList {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  box-shadow: $shadow-1;
+  overflow: hidden;
+}
+
+.spListTitle {
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $fg-2;
+  border-bottom: 1px solid $line-1;
+}
+
+.spItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid $line-1;
+  transition: background 0.12s;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: $bg-2; }
+
+  &.active {
+    background: $accent-soft;
+    border-right: 2px solid $accent;
+  }
+}
+
+.spMeta {
+  flex: 1;
+  min-width: 0;
+}
+.spName  { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.spTitle { font-size: 11px; color: $fg-2; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.spStatus {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  &.active { background: $success; }
+  &.inactive { background: $fg-3; }
+}
+
+/* ── Schedule panel (right) ── */
+.schedulePanel {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  box-shadow: $shadow-1;
+  // No overflow:hidden — it would clip the TimePicker dropdown.
+}
+
+.scheduleHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid $line-1;
+  border-radius: $r-2 $r-2 0 0;
+}
+
+.scheduleTitle { font-family: $font-serif; font-size: 18px; letter-spacing: -0.01em; }
+.scheduleSub   { font-size: 12px; color: $fg-2; margin-top: 2px; }
+
+/* ── Day rows ── */
+.dayRow {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid $line-1;
+  transition: background 0.1s;
+
+  &:last-child { border-bottom: none; border-radius: 0 0 $r-2 $r-2; }
+  &:hover { background: $bg-4; }
+  &.disabled { opacity: 0.45; }
+}
+
+.dayLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: $fg-0;
+  width: 44px;
+}
+
+.timeInputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;     // allow the time block to shrink instead of overflowing
+}
+
+.timeInput {
+  width: 104px;
+  height: 34px;
+  padding: 0 8px 0 10px;
+  font-size: 13px;
+  font-family: $font-mono;
+  background: $bg-0;
+  border: 1px solid $line-2;
+  border-radius: $r-1;
+  color: $fg-0;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  cursor: pointer;
+
+  /* Native clock-picker indicator — tint it to match theme so it stays visible */
+  &::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.55;
+    transition: opacity 0.15s;
+  }
+  &:hover::-webkit-calendar-picker-indicator { opacity: 0.85; }
+
+  &:focus {
+    border-color: $accent;
+    box-shadow: 0 0 0 3px $accent-soft;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: $bg-2;
+  }
+}
+
+.timeSep {
+  font-size: 14px;
+  color: $fg-3;
+  font-weight: 300;
+}
+
+.emptyPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  color: $fg-2;
+}
+.emptyIcon  { color: $fg-3; margin-bottom: 12px; }
+.emptyTitle { font-family: $font-serif; font-size: 20px; color: $fg-0; margin-bottom: 6px; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .page { padding: 16px; }
+  .h1 { font-size: 24px; }
+  .layout { grid-template-columns: 1fr; }
+  .dayRow { gap: 10px; padding: 12px 14px; }
+  .timeInputs { gap: 6px; }
+}

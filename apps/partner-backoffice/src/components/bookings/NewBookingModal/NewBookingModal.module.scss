@@ -1,0 +1,44 @@
+@use 'variables' as *;
+
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.full { grid-column: span 2; }
+
+.slotGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.slot {
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $r-1;
+  font-size: 12px;
+  font-family: $font-mono;
+  font-weight: 500;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-1;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+
+  &:hover:not(.busy):not(.selected) { background: $bg-2; border-color: $line-strong; }
+  &.selected { background: $accent; border-color: $accent; color: white; }
+  &.busy { background: $bg-2; color: $fg-3; cursor: not-allowed; text-decoration: line-through; }
+}
+
+.infoBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: $bg-4;
+  border: 1px solid $line-1;
+  border-radius: 8px;
+  font-size: 12px;
+  color: $fg-1;
+  margin-top: 4px;
+}

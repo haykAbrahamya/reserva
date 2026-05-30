@@ -1,0 +1,108 @@
+@use 'variables' as *;
+
+.page { padding: 28px; animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both; }
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.h1   { font-family: $font-serif; font-size: 32px; letter-spacing: -0.022em; margin: 0 0 4px; }
+.sub  { font-size: 13px; color: $fg-2; margin: 0; }
+
+/* ── Desktop table ── */
+.tableWrap {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  box-shadow: $shadow-1;
+  overflow: hidden;
+}
+
+.svcName  { font-size: 13px; font-weight: 500; }
+.category {
+  display: inline-block;
+  font-size: 11px; font-weight: 500;
+  padding: 2px 8px; border-radius: 999px;
+  background: $bg-2; color: $fg-1;
+}
+.price    { font-family: $font-mono; font-size: 13px; font-weight: 500; }
+.duration { font-size: 13px; color: $fg-2; }
+
+/* ── Mobile: category group + cards ── */
+.groupList { display: flex; flex-direction: column; gap: 20px; }
+
+.groupLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: $fg-3;
+  padding: 0 2px;
+  margin-bottom: 8px;
+}
+
+.cardList { display: flex; flex-direction: column; gap: 1px; }
+
+.svcCard {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: 0;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: background 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+
+  // round top/bottom of group
+  &:first-child { border-radius: $r-2 $r-2 0 0; }
+  &:last-child  { border-radius: 0 0 $r-2 $r-2; border-bottom: 1px solid $line-1; }
+  &:first-child:last-child { border-radius: $r-2; }
+  &:not(:last-child) { border-bottom: none; }
+
+  &:active { background: $bg-2; }
+  box-shadow: $shadow-1;
+}
+
+.svcIconWrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: $accent-soft;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: $accent;
+}
+
+.svcCardBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.svcCardName  { font-size: 14px; font-weight: 500; color: $fg-0; }
+.svcCardMeta  { font-size: 12px; color: $fg-2; margin-top: 2px; }
+
+.svcCardRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.svcCardPrice {
+  font-family: $font-mono;
+  font-size: 14px;
+  font-weight: 600;
+  color: $fg-0;
+}
+
+/* ── Form ── */
+.formGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.formFull { grid-column: span 2; }
+
+@media (max-width: 768px) {
+  .page { padding: 16px; }
+  .h1   { font-size: 26px; }
+  .formGrid { grid-template-columns: 1fr; }
+  .formFull { grid-column: span 1; }
+}

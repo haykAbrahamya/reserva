@@ -1,0 +1,96 @@
+@use '../../styles/variables' as *;
+
+:global {
+  @keyframes timepicker-in {
+    from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+    to   { opacity: 1; transform: none; }
+  }
+}
+
+.wrap { position: relative; flex: 1; min-width: 0; }
+
+.trigger {
+  display: flex;
+  width: 100%;
+  min-width: 72px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  height: 34px;
+  padding: 0 10px;
+  background: $bg-0;
+  border: 1px solid $line-2;
+  border-radius: $r-1;
+  color: $fg-0;
+  font-family: $font-mono;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+
+  &:hover { border-color: $line-strong; }
+
+  &.open {
+    border-color: $accent;
+    box-shadow: 0 0 0 3px $accent-soft;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: $bg-2;
+  }
+
+  .val   { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .clock { color: $fg-3; flex-shrink: 0; }
+  &.open .clock { color: $accent; }
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 300;
+  width: 130px;
+  max-height: 240px;
+  overflow-y: auto;
+  background: $bg-1;
+  border: 1px solid $line-2;
+  border-radius: $r-2;
+  box-shadow: $shadow-3;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: timepicker-in 0.16s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: $font-mono;
+  font-size: 13px;
+  color: $fg-1;
+  transition: background 0.1s, color 0.1s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover { background: $bg-2; }
+
+  &.selected {
+    background: $accent-soft;
+    color: $accent-strong;
+    font-weight: 600;
+  }
+  &.selected:hover { background: $accent-soft; }
+
+  .check { color: $accent; flex-shrink: 0; }
+}
+
+/* Open the dropdown above the trigger when near the bottom */
+.dropdown.up {
+  top: auto;
+  bottom: calc(100% + 4px);
+}

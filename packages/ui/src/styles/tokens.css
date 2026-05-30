@@ -1,0 +1,258 @@
+/* ============================================================
+   Reserva Backoffice — Design Tokens
+   Calm warm-neutral chrome + Fraunces editorial serif accents
+   ============================================================ */
+
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  /* Surfaces */
+  --bg-0: #FAFAF7;
+  --bg-1: #FFFFFF;
+  --bg-2: #F2F0EA;
+  --bg-3: #E8E5DD;
+  --bg-4: #FBF8F0;
+
+  /* Ink */
+  --fg-0: #14110E;
+  --fg-1: #3F3A33;
+  --fg-2: #6E665B;
+  --fg-3: #9C9484;
+  --fg-on-accent: #FFFFFF;
+
+  /* Lines */
+  --line-1: rgba(20, 17, 14, 0.08);
+  --line-2: rgba(20, 17, 14, 0.16);
+  --line-strong: rgba(20, 17, 14, 0.34);
+
+  /* Accent — overridden per tenant */
+  --accent: #A8784B;
+  --accent-soft: rgba(168, 120, 75, 0.12);
+  --accent-strong: #6B4A2A;
+
+  /* Semantic */
+  --success: #4F7A4A;
+  --success-soft: rgba(79, 122, 74, 0.12);
+  --warn: #C9883B;
+  --warn-soft: rgba(201, 136, 59, 0.12);
+  --danger: #B0413D;
+  --danger-soft: rgba(176, 65, 61, 0.12);
+  --info: #4A6B8A;
+  --info-soft: rgba(74, 107, 138, 0.12);
+
+  /* Shape */
+  --r-1: 6px;
+  --r-2: 10px;
+  --r-3: 14px;
+  --shadow-1: 0 1px 0 rgba(20,17,14,.04), 0 1px 2px rgba(20,17,14,.04);
+  --shadow-2: 0 4px 16px rgba(20,17,14,.06), 0 1px 0 rgba(20,17,14,.04);
+  --shadow-3: 0 24px 60px rgba(20,17,14,.18), 0 8px 18px rgba(20,17,14,.08);
+
+  /* Typography */
+  --font-sans: "Geist", "Inter", -apple-system, sans-serif;
+  --font-serif: "Fraunces", Georgia, serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+
+  /* Density */
+  --row-h: 44px;
+  --pad-x: 14px;
+  --pad-y: 10px;
+  --text-sm: 13px;
+  --text-md: 14px;
+  --text-lg: 16px;
+
+  /* Layout */
+  --sidebar-w: 240px;
+  --sidebar-w-col: 64px;
+  --topbar-h: 56px;
+
+  /* Overlay / scrim behind modals, drawers, sheets */
+  --scrim: rgba(20, 17, 14, 0.36);
+  --scrim-soft: rgba(20, 17, 14, 0.28);
+
+  /* Decorative grid texture line (hero/login panels) */
+  --grid-line: rgba(20, 17, 14, 0.045);
+
+  /* Scrollbar */
+  --scroll-thumb: #C9C4BC;
+  --scroll-thumb-hover: #9E9890;
+}
+
+[data-density="compact"] {
+  --row-h: 36px; --pad-x: 10px; --pad-y: 6px;
+  --text-sm: 12px; --text-md: 13px; --text-lg: 14px;
+}
+[data-density="comfy"] {
+  --row-h: 56px; --pad-x: 18px; --pad-y: 14px;
+  --text-sm: 14px; --text-md: 15px; --text-lg: 17px;
+}
+
+[data-theme="dark"] {
+  /* Surfaces — warm charcoal, subtle step-up between layers */
+  --bg-0: #121110;   /* page */
+  --bg-1: #1A1816;   /* cards / panels */
+  --bg-2: #211E1B;   /* muted slabs / hover */
+  --bg-3: #2B2823;   /* stronger hover / chips */
+  --bg-4: #211D18;   /* warm highlight tint */
+
+  /* Ink — soft warm whites, never pure */
+  --fg-0: #F3EFE7;   /* primary */
+  --fg-1: #CFC8BB;   /* strong secondary */
+  --fg-2: #968D7F;   /* muted */
+  --fg-3: #6A6358;   /* tertiary / disabled */
+  --fg-on-accent: #FFFFFF;
+
+  /* Lines */
+  --line-1: rgba(243, 239, 231, 0.08);
+  --line-2: rgba(243, 239, 231, 0.15);
+  --line-strong: rgba(243, 239, 231, 0.32);
+
+  /* Accent — slightly brighter so it pops on dark */
+  --accent: #C0915F;
+  --accent-soft: rgba(192, 145, 95, 0.16);
+  --accent-strong: #D6A972;
+
+  /* Semantic — lifted for legibility on dark */
+  --success: #74A86E;
+  --success-soft: rgba(116, 168, 110, 0.16);
+  --warn: #DBA052;
+  --warn-soft: rgba(219, 160, 82, 0.16);
+  --danger: #D2615C;
+  --danger-soft: rgba(210, 97, 92, 0.16);
+  --info: #6E97BD;
+  --info-soft: rgba(110, 151, 189, 0.16);
+
+  /* Shadows — deeper, no light bleed */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-2: 0 4px 16px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(0, 0, 0, 0.4);
+  --shadow-3: 0 24px 60px rgba(0, 0, 0, 0.6), 0 8px 18px rgba(0, 0, 0, 0.5);
+
+  /* Overlay / scrim — darker on dark */
+  --scrim: rgba(0, 0, 0, 0.6);
+  --scrim-soft: rgba(0, 0, 0, 0.5);
+
+  /* Decorative grid texture — light lines on dark */
+  --grid-line: rgba(243, 239, 231, 0.05);
+
+  /* Scrollbar */
+  --scroll-thumb: #3A352F;
+  --scroll-thumb-hover: #524C44;
+}
+
+/* Per-tenant accent in dark mode — brighten the brand hues */
+[data-theme="dark"][data-brand="antheris"]  { --accent:#C0915F; --accent-soft:rgba(192,145,95,.16);  --accent-strong:#D6A972; }
+[data-theme="dark"][data-brand="barberbro"] { --accent:#5C8A6E; --accent-soft:rgba(92,138,110,.16);   --accent-strong:#79A98C; }
+[data-theme="dark"][data-brand="lume"]      { --accent:#C99AA5; --accent-soft:rgba(201,154,165,.16); --accent-strong:#DBB4BD; }
+
+/* Tenant accent presets */
+[data-brand="antheris"]  { --accent:#A8784B; --accent-soft:rgba(168,120,75,.12);  --accent-strong:#6B4A2A; }
+[data-brand="barberbro"] { --accent:#2F4A3A; --accent-soft:rgba(47,74,58,.12);    --accent-strong:#1E3225; }
+[data-brand="lume"]      { --accent:#B07683; --accent-soft:rgba(176,118,131,.12); --accent-strong:#7A4A55; }
+
+/* ---- Reset & base ---- */
+html, body, #root { height: 100%; margin: 0; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-0);
+  color: var(--fg-0);
+  font-size: var(--text-md);
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01","cv11","tnum";
+  transition: background-color 0.45s ease, color 0.45s ease;
+}
+
+/* ── Animated theme switch ────────────────────────────────
+   While the `.theme-transitioning` class is on <html> (added
+   briefly in JS on toggle), every element eases its color-bearing
+   properties so the whole UI cross-fades between light & dark.
+   It's removed afterwards so normal hovers/interactions stay snappy. */
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition:
+    background-color 0.45s ease,
+    border-color 0.45s ease,
+    color 0.45s ease,
+    fill 0.45s ease,
+    stroke 0.45s ease,
+    box-shadow 0.45s ease !important;
+  transition-delay: 0s !important;
+}
+
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+input, textarea, select { font-family: inherit; }
+
+*:focus { outline: none; }
+*:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+/* Native date/time picker indicator — invert in dark so the clock icon stays visible */
+[data-theme="dark"] ::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(0.85);
+}
+
+/* ── Scrollbar — cross-browser ── */
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #C9C4BC transparent;
+}
+[data-theme="dark"] * {
+  scrollbar-color: #3E3A35 transparent;
+}
+
+/* Chrome / Edge / Safari — must use hard-coded colors, CSS vars don't work reliably here */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #C9C4BC;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #9E9890;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Dark mode override */
+[data-theme="dark"] ::-webkit-scrollbar-thumb       { background-color: #4A4540; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background-color: #625D57; }
+
+/* ---- Global animation keyframes (referenced from modules + inline styles) ---- */
+@keyframes fade-in    { from { opacity: 0 }                                         to { opacity: 1 } }
+@keyframes fade-out   { from { opacity: 1 }                                         to { opacity: 0 } }
+@keyframes rise       { from { transform: translateY(8px);  opacity: 0 }            to { transform: none; opacity: 1 } }
+@keyframes slide-up   { from { transform: translateY(10px); opacity: 0 }            to { transform: none; opacity: 1 } }
+@keyframes slide-in-r { from { transform: translateX(22px); opacity: 0 }            to { transform: none; opacity: 1 } }
+@keyframes pop        { from { transform: translateY(-4px) scale(.98); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes bo-spin    { from { transform: rotate(-90deg) }                          to { transform: rotate(270deg) } }
+/* Modal / sheet specific */
+@keyframes overlay-in { from { opacity: 0 }                                         to { opacity: 1 } }
+@keyframes modal-in   { from { opacity: 0; transform: scale(0.96) translateY(8px) } to { opacity: 1; transform: none } }
+@keyframes drawer-in  { from { opacity: 0; transform: translateX(24px) }            to { opacity: 1; transform: none } }
+@keyframes sheet-in   { from { transform: translateY(100%) }   to { transform: translateY(0) } }
+@keyframes sheet-up   { from { transform: translateY(100%) }   to { transform: translateY(0) } }
+@keyframes sheet-out  { from { transform: translateY(0) }      to { transform: translateY(100%) } }
+/* Full-slide drawer (smooth, off-screen → in) */
+@keyframes drawer-slide-in { from { transform: translateX(100%) } to { transform: translateX(0) } }
+@keyframes overlay-out { from { opacity: 1 }                   to { opacity: 0 } }
+@keyframes modal-out  { from { opacity:1; transform: none }    to { opacity:0; transform: scale(0.96) translateY(8px) } }
+@keyframes drawer-out { from { opacity:1; transform: none }    to { opacity:0; transform: translateX(24px) } }

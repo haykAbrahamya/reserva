@@ -1,0 +1,28 @@
+@use 'variables' as *;
+
+.root {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: $bg-0;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ── Mobile: hide sidebar, show bottom tab bar ── */
+@media (max-width: 768px) {
+  .content {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 8px));
+  }
+}

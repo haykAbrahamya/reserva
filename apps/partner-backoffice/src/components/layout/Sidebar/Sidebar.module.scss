@@ -1,0 +1,182 @@
+@use 'variables' as *;
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  background: $bg-2;
+  border-right: 1px solid $line-1;
+  width: $sidebar-w;
+  transition: width 0.2s ease;
+  overflow: hidden;
+  position: relative;
+  z-index: 20;
+
+  &.collapsed { width: $sidebar-w-col; }
+}
+
+/* ── Logo / brand ── */
+.logo {
+  height: $topbar-h;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid $line-1;
+  flex-shrink: 0;
+}
+
+.logoIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: $accent;
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: $font-serif;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+  font-weight: 300;
+}
+
+.logoText {
+  min-width: 0;
+  .name {
+    font-family: $font-serif;
+    font-size: 15px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: $fg-0;
+  }
+  .tag {
+    font-family: $font-mono;
+    font-size: 9px;
+    color: $fg-2;
+    margin-top: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+}
+
+/* ── Partner info strip ── */
+.partnerStrip {
+  padding: 10px 12px;
+  border-bottom: 1px solid $line-1;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.partnerDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $success;
+  flex-shrink: 0;
+}
+
+.partnerName {
+  font-size: 12px;
+  font-weight: 500;
+  color: $fg-1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Nav ── */
+.nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+
+.section {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $fg-3;
+  font-weight: 600;
+  padding: 16px 16px 6px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  margin: 1px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: $fg-1;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  background: none;
+  border: none;
+  font-family: $font-sans;
+  width: calc(100% - 16px);
+
+  &:hover { background: $bg-3; color: $fg-0; }
+
+  &.active {
+    background: $bg-1;
+    color: $fg-0;
+    box-shadow: $shadow-1;
+    .icon { color: $accent; }
+  }
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: $fg-2;
+}
+
+.navItem.active .icon { color: $accent; }
+
+/* ── Collapse button at bottom ── */
+.bottom {
+  padding: 8px;
+  border-top: 1px solid $line-1;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.collapseBtn {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background: $bg-1;
+  border: 1px solid $line-2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: $fg-2;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  box-shadow: $shadow-1;
+  flex-shrink: 0;
+
+  &:hover {
+    background: $bg-3;
+    border-color: $line-strong;
+    color: $fg-0;
+  }
+}
+
+/* ── Mobile: hide sidebar entirely — bottom tab bar used instead ── */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+}

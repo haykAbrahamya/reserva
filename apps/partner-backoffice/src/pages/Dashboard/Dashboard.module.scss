@@ -1,0 +1,141 @@
+@use 'variables' as *;
+
+.page {
+  padding: 28px;
+  max-width: 1480px;
+  animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.h1 {
+  font-family: $font-serif;
+  font-size: 32px;
+  line-height: 1.1;
+  letter-spacing: -0.022em;
+  margin: 0 0 4px;
+  em { font-style: italic; color: $accent; }
+}
+
+.sub { font-size: 13px; color: $fg-2; margin: 0; }
+
+.headActions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ── KPI grid ── */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.kpi {
+  padding: 18px 20px;
+  .label { font-size: 11px; font-weight: 600; color: $fg-2; text-transform: uppercase; letter-spacing: 0.06em; }
+  .num   { font-family: $font-serif; font-size: 40px; line-height: 1.05; margin-top: 6px; letter-spacing: -0.02em; }
+  .delta { font-size: 12px; color: $fg-2; margin-top: 4px; }
+  .delta.negative { color: $danger; }
+}
+
+/* ── Two-col layout ── */
+.twoCol {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 16px;
+}
+
+.rightCol { display: flex; flex-direction: column; gap: 16px; }
+
+/* ── Booking rows ── */
+.bookingRow {
+  display: grid;
+  grid-template-columns: 64px 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s;
+  min-width: 0;
+  &:hover { background: $bg-2; }
+  &.compact { padding: 8px 12px; }
+}
+
+.time {
+  font-family: $font-serif;
+  font-size: 18px;
+  flex-shrink: 0;
+  &.compact { font-size: 15px; }
+}
+
+.clientName { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.clientSub  { font-size: 11px; color: $fg-2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.price      { font-family: $font-mono; font-size: 12px; color: $fg-2; white-space: nowrap; flex-shrink: 0; }
+
+/* ── Occupancy block ── */
+.occupancy {
+  padding: 20px 18px;
+  .occNum    { font-family: $font-serif; font-size: 44px; line-height: 1; letter-spacing: -0.02em; }
+  .occSuffix { font-size: 22px; color: $fg-2; }
+  .occLabel  { font-size: 12px; color: $fg-2; }
+  .bar       { height: 6px; background: $bg-2; border-radius: 999px; overflow: hidden; margin: 12px 0; }
+  .barFill   { height: 100%; background: $accent; border-radius: 999px; transition: width 0.5s; }
+  .staff     { display: flex; justify-content: space-around; gap: 8px; }
+  .staffMember {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: $fg-2;
+    max-width: 52px;
+    min-width: 0;
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
+      text-align: center;
+    }
+  }
+}
+
+.emptyDay {
+  padding: 40px 20px;
+  text-align: center;
+  color: $fg-2;
+  .emptyIcon  { color: $fg-3; display: block; margin: 0 auto 8px; }
+  .emptyTitle { font-family: $font-serif; font-size: 18px; color: $fg-0; margin-bottom: 4px; }
+}
+
+/* ── 900px: 2-col KPIs, single-col layout ── */
+@media (max-width: 900px) {
+  .kpiGrid { grid-template-columns: 1fr 1fr; }
+  .twoCol  { grid-template-columns: 1fr; }
+}
+
+/* ── 600px: tighter padding, smaller type ── */
+@media (max-width: 600px) {
+  .page       { padding: 16px; }
+  .h1         { font-size: 26px; }
+  .kpiGrid    { gap: 8px; }
+  .kpi        { padding: 14px 16px; }
+  .kpi .num   { font-size: 32px; }
+}
+
+/* ── 420px: single-col KPIs, strip rows down ── */
+@media (max-width: 420px) {
+  .kpiGrid    { grid-template-columns: 1fr 1fr; }
+  .kpi .num   { font-size: 28px; }
+  .bookingRow { grid-template-columns: 48px 1fr auto; gap: 8px; }
+  .time       { font-size: 15px; }
+  .price      { display: none; }
+  .headActions button:first-child { display: none; } /* hide "Open calendar" on tiny screens */
+}

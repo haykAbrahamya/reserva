@@ -1,0 +1,30 @@
+@use '../../styles/variables' as *;
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+
+  .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+}
+
+.confirmed { color: $success; background: $success-soft; }
+.pending   { color: $warn;    background: $warn-soft; }
+.cancelled { color: $danger;  background: $danger-soft; }
+.completed { color: $info;    background: $info-soft; }
+.noshow    { color: $fg-2;    background: $bg-3; }
+.active    { color: $success; background: $success-soft; }
+.inactive  { color: $fg-2;    background: $bg-3; }

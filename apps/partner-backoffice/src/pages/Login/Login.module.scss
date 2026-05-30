@@ -1,0 +1,373 @@
+@use 'variables' as *;
+
+/* ── Full page layout ── */
+.page {
+  min-height: 100vh;
+  display: flex;
+  background: $bg-0;
+}
+
+/* ── Left panel — brand / illustration (desktop only) ── */
+.panel {
+  display: none;
+
+  @media (min-width: 900px) {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 420px;
+    flex-shrink: 0;
+    background: $bg-4;
+    border-right: 1px solid $line-1;
+    color: $fg-0;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+}
+
+.panelLogo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+.panelLogoMark {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: $accent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: $shadow-2;
+}
+
+.panelLogoName {
+  font-family: $font-serif;
+  font-size: 22px;
+  letter-spacing: -0.015em;
+  color: $fg-0;
+  line-height: 1;
+}
+
+.panelLogoTag {
+  font-family: $font-mono;
+  font-size: 9px;
+  color: $fg-3;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 3px;
+}
+
+.panelQuote {
+  font-family: $font-serif;
+  font-size: 28px;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  color: $fg-0;
+  margin-bottom: 8px;
+  position: relative;
+
+  em { font-style: italic; color: $accent; }
+}
+
+.panelBy {
+  font-size: 12px;
+  color: $fg-2;
+  position: relative;
+}
+
+/* ── Feature highlights ── */
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.featureIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  box-shadow: $shadow-1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: $accent;
+}
+
+.featureTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: $fg-0;
+  line-height: 1.2;
+}
+
+.featureDesc {
+  font-size: 12px;
+  color: $fg-2;
+  margin-top: 2px;
+}
+
+/* Background grid decoration — ink lines on light bg */
+.panelGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+/* Accent orb */
+.panelOrb {
+  position: absolute;
+  top: -120px;
+  right: -80px;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168,120,75,0.16) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── Right / main area ── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  position: relative;
+}
+
+/* Mobile-only logo (shown when left panel is hidden) */
+.mobileLogo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 40px;
+
+  @media (min-width: 900px) { display: none; }
+}
+
+.mobileLogoMark {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: $accent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: $shadow-2;
+}
+
+.mobileLogoName {
+  font-family: $font-serif;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+  color: $fg-0;
+  line-height: 1;
+}
+
+.mobileLogoTag {
+  font-family: $font-mono;
+  font-size: 10px;
+  color: $fg-3;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Form column (open, no card) ── */
+.card {
+  width: 100%;
+  max-width: 380px;
+  animation: rise 0.4s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+}
+
+.heading {
+  margin-bottom: 28px;
+}
+
+.title {
+  font-family: $font-serif;
+  font-size: 30px;
+  letter-spacing: -0.022em;
+  color: $fg-0;
+  margin: 0 0 6px;
+  line-height: 1.1;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: $fg-2;
+  margin: 0;
+}
+
+/* ── Form fields ── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: $fg-1;
+}
+
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  height: 46px;
+  padding: 0 44px 0 14px;
+  background: $bg-1;
+  border: 1.5px solid $line-2;
+  border-radius: $r-2;
+  color: $fg-0;
+  font-family: $font-sans;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+
+  &::placeholder { color: $fg-3; }
+
+  &:focus {
+    border-color: $accent;
+    box-shadow: 0 0 0 4px $accent-soft;
+  }
+
+  &.hasError {
+    border-color: $danger;
+    &:focus { box-shadow: 0 0 0 4px $danger-soft; }
+  }
+}
+
+.inputIcon {
+  position: absolute;
+  right: 14px;
+  color: $fg-3;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.eyeBtn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $fg-3;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.15s;
+  pointer-events: all;
+  &:hover { color: $fg-1; }
+}
+
+/* ── Field error message ── */
+.fieldError {
+  font-size: 12px;
+  color: $danger;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ── General error banner ── */
+.errorBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: $danger-soft;
+  border: 1px solid rgba(176, 65, 61, 0.2);
+  border-radius: $r-2;
+  color: $danger;
+  font-size: 13px;
+  animation: rise 0.2s ease both;
+}
+
+/* ── Submit button ── */
+.submit {
+  height: 46px;
+  width: 100%;
+  border-radius: $r-2;
+  border: none;
+  background: $accent;
+  color: #fff;
+  font-family: $font-sans;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+  box-shadow: 0 1px 2px rgba(168,120,75,.18), 0 4px 14px rgba(168,120,75,.22);
+
+  &:hover:not(:disabled) {
+    background: $accent-strong;
+    box-shadow: 0 6px 20px rgba(168,120,75,.3);
+  }
+
+  &:active:not(:disabled) { transform: translateY(1px); }
+
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  &.loading {
+    background: $accent-strong;
+    cursor: wait;
+  }
+}
+
+/* Spinner inside button */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: bo-spin 0.7s linear infinite;
+}
+
+/* ── Footer ── */
+.footer {
+  position: absolute;
+  bottom: 24px;
+  font-size: 11px;
+  color: $fg-3;
+  text-align: center;
+}

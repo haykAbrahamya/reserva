@@ -1,0 +1,32 @@
+@use '../../styles/variables' as *;
+
+.card {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  box-shadow: $shadow-1;
+
+  &.pad { padding: 20px; }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-bottom: 1px solid $line-1;
+}
+
+.title {
+  font-family: $font-serif;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.sub {
+  font-size: 12px;
+  color: $fg-2;
+  margin-top: 2px;
+}

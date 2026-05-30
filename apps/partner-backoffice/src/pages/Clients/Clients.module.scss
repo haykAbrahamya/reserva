@@ -1,0 +1,108 @@
+@use 'variables' as *;
+
+.page { padding: 28px; animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both; }
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.h1   { font-family: $font-serif; font-size: 32px; letter-spacing: -0.022em; margin: 0 0 4px; }
+.sub  { font-size: 13px; color: $fg-2; margin: 0; }
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  background: $bg-1;
+  border: 1px solid $line-2;
+  border-radius: $r-1;
+  min-width: 240px;
+  box-shadow: $shadow-1;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  font-family: $font-sans;
+  font-size: 13px;
+  color: $fg-0;
+
+  input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: $font-sans;
+    font-size: 13px;
+    color: $fg-0;
+    flex: 1;
+    &::placeholder { color: $fg-3; }
+  }
+
+  &:focus-within {
+    border-color: $accent;
+    box-shadow: 0 0 0 3px $accent-soft;
+  }
+}
+
+/* ── Desktop table ── */
+.tableWrap {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  box-shadow: $shadow-1;
+  overflow: hidden;
+}
+
+.clientInfo  { display: flex; align-items: center; gap: 10px; }
+.clientName  { font-size: 13px; font-weight: 500; }
+.clientPhone { font-size: 11px; color: $fg-2; margin-top: 1px; }
+.stat        { font-family: $font-mono; font-size: 13px; }
+.statSub     { font-size: 11px; color: $fg-2; }
+.lastDate    { font-size: 13px; color: $fg-1; white-space: nowrap; }
+
+/* ── Mobile card list ── */
+.cardList { display: flex; flex-direction: column; gap: 8px; }
+
+.clientCard {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  padding: 14px 16px;
+  box-shadow: $shadow-1;
+  cursor: pointer;
+  transition: background 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  &:active { background: $bg-2; }
+}
+
+.cardRow { display: flex; align-items: center; gap: 12px; }
+.cardMeta { flex: 1; min-width: 0; }
+.cardName  { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cardPhone { font-size: 12px; color: $fg-2; margin-top: 1px; }
+.cardStats {
+  display: flex;
+  gap: 16px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid $line-1;
+}
+.cardStat { text-align: center; }
+.cardStatVal { font-family: $font-mono; font-size: 14px; font-weight: 500; color: $fg-0; }
+.cardStatLabel { font-size: 10px; color: $fg-2; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 1px; }
+
+/* ── Detail drawer ── */
+.drawerSection { padding: 16px 0; border-bottom: 1px solid $line-1; &:last-child { border-bottom: none; } }
+.drawerLabel   { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: $fg-2; margin-bottom: 8px; }
+.drawerValue   { font-size: 14px; color: $fg-0; }
+
+.historyRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid $line-1;
+  &:last-child { border-bottom: none; }
+}
+.histTime { font-family: $font-serif; font-size: 14px; color: $fg-0; min-width: 80px; }
+.histName { font-size: 13px; font-weight: 500; }
+.histSub  { font-size: 11px; color: $fg-2; }
+
+@media (max-width: 768px) {
+  .page { padding: 16px; }
+  .h1   { font-size: 26px; }
+  .search { min-width: 0; flex: 1; }
+}

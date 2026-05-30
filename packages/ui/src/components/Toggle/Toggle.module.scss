@@ -1,0 +1,49 @@
+@use '../../styles/variables' as *;
+
+.toggle {
+  position: relative;
+  width: 32px;
+  height: 18px;
+  border-radius: 999px;
+  background: $line-2;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background .2s;
+  border: none;
+  padding: 0;
+
+  &.on { background: $accent; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: $bg-1;
+    box-shadow: $shadow-1;
+    transition: left .2s;
+  }
+
+  &.on .knob { left: 16px; }
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1px solid $line-2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+  background: $bg-1;
+  padding: 0;
+
+  &.on { background: $accent; border-color: $accent; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}

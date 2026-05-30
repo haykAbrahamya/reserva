@@ -1,0 +1,3 @@
+/* Entry for the Reserva design system. Import once per app:
+   import '@reserva/ui/styles'  */
+@import './tokens.css';

@@ -1,0 +1,420 @@
+@use 'variables' as *;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0;
+  overflow: hidden;
+  animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+}
+
+/* ── Toolbar ── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-bottom: 1px solid $line-1;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  background: $bg-0;
+}
+
+.spacer { flex: 1; min-width: 8px; }
+
+.viewToggle {
+  display: flex;
+  border: 1px solid $line-2;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.viewBtn {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: $font-sans;
+  background: transparent;
+  border: none;
+  color: $fg-2;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  & + & { border-left: 1px solid $line-1; }
+  &.active { background: $bg-2; color: $fg-0; }
+}
+
+.navGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.navBtn {
+  height: 30px;
+  min-width: 30px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border-radius: $r-1;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-0;
+  cursor: pointer;
+  font-family: $font-sans;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background 0.15s, border-color 0.15s;
+  box-shadow: $shadow-1;
+  white-space: nowrap;
+  &:hover  { background: $bg-2; border-color: $line-strong; }
+  &:active { transform: translateY(1px); }
+  // icon-only (chevrons)
+  &.iconOnly { padding: 0; width: 30px; }
+}
+
+.dateLabel {
+  font-family: $font-serif;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
+.filterSelect { width: 190px; }
+
+.newBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 5px;
+  border: 1px solid $accent;
+  background: $accent;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: $font-sans;
+  cursor: pointer;
+  transition: background 0.15s;
+  &:hover { background: $accent-strong; border-color: $accent-strong; }
+}
+
+/* ── Grid container ── */
+.gridWrap {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  // prevent text selection while dragging
+  user-select: none;
+}
+
+/* ── Sticky day headers ── */
+.gridHeader {
+  display: grid;
+  position: sticky;
+  top: 0;
+  background: $bg-1;
+  z-index: 5;
+  border-bottom: 1px solid $line-1;
+}
+
+.headerGutter {
+  border-right: 1px solid $line-1;
+  background: $bg-0;
+}
+
+.headerCell {
+  padding: 8px 10px;
+  border-left: 1px solid $line-1;
+}
+
+.dayName {
+  font-family: $font-mono;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $fg-2;
+}
+
+.dayNum {
+  font-family: $font-serif;
+  font-size: 20px;
+  margin-top: 2px;
+  color: $fg-0;
+  letter-spacing: -0.01em;
+  &.today { color: $accent; }
+}
+
+/* ── Time grid ── */
+.timeGrid {
+  display: grid;
+  position: relative;
+}
+
+.gutter {
+  position: relative;
+  border-right: 1px solid $line-1;
+  background: $bg-0;
+  width: 52px;
+}
+
+.hourLabel {
+  position: absolute;
+  right: 6px;
+  font-family: $font-mono;
+  font-size: 10px;
+  color: $fg-3;
+  letter-spacing: 0.04em;
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+
+.halfLabel {
+  position: absolute;
+  right: 6px;
+  font-family: $font-mono;
+  font-size: 9px;
+  color: $fg-3;
+  opacity: 0.5;
+  letter-spacing: 0.04em;
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+
+.dayCol {
+  border-left: 1px solid $line-1;
+  position: relative;
+  background: $bg-1;
+  &.today { background: $bg-4; }
+}
+
+.hourLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: $line-1;
+  pointer-events: none;
+}
+
+.halfLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: $line-1;
+  opacity: 0.45;
+  pointer-events: none;
+  border-top: 1px dashed $line-1;
+  border-bottom: none;
+  background: transparent;
+}
+
+/* ── Booking events ── */
+.event {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  border-radius: 6px;
+  padding: 4px 7px;
+  background: $accent-soft;
+  border-left: 3px solid $accent;
+  cursor: grab;
+  overflow: hidden;
+  transition: box-shadow 0.12s;
+  box-shadow: $shadow-1;
+
+  &:hover { box-shadow: $shadow-2; }
+  &:active { cursor: grabbing; }
+
+  &.dragging {
+    cursor: grabbing;
+    opacity: 0.85;
+    box-shadow: $shadow-3;
+    z-index: 10;
+    transform: scale(1.01);
+    transition: box-shadow 0.12s, transform 0.05s;
+  }
+
+  &.confirmed { background: $success-soft; border-left-color: $success; }
+  &.pending   { background: $warn-soft;    border-left-color: $warn; }
+  &.cancelled { background: $danger-soft;  border-left-color: $danger; opacity: 0.65; }
+  &.completed { background: $info-soft;    border-left-color: $info; }
+  &.noshow    { background: $bg-3;         border-left-color: $fg-3; opacity: 0.6; }
+}
+
+.eventTime {
+  font-family: $font-mono;
+  font-size: 10px;
+  color: $fg-2;
+  letter-spacing: 0.02em;
+}
+
+.eventName {
+  font-size: 11px;
+  font-weight: 600;
+  color: $fg-0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 1px;
+}
+
+.eventSvc {
+  font-size: 10px;
+  color: $fg-2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Now line ── */
+.nowLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: $danger;
+  z-index: 4;
+  pointer-events: none;
+  &::before {
+    content: '';
+    position: absolute;
+    left: -3px;
+    top: -3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: $danger;
+  }
+}
+
+/* ── Mobile toolbar ── */
+.mobToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 8px;
+  flex-shrink: 0;
+  background: $bg-0;
+  border-bottom: 1px solid $line-1;
+}
+
+.mobDateLabel {
+  font-family: $font-serif;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: $fg-0;
+}
+
+/* ── Week strip (mobile) ── */
+.weekStrip {
+  display: flex;
+  gap: 2px;
+  padding: 8px 12px 12px;
+  background: $bg-0;
+  border-bottom: 1px solid $line-1;
+  flex-shrink: 0;
+}
+
+.stripDay {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 2px;
+  border-radius: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover { background: $bg-2; }
+  &.stripSelected { background: $fg-0; }
+}
+
+.stripDayName {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $fg-2;
+  .stripSelected & { color: rgba(255,255,255,0.7); }
+}
+
+.stripDayNum {
+  font-family: $font-serif;
+  font-size: 19px;
+  line-height: 1;
+  color: $fg-0;
+  .stripSelected & { color: $bg-1; }
+  &.stripToday { color: $accent; }
+}
+
+.stripDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: transparent;
+  transition: background 0.15s;
+  &.stripDotVisible { background: $accent; }
+}
+
+/* ── Mobile day scroll ── */
+.mobDayScroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+/* ── Mobile event card ── */
+.mobEventCard {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-left: 3px solid $success;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: $shadow-1;
+
+  &:active { background: $bg-2; }
+}
+
+.mobEventTime {
+  font-family: $font-serif;
+  font-size: 15px;
+  color: $fg-0;
+  letter-spacing: -0.01em;
+}
+
+.mobEventName {
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 6px;
+  color: $fg-0;
+}
+
+.mobEventSub {
+  font-size: 12px;
+  color: $fg-2;
+  margin-top: 3px;
+}
