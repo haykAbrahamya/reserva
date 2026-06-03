@@ -68,7 +68,13 @@
 
 /* ── Mobile ── */
 @media (max-width: 768px) {
-  .topbar     { padding: 0 16px; gap: 10px; }
+  .topbar {
+    /* Clear the notch / dynamic island: grow the bar by the top safe-area inset
+       and push its content below it. (Resolves to 0 without viewport-fit=cover.) */
+    height: calc(#{$topbar-h} + env(safe-area-inset-top, 0px));
+    padding: env(safe-area-inset-top, 0px) 16px 0;
+    gap: 10px;
+  }
   .mobileLogo { display: flex; }
   .breadcrumb { display: none; }
   .divider    { display: none; }

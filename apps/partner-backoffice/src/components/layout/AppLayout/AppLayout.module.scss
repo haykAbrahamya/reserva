@@ -2,7 +2,12 @@
 
 .root {
   display: flex;
+  /* 100vh on iOS is the *largest* viewport (toolbars hidden), which pushes the
+     topbar under the browser chrome on a height-locked, overflow-hidden layout.
+     100dvh tracks the actually-visible viewport so the topbar stays in view and
+     only the inner content scrolls. 100vh kept as a fallback for old browsers. */
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background: $bg-0;
 }
