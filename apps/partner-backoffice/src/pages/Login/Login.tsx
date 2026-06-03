@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { Mail, Eye, EyeOff, AlertCircle, CalendarClock, Users, TrendingUp } from 'lucide-react'
 import { useAuthStore } from '@/store/auth.store'
 import { authService } from '@/services/auth.service'
+import { useT } from '@/i18n'
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher/LanguageSwitcher'
 import s from './Login.module.scss'
 
 const FEATURES = [
-  { icon: CalendarClock, title: 'Bookings around the clock', desc: 'Clients book online, day or night' },
-  { icon: Users,         title: 'Your whole team, organized', desc: 'Specialists, services & schedules' },
-  { icon: TrendingUp,    title: 'Revenue at a glance',        desc: 'Track every booking and earning' },
+  { icon: CalendarClock, key: 'bookings' },
+  { icon: Users,         key: 'team' },
+  { icon: TrendingUp,    key: 'revenue' },
 ]
 
 // Logo mark SVG — reusable
@@ -26,6 +28,7 @@ function LogoMark({ size = 20, light = false }: { size?: number; light?: boolean
 export function Login() {
   const navigate = useNavigate()
   const login    = useAuthStore(s => s.login)
+  const t        = useT()
 
   const [email,       setEmail]       = useState('')
   const [password,    setPassword]    = useState('')
@@ -39,8 +42,8 @@ export function Login() {
   const validate = () => {
     let ok = true
     setEmailErr(null); setPassErr(null); setError(null)
-    if (!email.trim())  { setEmailErr('Email is required.');    ok = false }
-    if (!password)      { setPassErr('Password is required.');  ok = false }
+    if (!email.trim())  { setEmailErr(t('login.emailRequired'));    ok = false }
+    if (!password)      { setPassErr(t('login.passwordRequired'));  ok = false }
     return ok
   }
 
@@ -53,7 +56,7 @@ export function Login() {
       login(token, user)
       navigate('/', { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed. Please try again.')
+      setError(err instanceof Error ? err.message : t('login.loginFailed'))
     } finally {
       setLoading(false)
     }
@@ -72,48 +75,51 @@ export function Login() {
           </div>
           <div>
             <div className={s.panelLogoName}>Reserva</div>
-            <div className={s.panelLogoTag}>Backoffice</div>
+            <div className={s.panelLogoTag}>{t('common.backoffice')}</div>
           </div>
         </div>
 
         {/* Feature highlights */}
         <div className={s.features}>
           {FEATURES.map(f => (
-            <div key={f.title} className={s.feature}>
+            <div key={f.key} className={s.feature}>
               <div className={s.featureIcon}>
                 <f.icon size={18} />
               </div>
               <div>
-                <div className={s.featureTitle}>{f.title}</div>
-                <div className={s.featureDesc}>{f.desc}</div>
+                <div className={s.featureTitle}>{t(`login.features.${f.key}.title`)}</div>
+                <div className={s.featureDesc}>{t(`login.features.${f.key}.desc`)}</div>
               </div>
             </div>
           ))}
         </div>
 
         <div>
-          <p className={s.panelQuote}>
-            Your salon, <em>beautifully</em> managed.
-          </p>
-          <p className={s.panelBy}>Reserva · Booking platform for Armenian salons</p>
+          <p className={s.panelQuote}>{t('login.quote')}</p>
+          <p className={s.panelBy}>{t('login.tagline')}</p>
         </div>
       </aside>
 
       {/* Main / form area */}
       <main className={s.main}>
+        {/* Language switcher — top-right */}
+        <div className={s.langCorner}>
+          <LanguageSwitcher />
+        </div>
+
         {/* Mobile logo */}
         <div className={s.mobileLogo}>
           <div className={s.mobileLogoMark}>
             <LogoMark size={26} light />
           </div>
           <div className={s.mobileLogoName}>Reserva</div>
-          <div className={s.mobileLogoTag}>Backoffice</div>
+          <div className={s.mobileLogoTag}>{t('common.backoffice')}</div>
         </div>
 
         <div className={s.card}>
           <div className={s.heading}>
-            <h1 className={s.title}>Welcome back</h1>
-            <p className={s.subtitle}>Sign in to your backoffice dashboard</p>
+            <h1 className={s.title}>{t('login.welcomeBack')}</h1>
+            <p className={s.subtitle}>{t('login.subtitle')}</p>
           </div>
 
           <form className={s.form} onSubmit={handleSubmit} noValidate>
@@ -127,13 +133,13 @@ export function Login() {
 
             {/* Email */}
             <div className={s.field}>
-              <label className={s.label} htmlFor="email">Email address</label>
+              <label className={s.label} htmlFor="email">{t('login.emailLabel')}</label>
               <div className={s.inputWrap}>
                 <input
                   id="email"
                   type="email"
                   autoComplete="email"
-                  placeholder="armen@antheris.am"
+                  placeholder="admin@antheris.am"
                   value={email}
                   onChange={e => { setEmail(e.target.value); setEmailErr(null); setError(null) }}
                   onKeyDown={e => e.key === 'Enter' && passRef.current?.focus()}
@@ -148,7 +154,7 @@ export function Login() {
 
             {/* Password */}
             <div className={s.field}>
-              <label className={s.label} htmlFor="password">Password</label>
+              <label className={s.label} htmlFor="password">{t('login.passwordLabel')}</label>
               <div className={s.inputWrap}>
                 <input
                   id="password"
@@ -165,7 +171,7 @@ export function Login() {
                   className={s.eyeBtn}
                   onClick={() => setShowPass(v => !v)}
                   tabIndex={-1}
-                  aria-label={showPass ? 'Hide password' : 'Show password'}
+                  aria-label={showPass ? t('login.hidePassword') : t('login.showPassword')}
                 >
                   {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -182,12 +188,12 @@ export function Login() {
               disabled={loading}
             >
               {loading ? <span className={s.spinner} /> : null}
-              {loading ? 'Signing in…' : 'Sign in'}
+              {loading ? t('login.signingIn') : t('login.signIn')}
             </button>
           </form>
         </div>
 
-        <p className={s.footer}>© {new Date().getFullYear()} Reserva. All rights reserved.</p>
+        <p className={s.footer}>{t('login.copyright', { year: new Date().getFullYear() })}</p>
       </main>
     </div>
   )

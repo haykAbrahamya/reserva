@@ -155,6 +155,13 @@
   position: relative;
 }
 
+.langCorner {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 5;
+}
+
 /* Mobile-only logo (shown when left panel is hidden) */
 .mobileLogo {
   display: flex;

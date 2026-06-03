@@ -1,0 +1,168 @@
+@use 'variables' as *;
+
+.section {
+  padding: 96px 24px;
+  background: $bg-4;
+  border-top: 1px solid $line-1;
+  border-bottom: 1px solid $line-1;
+  position: relative;
+  overflow: hidden;
+
+  @media (max-width: 640px) { padding: 72px 18px; }
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, #000 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, #000 30%, transparent 80%);
+}
+
+.inner { max-width: 1080px; margin: 0 auto; position: relative; }
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  position: relative;
+
+  @media (max-width: 820px) { grid-template-columns: 1fr; gap: 28px; }
+}
+
+/* ── Travelling progress track (desktop) ── */
+.track {
+  position: absolute;
+  top: 28px;
+  left: 16%;
+  right: 16%;
+  height: 3px;
+  border-radius: 999px;
+  /* dim dashed base line */
+  background-image: linear-gradient(90deg, $line-2 0 8px, transparent 8px 16px);
+  background-size: 16px 3px;
+  z-index: 0;
+
+  @media (max-width: 820px) { display: none; }
+}
+
+.trackFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, $accent-strong, $accent);
+  box-shadow: 0 0 12px rgba(192, 145, 95, 0.5);
+  transition: width 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.instant { transition: none; }
+}
+
+/* glowing head of the travelling line */
+.comet {
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: $accent;
+  box-shadow: 0 0 8px 2px rgba(192, 145, 95, 0.7), 0 0 18px 4px rgba(192, 145, 95, 0.35);
+}
+
+.step {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Number badge ── */
+.num {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 20px;
+  z-index: 1;
+}
+
+.numInner {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: $bg-1;
+  border: 1px solid $line-2;
+  box-shadow: $shadow-1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-serif;
+  font-size: 24px;
+  color: $fg-3;
+  transition: color 0.35s ease, background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s cubic-bezier(0.22, 0.86, 0.23, 1);
+}
+
+/* pulsing ring that appears on the current step */
+.numRing {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid $accent;
+  opacity: 0;
+  transform: scale(0.85);
+  pointer-events: none;
+}
+
+/* Reached: the line has passed → number fills accent */
+.step.reached {
+  .numInner {
+    color: $accent;
+    border-color: $accent;
+  }
+}
+
+/* Current: this step is actively lit → glow + lift the whole block */
+.step.current {
+  .numInner {
+    background: $accent;
+    color: #fff;
+    border-color: $accent;
+    box-shadow: 0 0 0 4px $accent-soft, 0 8px 22px rgba(192, 145, 95, 0.4);
+    transform: scale(1.08);
+  }
+  .numRing { animation: hiw-ring 1.6s ease-out infinite; }
+
+  .stepTitle { color: $fg-0; }
+  .stepText  { color: $fg-1; }
+}
+
+.stepTitle {
+  font-size: 19px;
+  font-weight: 600;
+  color: $fg-1;
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+  transition: color 0.35s ease;
+}
+
+.stepText {
+  font-size: 14px;
+  line-height: 1.6;
+  color: $fg-3;
+  margin: 0 auto;
+  max-width: 280px;
+  transition: color 0.35s ease;
+}
+
+:global {
+  @keyframes hiw-ring {
+    0%   { opacity: 0.7; transform: scale(0.9); }
+    70%  { opacity: 0;   transform: scale(1.35); }
+    100% { opacity: 0;   transform: scale(1.35); }
+  }
+}

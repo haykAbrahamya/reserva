@@ -1,0 +1,105 @@
+@use 'variables' as *;
+
+.section {
+  padding: 56px 24px;
+  @media (max-width: 600px) { padding: 44px 18px; }
+}
+
+.inner { max-width: 1080px; margin: 0 auto; }
+
+.head { margin-bottom: 28px; }
+.eyebrow {
+  font-size: 12px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: $accent; margin-bottom: 10px;
+}
+.title {
+  font-family: $font-serif;
+  font-size: clamp(26px, 4vw, 38px);
+  letter-spacing: -0.025em;
+  color: $fg-0;
+  margin: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+
+  @media (max-width: 860px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 460px) { grid-template-columns: 1fr; }
+}
+
+/* Reveal wrapper — no box styling, just lays out the button. */
+.card { display: flex; }
+
+.cardBtn {
+  position: relative;
+  flex: 1;
+  display: block;
+  width: 100%;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  padding: 24px 20px;
+  text-align: center;
+  box-shadow: $shadow-1;
+  cursor: pointer;
+  font-family: $font-sans;
+  overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.22, 0.86, 0.23, 1), box-shadow 0.25s, border-color 0.25s;
+
+  &:hover { transform: translateY(-4px); box-shadow: $shadow-2; border-color: $accent-soft; }
+  &:active { transform: translateY(-1px); }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+
+  &:hover .avatar { transform: scale(1.05); }
+  &:hover .viewHint { opacity: 1; transform: translateY(0); }
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-serif;
+  font-size: 26px;
+  color: #fff;
+  letter-spacing: -0.01em;
+  box-shadow: $shadow-2;
+  border: 2px solid rgba(255,255,255,0.2);
+  transition: transform 0.25s cubic-bezier(0.22, 0.86, 0.23, 1);
+}
+
+.spName {
+  font-size: 15px;
+  font-weight: 600;
+  color: $fg-0;
+  margin-bottom: 3px;
+  letter-spacing: -0.01em;
+}
+.spTitle { font-size: 13px; color: $fg-2; }
+
+.spServices {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid $line-1;
+  font-size: 12px;
+  color: $fg-3;
+}
+
+.viewHint {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: $accent;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.25s, transform 0.25s;
+
+  /* On touch devices there's no hover — keep it gently visible. */
+  @media (hover: none) { opacity: 0.85; transform: none; }
+}

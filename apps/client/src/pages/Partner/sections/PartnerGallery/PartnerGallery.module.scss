@@ -1,0 +1,96 @@
+@use 'variables' as *;
+
+.section {
+  padding: 56px 24px;
+  background: $bg-4;
+  border-top: 1px solid $line-1;
+  border-bottom: 1px solid $line-1;
+  @media (max-width: 600px) { padding: 44px 18px; }
+}
+
+.inner { max-width: 1080px; margin: 0 auto; }
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-family: $font-serif;
+  font-size: clamp(22px, 3vw, 30px);
+  letter-spacing: -0.02em;
+  color: $fg-0;
+  margin: 0;
+}
+
+.hint { font-size: 13px; color: $fg-3; }
+
+/* Masonry-ish grid: first tile larger */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 150px;
+  gap: 12px;
+
+  @media (max-width: 760px) { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 140px; }
+}
+
+.tile {
+  position: relative;
+  overflow: hidden;
+  border-radius: $r-3;
+  border: 1px solid $line-1;
+  display: flex;
+  align-items: flex-end;
+  padding: 14px;
+  cursor: default;
+  transition: transform 0.3s cubic-bezier(0.22, 0.86, 0.23, 1), box-shadow 0.3s;
+
+  &:hover { transform: translateY(-3px); box-shadow: $shadow-2; }
+  &:hover .icon { transform: scale(1.08) rotate(-4deg); }
+
+  /* first tile spans 2x2 */
+  &:first-child {
+    grid-column: span 2;
+    grid-row: span 2;
+    @media (max-width: 760px) { grid-column: span 2; grid-row: span 1; }
+  }
+}
+
+.icon {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: rgba(255,255,255,0.18);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: transform 0.3s cubic-bezier(0.22, 0.86, 0.23, 1);
+}
+
+.label {
+  position: relative;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.35);
+  letter-spacing: 0.01em;
+}
+
+/* grain/sheen overlay for depth */
+.sheen {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(160deg, rgba(255,255,255,0.14), transparent 40%),
+    linear-gradient(0deg, rgba(0,0,0,0.28), transparent 55%);
+  pointer-events: none;
+}

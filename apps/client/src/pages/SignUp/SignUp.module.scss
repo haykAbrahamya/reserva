@@ -1,0 +1,377 @@
+@use 'variables' as *;
+
+.page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  background: $bg-0;
+}
+
+/* ── Left brand panel (desktop) ── */
+.panel {
+  display: none;
+
+  @media (min-width: 960px) {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 46%;
+    max-width: 560px;
+    flex-shrink: 0;
+    background: $bg-4;
+    border-right: 1px solid $line-1;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+}
+
+.panelGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, #000 40%, transparent 100%);
+}
+.panelOrb {
+  position: absolute;
+  top: -140px;
+  right: -100px;
+  width: 440px;
+  height: 440px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, $accent 22%, transparent) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.panelLogo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  text-decoration: none;
+  width: fit-content;
+}
+.panelLogoMark {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  background: $accent;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: $shadow-2;
+  flex-shrink: 0;
+}
+.panelLogoName { font-family: $font-serif; font-size: 22px; letter-spacing: -0.015em; color: $fg-0; line-height: 1; }
+.panelLogoTag { font-family: $font-mono; font-size: 9px; color: $fg-3; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 3px; }
+
+.panelMid { position: relative; }
+.panelQuote {
+  font-family: $font-serif;
+  font-size: clamp(26px, 2.6vw, 34px);
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  color: $fg-0;
+  margin: 0 0 30px;
+  em { font-style: italic; color: $accent; }
+}
+
+.features { display: flex; flex-direction: column; gap: 18px; }
+.feature { display: flex; align-items: center; gap: 14px; }
+.featureIcon {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  box-shadow: $shadow-1;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: $accent;
+}
+.featureTitle { font-size: 14px; font-weight: 600; color: $fg-0; line-height: 1.2; }
+.featureDesc { font-size: 12.5px; color: $fg-2; margin-top: 2px; }
+
+.panelBy { position: relative; font-size: 12px; color: $fg-2; margin: 0; }
+
+/* ── Right form area ── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px 60px;
+  position: relative;
+  min-width: 0;
+
+  /* Leave room for the absolutely-positioned corner controls on mobile,
+     where the panel is hidden and there's nothing else up top. */
+  @media (max-width: 959px) {
+    justify-content: flex-start;
+    padding-top: 84px;
+  }
+}
+
+.corner {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 5;
+}
+
+.mobileLogo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 30px;
+  text-decoration: none;
+  align-self: flex-start;
+  @media (min-width: 960px) { display: none; }
+}
+.mobileLogoMark {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: $accent;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: $shadow-2;
+}
+.mobileLogoName { font-family: $font-serif; font-size: 24px; letter-spacing: -0.02em; color: $fg-0; }
+
+.card {
+  width: 100%;
+  max-width: 440px;
+  animation: su-rise 0.4s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+}
+
+/* ── Step indicator ── */
+.steps {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.stepDot { display: flex; align-items: center; gap: 8px; }
+.stepCircle {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  background: $bg-2;
+  border: 1.5px solid $line-2;
+  color: $fg-3;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.stepLabel { font-size: 12.5px; font-weight: 500; color: $fg-3; transition: color 0.2s; }
+.stepActive {
+  .stepCircle { background: $accent; border-color: $accent; color: #fff; box-shadow: 0 0 0 4px $accent-soft; }
+  .stepLabel { color: $fg-0; }
+}
+.stepDone {
+  .stepCircle { background: $accent-soft; border-color: $accent; color: $accent; }
+  .stepLabel { color: $fg-1; }
+}
+.stepBar {
+  flex: 1;
+  height: 2px;
+  border-radius: 2px;
+  background: $line-2;
+  transition: background 0.3s;
+}
+.stepBarDone { background: $accent; }
+
+.planChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: $accent;
+  background: $accent-soft;
+  border: 1px solid color-mix(in srgb, $accent 28%, transparent);
+  padding: 5px 11px;
+  border-radius: 999px;
+  margin-bottom: 18px;
+}
+
+.heading { margin-bottom: 22px; }
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: $fg-2;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 12px;
+  transition: color 0.15s;
+  &:hover { color: $accent; }
+}
+.title {
+  font-family: $font-serif;
+  font-size: clamp(26px, 4vw, 32px);
+  letter-spacing: -0.022em;
+  color: $fg-0;
+  margin: 0 0 6px;
+  line-height: 1.1;
+}
+.subtitle { font-size: 14px; color: $fg-2; margin: 0; line-height: 1.5; }
+
+/* ── Form ── */
+.form { display: flex; flex-direction: column; gap: 15px; }
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.label { font-size: 12px; font-weight: 500; color: $fg-1; }
+.optional { color: $fg-3; font-weight: 400; }
+
+.inputWrap { position: relative; display: flex; align-items: center; }
+.inputIcon {
+  position: absolute;
+  left: 13px;
+  color: $fg-3;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+.input {
+  width: 100%;
+  height: 48px;
+  padding: 0 42px 0 40px;
+  background: $bg-1;
+  border: 1.5px solid $line-2;
+  border-radius: $r-2;
+  color: $fg-0;
+  font-family: $font-sans;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+
+  &::placeholder { color: $fg-3; }
+  &:focus { border-color: $accent; box-shadow: 0 0 0 4px $accent-soft; }
+  &.hasError { border-color: $danger; &:focus { box-shadow: 0 0 0 4px $danger-soft; } }
+  &.isValid { border-color: color-mix(in srgb, $success 60%, $line-2); }
+}
+.eyeBtn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $fg-3;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.15s;
+  &:hover { color: $fg-1; }
+}
+.validIcon {
+  position: absolute;
+  right: 13px;
+  color: $success;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+.fieldError {
+  font-size: 12px;
+  color: $danger;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ── Submit ── */
+.submit {
+  height: 48px;
+  width: 100%;
+  border-radius: $r-2;
+  border: none;
+  background: $accent;
+  color: #fff;
+  font-family: $font-sans;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 1px 2px color-mix(in srgb, $accent 18%, transparent), 0 6px 18px color-mix(in srgb, $accent 22%, transparent);
+
+  &:hover:not(:disabled) { background: $accent-strong; box-shadow: 0 8px 24px color-mix(in srgb, $accent 30%, transparent); }
+  &:active:not(:disabled) { transform: translateY(1px); }
+  &:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+  &.loading { cursor: wait; }
+}
+.spinner {
+  width: 17px; height: 17px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: su-spin 0.7s linear infinite;
+}
+
+.terms { font-size: 11.5px; color: $fg-3; text-align: center; margin: 4px 0 0; line-height: 1.5; }
+
+.signInRow { font-size: 13px; color: $fg-2; margin: 20px 0 0; text-align: center; }
+.signInLink { color: $accent; font-weight: 600; text-decoration: none; &:hover { text-decoration: underline; } }
+
+/* ── Success ── */
+.success {
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+  animation: su-rise 0.4s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+}
+.successIcon {
+  width: 64px; height: 64px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, $success 15%, transparent);
+  color: $success;
+}
+.successTitle { font-family: $font-serif; font-size: clamp(26px, 4vw, 32px); letter-spacing: -0.02em; margin: 0 0 8px; color: $fg-0; }
+.successText { font-size: 14.5px; color: $fg-2; line-height: 1.55; margin: 0 0 24px; }
+.successCard {
+  text-align: left;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  box-shadow: $shadow-1;
+  padding: 6px 16px;
+  margin-bottom: 24px;
+}
+.successRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 0;
+  & + & { border-top: 1px solid $line-1; }
+}
+.successRowLabel { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: $fg-2; svg { color: $fg-3; } }
+.successRowValue { font-size: 13.5px; font-weight: 600; color: $fg-0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.footNote { font-size: 12px; color: $fg-3; margin: 14px 0 0; }
+
+:global {
+  @keyframes su-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes su-spin { to { transform: rotate(360deg); } }
+}

@@ -1,20 +1,22 @@
 import { useEffect, useState, useCallback } from 'react'
-import { X } from 'lucide-react'
+import { X, CalendarClock } from 'lucide-react'
 import { useAppStore, usePartner } from '@/store/app.store'
 import { Button, Avatar, BookingBadge } from '@/components/ui'
 import { useToast } from '@/components/ui'
 import { bookingsService } from '@/services/bookings.service'
 import { fmtAMD, fmtDateTime, fmtDuration } from '@/utils/format'
+import { useT } from '@/i18n'
 import type { BookingStatus } from '@/types'
+import { RescheduleModal } from '../RescheduleModal/RescheduleModal'
 import s from './BookingDrawer.module.scss'
 
 const CLOSE_MS = 300
 
-const STATUS_ACTIONS: { status: BookingStatus; label: string }[] = [
-  { status: 'confirmed', label: 'Confirm' },
-  { status: 'completed', label: 'Complete' },
-  { status: 'cancelled', label: 'Cancel' },
-  { status: 'noshow',    label: 'No-show' },
+const STATUS_ACTIONS: { status: BookingStatus; labelKey: string }[] = [
+  { status: 'confirmed', labelKey: 'bookingDrawer.actions.confirm' },
+  { status: 'completed', labelKey: 'bookingDrawer.actions.complete' },
+  { status: 'cancelled', labelKey: 'bookingDrawer.actions.cancel' },
+  { status: 'noshow',    labelKey: 'bookingDrawer.actions.noshow' },
 ]
 
 interface Props {
@@ -29,7 +31,9 @@ export function BookingDrawer({ bookingId, onClose, sheet }: Props) {
   const booking       = useAppStore(st => st.bookings.find(b => b.id === bookingId))
   const upsertBooking = useAppStore(st => st.upsertBooking)
   const toast         = useToast()
+  const t             = useT()
   const [closing, setClosing] = useState(false)
+  const [rescheduling, setRescheduling] = useState(false)
 
   // Play the exit animation, then actually unmount via the parent's onClose.
   const handleClose = useCallback(() => {
@@ -52,14 +56,16 @@ export function BookingDrawer({ bookingId, onClose, sheet }: Props) {
   const handleStatus = async (status: BookingStatus) => {
     const updated = await bookingsService.updateStatus(booking.id, status)
     upsertBooking(updated)
-    toast(`Booking ${status}`)
+    toast(t('bookingDrawer.statusToast', { status: t(`status.${status}`).toLowerCase() }))
   }
+
+  const canReschedule = booking.status === 'pending' || booking.status === 'confirmed'
 
   const inner = (
     <>
       {/* Status actions */}
       <div className={s.section}>
-        <div className={s.label}>Status</div>
+        <div className={s.label}>{t('bookingDrawer.status')}</div>
         <div className={s.statusRow}>
           {STATUS_ACTIONS.map(a => (
             <Button
@@ -68,15 +74,31 @@ export function BookingDrawer({ bookingId, onClose, sheet }: Props) {
               variant={booking.status === a.status ? 'accent' : 'default'}
               onClick={() => handleStatus(a.status)}
             >
-              {a.label}
+              {t(a.labelKey)}
             </Button>
           ))}
         </div>
       </div>
 
+      {/* When */}
+      <div className={s.section}>
+        <div className={s.label}>{t('bookingDrawer.when')}</div>
+        <div className={s.value}>{fmtDateTime(booking.startISO)}</div>
+        {canReschedule && (
+          <Button
+            size="sm"
+            variant="default"
+            onClick={() => setRescheduling(true)}
+            style={{ marginTop: 10, gap: 7 }}
+          >
+            <CalendarClock size={14} /> {t('bookingDrawer.reschedule')}
+          </Button>
+        )}
+      </div>
+
       {/* Client */}
       <div className={s.section}>
-        <div className={s.label}>Client</div>
+        <div className={s.label}>{t('bookingDrawer.client')}</div>
         <div className={s.value}>{booking.clientName}</div>
         <div className={s.sub}>{booking.clientPhone}</div>
       </div>
@@ -84,7 +106,7 @@ export function BookingDrawer({ bookingId, onClose, sheet }: Props) {
       {/* Service */}
       {svc && (
         <div className={s.section}>
-          <div className={s.label}>Service</div>
+          <div className={s.label}>{t('bookingDrawer.service')}</div>
           <div className={s.value}>{svc.name}</div>
           <div className={s.sub}>{fmtDuration(svc.duration)} · {fmtAMD(svc.price)}</div>
         </div>
@@ -93,7 +115,7 @@ export function BookingDrawer({ bookingId, onClose, sheet }: Props) {
       {/* Specialist */}
       {sp && (
         <div className={s.section}>
-          <div className={s.label}>Specialist</div>
+          <div className={s.label}>{t('bookingDrawer.specialist')}</div>
           <div className={s.spRow}>
             <Avatar name={sp.name} color={partner.accent} size="md" />
             <div>
@@ -107,12 +129,16 @@ export function BookingDrawer({ bookingId, onClose, sheet }: Props) {
       {/* Location */}
       {loc && (
         <div className={s.section}>
-          <div className={s.label}>Location</div>
+          <div className={s.label}>{t('bookingDrawer.location')}</div>
           <div className={s.value}>{loc.name}</div>
           <div className={s.sub}>{loc.address}</div>
         </div>
       )}
     </>
+  )
+
+  const rescheduleModal = rescheduling && (
+    <RescheduleModal booking={booking} onClose={() => setRescheduling(false)} />
   )
 
   if (sheet) {
@@ -139,6 +165,7 @@ export function BookingDrawer({ bookingId, onClose, sheet }: Props) {
           </div>
           <div className={s.sheetBody}>{inner}</div>
         </div>
+        {rescheduleModal}
       </>
     )
   }
@@ -163,6 +190,7 @@ export function BookingDrawer({ bookingId, onClose, sheet }: Props) {
         </div>
         <div style={{ flex: 1, overflowY: 'auto', padding: '0 22px 32px' }}>{inner}</div>
       </div>
+      {rescheduleModal}
     </>
   )
 }

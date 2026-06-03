@@ -3,18 +3,12 @@ import { Clock } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { Avatar, Button, TimePicker } from '@/components/ui'
 import { partnersService } from '@/services/partners.service'
+import { useScopedLocationId } from '@/store/auth.hooks'
+import { useT } from '@/i18n'
 import type { WeekSchedule, WorkingDay } from '@/types'
 import s from './Hours.module.scss'
 
-const DAYS = [
-  { key: 'mon', label: 'Mon' },
-  { key: 'tue', label: 'Tue' },
-  { key: 'wed', label: 'Wed' },
-  { key: 'thu', label: 'Thu' },
-  { key: 'fri', label: 'Fri' },
-  { key: 'sat', label: 'Sat' },
-  { key: 'sun', label: 'Sun' },
-]
+const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const
 
 const DEFAULT_DAY: WorkingDay = { enabled: true, start: '10:00', end: '19:00' }
 const DEFAULT_SCHEDULE: WeekSchedule = {
@@ -29,17 +23,25 @@ const DEFAULT_SCHEDULE: WeekSchedule = {
 
 export function Hours() {
   const partner = usePartner()
+  const scopedLocationId = useScopedLocationId()
+  const t = useT()
   const [schedules, setSchedules] = useState<Record<string, WeekSchedule>>({})
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
+  // Managers only manage their branch's team.
+  const teamSpecialists = (partner?.specialists ?? []).filter(
+    sp => !scopedLocationId || sp.locationId === scopedLocationId
+  )
+
   useEffect(() => {
     if (!partner) return
-    const first = partner.specialists.find(sp => sp.active) ?? partner.specialists[0]
+    const team = partner.specialists.filter(sp => !scopedLocationId || sp.locationId === scopedLocationId)
+    const first = team.find(sp => sp.active) ?? team[0]
     if (first && !selectedId) setSelectedId(first.id)
 
     Promise.all(
-      partner.specialists.map(sp =>
+      team.map(sp =>
         partnersService.getHours(sp.id).then(h => ({ id: sp.id, schedule: h?.schedule ?? DEFAULT_SCHEDULE }))
       )
     ).then(results => {
@@ -47,7 +49,7 @@ export function Hours() {
       results.forEach(r => { map[r.id] = r.schedule })
       setSchedules(map)
     })
-  }, [partner])
+  }, [partner, scopedLocationId])
 
   if (!partner) return null
 
@@ -96,12 +98,12 @@ export function Hours() {
     <div className={s.page}>
       <div className={s.head}>
         <div>
-          <h1 className={s.h1}>Working hours</h1>
-          <p className={s.sub}>{partner.name} · weekly schedule per specialist</p>
+          <h1 className={s.h1}>{t('hours.title')}</h1>
+          <p className={s.sub}>{t('hours.subtitle', { name: partner.name })}</p>
         </div>
         {selectedSp && (
           <Button variant="accent" onClick={handleSave} disabled={saving}>
-            {saving ? 'Saving…' : 'Save changes'}
+            {saving ? t('common.saving') : t('common.saveChanges')}
           </Button>
         )}
       </div>
@@ -109,8 +111,8 @@ export function Hours() {
       <div className={s.layout}>
         {/* Left: Specialist list */}
         <div className={s.spList}>
-          <div className={s.spListTitle}>Specialists</div>
-          {partner.specialists.map(sp => (
+          <div className={s.spListTitle}>{t('hours.specialists')}</div>
+          {teamSpecialists.map(sp => (
             <div
               key={sp.id}
               className={[s.spItem, sp.id === selectedId ? s.active : ''].filter(Boolean).join(' ')}
@@ -132,8 +134,8 @@ export function Hours() {
             ? (
               <div className={s.emptyPanel}>
                 <Clock size={36} strokeWidth={1} className={s.emptyIcon} />
-                <div className={s.emptyTitle}>Select a specialist</div>
-                <div style={{ fontSize: 13 }}>Pick someone from the list to edit their hours.</div>
+                <div className={s.emptyTitle}>{t('hours.selectSpecialist')}</div>
+                <div style={{ fontSize: 13 }}>{t('hours.selectSpecialistHint')}</div>
               </div>
             )
             : (
@@ -145,11 +147,11 @@ export function Hours() {
                   </div>
                 </div>
 
-                {DAYS.map(({ key, label }) => {
+                {DAY_KEYS.map((key) => {
                   const day: WorkingDay = schedule[key] ?? { enabled: false, start: '10:00', end: '19:00' }
                   return (
                     <div key={key} className={[s.dayRow, !day.enabled ? s.disabled : ''].filter(Boolean).join(' ')}>
-                      <span className={s.dayLabel}>{label}</span>
+                      <span className={s.dayLabel}>{t(`hours.days.${key}`)}</span>
                       <div className={s.timeInputs}>
                         <TimePicker
                           value={day.start}

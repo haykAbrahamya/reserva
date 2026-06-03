@@ -9,9 +9,11 @@ import { Services } from '@/pages/Services/Services'
 import { Specialists } from '@/pages/Specialists/Specialists'
 import { Hours } from '@/pages/Hours/Hours'
 import { Locations } from '@/pages/Locations/Locations'
+import { Users } from '@/pages/Users/Users'
 import { CalendarPage } from '@/pages/Calendar/CalendarPage'
 import { Clients } from '@/pages/Clients/Clients'
 import { Placeholder } from '@/pages/Placeholder'
+import { RequireAdmin } from '@/components/auth/RequireAdmin'
 import { ToastProvider } from '@/components/ui'
 import { NewBookingModal } from '@/components/bookings/NewBookingModal/NewBookingModal'
 import { useAppStore } from '@/store/app.store'
@@ -87,8 +89,10 @@ export default function App() {
             <Route path="services"    element={<Services />} />
             <Route path="specialists" element={<Specialists />} />
             <Route path="hours"       element={<Hours />} />
-            <Route path="locations"   element={<Locations />} />
-            <Route path="settings"    element={<Placeholder icon={Settings} title="Settings" />} />
+            {/* Admin-only: branches + team management */}
+            <Route path="locations"   element={<RequireAdmin><Locations /></RequireAdmin>} />
+            <Route path="users"       element={<RequireAdmin><Users /></RequireAdmin>} />
+            <Route path="settings"    element={<Placeholder icon={Settings} titleKey="nav.settings" />} />
           </Route>
 
           {/* Fallback */}

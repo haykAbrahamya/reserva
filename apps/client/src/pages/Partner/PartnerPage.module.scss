@@ -1,0 +1,36 @@
+@use 'variables' as *;
+
+.page {
+  min-height: 100vh;
+  background: $bg-0;
+  overflow-x: clip;   /* contain decorative orbs/gradients, no horizontal scroll */
+}
+
+/* ── Loading state ── */
+.loading {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background: $bg-0;
+}
+
+.spinner {
+  width: 38px;
+  height: 38px;
+  border: 3px solid $line-2;
+  border-top-color: $accent;
+  border-radius: 50%;
+  animation: pp-spin 0.8s linear infinite;
+}
+
+.loadingText {
+  font-size: 14px;
+  color: $fg-2;
+}
+
+:global {
+  @keyframes pp-spin { to { transform: rotate(360deg); } }
+}

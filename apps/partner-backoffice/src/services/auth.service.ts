@@ -1,44 +1,5 @@
 import type { AuthUser } from '@/store/auth.store'
-
-// Mock credentials — swap for real API calls later
-const MOCK_USERS: Array<{ email: string; password: string; user: AuthUser; token: string }> = [
-  {
-    email: 'armen@antheris.am',
-    password: 'demo1234',
-    token: 'mock-token-antheris-owner-' + Math.random().toString(36).slice(2),
-    user: {
-      id: 'usr-001',
-      name: 'Armen Petrosyan',
-      email: 'armen@antheris.am',
-      role: 'owner',
-      partnerId: 'antheris',
-    },
-  },
-  {
-    email: 'manager@antheris.am',
-    password: 'demo1234',
-    token: 'mock-token-antheris-manager-' + Math.random().toString(36).slice(2),
-    user: {
-      id: 'usr-002',
-      name: 'Nare Avetisyan',
-      email: 'manager@antheris.am',
-      role: 'manager',
-      partnerId: 'antheris',
-    },
-  },
-  {
-    email: 'admin@barberbro.am',
-    password: 'demo1234',
-    token: 'mock-token-barberbro-owner-' + Math.random().toString(36).slice(2),
-    user: {
-      id: 'usr-003',
-      name: 'Armen Grigoryan',
-      email: 'admin@barberbro.am',
-      role: 'owner',
-      partnerId: 'barberbro',
-    },
-  },
-]
+import { usersService } from './users.service'
 
 const delay = (ms = 800) => new Promise(r => setTimeout(r, ms))
 
@@ -48,18 +9,23 @@ export interface LoginResult {
 }
 
 export const authService = {
-  async login(email: string, password: string): Promise<LoginResult> {
+  /**
+   * Log in with an email OR phone number plus password. Managers created by
+   * an admin use their one-time password here. Reads from the shared mock
+   * user registry (users.service) so newly created managers can sign in.
+   */
+  async login(login: string, password: string): Promise<LoginResult> {
     await delay()
 
-    const found = MOCK_USERS.find(
-      u => u.email.toLowerCase() === email.toLowerCase().trim() && u.password === password
-    )
-
+    const found = usersService._findByLogin(login, password)
     if (!found) {
-      throw new Error('Invalid email or password.')
+      throw new Error('Invalid credentials. Check the email/phone and password.')
     }
 
-    return { token: found.token, user: found.user }
+    const token = `mock-token-${found.id}-` + Math.random().toString(36).slice(2)
+    // Strip the password out of the returned user object.
+    const { password: _pw, otpChannel: _c, createdAtISO: _d, ...user } = found
+    return { token, user }
   },
 
   async logout(): Promise<void> {

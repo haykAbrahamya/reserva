@@ -5,6 +5,8 @@ import { Button, Table, Th, Td, Tr, BookingBadge, Avatar, Empty } from '@/compon
 import { fmtAMD, fmtDateTime, fmtDuration, fmtTime, fmtDateInput } from '@/utils/format'
 import { useNewBooking } from '@/App'
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
+import { useScopedLocationId } from '@/store/auth.hooks'
+import { useI18n } from '@/i18n'
 import type { Booking } from '@/types'
 import s from './Bookings.module.scss'
 
@@ -18,20 +20,15 @@ function useIsMobile() {
   return m
 }
 
-const STATUS_FILTERS = [
-  { value: 'all',       label: 'All' },
-  { value: 'confirmed', label: 'Confirmed' },
-  { value: 'pending',   label: 'Pending' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'cancelled', label: 'Cancelled' },
-  { value: 'noshow',    label: 'No-show' },
-]
+const STATUS_FILTERS = ['all', 'confirmed', 'pending', 'completed', 'cancelled', 'noshow'] as const
 
 export function Bookings() {
   const partner        = usePartner()
   const bookings       = useAppStore(st => st.bookings)
   const openNewBooking = useNewBooking()
   const isMobile       = useIsMobile()
+  const scopedLocationId = useScopedLocationId()
+  const { t, tp }      = useI18n()
 
   const [statusFilter, setStatusFilter] = useState('all')
   const [selectedId,   setSelectedId]   = useState<string | null>(null)
@@ -40,6 +37,7 @@ export function Bookings() {
 
   const partnerBookings = bookings
     .filter(b => b.partnerId === partner.id)
+    .filter(b => !scopedLocationId || b.locationId === scopedLocationId)
     .filter(b => statusFilter === 'all' || b.status === statusFilter)
     .sort((a, b) => b.startISO.localeCompare(a.startISO))
 
@@ -58,21 +56,21 @@ export function Bookings() {
     <div className={s.page}>
       <div className={s.head}>
         <div>
-          <h1 className={s.h1}>Bookings</h1>
-          <p className={s.sub}>{partner.name} · {partnerBookings.length} record{partnerBookings.length !== 1 ? 's' : ''}</p>
+          <h1 className={s.h1}>{t('bookings.title')}</h1>
+          <p className={s.sub}>{tp('bookings.subtitle', partnerBookings.length, { name: partner.name })}</p>
         </div>
-        <Button variant="accent" onClick={openNewBooking}><Plus size={14} /> New booking</Button>
+        <Button variant="accent" onClick={openNewBooking}><Plus size={14} /> {t('bookings.newBooking')}</Button>
       </div>
 
       {/* Status filter chips — horizontal scroll on mobile */}
       <div className={s.filters}>
         {STATUS_FILTERS.map(f => (
           <button
-            key={f.value}
-            className={[s.filterChip, statusFilter === f.value ? s.active : ''].filter(Boolean).join(' ')}
-            onClick={() => setStatusFilter(f.value)}
+            key={f}
+            className={[s.filterChip, statusFilter === f ? s.active : ''].filter(Boolean).join(' ')}
+            onClick={() => setStatusFilter(f)}
           >
-            {f.label}
+            {t(`bookings.filters.${f}`)}
           </button>
         ))}
       </div>
@@ -81,8 +79,8 @@ export function Bookings() {
       {isMobile ? (
         <div className={s.cardList}>
           {partnerBookings.length === 0 ? (
-            <Empty icon={Calendar} title="No bookings found" description="Try changing the filter or add a new booking." action={
-              <Button variant="accent" onClick={openNewBooking}><Plus size={14} /> New booking</Button>
+            <Empty icon={Calendar} title={t('bookings.emptyTitle')} description={t('bookings.emptyDescFilter')} action={
+              <Button variant="accent" onClick={openNewBooking}><Plus size={14} /> {t('bookings.newBooking')}</Button>
             } />
           ) : (
             Object.entries(grouped).map(([dateKey, bks]) => (
@@ -123,19 +121,19 @@ export function Bookings() {
           <Table>
             <thead>
               <tr>
-                <Th>Client</Th>
-                <Th>Service</Th>
-                <Th>Specialist</Th>
-                <Th>Date & time</Th>
-                <Th>Price</Th>
-                <Th>Status</Th>
+                <Th>{t('bookings.col.client')}</Th>
+                <Th>{t('bookings.col.service')}</Th>
+                <Th>{t('bookings.col.specialist')}</Th>
+                <Th>{t('bookings.col.datetime')}</Th>
+                <Th>{t('bookings.col.price')}</Th>
+                <Th>{t('bookings.col.status')}</Th>
               </tr>
             </thead>
             <tbody>
               {partnerBookings.length === 0 ? (
                 <tr>
                   <td colSpan={6}>
-                    <Empty icon={Calendar} title="No bookings found" description="Try changing the filter or create a new booking." />
+                    <Empty icon={Calendar} title={t('bookings.emptyTitle')} description={t('bookings.emptyDescCreate')} />
                   </td>
                 </tr>
               ) : partnerBookings.map(b => {

@@ -1,0 +1,330 @@
+{
+  "common": {
+    "dash": "—"
+  },
+  "nav": {
+    "features": "Features",
+    "howItWorks": "How it works",
+    "pricing": "Pricing",
+    "signIn": "Sign in",
+    "getStarted": "Get started",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "hero": {
+    "pillTag": "New",
+    "pill": "Online booking for Armenian salons",
+    "titlePre": "Let clients book you, ",
+    "titleEm": "without the back-and-forth",
+    "titlePost": ".",
+    "subtitle1": "A beautiful booking page for your clients, a powerful backoffice for you.",
+    "subtitle2": "Reservations in seconds — appointments fully under your control.",
+    "startFree": "Start free",
+    "seeHow": "See how it works",
+    "proofPre": "Trusted by ",
+    "proofStrong": "120+ salons",
+    "proofPost": " across Yerevan",
+    "previewBookingsToday": "Bookings today",
+    "previewThisWeek": "This week",
+    "previewRevenue": "Revenue",
+    "previewConfirmed": "18 confirmed",
+    "previewVsLast": "+12% vs last",
+    "previewDays": "7 days"
+  },
+  "trust": {
+    "label": "Trusted by leading salons & studios in Armenia"
+  },
+  "features": {
+    "eyebrow": "Everything you need",
+    "titlePre": "Run your salon, ",
+    "titleEm": "beautifully",
+    "titlePost": "",
+    "subtitle": "From the client’s first tap to your end-of-week numbers — Reserva handles the whole booking journey.",
+    "items": {
+      "bookingPage": {
+        "title": "Your own booking page",
+        "text": "Every salon gets a branded page at reserva.am — clients book in seconds, 24/7, no app to install."
+      },
+      "calendar": {
+        "title": "Smart calendar",
+        "text": "A drag-and-drop calendar that shows every specialist’s day. Reschedule with a single move."
+      },
+      "team": {
+        "title": "Team & services",
+        "text": "Manage specialists, services, prices and working hours — all from one clean backoffice."
+      },
+      "notifications": {
+        "title": "Instant notifications",
+        "text": "New bookings land in your dashboard the moment they happen. Optional Telegram alerts for owners."
+      },
+      "multiLocation": {
+        "title": "Multi-location ready",
+        "text": "Run several branches under one account. Clients pick a location right inside the booking flow."
+      },
+      "revenue": {
+        "title": "Revenue at a glance",
+        "text": "See bookings, occupancy and earnings in real time. Know exactly how your salon is performing."
+      }
+    }
+  },
+  "howItWorks": {
+    "eyebrow": "How it works",
+    "titlePre": "Up and running in ",
+    "titleEm": "days",
+    "titlePost": ", not months",
+    "subtitle": "No technical setup on your side. We handle the heavy lifting so you can start taking bookings fast.",
+    "steps": {
+      "setup": {
+        "title": "We set you up",
+        "text": "Tell us about your salon. We create your branded booking page, add your services, team and hours."
+      },
+      "book": {
+        "title": "Clients book online",
+        "text": "Share your link. Clients pick a service, specialist and time — and the booking lands in your dashboard."
+      },
+      "control": {
+        "title": "You stay in control",
+        "text": "Manage everything from one backoffice: confirm, reschedule, track revenue and grow with confidence."
+      }
+    }
+  },
+  "pricing": {
+    "eyebrow": "Pricing",
+    "titlePre": "One plan, ",
+    "titleEm": "everything included",
+    "titlePost": "",
+    "subtitle": "No tiers, no add-ons, no surprises. Every feature, one simple price.",
+    "perMonth": "/ mo",
+    "offerBadge": "Limited offer",
+    "planName": "All-in-one plan",
+    "planDesc": "Everything Reserva offers — for your whole salon, every branch, every specialist.",
+    "offerNote": "Special launch price — for a limited time",
+    "cta": "Start free trial",
+    "trialNote": "14-day free trial · no card required",
+    "everythingIncluded": "Everything included",
+    "footnote": "Prices in Armenian Dram (AMD). Cancel anytime — no setup or hidden fees.",
+    "tiers": {
+      "all": { "name": "All-in-one" }
+    },
+    "feat": {
+      "brandedPage": "Branded booking page",
+      "unlimitedSpecialists": "Unlimited specialists",
+      "unlimitedServices": "Unlimited services",
+      "multipleLocations": "Multiple locations",
+      "calendarList": "Smart calendar & bookings",
+      "hoursPerSpecialist": "Working hours per specialist",
+      "telegram": "Telegram notifications",
+      "insights": "Revenue & occupancy insights",
+      "roles": "Team roles & permissions",
+      "prioritySupport": "Priority support"
+    }
+  },
+  "ctaFooter": {
+    "titlePre": "Ready to take bookings ",
+    "titleEm": "online",
+    "titlePost": "?",
+    "text": "Join the salons already growing with Reserva. Set up in days, start a free 14-day trial today.",
+    "startTrial": "Start free trial",
+    "bookDemo": "Book a demo",
+    "tagline": "The online reservation platform built for Armenian salons, barbershops and beauty studios.",
+    "cols": {
+      "product": "Product",
+      "company": "Company",
+      "legal": "Legal"
+    },
+    "links": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "howItWorks": "How it works",
+      "forSalons": "For salons",
+      "about": "About",
+      "partners": "Partners",
+      "careers": "Careers",
+      "contact": "Contact",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "cookies": "Cookies"
+    },
+    "copyright": "© {year} Reserva. All rights reserved."
+  },
+  "partner": {
+    "loading": "Loading salon…",
+    "notFoundEyebrow": "Sorry, we're closed",
+    "notFoundTitle": "This salon isn't here",
+    "notFoundText": "We couldn't find a salon at this link. It may have moved, closed its doors, or the link is simply incorrect.",
+    "notFoundExplore": "Explore salons",
+    "backToReserva": "Back to Reserva",
+    "poweredBy": "Powered by Reserva",
+    "bookNow": "Book now",
+    "hero": {
+      "reviews": "({count} reviews)",
+      "locationsInYerevan": "{count} locations in Yerevan",
+      "bookAppointment": "Book an appointment",
+      "call": "Call",
+      "scrollToExplore": "Scroll to explore",
+      "scrollDown": "Scroll down"
+    },
+    "services": {
+      "eyebrow": "Menu",
+      "title": "Services & pricing",
+      "all": "All",
+      "book": "Book"
+    },
+    "about": {
+      "eyebrow": "About {name}",
+      "factBranches": "Branches",
+      "factLocation": "Location",
+      "factBranchesValue": "{count} in Yerevan",
+      "factHours": "Hours",
+      "factServices": "Services",
+      "factServicesValue": "{count} available",
+      "factSpecialists": "Specialists",
+      "factSpecialistsValue": "{count} on the team"
+    },
+    "locations": {
+      "eyebrow": "Locations",
+      "title": "{count} branches to choose from",
+      "specialistsHere": "{count} specialist here",
+      "specialistsHere_plural": "{count} specialists here",
+      "bookHere": "Book here",
+      "call": "Call"
+    },
+    "team": {
+      "eyebrow": "The team",
+      "title": "Meet your specialists",
+      "serviceCount": "{count} service",
+      "serviceCount_plural": "{count} services",
+      "viewProfile": "View profile",
+      "viewProfileAria": "View {name}'s profile"
+    },
+    "gallery": {
+      "title": "Inside {name}",
+      "hint": "Photos coming soon"
+    },
+    "footer": {
+      "title": "Ready when you are",
+      "text": "Pick a time that works for you and book your appointment at {name} in seconds.",
+      "bookNow": "Book now",
+      "poweredBy": "Powered by Reserva"
+    }
+  },
+  "specialistModal": {
+    "reviewsCount": "({count})",
+    "about": "About",
+    "services": "Services",
+    "whatClientsSay": "What clients say",
+    "stats": {
+      "rating": "Rating",
+      "reviews": "Reviews",
+      "experience": "Experience"
+    },
+    "bookWith": "Book with {name}",
+    "close": "Close"
+  },
+  "booking": {
+    "stepLabel": "Step {current} of {total}",
+    "steps": {
+      "location": { "title": "Choose a branch", "sub": "Which location works best for you?" },
+      "service": { "title": "Choose a service", "sub": "What would you like to book?" },
+      "specialist": { "title": "Pick your specialist", "sub": "Choose someone specific, or let us assign the best available." },
+      "datetime": { "title": "Select a time", "sub": "Pick a day and an available slot." },
+      "details": { "title": "Your details", "sub": "So the salon knows who to expect." },
+      "confirm": { "title": "Review & confirm", "sub": "Make sure everything looks right." }
+    },
+    "anySpecialist": "Any available specialist",
+    "anySpecialistMeta": "We'll match you with the best fit",
+    "orChooseSomeone": "Or choose someone",
+    "dateLabel": "Date",
+    "availableTimes": "Available times",
+    "findingSlots": "Finding open slots…",
+    "noSlots": "No open slots this day. Try another date.",
+    "fullNameLabel": "Full name",
+    "fullNamePlaceholder": "e.g. Anna Karapetyan",
+    "phoneLabel": "Phone number",
+    "phonePlaceholder": "+374 …",
+    "notesLabel": "Notes (optional)",
+    "notesPlaceholder": "Anything the salon should know?",
+    "continue": "Continue",
+    "reviewBooking": "Review booking",
+    "confirmBooking": "Confirm booking",
+    "booking": "Booking…",
+    "successTitle": "You're booked!",
+    "successTextPre": "Your appointment at ",
+    "successTextPost": " is confirmed. We've saved your spot — see you soon.",
+    "done": "Done",
+    "summary": {
+      "branch": "Branch",
+      "service": "Service",
+      "specialist": "Specialist",
+      "anyAvailable": "Any available",
+      "date": "Date",
+      "time": "Time",
+      "name": "Name",
+      "phone": "Phone",
+      "total": "Total"
+    }
+  },
+  "signup": {
+    "panelTag": "For salons",
+    "panelQuotePre": "Start taking bookings ",
+    "panelQuoteEm": "online",
+    "panelQuotePost": " in days.",
+    "panelBy": "Reserva · Booking platform for Armenian salons",
+    "features": {
+      "bookings": { "title": "Bookings around the clock", "desc": "Clients book online, day or night" },
+      "page": { "title": "Your own branded page", "desc": "Live at reserva.am in minutes" },
+      "trial": { "title": "14-day free trial", "desc": "No card required, cancel anytime" }
+    },
+    "stepCompany": "Company",
+    "stepAccount": "Your account",
+    "planChip": "{plan} plan selected",
+    "companyTitle": "Tell us about your salon",
+    "companySubtitle": "This becomes your booking page and backoffice.",
+    "companyName": "Company name",
+    "companyNamePlaceholder": "e.g. Antheris",
+    "companyType": "Business type",
+    "companyTypePlaceholder": "e.g. Beauty & aesthetics",
+    "optional": "optional",
+    "accountTitle": "Create your admin account",
+    "accountSubtitle": "You'll use this to sign in and manage everything.",
+    "adminName": "Full name",
+    "adminNamePlaceholder": "e.g. Armen Petrosyan",
+    "email": "Email",
+    "phone": "Phone",
+    "password": "Password",
+    "confirm": "Confirm password",
+    "show": "Show password",
+    "hide": "Hide password",
+    "continue": "Continue",
+    "back": "Back",
+    "createAccount": "Create account",
+    "creating": "Creating your account…",
+    "terms": "By creating an account you agree to our Terms & Privacy Policy.",
+    "haveAccount": "Already have an account?",
+    "signIn": "Sign in",
+    "errCompany": "Please enter your company name.",
+    "errName": "Please enter your full name.",
+    "errEmail": "Enter a valid email address.",
+    "errPhone": "Enter a valid phone number.",
+    "errPassword": "Must be at least {n} characters.",
+    "errMismatch": "Passwords don't match.",
+    "success": {
+      "title": "Welcome to Reserva!",
+      "textPre": "Your free trial for ",
+      "textPost": " is ready. We've set up your account — check your email to finish.",
+      "cta": "Back to home",
+      "note": "Our team will reach out shortly to help you get set up."
+    }
+  },
+  "notFound": {
+    "eyebrow": "Page not found",
+    "title": "This slot doesn't exist",
+    "text": "The page you're looking for may have moved, been removed, or never existed. Let's get you back on track.",
+    "home": "Back to home",
+    "back": "Go back"
+  },
+  "language": {
+    "label": "Language",
+    "switcherAria": "Change language"
+  }
+}

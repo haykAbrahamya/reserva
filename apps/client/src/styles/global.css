@@ -1,0 +1,10 @@
+/* Client-app global guards. Imported after the shared design tokens. */
+
+/* Contain horizontal overflow WITHOUT creating a scroll container.
+   `overflow-x: clip` (unlike `hidden`) doesn't break position:fixed
+   navs or backdrop-filter blur on the landing header. */
+html,
+body {
+  overflow-x: clip;
+  max-width: 100%;
+}

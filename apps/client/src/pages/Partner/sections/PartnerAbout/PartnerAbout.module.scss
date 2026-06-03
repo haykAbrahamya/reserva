@@ -1,0 +1,79 @@
+@use 'variables' as *;
+
+.section {
+  padding: 56px 24px;
+  @media (max-width: 600px) { padding: 40px 18px; }
+}
+
+.inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 32px;
+  align-items: stretch;
+
+  @media (max-width: 760px) { grid-template-columns: 1fr; gap: 18px; }
+}
+
+.about {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  padding: 32px;
+  box-shadow: $shadow-1;
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $accent;
+  margin-bottom: 14px;
+}
+
+.aboutText {
+  font-size: clamp(16px, 2vw, 19px);
+  line-height: 1.7;
+  color: $fg-1;
+  margin: 0;
+  font-family: $font-serif;
+  letter-spacing: -0.01em;
+}
+
+/* Info card with quick facts */
+.facts {
+  background: $bg-4;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: $shadow-1;
+}
+
+.fact {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 13px 4px;
+  border-bottom: 1px solid $line-1;
+  &:last-child { border-bottom: none; }
+}
+
+.factIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: $accent-soft;
+  color: $accent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.factLabel { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: $fg-3; font-weight: 600; }
+.factValue { font-size: 14px; color: $fg-0; margin-top: 2px; font-weight: 500; }

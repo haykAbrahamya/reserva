@@ -4,6 +4,7 @@ import { useAppStore, usePartner } from '@/store/app.store'
 import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Empty } from '@/components/ui'
 import { fmtAMD, fmtDuration } from '@/utils/format'
 import { partnersService } from '@/services/partners.service'
+import { useI18n } from '@/i18n'
 import type { Service } from '@/types'
 import s from './Services.module.scss'
 
@@ -23,6 +24,7 @@ export function Services() {
   const partner     = usePartner()
   const setPartners = useAppStore(st => st.setPartners)
   const isMobile    = useIsMobile()
+  const { t, tp }   = useI18n()
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editing,   setEditing]   = useState<Service | null>(null)
@@ -52,7 +54,7 @@ export function Services() {
 
   // Group by category for mobile
   const grouped = partner.services.reduce<Record<string, Service[]>>((acc, svc) => {
-    const cat = svc.category || 'Other'
+    const cat = svc.category || t('services.otherCategory')
     if (!acc[cat]) acc[cat] = []
     acc[cat].push(svc)
     return acc
@@ -62,15 +64,15 @@ export function Services() {
     <div className={s.page}>
       <div className={s.head}>
         <div>
-          <h1 className={s.h1}>Services</h1>
-          <p className={s.sub}>{partner.name} · {partner.services.length} service{partner.services.length !== 1 ? 's' : ''}</p>
+          <h1 className={s.h1}>{t('services.title')}</h1>
+          <p className={s.sub}>{tp('services.subtitle', partner.services.length, { name: partner.name })}</p>
         </div>
-        <Button variant="accent" onClick={openNew}><Plus size={14} /> Add service</Button>
+        <Button variant="accent" onClick={openNew}><Plus size={14} /> {t('services.addService')}</Button>
       </div>
 
       {partner.services.length === 0 ? (
-        <Empty icon={Sparkles} title="No services yet" description="Add your first service to start taking bookings."
-          action={<Button variant="accent" onClick={openNew}><Plus size={14} /> Add service</Button>}
+        <Empty icon={Sparkles} title={t('services.emptyTitle')} description={t('services.emptyDesc')}
+          action={<Button variant="accent" onClick={openNew}><Plus size={14} /> {t('services.addService')}</Button>}
         />
       ) : isMobile ? (
         /* ── Mobile: grouped cards ── */
@@ -111,11 +113,11 @@ export function Services() {
           <Table>
             <thead>
               <tr>
-                <Th>Name</Th>
-                <Th>Category</Th>
-                <Th>Duration</Th>
-                <Th>Price</Th>
-                <Th>Active</Th>
+                <Th>{t('services.col.name')}</Th>
+                <Th>{t('services.col.category')}</Th>
+                <Th>{t('services.col.duration')}</Th>
+                <Th>{t('services.col.price')}</Th>
+                <Th>{t('services.col.active')}</Th>
                 <Th></Th>
               </tr>
             </thead>
@@ -142,26 +144,26 @@ export function Services() {
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        title={editing ? 'Edit service' : 'New service'}
+        title={editing ? t('services.modal.editTitle') : t('services.modal.newTitle')}
         footer={
           <>
-            <Button variant="ghost" onClick={() => setModalOpen(false)}>Cancel</Button>
-            <Button variant="accent" onClick={handleSave}>Save service</Button>
+            <Button variant="ghost" onClick={() => setModalOpen(false)}>{t('common.cancel')}</Button>
+            <Button variant="accent" onClick={handleSave}>{t('services.modal.save')}</Button>
           </>
         }
       >
         <div className={s.formGrid}>
           <div className={s.formFull}>
-            <Input label="Service name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Haircut" />
+            <Input label={t('services.modal.nameLabel')} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder={t('services.modal.namePlaceholder')} />
           </div>
-          <Input label="Price (AMD)" type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} placeholder="5000" />
-          <Input label="Duration (min)" type="number" value={form.duration} onChange={e => setForm(f => ({ ...f, duration: e.target.value }))} placeholder="30" />
+          <Input label={t('services.modal.priceLabel')} type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} placeholder={t('services.modal.pricePlaceholder')} />
+          <Input label={t('services.modal.durationLabel')} type="number" value={form.duration} onChange={e => setForm(f => ({ ...f, duration: e.target.value }))} placeholder={t('services.modal.durationPlaceholder')} />
           <div className={s.formFull}>
-            <Input label="Category" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} placeholder="e.g. Hair" />
+            <Input label={t('services.modal.categoryLabel')} value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} placeholder={t('services.modal.categoryPlaceholder')} />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Toggle checked={form.active} onChange={v => setForm(f => ({ ...f, active: v }))} />
-            <span style={{ fontSize: 13 }}>Active</span>
+            <span style={{ fontSize: 13 }}>{t('services.modal.active')}</span>
           </div>
         </div>
       </Modal>

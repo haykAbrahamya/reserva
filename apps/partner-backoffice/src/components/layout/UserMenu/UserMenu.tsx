@@ -1,16 +1,20 @@
 import { useRef, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronDown, LogOut, Settings } from 'lucide-react'
+import { ChevronDown, LogOut, Settings, KeyRound } from 'lucide-react'
 import { useAuthStore } from '@/store/auth.store'
 import { authService } from '@/services/auth.service'
 import { Avatar } from '@/components/ui'
+import { ChangePasswordModal } from '@/components/account/ChangePasswordModal/ChangePasswordModal'
+import { useT } from '@/i18n'
 import s from './UserMenu.module.scss'
 
 export function UserMenu() {
   const user   = useAuthStore(st => st.user)
   const logout = useAuthStore(st => st.logout)
   const navigate = useNavigate()
+  const t = useT()
   const [open, setOpen] = useState(false)
+  const [pwOpen, setPwOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -48,7 +52,7 @@ export function UserMenu() {
         }} />
         <div className={s.info}>
           <div className={s.name}>{user.name}</div>
-          <div className={s.role}>{user.role}</div>
+          <div className={s.role}>{t(`roles.${user.role}`)}</div>
         </div>
         <ChevronDown size={13} className={[s.chevron, open ? s.rotated : ''].filter(Boolean).join(' ')} />
       </button>
@@ -61,23 +65,30 @@ export function UserMenu() {
             <div>
               <div className={s.dropName}>{user.name}</div>
               <div className={s.dropEmail}>{user.email}</div>
-              <div className={s.dropRole}>{user.role}</div>
+              <div className={s.dropRole}>{t(`roles.${user.role}`)}</div>
             </div>
           </div>
 
+          <button className={s.dropItem} role="menuitem" onClick={() => { setOpen(false); setPwOpen(true) }}>
+            <KeyRound size={15} />
+            {t('changePassword.title')}
+          </button>
+
           <button className={s.dropItem} role="menuitem" onClick={() => { setOpen(false); navigate('/settings') }}>
             <Settings size={15} />
-            Settings
+            {t('userMenu.settings')}
           </button>
 
           <div className={s.divider} />
 
           <button className={[s.dropItem, s.danger].join(' ')} role="menuitem" onClick={handleLogout}>
             <LogOut size={15} />
-            Sign out
+            {t('userMenu.signOut')}
           </button>
         </div>
       )}
+
+      <ChangePasswordModal open={pwOpen} onClose={() => setPwOpen(false)} />
     </div>
   )
 }

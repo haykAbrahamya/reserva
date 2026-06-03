@@ -1,0 +1,408 @@
+@use 'variables' as *;
+
+/* ── Overlay + container ── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--scrim);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: bf-fade 0.22s ease both;
+
+  @media (max-width: 720px) { padding: 0; align-items: flex-end; }
+  &.closing { animation: bf-fade-out 0.24s ease both; }
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  box-shadow: $shadow-3;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: bf-pop 0.32s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+
+  @media (max-width: 720px) {
+    max-width: 100%;
+    max-height: 94vh;
+    border-radius: 22px 22px 0 0;
+    border-bottom: none;
+    animation: bf-sheet 0.36s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+  }
+
+  &.closing {
+    animation: bf-pop-out 0.24s ease both;
+    @media (max-width: 720px) { animation: bf-sheet-out 0.28s cubic-bezier(0.4,0,1,1) both; }
+  }
+}
+
+/* ── Header: progress + title + close ── */
+.header {
+  flex-shrink: 0;
+  padding: 16px 18px 0;
+}
+
+.headTop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.backBtn, .closeBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: $r-1;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  &:hover { background: $bg-2; color: $fg-0; border-color: $line-strong; }
+  &:disabled { opacity: 0; pointer-events: none; }
+}
+.closeBtn { margin-left: auto; }
+
+.stepLabel {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $fg-3;
+}
+
+/* progress bar segments */
+.progress {
+  display: flex;
+  gap: 5px;
+  padding-bottom: 4px;
+}
+.segment {
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: $bg-3;
+  overflow: hidden;
+  position: relative;
+}
+.segFill {
+  position: absolute;
+  inset: 0;
+  background: $accent;
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 0.4s cubic-bezier(0.22, 0.86, 0.23, 1);
+  &.done { transform: scaleX(1); }
+  &.active { transform: scaleX(0.5); }
+}
+
+/* ── Body (scrollable) ── */
+.body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 18px;
+}
+
+.stepTitle {
+  font-family: $font-serif;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  color: $fg-0;
+  margin: 0 0 4px;
+}
+.stepSub {
+  font-size: 14px;
+  color: $fg-2;
+  margin: 0 0 20px;
+}
+
+/* ── Service / specialist option list ── */
+.catLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $fg-3;
+  margin: 18px 0 8px;
+  &:first-child { margin-top: 0; }
+}
+
+.option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: $r-2;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  cursor: pointer;
+  margin-bottom: 8px;
+  font-family: $font-sans;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover { border-color: $line-strong; background: $bg-2; }
+  &:active { transform: scale(0.99); }
+  &.selected {
+    border-color: $accent;
+    background: $accent-soft;
+    box-shadow: 0 0 0 3px $accent-soft;
+  }
+}
+
+.optBody { flex: 1; min-width: 0; }
+.optName { font-size: 15px; font-weight: 600; color: $fg-0; letter-spacing: -0.01em; }
+.optMeta { font-size: 13px; color: $fg-2; margin-top: 3px; display: flex; align-items: center; gap: 10px; }
+.metaDot { width: 3px; height: 3px; border-radius: 50%; background: $fg-3; }
+.optPrice { font-family: $font-serif; font-size: 17px; color: $fg-0; flex-shrink: 0; }
+
+.optAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-serif;
+  font-size: 17px;
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.2);
+}
+
+/* "Any specialist" option highlight */
+.anyIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: $accent-soft;
+  color: $accent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.check {
+  flex-shrink: 0;
+  color: $accent;
+}
+
+/* ── Date & time step ── */
+.dateField { margin-bottom: 18px; }
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: $fg-1;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.slotsWrap { min-height: 120px; }
+.slotsLoading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 36px 0;
+  color: $fg-2;
+  font-size: 14px;
+}
+.miniSpinner {
+  width: 18px; height: 18px;
+  border: 2px solid $line-2;
+  border-top-color: $accent;
+  border-radius: 50%;
+  animation: bf-spin 0.7s linear infinite;
+}
+
+.slotGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+
+  @media (max-width: 420px) { grid-template-columns: repeat(3, 1fr); }
+}
+.slot {
+  height: 42px;
+  border-radius: $r-1;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-1;
+  font-family: $font-mono;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s, color 0.12s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  &:hover { border-color: $line-strong; background: $bg-2; }
+  &:active { transform: scale(0.96); }
+  &.selected {
+    border-color: $accent;
+    background: $accent;
+    color: #fff;
+  }
+}
+.noSlots {
+  text-align: center;
+  padding: 32px 12px;
+  color: $fg-2;
+  font-size: 14px;
+}
+
+/* ── Details step ── */
+.formField { margin-bottom: 16px; }
+.input {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  border-radius: $r-2;
+  border: 1.5px solid $line-2;
+  background: $bg-1;
+  color: $fg-0;
+  font-family: $font-sans;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  &::placeholder { color: $fg-3; }
+  &:focus { border-color: $accent; box-shadow: 0 0 0 3px $accent-soft; }
+}
+.textarea { height: auto; min-height: 84px; padding: 12px 14px; resize: vertical; line-height: 1.5; }
+
+/* ── Summary / confirm step ── */
+.summary {
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  overflow: hidden;
+  background: $bg-0;
+}
+.sumRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  border-bottom: 1px solid $line-1;
+  &:last-child { border-bottom: none; }
+}
+.sumLabel { font-size: 13px; color: $fg-2; white-space: nowrap; flex-shrink: 0; }
+.sumValue { font-size: 14px; font-weight: 600; color: $fg-0; text-align: right; min-width: 0; overflow-wrap: break-word; }
+.sumTotal { background: $accent-soft; }
+.sumTotalLabel { font-size: 13px; font-weight: 600; color: $accent-strong; }
+.sumTotalValue { font-family: $font-serif; font-size: 22px; color: $accent-strong; letter-spacing: -0.01em; }
+
+/* ── Footer (next/confirm) ── */
+.footer {
+  flex-shrink: 0;
+  padding: 14px 18px;
+  border-top: 1px solid $line-1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+}
+.nextBtn {
+  flex: 1;
+  height: 50px;
+  border-radius: $r-2;
+  background: $accent;
+  color: #fff;
+  border: none;
+  font-family: $font-sans;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px color-mix(in srgb, $accent 28%, transparent);
+  transition: background 0.15s, transform 0.1s, opacity 0.15s;
+  &:hover:not(:disabled) { background: $accent-strong; }
+  &:active:not(:disabled) { transform: translateY(1px); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+/* ── Success screen ── */
+.success {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 24px;
+  gap: 6px;
+}
+.successIcon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: $success-soft;
+  color: $success;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  animation: bf-pop 0.4s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+}
+.successTitle {
+  font-family: $font-serif;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  color: $fg-0;
+  margin: 0 0 6px;
+}
+.successText { font-size: 15px; color: $fg-2; max-width: 360px; line-height: 1.6; margin: 0 0 24px; }
+
+.successCard {
+  width: 100%;
+  max-width: 360px;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  background: $bg-0;
+  padding: 4px 0;
+  margin-bottom: 24px;
+}
+.doneBtn {
+  height: 48px;
+  width: 100%;
+  max-width: 360px;
+  border-radius: $r-2;
+  background: $accent;
+  color: #fff;
+  border: none;
+  font-family: $font-sans;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  &:hover { background: $accent-strong; }
+}
+
+:global {
+  @keyframes bf-fade      { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes bf-fade-out  { from { opacity: 1 } to { opacity: 0 } }
+  @keyframes bf-pop       { from { opacity: 0; transform: scale(0.96) translateY(8px) } to { opacity: 1; transform: none } }
+  @keyframes bf-pop-out   { from { opacity: 1; transform: none } to { opacity: 0; transform: scale(0.96) translateY(8px) } }
+  @keyframes bf-sheet     { from { transform: translateY(100%) } to { transform: translateY(0) } }
+  @keyframes bf-sheet-out { from { transform: translateY(0) } to { transform: translateY(100%) } }
+  @keyframes bf-spin      { to { transform: rotate(360deg) } }
+}

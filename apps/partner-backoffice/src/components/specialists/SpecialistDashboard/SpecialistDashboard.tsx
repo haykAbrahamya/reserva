@@ -3,6 +3,7 @@ import { X, ChevronLeft, MapPin, Phone, CheckCircle2, XCircle, Clock, TrendingUp
 import { useAppStore, usePartner } from '@/store/app.store'
 import { BookingBadge } from '@/components/ui'
 import { fmtAMD, fmtTime, fmtDateShort, initials } from '@/utils/format'
+import { useT } from '@/i18n'
 import type { Specialist } from '@/types'
 import s from './SpecialistDashboard.module.scss'
 
@@ -27,6 +28,7 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
   const partner   = usePartner()
   const bookings  = useAppStore(st => st.bookings)
   const isMobile  = useIsMobile()
+  const t         = useT()
   const [closing, setClosing] = useState(false)
 
   const handleClose = useCallback(() => {
@@ -129,7 +131,7 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
             <div className={s.heroBadges}>
               <span className={[s.heroBadge, sp.active ? s.active : s.inactive].join(' ')}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'currentColor' }} />
-                {sp.active ? 'Active' : 'Inactive'}
+                {sp.active ? t('common.active') : t('common.inactive')}
               </span>
               {loc && (
                 <span className={s.heroBadge}>
@@ -149,10 +151,10 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
       {/* KPI strip */}
       <div className={s.kpiStrip}>
         {[
-          { val: total,              label: 'Total',      accent: false },
-          { val: completed,          label: 'Completed',  accent: false },
-          { val: `${completionRate}%`, label: 'Rate',     accent: true  },
-          { val: fmtAMD(totalRevenue), label: 'Revenue',  accent: false },
+          { val: total,              label: t('specialistDashboard.kpi.total'),     accent: false },
+          { val: completed,          label: t('specialistDashboard.kpi.completed'), accent: false },
+          { val: `${completionRate}%`, label: t('specialistDashboard.kpi.rate'),    accent: true  },
+          { val: fmtAMD(totalRevenue), label: t('specialistDashboard.kpi.revenue'), accent: false },
         ].map(({ val, label, accent }) => (
           <div key={label} className={s.kpi}>
             <div className={[s.kpiVal, accent ? s.kpiAccent : ''].filter(Boolean).join(' ')}>{val}</div>
@@ -165,15 +167,15 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
         {/* Status breakdown */}
         <div className={s.section}>
           <div className={s.sectionHead}>
-            <span className={s.sectionTitle}>Booking breakdown</span>
-            <span className={s.sectionBadge}>{total} total</span>
+            <span className={s.sectionTitle}>{t('specialistDashboard.bookingBreakdown')}</span>
+            <span className={s.sectionBadge}>{t('specialistDashboard.totalBadge', { count: total })}</span>
           </div>
           <div className={s.statusGrid}>
             {[
-              { icon: <CheckCircle2 size={15} />, color: 'var(--success)', dot: 'var(--success)', val: completed, lbl: 'Completed' },
-              { icon: <Clock size={15} />,        color: 'var(--accent)',  dot: 'var(--accent)',  val: pending,   lbl: 'Upcoming' },
-              { icon: <XCircle size={15} />,      color: 'var(--danger)',  dot: 'var(--danger)',  val: cancelled, lbl: 'Cancelled' },
-              { icon: <XCircle size={15} />,      color: 'var(--fg-3)',    dot: 'var(--fg-3)',    val: noshow,    lbl: 'No-shows' },
+              { icon: <CheckCircle2 size={15} />, color: 'var(--success)', dot: 'var(--success)', val: completed, lbl: t('specialistDashboard.status.completed') },
+              { icon: <Clock size={15} />,        color: 'var(--accent)',  dot: 'var(--accent)',  val: pending,   lbl: t('specialistDashboard.status.upcoming') },
+              { icon: <XCircle size={15} />,      color: 'var(--danger)',  dot: 'var(--danger)',  val: cancelled, lbl: t('specialistDashboard.status.cancelled') },
+              { icon: <XCircle size={15} />,      color: 'var(--fg-3)',    dot: 'var(--fg-3)',    val: noshow,    lbl: t('specialistDashboard.status.noshows') },
             ].map(({ color, dot, val, lbl }) => (
               <div key={lbl} className={s.statusCell}>
                 <span className={s.statusDot} style={{ background: dot }} />
@@ -189,7 +191,7 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
         {/* Weekly revenue chart */}
         <div className={s.section}>
           <div className={s.sectionHead}>
-            <span className={s.sectionTitle}>Revenue · last 7 weeks</span>
+            <span className={s.sectionTitle}>{t('specialistDashboard.revenueLast7')}</span>
             <span className={s.sectionBadge} style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--success)' }}>
               <TrendingUp size={12} /> {fmtAMD(totalRevenue)}
             </span>
@@ -205,7 +207,7 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
             ))}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 16px 10px', fontSize: 10, color: 'var(--fg-3)', fontFamily: 'var(--font-mono)' }}>
-            <span>-6w</span><span>-5w</span><span>-4w</span><span>-3w</span><span>-2w</span><span>-1w</span><span>Now</span>
+            <span>-6w</span><span>-5w</span><span>-4w</span><span>-3w</span><span>-2w</span><span>-1w</span><span>{t('specialistDashboard.now')}</span>
           </div>
         </div>
 
@@ -213,8 +215,8 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
         {svcBreakdown.length > 0 && (
           <div className={s.section}>
             <div className={s.sectionHead}>
-              <span className={s.sectionTitle}>Top services</span>
-              <span className={s.sectionBadge}>{svcBreakdown.length} types</span>
+              <span className={s.sectionTitle}>{t('specialistDashboard.topServices')}</span>
+              <span className={s.sectionBadge}>{t('specialistDashboard.typesBadge', { count: svcBreakdown.length })}</span>
             </div>
             {svcBreakdown.map(({ svc, count }) => (
               <div key={svc!.id} className={s.progressRow}>
@@ -231,22 +233,22 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
         {/* Info */}
         <div className={s.section}>
           <div className={s.sectionHead}>
-            <span className={s.sectionTitle}>Details</span>
+            <span className={s.sectionTitle}>{t('specialistDashboard.details')}</span>
           </div>
           <div className={s.infoRow}>
-            <span className={s.infoLabel}>Location</span>
+            <span className={s.infoLabel}>{t('specialistDashboard.location')}</span>
             <span className={s.infoValue}>{loc?.name ?? '—'}</span>
           </div>
           <div className={s.infoRow}>
-            <span className={s.infoLabel}>Phone</span>
+            <span className={s.infoLabel}>{t('specialistDashboard.phone')}</span>
             <span className={s.infoValue}>{sp.phone || '—'}</span>
           </div>
           <div className={s.infoRow}>
-            <span className={s.infoLabel}>Avg per booking</span>
+            <span className={s.infoLabel}>{t('specialistDashboard.avgPerBooking')}</span>
             <span className={s.infoValue}>{completed > 0 ? fmtAMD(Math.round(totalRevenue / completed)) : '—'}</span>
           </div>
           <div className={s.infoRow}>
-            <span className={s.infoLabel}>Services offered</span>
+            <span className={s.infoLabel}>{t('specialistDashboard.servicesOffered')}</span>
             <span className={s.infoValue}>{sp.services.length}</span>
           </div>
         </div>
@@ -254,11 +256,11 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
         {/* Recent bookings */}
         <div className={s.section}>
           <div className={s.sectionHead}>
-            <span className={s.sectionTitle}>Recent bookings</span>
+            <span className={s.sectionTitle}>{t('specialistDashboard.recentBookings')}</span>
             <span className={s.sectionBadge}>{recent.length}</span>
           </div>
           {recent.length === 0
-            ? <div className={s.emptySection}>No bookings yet</div>
+            ? <div className={s.emptySection}>{t('specialistDashboard.noBookings')}</div>
             : recent.map(b => {
               const svc = partner.services.find(sv => sv.id === b.serviceId)
               return (
@@ -285,7 +287,7 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
       <div className={[s.mobilePage, closing ? s.closing : ''].filter(Boolean).join(' ')}>
         <div className={s.mobileNav}>
           <button className={s.backBtn} onClick={handleClose}>
-            <ChevronLeft size={18} /> Specialists
+            <ChevronLeft size={18} /> {t('specialistDashboard.back')}
           </button>
         </div>
         {content}

@@ -4,6 +4,8 @@ import { useAppStore, usePartner } from '@/store/app.store'
 import { Avatar, Table, Th, Td, Tr, BookingBadge, Empty, Drawer } from '@/components/ui'
 import { fmtAMD, fmtDateTime, fmtDateShort } from '@/utils/format'
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
+import { useScopedLocationId } from '@/store/auth.hooks'
+import { useI18n } from '@/i18n'
 import type { Booking } from '@/types'
 import s from './Clients.module.scss'
 
@@ -29,6 +31,8 @@ export function Clients() {
   const partner  = usePartner()
   const bookings = useAppStore(st => st.bookings)
   const isMobile = useIsMobile()
+  const scopedLocationId = useScopedLocationId()
+  const { t, tp } = useI18n()
 
   const [query,        setQuery]        = useState('')
   const [selectedName, setSelectedName] = useState<string | null>(null)
@@ -39,6 +43,7 @@ export function Clients() {
     const map = new Map<string, Client>()
     bookings
       .filter(b => b.partnerId === partner.id && b.status !== 'cancelled')
+      .filter(b => !scopedLocationId || b.locationId === scopedLocationId)
       .forEach(b => {
         const key = b.clientPhone
         if (!map.has(key)) {
@@ -51,7 +56,7 @@ export function Clients() {
         if (b.startISO > c.lastVisit) c.lastVisit = b.startISO
       })
     return Array.from(map.values()).sort((a, b) => b.lastVisit.localeCompare(a.lastVisit))
-  }, [bookings, partner])
+  }, [bookings, partner, scopedLocationId])
 
   const filtered = useMemo(() =>
     query.trim()
@@ -71,13 +76,13 @@ export function Clients() {
     <div className={s.page}>
       <div className={s.head}>
         <div>
-          <h1 className={s.h1}>Clients</h1>
-          <p className={s.sub}>{partner.name} · {clients.length} client{clients.length !== 1 ? 's' : ''}</p>
+          <h1 className={s.h1}>{t('clients.title')}</h1>
+          <p className={s.sub}>{tp('clients.subtitle', clients.length, { name: partner.name })}</p>
         </div>
         <div className={s.search}>
           <Search size={14} style={{ color: 'var(--fg-3)', flexShrink: 0 }} />
           <input
-            placeholder="Search by name or phone…"
+            placeholder={t('clients.searchPlaceholder')}
             value={query}
             onChange={e => setQuery(e.target.value)}
           />
@@ -85,7 +90,7 @@ export function Clients() {
       </div>
 
       {filtered.length === 0 ? (
-        <Empty icon={Users} title="No clients found" description={query ? 'Try a different search.' : 'Clients will appear here once bookings are completed.'} />
+        <Empty icon={Users} title={t('clients.emptyTitle')} description={query ? t('clients.emptyDescSearch') : t('clients.emptyDescDefault')} />
       ) : isMobile ? (
         /* ── Mobile card list ── */
         <div className={s.cardList}>
@@ -101,15 +106,15 @@ export function Clients() {
               <div className={s.cardStats}>
                 <div className={s.cardStat}>
                   <div className={s.cardStatVal}>{c.bookings.length}</div>
-                  <div className={s.cardStatLabel}>Visits</div>
+                  <div className={s.cardStatLabel}>{t('clients.visits')}</div>
                 </div>
                 <div className={s.cardStat}>
                   <div className={s.cardStatVal}>{fmtAMD(c.totalSpend)}</div>
-                  <div className={s.cardStatLabel}>Spent</div>
+                  <div className={s.cardStatLabel}>{t('clients.spent')}</div>
                 </div>
                 <div className={s.cardStat}>
                   <div className={s.cardStatVal}>{fmtDateShort(c.lastVisit)}</div>
-                  <div className={s.cardStatLabel}>Last visit</div>
+                  <div className={s.cardStatLabel}>{t('clients.lastVisit')}</div>
                 </div>
               </div>
             </div>
@@ -121,10 +126,10 @@ export function Clients() {
           <Table>
             <thead>
               <tr>
-                <Th>Client</Th>
-                <Th>Visits</Th>
-                <Th>Total spent</Th>
-                <Th>Last visit</Th>
+                <Th>{t('bookings.col.client')}</Th>
+                <Th>{t('clients.visits')}</Th>
+                <Th>{t('clients.totalSpent')}</Th>
+                <Th>{t('clients.lastVisit')}</Th>
               </tr>
             </thead>
             <tbody>
@@ -141,7 +146,7 @@ export function Clients() {
                   </Td>
                   <Td>
                     <div className={s.stat}>{c.bookings.length}</div>
-                    <div className={s.statSub}>{c.bookings.filter(b => b.status === 'completed').length} completed</div>
+                    <div className={s.statSub}>{t('clients.completedCount', { count: c.bookings.filter(b => b.status === 'completed').length })}</div>
                   </Td>
                   <Td><span className={s.stat}>{fmtAMD(c.totalSpend)}</span></Td>
                   <Td><span className={s.lastDate}>{fmtDateTime(c.lastVisit)}</span></Td>
@@ -161,12 +166,12 @@ export function Clients() {
           subtitle={selectedClient.phone}
         >
           <div className={s.drawerSection}>
-            <div className={s.drawerLabel}>Stats</div>
+            <div className={s.drawerLabel}>{t('clients.stats')}</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginTop: 4 }}>
               {[
-                { label: 'Visits',     value: selectedClient.bookings.length },
-                { label: 'Completed',  value: selectedClient.bookings.filter(b => b.status === 'completed').length },
-                { label: 'Total spent', value: fmtAMD(selectedClient.totalSpend) },
+                { label: t('clients.visits'),     value: selectedClient.bookings.length },
+                { label: t('clients.completed'),  value: selectedClient.bookings.filter(b => b.status === 'completed').length },
+                { label: t('clients.totalSpent'), value: fmtAMD(selectedClient.totalSpend) },
               ].map(stat => (
                 <div key={stat.label} style={{ background: 'var(--bg-2)', borderRadius: 8, padding: '10px 12px', textAlign: 'center' }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: 16, fontWeight: 600 }}>{stat.value}</div>
@@ -177,7 +182,7 @@ export function Clients() {
           </div>
 
           <div className={s.drawerSection}>
-            <div className={s.drawerLabel}>Booking history</div>
+            <div className={s.drawerLabel}>{t('clients.bookingHistory')}</div>
             {selectedClient.bookings
               .sort((a, b) => b.startISO.localeCompare(a.startISO))
               .map(b => {

@@ -1,0 +1,175 @@
+@use 'variables' as *;
+
+.section {
+  padding: 56px 24px;
+  background: $bg-4;
+  border-top: 1px solid $line-1;
+  border-bottom: 1px solid $line-1;
+
+  @media (max-width: 600px) { padding: 44px 18px; }
+}
+
+.inner { max-width: 1080px; margin: 0 auto; }
+
+.head { margin-bottom: 28px; }
+.eyebrow {
+  font-size: 12px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: $accent; margin-bottom: 10px;
+}
+.title {
+  font-family: $font-serif;
+  font-size: clamp(26px, 4vw, 38px);
+  letter-spacing: -0.025em;
+  color: $fg-0;
+  margin: 0;
+}
+
+/* Category filter chips */
+.chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+.chip {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: $font-sans;
+  background: $bg-1;
+  border: 1px solid $line-2;
+  color: $fg-1;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  &:hover { background: $bg-2; }
+  &.active { background: $accent-soft; border-color: $accent; color: $accent-strong; }
+}
+
+/* Service rows */
+.list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  @media (max-width: 720px) { grid-template-columns: 1fr; }
+}
+
+.card {
+  position: relative;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: $shadow-1;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+
+  /* accent edge that grows in on hover */
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: $accent;
+    transform: scaleY(0);
+    transform-origin: center;
+    transition: transform 0.25s cubic-bezier(0.22, 0.86, 0.23, 1);
+  }
+
+  &:hover {
+    border-color: $line-2;
+    box-shadow: $shadow-2;
+    transform: translateY(-2px);
+    &::before { transform: scaleY(1); }
+  }
+}
+
+.cardBody { flex: 1; min-width: 0; }
+.svcName {
+  font-size: 15px;
+  font-weight: 600;
+  color: $fg-0;
+  margin-bottom: 5px;
+  letter-spacing: -0.01em;
+}
+.svcMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: $fg-2;
+}
+.dot { width: 3px; height: 3px; border-radius: 50%; background: $fg-3; }
+.price { font-family: $font-serif; font-size: 18px; color: $fg-0; letter-spacing: -0.01em; }
+
+.bookBtn {
+  flex-shrink: 0;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: $r-2;
+  background: $bg-2;
+  color: $fg-0;
+  border: 1px solid $line-2;
+  font-family: $font-sans;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover {
+    background: $accent;
+    color: #fff;
+    border-color: $accent;
+  }
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+/* ── Mobile: stack into a cleaner card layout ── */
+@media (max-width: 560px) {
+  .card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* top: name + meta */
+  .cardBody {
+    padding: 16px 16px 12px;
+  }
+  .svcName { font-size: 16px; }
+
+  /* bottom: price + book on one row, divided from the name block */
+  .right {
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-top: 1px solid $line-1;
+    background: $bg-0;
+  }
+  .price { font-size: 17px; }
+  .bookBtn {
+    height: 40px;
+    padding: 0 18px;
+  }
+}

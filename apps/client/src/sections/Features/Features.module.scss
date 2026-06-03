@@ -1,0 +1,73 @@
+@use 'variables' as *;
+
+.section {
+  padding: 96px 24px;
+  background: $bg-0;
+
+  @media (max-width: 640px) { padding: 72px 18px; }
+}
+
+.inner { max-width: 1120px; margin: 0 auto; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+
+  @media (max-width: 900px) { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 560px) { grid-template-columns: 1fr; }
+}
+
+.card {
+  height: 100%;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  padding: 28px;
+  box-shadow: $shadow-1;
+  transition: transform 0.25s cubic-bezier(0.22, 0.86, 0.23, 1), box-shadow 0.25s, border-color 0.25s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-2;
+    border-color: $line-2;
+  }
+}
+
+/* The Reveal wrapper sits between the grid cell and the card — make it
+   stretch so every card matches its row's height. */
+.cell {
+  height: 100%;
+}
+
+/* Make the first card span wider on large screens for rhythm */
+.card.wide {
+  @media (min-width: 901px) { grid-column: span 1; }
+}
+
+.iconWrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  background: $accent-soft;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $accent;
+  margin-bottom: 18px;
+}
+
+.cardTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: $fg-0;
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+
+.cardText {
+  font-size: 14px;
+  line-height: 1.6;
+  color: $fg-2;
+  margin: 0;
+}

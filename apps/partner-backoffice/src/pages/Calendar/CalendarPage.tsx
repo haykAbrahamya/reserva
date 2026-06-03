@@ -7,6 +7,8 @@ import { isSameDay, fmtTime, fmtAMD } from '@/utils/format'
 import { bookingsService } from '@/services/bookings.service'
 import { useToast } from '@/components/ui'
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
+import { useScopedLocationId } from '@/store/auth.hooks'
+import { useT } from '@/i18n'
 import type { Booking } from '@/types'
 import s from './CalendarPage.module.scss'
 
@@ -30,6 +32,8 @@ export function CalendarPage() {
   const upsertBooking  = useAppStore(st => st.upsertBooking)
   const openNewBooking = useNewBooking()
   const toast          = useToast()
+  const scopedLocationId = useScopedLocationId()
+  const t              = useT()
 
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768)
   useEffect(() => {
@@ -57,11 +61,17 @@ export function CalendarPage() {
     setMobDay(d)
   }
 
+  // Managers only see their branch's specialists (and therefore bookings).
+  const branchSpecialists = useMemo(
+    () => (partner?.specialists ?? []).filter(sp => !scopedLocationId || sp.locationId === scopedLocationId),
+    [partner, scopedLocationId]
+  )
+
   const visibleSpecialists = useMemo(() =>
     filterSp === 'all'
-      ? (partner?.specialists.filter(sp => sp.active) ?? [])
-      : (partner?.specialists.filter(sp => sp.id === filterSp) ?? []),
-    [partner, filterSp]
+      ? branchSpecialists.filter(sp => sp.active)
+      : branchSpecialists.filter(sp => sp.id === filterSp),
+    [branchSpecialists, filterSp]
   )
 
   const filteredBookings = useMemo(() =>
@@ -132,12 +142,12 @@ export function CalendarPage() {
       const newEnd = new Date(newStart.getTime() + dur)
       const updated = await bookingsService.update(dr.bookingId, { startISO: newStart.toISOString(), endISO: newEnd.toISOString() })
       upsertBooking(updated)
-      toast(`Moved to ${newStart.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`)
+      toast(t('calendar.movedTo', { time: newStart.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) }))
     }
 
     document.addEventListener('mousemove', onMove)
     document.addEventListener('mouseup', onUp)
-  }, [days, upsertBooking, toast])
+  }, [days, upsertBooking, toast, t])
 
   // Touch: tap = open detail, no drag on mobile calendar (drag handled by grid)
   const onEventTouchStart = useCallback((_e: React.TouchEvent, b: Booking, _dayIdx: number) => {
@@ -196,7 +206,7 @@ export function CalendarPage() {
           {mobDayBks.length === 0 ? (
             <div className={s.mobEmpty}>
               <Calendar size={28} strokeWidth={1} style={{ color: 'var(--fg-3)', marginBottom: 8 }} />
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: 18, color: 'var(--fg-1)' }}>Nothing booked</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: 18, color: 'var(--fg-1)' }}>{t('calendar.nothingBooked')}</div>
               <div style={{ fontSize: 13, color: 'var(--fg-2)', marginTop: 4 }}>
                 {mobDay.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
               </div>
@@ -215,7 +225,7 @@ export function CalendarPage() {
                   </div>
                   <div className={s.mobEventName}>{b.clientName}</div>
                   <div className={s.mobEventSub}>
-                    {svc?.name ?? '—'} · with {sp?.name.split(' ')[0] ?? '—'}
+                    {svc?.name ?? '—'} · {t('calendar.with')} {sp?.name.split(' ')[0] ?? '—'}
                     {svc && <span> · {fmtAMD(svc.price)}</span>}
                   </div>
                 </div>
@@ -237,7 +247,7 @@ export function CalendarPage() {
       <div className={s.toolbar}>
         <div className={s.navGroup}>
           <button className={`${s.navBtn} ${s.iconOnly}`} onClick={() => move(-1)}><ChevronLeft size={13} /></button>
-          <button className={s.navBtn} onClick={goToday}>Today</button>
+          <button className={s.navBtn} onClick={goToday}>{t('calendar.today')}</button>
           <button className={`${s.navBtn} ${s.iconOnly}`} onClick={() => move(1)}><ChevronRight size={13} /></button>
           <span className={s.dateLabel}>{dateLabel}</span>
         </div>
@@ -246,14 +256,14 @@ export function CalendarPage() {
           className={s.filterSelect}
           value={filterSp}
           onChange={setFilterSp}
-          options={[{ value: 'all', label: 'All specialists' }, ...partner.specialists.map(sp => ({ value: sp.id, label: sp.name, sub: sp.title }))]}
+          options={[{ value: 'all', label: t('calendar.allSpecialists') }, ...branchSpecialists.map(sp => ({ value: sp.id, label: sp.name, sub: sp.title }))]}
           size="sm"
         />
         <div className={s.viewToggle}>
-          <button className={[s.viewBtn, view === 'day' ? s.active : ''].filter(Boolean).join(' ')} onClick={() => setView('day')}>Day</button>
-          <button className={[s.viewBtn, view === 'week' ? s.active : ''].filter(Boolean).join(' ')} onClick={() => setView('week')}>Week</button>
+          <button className={[s.viewBtn, view === 'day' ? s.active : ''].filter(Boolean).join(' ')} onClick={() => setView('day')}>{t('calendar.day')}</button>
+          <button className={[s.viewBtn, view === 'week' ? s.active : ''].filter(Boolean).join(' ')} onClick={() => setView('week')}>{t('calendar.week')}</button>
         </div>
-        <button className={s.newBtn} onClick={openNewBooking}><Plus size={13} /> New</button>
+        <button className={s.newBtn} onClick={openNewBooking}><Plus size={13} /> {t('calendar.new')}</button>
       </div>
 
       <div className={s.gridWrap} style={{ userSelect: 'none' }}>

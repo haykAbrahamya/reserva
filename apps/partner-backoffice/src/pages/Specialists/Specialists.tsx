@@ -4,6 +4,8 @@ import { useAppStore, usePartner } from '@/store/app.store'
 import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Select, Avatar, Empty, Badge } from '@/components/ui'
 import { SpecialistDashboard } from '@/components/specialists/SpecialistDashboard/SpecialistDashboard'
 import { partnersService } from '@/services/partners.service'
+import { useScopedLocationId } from '@/store/auth.hooks'
+import { useI18n } from '@/i18n'
 import type { Specialist } from '@/types'
 import s from './Specialists.module.scss'
 
@@ -23,6 +25,8 @@ export function Specialists() {
   const partner     = usePartner()
   const setPartners = useAppStore(st => st.setPartners)
   const isMobile    = useIsMobile()
+  const scopedLocationId = useScopedLocationId()
+  const { t }       = useI18n()
 
   const [modalOpen,   setModalOpen]   = useState(false)
   const [editing,     setEditing]     = useState<Specialist | null>(null)
@@ -31,9 +35,16 @@ export function Specialists() {
 
   if (!partner) return null
 
+  // Managers only manage their own branch's team.
+  const specialists = scopedLocationId
+    ? partner.specialists.filter(sp => sp.locationId === scopedLocationId)
+    : partner.specialists
+  // Managers can't reassign branches — lock the location select to their branch.
+  const lockedLocation = scopedLocationId
+
   const openNew = () => {
     setEditing(null)
-    setForm({ ...EMPTY_FORM, locationId: partner.locations[0]?.id ?? '' })
+    setForm({ ...EMPTY_FORM, locationId: lockedLocation ?? partner.locations[0]?.id ?? '' })
     setModalOpen(true)
   }
 
@@ -57,20 +68,20 @@ export function Specialists() {
     <div className={s.page}>
       <div className={s.head}>
         <div>
-          <h1 className={s.h1}>Specialists</h1>
-          <p className={s.sub}>{partner.name} · {partner.specialists.length} staff</p>
+          <h1 className={s.h1}>{t('specialists.title')}</h1>
+          <p className={s.sub}>{t('specialists.subtitle', { name: partner.name, count: specialists.length })}</p>
         </div>
-        <Button variant="accent" onClick={openNew}><Plus size={14} /> Add specialist</Button>
+        <Button variant="accent" onClick={openNew}><Plus size={14} /> {t('specialists.addSpecialist')}</Button>
       </div>
 
-      {partner.specialists.length === 0 ? (
-        <Empty icon={User} title="No specialists yet" description="Add your first team member."
-          action={<Button variant="accent" onClick={openNew}><Plus size={14} /> Add specialist</Button>}
+      {specialists.length === 0 ? (
+        <Empty icon={User} title={t('specialists.emptyTitle')} description={t('specialists.emptyDesc')}
+          action={<Button variant="accent" onClick={openNew}><Plus size={14} /> {t('specialists.addSpecialist')}</Button>}
         />
       ) : isMobile ? (
         /* ── Mobile: cards ── */
         <div className={s.cardList}>
-          {partner.specialists.map(sp => {
+          {specialists.map(sp => {
             const loc = partner.locations.find(l => l.id === sp.locationId)
             const visibleSvcs = sp.services.slice(0, 3)
             const extra = sp.services.length - visibleSvcs.length
@@ -83,9 +94,9 @@ export function Specialists() {
                     <div className={s.spCardTitle}>{sp.title}</div>
                   </div>
                   <div className={s.spCardRight}>
-                    <Badge variant={sp.active ? 'active' : 'inactive'} />
+                    <Badge variant={sp.active ? 'active' : 'inactive'} label={sp.active ? t('common.active') : t('common.inactive')} />
                     <button className={s.spCardEditBtn} onClick={e => { e.stopPropagation(); openEdit(sp) }}>
-                      <Pencil size={12} /> Edit
+                      <Pencil size={12} /> {t('common.edit')}
                     </button>
                   </div>
                 </div>
@@ -99,7 +110,7 @@ export function Specialists() {
                       const svc = partner.services.find(sv => sv.id === sid)
                       return svc ? <span key={sid} className={s.svcPill}>{svc.name}</span> : null
                     })}
-                    {extra > 0 && <span className={[s.svcPill, s.more].join(' ')}>+{extra} more</span>}
+                    {extra > 0 && <span className={[s.svcPill, s.more].join(' ')}>{t('common.more', { count: extra })}</span>}
                   </div>
                 </div>
               </div>
@@ -112,16 +123,16 @@ export function Specialists() {
           <Table>
             <thead>
               <tr>
-                <Th>Name</Th>
-                <Th>Location</Th>
-                <Th>Services</Th>
-                <Th>Active</Th>
+                <Th>{t('specialists.col.name')}</Th>
+                <Th>{t('specialists.col.location')}</Th>
+                <Th>{t('specialists.col.services')}</Th>
+                <Th>{t('specialists.col.active')}</Th>
                 <Th></Th>
                 <Th></Th>
               </tr>
             </thead>
             <tbody>
-              {partner.specialists.map(sp => {
+              {specialists.map(sp => {
                 const loc = partner.locations.find(l => l.id === sp.locationId)
                 return (
                   <Tr key={sp.id} onClick={() => setDashboardSp(sp)}>
@@ -144,14 +155,14 @@ export function Specialists() {
                         {sp.services.length > 3 && <span className={s.svcTag}>+{sp.services.length - 3}</span>}
                       </div>
                     </Td>
-                    <Td><Badge variant={sp.active ? 'active' : 'inactive'} /></Td>
+                    <Td><Badge variant={sp.active ? 'active' : 'inactive'} label={sp.active ? t('common.active') : t('common.inactive')} /></Td>
                     <Td>
                       <Button variant="ghost" size="sm" icon onClick={e => { e.stopPropagation(); openEdit(sp) }}>
                         <Pencil size={13} />
                       </Button>
                     </Td>
                     <Td>
-                      <span className={s.viewHint}>View stats →</span>
+                      <span className={s.viewHint}>{t('specialists.viewStats')}</span>
                     </Td>
                   </Tr>
                 )
@@ -164,30 +175,31 @@ export function Specialists() {
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        title={editing ? 'Edit specialist' : 'New specialist'}
+        title={editing ? t('specialists.modal.editTitle') : t('specialists.modal.newTitle')}
         footer={
           <>
-            <Button variant="ghost" onClick={() => setModalOpen(false)}>Cancel</Button>
-            <Button variant="accent" onClick={handleSave}>Save</Button>
+            <Button variant="ghost" onClick={() => setModalOpen(false)}>{t('common.cancel')}</Button>
+            <Button variant="accent" onClick={handleSave}>{t('common.save')}</Button>
           </>
         }
       >
         <div className={s.formGrid}>
           <div className={s.formFull}>
-            <Input label="Full name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Anush Petrosyan" />
+            <Input label={t('specialists.modal.nameLabel')} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder={t('specialists.modal.namePlaceholder')} />
           </div>
-          <Input label="Title / role" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="e.g. Senior barber" />
-          <Input label="Phone" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+374 91 …" />
+          <Input label={t('specialists.modal.titleLabel')} value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder={t('specialists.modal.titlePlaceholder')} />
+          <Input label={t('specialists.modal.phoneLabel')} value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder={t('specialists.modal.phonePlaceholder')} />
           <div className={s.formFull}>
-            <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>Location</label>
+            <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('specialists.modal.locationLabel')}</label>
             <Select
               value={form.locationId}
               onChange={v => setForm(f => ({ ...f, locationId: v }))}
               options={partner.locations.map(l => ({ value: l.id, label: l.name }))}
+              disabled={!!lockedLocation}
             />
           </div>
           <div className={s.formFull}>
-            <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', marginBottom: 8 }}>Services</div>
+            <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', marginBottom: 8 }}>{t('specialists.modal.servicesLabel')}</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               {partner.services.map(svc => (
                 <button
@@ -209,7 +221,7 @@ export function Specialists() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Toggle checked={form.active} onChange={v => setForm(f => ({ ...f, active: v }))} />
-            <span style={{ fontSize: 13 }}>Active</span>
+            <span style={{ fontSize: 13 }}>{t('specialists.modal.active')}</span>
           </div>
         </div>
       </Modal>

@@ -1,0 +1,25 @@
+@use 'variables' as *;
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: $accent;
+  box-shadow: $shadow-1;
+  flex-shrink: 0;
+}
+
+.name {
+  font-family: $font-serif;
+  font-size: 21px;
+  letter-spacing: -0.015em;
+  color: $fg-0;
+  line-height: 1;
+}

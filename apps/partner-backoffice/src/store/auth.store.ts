@@ -1,12 +1,17 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
+export type Role = 'admin' | 'manager'
+
 export interface AuthUser {
   id: string
   name: string
   email: string
-  role: 'owner' | 'manager' | 'staff'
+  phone: string
+  role: Role
   partnerId: string
+  /** Managers are scoped to a single branch. Admin = null (all locations). */
+  locationId: string | null
   avatar?: string
 }
 

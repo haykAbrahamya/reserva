@@ -1,0 +1,229 @@
+@use 'variables' as *;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  background: var(--scrim);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: sm-fade 0.24s ease both;
+
+  @media (max-width: 600px) { padding: 0; align-items: flex-end; }
+  &.closing { animation: sm-fade-out 0.24s ease both; }
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  max-height: 88vh;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  box-shadow: $shadow-3;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: sm-pop 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @media (max-width: 600px) {
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 22px 22px 0 0;
+    border-bottom: none;
+    animation: sm-sheet 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  &.closing {
+    animation: sm-pop-out 0.26s ease both;
+    @media (max-width: 600px) { animation: sm-sheet-out 0.3s cubic-bezier(0.4,0,1,1) both; }
+  }
+}
+
+.closeBtn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  border-radius: $r-1;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+  &:hover { background: rgba(255,255,255,0.22); }
+}
+
+/* ── Header banner (branded gradient) ── */
+.banner {
+  position: relative;
+  padding: 30px 24px 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.bannerGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+}
+.avatar {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-serif;
+  font-size: 28px;
+  color: #fff;
+  flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.3);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+.bannerInfo { position: relative; min-width: 0; }
+.spName { font-family: $font-serif; font-size: 24px; letter-spacing: -0.01em; color: #fff; line-height: 1.1; }
+.spTitle { font-size: 14px; color: rgba(255,255,255,0.82); margin-top: 3px; }
+.spRating {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #fff;
+  background: rgba(255,255,255,0.16);
+  padding: 3px 10px;
+  border-radius: 999px;
+  .star { color: #FFD27A; }
+  .count { color: rgba(255,255,255,0.7); }
+}
+
+/* ── Body ── */
+.body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px 24px;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1px;
+  background: $line-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  overflow: hidden;
+  margin-bottom: 22px;
+}
+.stat { background: $bg-1; padding: 12px 8px; text-align: center; }
+.statVal { font-family: $font-serif; font-size: 20px; color: $fg-0; letter-spacing: -0.01em; }
+.statLabel { font-size: 11px; color: $fg-3; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+.sectionLabel {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $fg-3;
+  margin: 0 0 10px;
+}
+
+.bio {
+  font-size: 14px;
+  line-height: 1.6;
+  color: $fg-1;
+  margin: 0 0 22px;
+}
+
+/* services chips */
+.svcChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 24px;
+}
+.chip {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: $bg-2;
+  color: $fg-1;
+  border: 1px solid $line-2;
+}
+
+/* reviews */
+.reviews { display: flex; flex-direction: column; gap: 12px; }
+.review {
+  background: $bg-0;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  padding: 14px 16px;
+}
+.reviewHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 7px;
+}
+.reviewAuthor { font-size: 13px; font-weight: 600; color: $fg-0; }
+.reviewStars { font-size: 12px; color: $warn; letter-spacing: 0.5px; }
+.reviewDate { font-size: 11px; color: $fg-3; }
+.reviewText { font-size: 13px; line-height: 1.5; color: $fg-2; margin: 0; }
+
+/* ── Footer CTA ── */
+.footer {
+  flex-shrink: 0;
+  padding: 14px 24px;
+  border-top: 1px solid $line-1;
+  padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+}
+.bookBtn {
+  width: 100%;
+  height: 50px;
+  border-radius: $r-2;
+  background: $accent;
+  color: #fff;
+  border: none;
+  font-family: $font-sans;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px color-mix(in srgb, $accent 28%, transparent);
+  transition: background 0.15s, transform 0.1s;
+  &:hover { background: $accent-strong; }
+  &:active { transform: translateY(1px); }
+}
+
+:global {
+  @keyframes sm-fade      { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes sm-fade-out  { from { opacity: 1 } to { opacity: 0 } }
+  @keyframes sm-pop       { from { opacity: 0; transform: scale(0.96) translateY(10px) } to { opacity: 1; transform: none } }
+  @keyframes sm-pop-out   { from { opacity: 1; transform: none } to { opacity: 0; transform: scale(0.96) translateY(10px) } }
+  @keyframes sm-sheet     { from { transform: translateY(100%) } to { transform: translateY(0) } }
+  @keyframes sm-sheet-out { from { transform: translateY(0) } to { transform: translateY(100%) } }
+}

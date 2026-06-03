@@ -1,0 +1,416 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "saveChanges": "Save changes",
+    "saving": "Saving…",
+    "remove": "Remove",
+    "edit": "Edit",
+    "add": "Add",
+    "active": "Active",
+    "inactive": "Inactive",
+    "backoffice": "Backoffice",
+    "dash": "—",
+    "more": "+{count} more",
+    "search": "Search…"
+  },
+  "nav": {
+    "sections": {
+      "operations": "Operations",
+      "catalog": "Catalog",
+      "account": "Account"
+    },
+    "dashboard": "Dashboard",
+    "calendar": "Calendar",
+    "bookings": "Bookings",
+    "clients": "Clients",
+    "services": "Services",
+    "specialists": "Specialists",
+    "hours": "Working hours",
+    "locations": "Locations",
+    "users": "Users",
+    "settings": "Settings",
+    "home": "Home",
+    "more": "More",
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar"
+  },
+  "roles": {
+    "admin": "Admin",
+    "manager": "Manager"
+  },
+  "changePassword": {
+    "title": "Change password",
+    "subtitle": "Update the password you use to sign in.",
+    "currentLabel": "Old password",
+    "newLabel": "New password",
+    "confirmLabel": "Confirm new password",
+    "save": "Update password",
+    "saving": "Updating…",
+    "show": "Show password",
+    "hide": "Hide password",
+    "minLen": "Must be at least {n} characters.",
+    "sameAsOld": "New password must differ from the old one.",
+    "mismatch": "Passwords don't match.",
+    "wrongCurrent": "Your old password is incorrect.",
+    "failed": "Couldn't update password. Please try again.",
+    "toast": "Password updated"
+  },
+  "users": {
+    "title": "Users",
+    "subtitle": "{name} · {count} managers",
+    "addManager": "Add manager",
+    "emptyTitle": "No managers yet",
+    "emptyDesc": "Create a manager to give a branch its own login.",
+    "toast": { "removed": "Manager removed" },
+    "modal": {
+      "title": "New manager",
+      "subtitle": "Create a branch login. We'll send them a one-time password.",
+      "create": "Create manager",
+      "creating": "Creating…",
+      "nameLabel": "Full name",
+      "namePlaceholder": "e.g. Nare Avetisyan",
+      "phoneLabel": "Phone",
+      "emailLabel": "Email",
+      "locationLabel": "Location",
+      "locationPlaceholder": "Select branch…",
+      "otpLabel": "Send one-time password via",
+      "viaPhone": "Phone (SMS)",
+      "viaEmail": "Email",
+      "otpHint": "The manager signs in with their email or phone and this one-time password."
+    },
+    "created": {
+      "title": "Manager created",
+      "sentPhone": "A one-time password was sent to {name} at {to}.",
+      "sentEmail": "A one-time password was sent to {name} at {to}.",
+      "otpLabel": "One-time password",
+      "copy": "Copy",
+      "loginHint": "They can sign in with: {login}",
+      "done": "Done"
+    },
+    "delete": {
+      "title": "Remove manager?",
+      "body": "Are you sure you want to remove {name}? They will immediately lose access to the backoffice."
+    }
+  },
+  "sidebar": {
+    "locationCount": "{type} · {count} location",
+    "locationCount_plural": "{type} · {count} locations"
+  },
+  "status": {
+    "confirmed": "Confirmed",
+    "pending": "Pending",
+    "cancelled": "Cancelled",
+    "completed": "Completed",
+    "noshow": "No-show"
+  },
+  "userMenu": {
+    "settings": "Settings",
+    "signOut": "Sign out"
+  },
+  "login": {
+    "features": {
+      "bookings": { "title": "Bookings around the clock", "desc": "Clients book online, day or night" },
+      "team": { "title": "Your whole team, organized", "desc": "Specialists, services & schedules" },
+      "revenue": { "title": "Revenue at a glance", "desc": "Track every booking and earning" }
+    },
+    "quote": "Your salon, beautifully managed.",
+    "tagline": "Reserva · Booking platform for Armenian salons",
+    "welcomeBack": "Welcome back",
+    "subtitle": "Sign in to your backoffice dashboard",
+    "emailLabel": "Email address",
+    "passwordLabel": "Password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "signIn": "Sign in",
+    "signingIn": "Signing in…",
+    "emailRequired": "Email is required.",
+    "passwordRequired": "Password is required.",
+    "loginFailed": "Login failed. Please try again.",
+    "copyright": "© {year} Reserva. All rights reserved."
+  },
+  "topbar": {
+    "titles": {
+      "/": "Dashboard",
+      "/calendar": "Calendar",
+      "/bookings": "Bookings",
+      "/clients": "Clients",
+      "/services": "Services",
+      "/specialists": "Specialists",
+      "/hours": "Working hours",
+      "/locations": "Locations",
+      "/settings": "Settings"
+    }
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Good morning, {name}",
+      "afternoon": "Good afternoon, {name}",
+      "evening": "Good evening, {name}"
+    },
+    "fallbackName": "there",
+    "openCalendar": "Open calendar",
+    "newBooking": "New booking",
+    "kpi": {
+      "bookingsToday": "Bookings today",
+      "confirmed": "{count} confirmed",
+      "revenue7": "Revenue — 7 days",
+      "servicesCompleted": "{count} services completed",
+      "upcoming30": "Upcoming — 30 days",
+      "onBooks": "bookings on books",
+      "noshows7": "No-shows — 7 days",
+      "aboveAverage": "above average",
+      "withinRange": "within range"
+    },
+    "todaySchedule": "Today's schedule",
+    "quietDay": "No bookings yet — quiet day.",
+    "scheduleSummary": "{booked} booked · {upcoming} upcoming",
+    "viewCalendar": "View calendar",
+    "emptyDay": "Empty day",
+    "walkIns": "You can still take walk-ins.",
+    "tomorrow": "Tomorrow",
+    "tomorrowCount": "{count} bookings",
+    "nothingBooked": "Nothing booked.",
+    "todayOccupancy": "Today's occupancy",
+    "slotsFilled": "of bookable slots filled"
+  },
+  "bookings": {
+    "title": "Bookings",
+    "subtitle": "{name} · {count} record",
+    "subtitle_plural": "{name} · {count} records",
+    "newBooking": "New booking",
+    "filters": {
+      "all": "All",
+      "confirmed": "Confirmed",
+      "pending": "Pending",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "noshow": "No-show"
+    },
+    "emptyTitle": "No bookings found",
+    "emptyDescFilter": "Try changing the filter or add a new booking.",
+    "emptyDescCreate": "Try changing the filter or create a new booking.",
+    "col": {
+      "client": "Client",
+      "service": "Service",
+      "specialist": "Specialist",
+      "datetime": "Date & time",
+      "price": "Price",
+      "status": "Status"
+    }
+  },
+  "services": {
+    "title": "Services",
+    "subtitle": "{name} · {count} service",
+    "subtitle_plural": "{name} · {count} services",
+    "addService": "Add service",
+    "emptyTitle": "No services yet",
+    "emptyDesc": "Add your first service to start taking bookings.",
+    "otherCategory": "Other",
+    "col": {
+      "name": "Name",
+      "category": "Category",
+      "duration": "Duration",
+      "price": "Price",
+      "active": "Active"
+    },
+    "modal": {
+      "newTitle": "New service",
+      "editTitle": "Edit service",
+      "save": "Save service",
+      "nameLabel": "Service name",
+      "namePlaceholder": "e.g. Haircut",
+      "priceLabel": "Price (AMD)",
+      "pricePlaceholder": "5000",
+      "durationLabel": "Duration (min)",
+      "durationPlaceholder": "30",
+      "categoryLabel": "Category",
+      "categoryPlaceholder": "e.g. Hair",
+      "active": "Active"
+    }
+  },
+  "specialists": {
+    "title": "Specialists",
+    "subtitle": "{name} · {count} staff",
+    "addSpecialist": "Add specialist",
+    "emptyTitle": "No specialists yet",
+    "emptyDesc": "Add your first team member.",
+    "viewStats": "View stats →",
+    "col": {
+      "name": "Name",
+      "location": "Location",
+      "services": "Services",
+      "active": "Active"
+    },
+    "modal": {
+      "newTitle": "New specialist",
+      "editTitle": "Edit specialist",
+      "nameLabel": "Full name",
+      "namePlaceholder": "e.g. Anush Petrosyan",
+      "titleLabel": "Title / role",
+      "titlePlaceholder": "e.g. Senior barber",
+      "phoneLabel": "Phone",
+      "phonePlaceholder": "+374 91 …",
+      "locationLabel": "Location",
+      "servicesLabel": "Services",
+      "active": "Active"
+    }
+  },
+  "specialistDashboard": {
+    "back": "Specialists",
+    "kpi": {
+      "total": "Total",
+      "completed": "Completed",
+      "rate": "Rate",
+      "revenue": "Revenue"
+    },
+    "bookingBreakdown": "Booking breakdown",
+    "totalBadge": "{count} total",
+    "status": {
+      "completed": "Completed",
+      "upcoming": "Upcoming",
+      "cancelled": "Cancelled",
+      "noshows": "No-shows"
+    },
+    "revenueLast7": "Revenue · last 7 weeks",
+    "now": "Now",
+    "topServices": "Top services",
+    "typesBadge": "{count} types",
+    "details": "Details",
+    "location": "Location",
+    "phone": "Phone",
+    "avgPerBooking": "Avg per booking",
+    "servicesOffered": "Services offered",
+    "recentBookings": "Recent bookings",
+    "noBookings": "No bookings yet"
+  },
+  "clients": {
+    "title": "Clients",
+    "subtitle": "{name} · {count} client",
+    "subtitle_plural": "{name} · {count} clients",
+    "searchPlaceholder": "Search by name or phone…",
+    "emptyTitle": "No clients found",
+    "emptyDescSearch": "Try a different search.",
+    "emptyDescDefault": "Clients will appear here once bookings are completed.",
+    "visits": "Visits",
+    "spent": "Spent",
+    "lastVisit": "Last visit",
+    "totalSpent": "Total spent",
+    "completedCount": "{count} completed",
+    "stats": "Stats",
+    "completed": "Completed",
+    "bookingHistory": "Booking history"
+  },
+  "hours": {
+    "title": "Working hours",
+    "subtitle": "{name} · weekly schedule per specialist",
+    "specialists": "Specialists",
+    "selectSpecialist": "Select a specialist",
+    "selectSpecialistHint": "Pick someone from the list to edit their hours.",
+    "days": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    }
+  },
+  "locations": {
+    "title": "Locations",
+    "subtitle": "{name} · {count} branch",
+    "subtitle_plural": "{name} · {count} branches",
+    "addLocation": "Add location",
+    "emptyTitle": "No locations yet",
+    "emptyDesc": "Add your first branch so clients can book a place.",
+    "modal": {
+      "newTitle": "New location",
+      "editTitle": "Edit location",
+      "newSubtitle": "Add a new branch for this salon",
+      "addLocation": "Add location",
+      "nameLabel": "Branch name",
+      "namePlaceholder": "e.g. Arabkir",
+      "addressLabel": "Address",
+      "addressPlaceholder": "e.g. 34 Komitas Ave, Yerevan",
+      "phoneLabel": "Phone",
+      "phonePlaceholder": "+374 10 …"
+    },
+    "delete": {
+      "title": "Remove location?",
+      "body": "Are you sure you want to remove {name}? Specialists assigned to this branch will need to be reassigned."
+    },
+    "toast": {
+      "updated": "Location updated",
+      "added": "Location added",
+      "removed": "Location removed"
+    }
+  },
+  "calendar": {
+    "today": "Today",
+    "day": "Day",
+    "week": "Week",
+    "new": "New",
+    "allSpecialists": "All specialists",
+    "nothingBooked": "Nothing booked",
+    "movedTo": "Moved to {time}",
+    "with": "with"
+  },
+  "newBooking": {
+    "title": "New booking",
+    "subtitle": "Fill in the details to create a booking",
+    "confirm": "Confirm booking",
+    "locationLabel": "Location",
+    "locationPlaceholder": "Select location…",
+    "serviceLabel": "Service",
+    "servicePlaceholder": "Select service…",
+    "serviceSub": "{duration} min · {price} AMD",
+    "specialistLabel": "Specialist",
+    "specialistPlaceholder": "Select specialist…",
+    "dateLabel": "Date",
+    "timeLabel": "Time",
+    "slotsHint": "Select a specialist and date to see available slots.",
+    "clientNameLabel": "Client name",
+    "clientNamePlaceholder": "Anna Karapetyan",
+    "clientPhoneLabel": "Client phone",
+    "clientPhonePlaceholder": "+374 91 …",
+    "summary": "{date} at {time} · {service} ({duration} min)",
+    "confirmedToast": "Booking confirmed for {name}"
+  },
+  "bookingDrawer": {
+    "status": "Status",
+    "actions": {
+      "confirm": "Confirm",
+      "complete": "Complete",
+      "cancel": "Cancel",
+      "noshow": "No-show"
+    },
+    "statusToast": "Booking {status}",
+    "when": "When",
+    "reschedule": "Reschedule",
+    "client": "Client",
+    "service": "Service",
+    "serviceMeta": "{duration} · {price}",
+    "specialist": "Specialist",
+    "location": "Location"
+  },
+  "reschedule": {
+    "title": "Reschedule booking",
+    "subtitle": "Move {name}'s appointment to a new time",
+    "cancel": "Cancel",
+    "save": "Save new time",
+    "saving": "Saving…",
+    "currently": "Currently {datetime}",
+    "newDate": "New date",
+    "newTime": "New time",
+    "preview": "New time: {date} at {time} · {service} ({duration} min)",
+    "movedToast": "Booking moved to {datetime}"
+  },
+  "placeholder": {
+    "comingSoon": "Coming soon — this section is under construction."
+  },
+  "language": {
+    "label": "Language",
+    "switcherAria": "Change language"
+  }
+}

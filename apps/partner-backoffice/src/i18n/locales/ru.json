@@ -1,0 +1,416 @@
+{
+  "common": {
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "saveChanges": "Сохранить изменения",
+    "saving": "Сохранение…",
+    "remove": "Удалить",
+    "edit": "Изменить",
+    "add": "Добавить",
+    "active": "Активен",
+    "inactive": "Неактивен",
+    "backoffice": "Панель управления",
+    "dash": "—",
+    "more": "+{count} ещё",
+    "search": "Поиск…"
+  },
+  "nav": {
+    "sections": {
+      "operations": "Операции",
+      "catalog": "Каталог",
+      "account": "Аккаунт"
+    },
+    "dashboard": "Главная",
+    "calendar": "Календарь",
+    "bookings": "Записи",
+    "clients": "Клиенты",
+    "services": "Услуги",
+    "specialists": "Специалисты",
+    "hours": "Часы работы",
+    "locations": "Филиалы",
+    "users": "Пользователи",
+    "settings": "Настройки",
+    "home": "Главная",
+    "more": "Ещё",
+    "expandSidebar": "Развернуть панель",
+    "collapseSidebar": "Свернуть панель"
+  },
+  "roles": {
+    "admin": "Админ",
+    "manager": "Менеджер"
+  },
+  "changePassword": {
+    "title": "Сменить пароль",
+    "subtitle": "Обновите пароль для входа.",
+    "currentLabel": "Старый пароль",
+    "newLabel": "Новый пароль",
+    "confirmLabel": "Повторите новый пароль",
+    "save": "Обновить пароль",
+    "saving": "Обновление…",
+    "show": "Показать пароль",
+    "hide": "Скрыть пароль",
+    "minLen": "Не менее {n} символов.",
+    "sameAsOld": "Новый пароль должен отличаться от старого.",
+    "mismatch": "Пароли не совпадают.",
+    "wrongCurrent": "Старый пароль неверен.",
+    "failed": "Не удалось обновить пароль. Попробуйте ещё раз.",
+    "toast": "Пароль обновлён"
+  },
+  "users": {
+    "title": "Пользователи",
+    "subtitle": "{name} · {count} менеджеров",
+    "addManager": "Добавить менеджера",
+    "emptyTitle": "Менеджеров пока нет",
+    "emptyDesc": "Создайте менеджера, чтобы у филиала был свой вход.",
+    "toast": { "removed": "Менеджер удалён" },
+    "modal": {
+      "title": "Новый менеджер",
+      "subtitle": "Создайте вход для филиала. Мы отправим одноразовый пароль.",
+      "create": "Создать менеджера",
+      "creating": "Создание…",
+      "nameLabel": "Имя и фамилия",
+      "namePlaceholder": "напр. Наре Аветисян",
+      "phoneLabel": "Телефон",
+      "emailLabel": "Эл. почта",
+      "locationLabel": "Филиал",
+      "locationPlaceholder": "Выберите филиал…",
+      "otpLabel": "Отправить одноразовый пароль через",
+      "viaPhone": "Телефон (SMS)",
+      "viaEmail": "Эл. почту",
+      "otpHint": "Менеджер входит по своей почте или телефону и этому одноразовому паролю."
+    },
+    "created": {
+      "title": "Менеджер создан",
+      "sentPhone": "Одноразовый пароль отправлен {name} на {to}.",
+      "sentEmail": "Одноразовый пароль отправлен {name} на {to}.",
+      "otpLabel": "Одноразовый пароль",
+      "copy": "Копировать",
+      "loginHint": "Вход возможен по: {login}",
+      "done": "Готово"
+    },
+    "delete": {
+      "title": "Удалить менеджера?",
+      "body": "Вы уверены, что хотите удалить {name}? Доступ к панели будет немедленно закрыт."
+    }
+  },
+  "sidebar": {
+    "locationCount": "{type} · {count} филиал",
+    "locationCount_plural": "{type} · {count} филиалов"
+  },
+  "status": {
+    "confirmed": "Подтверждена",
+    "pending": "Ожидает",
+    "cancelled": "Отменена",
+    "completed": "Завершена",
+    "noshow": "Неявка"
+  },
+  "userMenu": {
+    "settings": "Настройки",
+    "signOut": "Выйти"
+  },
+  "login": {
+    "features": {
+      "bookings": { "title": "Записи круглосуточно", "desc": "Клиенты записываются онлайн днём и ночью" },
+      "team": { "title": "Вся команда под контролем", "desc": "Специалисты, услуги и расписание" },
+      "revenue": { "title": "Доход как на ладони", "desc": "Отслеживайте каждую запись и каждый заработок" }
+    },
+    "quote": "Ваш салон под безупречным управлением.",
+    "tagline": "Reserva · Платформа онлайн-записи для салонов Армении",
+    "welcomeBack": "С возвращением",
+    "subtitle": "Войдите в панель управления",
+    "emailLabel": "Адрес эл. почты",
+    "passwordLabel": "Пароль",
+    "showPassword": "Показать пароль",
+    "hidePassword": "Скрыть пароль",
+    "signIn": "Войти",
+    "signingIn": "Вход…",
+    "emailRequired": "Введите эл. почту.",
+    "passwordRequired": "Введите пароль.",
+    "loginFailed": "Не удалось войти. Попробуйте ещё раз.",
+    "copyright": "© {year} Reserva. Все права защищены."
+  },
+  "topbar": {
+    "titles": {
+      "/": "Главная",
+      "/calendar": "Календарь",
+      "/bookings": "Записи",
+      "/clients": "Клиенты",
+      "/services": "Услуги",
+      "/specialists": "Специалисты",
+      "/hours": "Часы работы",
+      "/locations": "Филиалы",
+      "/settings": "Настройки"
+    }
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Доброе утро, {name}",
+      "afternoon": "Добрый день, {name}",
+      "evening": "Добрый вечер, {name}"
+    },
+    "fallbackName": "коллега",
+    "openCalendar": "Открыть календарь",
+    "newBooking": "Новая запись",
+    "kpi": {
+      "bookingsToday": "Записи на сегодня",
+      "confirmed": "{count} подтверждено",
+      "revenue7": "Доход — 7 дней",
+      "servicesCompleted": "{count} услуг оказано",
+      "upcoming30": "Предстоящие — 30 дней",
+      "onBooks": "записей в графике",
+      "noshows7": "Неявки — 7 дней",
+      "aboveAverage": "выше среднего",
+      "withinRange": "в пределах нормы"
+    },
+    "todaySchedule": "Расписание на сегодня",
+    "quietDay": "Записей пока нет — спокойный день.",
+    "scheduleSummary": "{booked} записано · {upcoming} предстоит",
+    "viewCalendar": "Открыть календарь",
+    "emptyDay": "Свободный день",
+    "walkIns": "Вы по-прежнему можете принять клиентов без записи.",
+    "tomorrow": "Завтра",
+    "tomorrowCount": "{count} записей",
+    "nothingBooked": "Ничего не записано.",
+    "todayOccupancy": "Загрузка на сегодня",
+    "slotsFilled": "доступных слотов занято"
+  },
+  "bookings": {
+    "title": "Записи",
+    "subtitle": "{name} · {count} запись",
+    "subtitle_plural": "{name} · {count} записей",
+    "newBooking": "Новая запись",
+    "filters": {
+      "all": "Все",
+      "confirmed": "Подтверждённые",
+      "pending": "Ожидающие",
+      "completed": "Завершённые",
+      "cancelled": "Отменённые",
+      "noshow": "Неявки"
+    },
+    "emptyTitle": "Записи не найдены",
+    "emptyDescFilter": "Измените фильтр или добавьте новую запись.",
+    "emptyDescCreate": "Измените фильтр или создайте новую запись.",
+    "col": {
+      "client": "Клиент",
+      "service": "Услуга",
+      "specialist": "Специалист",
+      "datetime": "Дата и время",
+      "price": "Цена",
+      "status": "Статус"
+    }
+  },
+  "services": {
+    "title": "Услуги",
+    "subtitle": "{name} · {count} услуга",
+    "subtitle_plural": "{name} · {count} услуг",
+    "addService": "Добавить услугу",
+    "emptyTitle": "Услуг пока нет",
+    "emptyDesc": "Добавьте первую услугу, чтобы начать принимать записи.",
+    "otherCategory": "Прочее",
+    "col": {
+      "name": "Название",
+      "category": "Категория",
+      "duration": "Длительность",
+      "price": "Цена",
+      "active": "Активна"
+    },
+    "modal": {
+      "newTitle": "Новая услуга",
+      "editTitle": "Изменить услугу",
+      "save": "Сохранить услугу",
+      "nameLabel": "Название услуги",
+      "namePlaceholder": "напр. Стрижка",
+      "priceLabel": "Цена (֏)",
+      "pricePlaceholder": "5000",
+      "durationLabel": "Длительность (мин)",
+      "durationPlaceholder": "30",
+      "categoryLabel": "Категория",
+      "categoryPlaceholder": "напр. Волосы",
+      "active": "Активна"
+    }
+  },
+  "specialists": {
+    "title": "Специалисты",
+    "subtitle": "{name} · {count} сотрудников",
+    "addSpecialist": "Добавить специалиста",
+    "emptyTitle": "Специалистов пока нет",
+    "emptyDesc": "Добавьте первого члена команды.",
+    "viewStats": "Статистика →",
+    "col": {
+      "name": "Имя",
+      "location": "Филиал",
+      "services": "Услуги",
+      "active": "Активен"
+    },
+    "modal": {
+      "newTitle": "Новый специалист",
+      "editTitle": "Изменить специалиста",
+      "nameLabel": "Имя и фамилия",
+      "namePlaceholder": "напр. Ануш Петросян",
+      "titleLabel": "Должность",
+      "titlePlaceholder": "напр. Старший барбер",
+      "phoneLabel": "Телефон",
+      "phonePlaceholder": "+374 91 …",
+      "locationLabel": "Филиал",
+      "servicesLabel": "Услуги",
+      "active": "Активен"
+    }
+  },
+  "specialistDashboard": {
+    "back": "Специалисты",
+    "kpi": {
+      "total": "Всего",
+      "completed": "Завершено",
+      "rate": "Доля",
+      "revenue": "Доход"
+    },
+    "bookingBreakdown": "Разбивка записей",
+    "totalBadge": "всего {count}",
+    "status": {
+      "completed": "Завершено",
+      "upcoming": "Предстоит",
+      "cancelled": "Отменено",
+      "noshows": "Неявки"
+    },
+    "revenueLast7": "Доход · последние 7 недель",
+    "now": "Сейчас",
+    "topServices": "Популярные услуги",
+    "typesBadge": "{count} видов",
+    "details": "Детали",
+    "location": "Филиал",
+    "phone": "Телефон",
+    "avgPerBooking": "Средний чек",
+    "servicesOffered": "Оказываемые услуги",
+    "recentBookings": "Последние записи",
+    "noBookings": "Записей пока нет"
+  },
+  "clients": {
+    "title": "Клиенты",
+    "subtitle": "{name} · {count} клиент",
+    "subtitle_plural": "{name} · {count} клиентов",
+    "searchPlaceholder": "Поиск по имени или телефону…",
+    "emptyTitle": "Клиенты не найдены",
+    "emptyDescSearch": "Попробуйте другой запрос.",
+    "emptyDescDefault": "Клиенты появятся здесь после завершённых записей.",
+    "visits": "Визиты",
+    "spent": "Потрачено",
+    "lastVisit": "Последний визит",
+    "totalSpent": "Всего потрачено",
+    "completedCount": "{count} завершено",
+    "stats": "Статистика",
+    "completed": "Завершено",
+    "bookingHistory": "История записей"
+  },
+  "hours": {
+    "title": "Часы работы",
+    "subtitle": "{name} · недельное расписание по специалистам",
+    "specialists": "Специалисты",
+    "selectSpecialist": "Выберите специалиста",
+    "selectSpecialistHint": "Выберите кого-нибудь из списка, чтобы изменить часы работы.",
+    "days": {
+      "mon": "Пн",
+      "tue": "Вт",
+      "wed": "Ср",
+      "thu": "Чт",
+      "fri": "Пт",
+      "sat": "Сб",
+      "sun": "Вс"
+    }
+  },
+  "locations": {
+    "title": "Филиалы",
+    "subtitle": "{name} · {count} филиал",
+    "subtitle_plural": "{name} · {count} филиалов",
+    "addLocation": "Добавить филиал",
+    "emptyTitle": "Филиалов пока нет",
+    "emptyDesc": "Добавьте первый филиал, чтобы клиенты могли выбрать место.",
+    "modal": {
+      "newTitle": "Новый филиал",
+      "editTitle": "Изменить филиал",
+      "newSubtitle": "Добавьте новый филиал для этого салона",
+      "addLocation": "Добавить филиал",
+      "nameLabel": "Название филиала",
+      "namePlaceholder": "напр. Арабкир",
+      "addressLabel": "Адрес",
+      "addressPlaceholder": "напр. пр. Комитаса 34, Ереван",
+      "phoneLabel": "Телефон",
+      "phonePlaceholder": "+374 10 …"
+    },
+    "delete": {
+      "title": "Удалить филиал?",
+      "body": "Вы уверены, что хотите удалить «{name}»? Специалистов этого филиала нужно будет переназначить."
+    },
+    "toast": {
+      "updated": "Филиал обновлён",
+      "added": "Филиал добавлен",
+      "removed": "Филиал удалён"
+    }
+  },
+  "calendar": {
+    "today": "Сегодня",
+    "day": "День",
+    "week": "Неделя",
+    "new": "Создать",
+    "allSpecialists": "Все специалисты",
+    "nothingBooked": "Ничего не записано",
+    "movedTo": "Перенесено на {time}",
+    "with": "с"
+  },
+  "newBooking": {
+    "title": "Новая запись",
+    "subtitle": "Заполните данные, чтобы создать запись",
+    "confirm": "Подтвердить запись",
+    "locationLabel": "Филиал",
+    "locationPlaceholder": "Выберите филиал…",
+    "serviceLabel": "Услуга",
+    "servicePlaceholder": "Выберите услугу…",
+    "serviceSub": "{duration} мин · {price} ֏",
+    "specialistLabel": "Специалист",
+    "specialistPlaceholder": "Выберите специалиста…",
+    "dateLabel": "Дата",
+    "timeLabel": "Время",
+    "slotsHint": "Выберите специалиста и дату, чтобы увидеть свободное время.",
+    "clientNameLabel": "Имя клиента",
+    "clientNamePlaceholder": "Анна Карапетян",
+    "clientPhoneLabel": "Телефон клиента",
+    "clientPhonePlaceholder": "+374 91 …",
+    "summary": "{date} в {time} · {service} ({duration} мин)",
+    "confirmedToast": "Запись подтверждена для {name}"
+  },
+  "bookingDrawer": {
+    "status": "Статус",
+    "actions": {
+      "confirm": "Подтвердить",
+      "complete": "Завершить",
+      "cancel": "Отменить",
+      "noshow": "Неявка"
+    },
+    "statusToast": "Запись: {status}",
+    "when": "Когда",
+    "reschedule": "Перенести",
+    "client": "Клиент",
+    "service": "Услуга",
+    "serviceMeta": "{duration} · {price}",
+    "specialist": "Специалист",
+    "location": "Филиал"
+  },
+  "reschedule": {
+    "title": "Перенос записи",
+    "subtitle": "Перенесите запись клиента {name} на новое время",
+    "cancel": "Отмена",
+    "save": "Сохранить новое время",
+    "saving": "Сохранение…",
+    "currently": "Сейчас: {datetime}",
+    "newDate": "Новая дата",
+    "newTime": "Новое время",
+    "preview": "Новое время: {date} в {time} · {service} ({duration} мин)",
+    "movedToast": "Запись перенесена на {datetime}"
+  },
+  "placeholder": {
+    "comingSoon": "Скоро — этот раздел в разработке."
+  },
+  "language": {
+    "label": "Язык",
+    "switcherAria": "Сменить язык"
+  }
+}

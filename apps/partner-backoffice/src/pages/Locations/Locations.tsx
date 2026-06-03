@@ -3,6 +3,7 @@ import { MapPin, Plus, Pencil, Trash2, Phone } from 'lucide-react'
 import { useAppStore, usePartner } from '@/store/app.store'
 import { Button, Modal, Input, Empty, useToast } from '@/components/ui'
 import { partnersService } from '@/services/partners.service'
+import { useI18n } from '@/i18n'
 import type { Location } from '@/types'
 import s from './Locations.module.scss'
 
@@ -12,6 +13,7 @@ export function Locations() {
   const partner     = usePartner()
   const setPartners = useAppStore(st => st.setPartners)
   const toast       = useToast()
+  const { t, tp }   = useI18n()
 
   const [modalOpen,   setModalOpen]   = useState(false)
   const [editing,     setEditing]     = useState<Location | null>(null)
@@ -35,10 +37,10 @@ export function Locations() {
     setSaving(true)
     if (editing) {
       await partnersService.updateLocation(partner.id, editing.id, form)
-      toast('Location updated')
+      toast(t('locations.toast.updated'))
     } else {
       await partnersService.createLocation(partner.id, form)
-      toast('Location added')
+      toast(t('locations.toast.added'))
     }
     setPartners(await partnersService.list())
     setSaving(false)
@@ -49,7 +51,7 @@ export function Locations() {
     if (!confirmDel) return
     await partnersService.deleteLocation(partner.id, confirmDel.id)
     setPartners(await partnersService.list())
-    toast('Location removed')
+    toast(t('locations.toast.removed'))
     setConfirmDel(null)
   }
 
@@ -57,20 +59,20 @@ export function Locations() {
     <div className={s.page}>
       <div className={s.head}>
         <div>
-          <h1 className={s.h1}>Locations</h1>
+          <h1 className={s.h1}>{t('locations.title')}</h1>
           <p className={s.sub}>
-            {partner.name} · {partner.locations.length} branch{partner.locations.length !== 1 ? 'es' : ''}
+            {tp('locations.subtitle', partner.locations.length, { name: partner.name })}
           </p>
         </div>
-        <Button variant="accent" onClick={openNew}><Plus size={14} /> Add location</Button>
+        <Button variant="accent" onClick={openNew}><Plus size={14} /> {t('locations.addLocation')}</Button>
       </div>
 
       {partner.locations.length === 0 ? (
         <Empty
           icon={MapPin}
-          title="No locations yet"
-          description="Add your first branch so clients can book a place."
-          action={<Button variant="accent" onClick={openNew}><Plus size={14} /> Add location</Button>}
+          title={t('locations.emptyTitle')}
+          description={t('locations.emptyDesc')}
+          action={<Button variant="accent" onClick={openNew}><Plus size={14} /> {t('locations.addLocation')}</Button>}
         />
       ) : (
         <div className={s.grid}>
@@ -112,35 +114,35 @@ export function Locations() {
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        title={editing ? 'Edit location' : 'New location'}
-        subtitle={editing ? undefined : 'Add a new branch for this salon'}
+        title={editing ? t('locations.modal.editTitle') : t('locations.modal.newTitle')}
+        subtitle={editing ? undefined : t('locations.modal.newSubtitle')}
         footer={
           <>
-            <Button variant="ghost" onClick={() => setModalOpen(false)}>Cancel</Button>
+            <Button variant="ghost" onClick={() => setModalOpen(false)}>{t('common.cancel')}</Button>
             <Button variant="accent" disabled={!canSave || saving} onClick={handleSave}>
-              {saving ? 'Saving…' : editing ? 'Save changes' : 'Add location'}
+              {saving ? t('common.saving') : editing ? t('common.saveChanges') : t('locations.modal.addLocation')}
             </Button>
           </>
         }
       >
         <div className={s.formGrid}>
           <Input
-            label="Branch name"
+            label={t('locations.modal.nameLabel')}
             value={form.name}
             onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-            placeholder="e.g. Arabkir"
+            placeholder={t('locations.modal.namePlaceholder')}
           />
           <Input
-            label="Address"
+            label={t('locations.modal.addressLabel')}
             value={form.address}
             onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
-            placeholder="e.g. 34 Komitas Ave, Yerevan"
+            placeholder={t('locations.modal.addressPlaceholder')}
           />
           <Input
-            label="Phone"
+            label={t('locations.modal.phoneLabel')}
             value={form.phone}
             onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-            placeholder="+374 10 …"
+            placeholder={t('locations.modal.phonePlaceholder')}
           />
         </div>
       </Modal>
@@ -149,18 +151,20 @@ export function Locations() {
       <Modal
         open={!!confirmDel}
         onClose={() => setConfirmDel(null)}
-        title="Remove location?"
+        title={t('locations.delete.title')}
         size="sm"
         footer={
           <>
-            <Button variant="ghost" onClick={() => setConfirmDel(null)}>Cancel</Button>
-            <Button variant="danger" onClick={handleDelete}>Remove</Button>
+            <Button variant="ghost" onClick={() => setConfirmDel(null)}>{t('common.cancel')}</Button>
+            <Button variant="danger" onClick={handleDelete}>{t('common.remove')}</Button>
           </>
         }
       >
         <p style={{ fontSize: 14, color: 'var(--fg-1)', margin: 0, lineHeight: 1.5 }}>
-          Are you sure you want to remove <strong>{confirmDel?.name}</strong>? Specialists assigned
-          to this branch will need to be reassigned.
+          {(() => {
+            const [before, after] = t('locations.delete.body').split('{name}')
+            return <>{before}<strong>{confirmDel?.name}</strong>{after}</>
+          })()}
         </p>
       </Modal>
     </div>

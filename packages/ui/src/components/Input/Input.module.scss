@@ -28,6 +28,17 @@
     border-color: $danger;
     &:focus { box-shadow: 0 0 0 3px $danger-soft; }
   }
+
+  /* Drop the native number spinner — we don't use steppers. */
+  &[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  &[type='number']::-webkit-outer-spin-button,
+  &[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 }
 
 .textarea {

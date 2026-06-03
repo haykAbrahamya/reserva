@@ -1,0 +1,416 @@
+{
+  "common": {
+    "cancel": "Չեղարկել",
+    "save": "Պահպանել",
+    "saveChanges": "Պահպանել փոփոխությունները",
+    "saving": "Պահպանվում է…",
+    "remove": "Հեռացնել",
+    "edit": "Խմբագրել",
+    "add": "Ավելացնել",
+    "active": "Ակտիվ",
+    "inactive": "Ոչ ակտիվ",
+    "backoffice": "Կառավարման վահանակ",
+    "dash": "—",
+    "more": "+{count} ևս",
+    "search": "Որոնել…"
+  },
+  "nav": {
+    "sections": {
+      "operations": "Գործառնություններ",
+      "catalog": "Կատալոգ",
+      "account": "Հաշիվ"
+    },
+    "dashboard": "Գլխավոր",
+    "calendar": "Օրացույց",
+    "bookings": "Ամրագրումներ",
+    "clients": "Հաճախորդներ",
+    "services": "Ծառայություններ",
+    "specialists": "Մասնագետներ",
+    "hours": "Աշխատանքային ժամեր",
+    "locations": "Մասնաճյուղեր",
+    "users": "Օգտատերեր",
+    "settings": "Կարգավորումներ",
+    "home": "Գլխավոր",
+    "more": "Ավելին",
+    "expandSidebar": "Բացել վահանակը",
+    "collapseSidebar": "Ծալել վահանակը"
+  },
+  "roles": {
+    "admin": "Ադմին",
+    "manager": "Մենեջեր"
+  },
+  "changePassword": {
+    "title": "Փոխել գաղտնաբառը",
+    "subtitle": "Թարմացրեք մուտքի գաղտնաբառը։",
+    "currentLabel": "Հին գաղտնաբառ",
+    "newLabel": "Նոր գաղտնաբառ",
+    "confirmLabel": "Հաստատեք նոր գաղտնաբառը",
+    "save": "Թարմացնել գաղտնաբառը",
+    "saving": "Թարմացվում է…",
+    "show": "Ցույց տալ գաղտնաբառը",
+    "hide": "Թաքցնել գաղտնաբառը",
+    "minLen": "Պետք է լինի առնվազն {n} նիշ։",
+    "sameAsOld": "Նոր գաղտնաբառը պետք է տարբերվի հինից։",
+    "mismatch": "Գաղտնաբառերը չեն համընկնում։",
+    "wrongCurrent": "Հին գաղտնաբառը սխալ է։",
+    "failed": "Չհաջողվեց թարմացնել գաղտնաբառը։ Խնդրում ենք կրկին փորձել։",
+    "toast": "Գաղտնաբառը թարմացվեց"
+  },
+  "users": {
+    "title": "Օգտատերեր",
+    "subtitle": "{name} · {count} մենեջեր",
+    "addManager": "Ավելացնել մենեջեր",
+    "emptyTitle": "Դեռ մենեջերներ չկան",
+    "emptyDesc": "Ստեղծեք մենեջեր՝ մասնաճյուղին սեփական մուտք տալու համար։",
+    "toast": { "removed": "Մենեջերը հեռացվեց" },
+    "modal": {
+      "title": "Նոր մենեջեր",
+      "subtitle": "Ստեղծեք մասնաճյուղի մուտք։ Մենք կուղարկենք միանվագ գաղտնաբառ։",
+      "create": "Ստեղծել մենեջեր",
+      "creating": "Ստեղծվում է…",
+      "nameLabel": "Անուն Ազգանուն",
+      "namePlaceholder": "օր․՝ Նարե Ավետիսյան",
+      "phoneLabel": "Հեռախոս",
+      "emailLabel": "Էլ. փոստ",
+      "locationLabel": "Մասնաճյուղ",
+      "locationPlaceholder": "Ընտրեք մասնաճյուղը…",
+      "otpLabel": "Ուղարկել միանվագ գաղտնաբառը՝",
+      "viaPhone": "Հեռախոսով (SMS)",
+      "viaEmail": "Էլ. փոստով",
+      "otpHint": "Մենեջերը մուտք է գործում իր էլ. փոստով կամ հեռախոսով և այս միանվագ գաղտնաբառով։"
+    },
+    "created": {
+      "title": "Մենեջերը ստեղծվեց",
+      "sentPhone": "Միանվագ գաղտնաբառն ուղարկվեց {name}-ին՝ {to} համարին։",
+      "sentEmail": "Միանվագ գաղտնաբառն ուղարկվեց {name}-ին՝ {to} հասցեին։",
+      "otpLabel": "Միանվագ գաղտնաբառ",
+      "copy": "Պատճենել",
+      "loginHint": "Մուտքի համար՝ {login}",
+      "done": "Պատրաստ է"
+    },
+    "delete": {
+      "title": "Հեռացնե՞լ մենեջերին",
+      "body": "Վստա՞հ եք, որ ցանկանում եք հեռացնել {name}-ին։ Նա անմիջապես կկորցնի մուտքը վահանակ։"
+    }
+  },
+  "sidebar": {
+    "locationCount": "{type} · {count} մասնաճյուղ",
+    "locationCount_plural": "{type} · {count} մասնաճյուղ"
+  },
+  "status": {
+    "confirmed": "Հաստատված",
+    "pending": "Սպասման մեջ",
+    "cancelled": "Չեղարկված",
+    "completed": "Ավարտված",
+    "noshow": "Չներկայացած"
+  },
+  "userMenu": {
+    "settings": "Կարգավորումներ",
+    "signOut": "Դուրս գալ"
+  },
+  "login": {
+    "features": {
+      "bookings": { "title": "Ամրագրումներ՝ շուրջօրյա", "desc": "Հաճախորդներն ամրագրում են առցանց՝ ցերեկ թե գիշեր" },
+      "team": { "title": "Ձեր ողջ թիմը՝ կազմակերպված", "desc": "Մասնագետներ, ծառայություններ և ժամանակացույց" },
+      "revenue": { "title": "Եկամուտը՝ մեկ հայացքով", "desc": "Հետևեք յուրաքանչյուր ամրագրման ու եկամտի" }
+    },
+    "quote": "Ձեր սրահը՝ գեղեցիկ կառավարված։",
+    "tagline": "Reserva · Ամրագրման հարթակ հայկական գեղեցկության սրահների համար",
+    "welcomeBack": "Բարի վերադարձ",
+    "subtitle": "Մուտք գործեք ձեր կառավարման վահանակ",
+    "emailLabel": "Էլ. փոստի հասցե",
+    "passwordLabel": "Գաղտնաբառ",
+    "showPassword": "Ցույց տալ գաղտնաբառը",
+    "hidePassword": "Թաքցնել գաղտնաբառը",
+    "signIn": "Մուտք գործել",
+    "signingIn": "Մուտք է գործում…",
+    "emailRequired": "Էլ. փոստը պարտադիր է։",
+    "passwordRequired": "Գաղտնաբառը պարտադիր է։",
+    "loginFailed": "Մուտքը ձախողվեց։ Խնդրում ենք կրկին փորձել։",
+    "copyright": "© {year} Reserva։ Բոլոր իրավունքները պաշտպանված են։"
+  },
+  "topbar": {
+    "titles": {
+      "/": "Գլխավոր",
+      "/calendar": "Օրացույց",
+      "/bookings": "Ամրագրումներ",
+      "/clients": "Հաճախորդներ",
+      "/services": "Ծառայություններ",
+      "/specialists": "Մասնագետներ",
+      "/hours": "Աշխատանքային ժամեր",
+      "/locations": "Մասնաճյուղեր",
+      "/settings": "Կարգավորումներ"
+    }
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Բարի լույս, {name}",
+      "afternoon": "Բարի օր, {name}",
+      "evening": "Բարի երեկո, {name}"
+    },
+    "fallbackName": "բարեկամ",
+    "openCalendar": "Բացել օրացույցը",
+    "newBooking": "Նոր ամրագրում",
+    "kpi": {
+      "bookingsToday": "Այսօրվա ամրագրումներ",
+      "confirmed": "{count} հաստատված",
+      "revenue7": "Եկամուտ — 7 օր",
+      "servicesCompleted": "{count} ծառայություն մատուցված",
+      "upcoming30": "Առաջիկա — 30 օր",
+      "onBooks": "ամրագրում օրացույցում",
+      "noshows7": "Չներկայացածներ — 7 օր",
+      "aboveAverage": "միջինից բարձր",
+      "withinRange": "նորմայի սահմաններում"
+    },
+    "todaySchedule": "Այսօրվա ժամանակացույց",
+    "quietDay": "Դեռ ամրագրումներ չկան — հանգիստ օր է։",
+    "scheduleSummary": "{booked} ամրագրված · {upcoming} առաջիկա",
+    "viewCalendar": "Դիտել օրացույցը",
+    "emptyDay": "Ազատ օր",
+    "walkIns": "Կարող եք ընդունել նաև առանց ամրագրման։",
+    "tomorrow": "Վաղը",
+    "tomorrowCount": "{count} ամրագրում",
+    "nothingBooked": "Ոչինչ ամրագրված չէ։",
+    "todayOccupancy": "Այսօրվա զբաղվածությունը",
+    "slotsFilled": "հասանելի ժամերից զբաղված է"
+  },
+  "bookings": {
+    "title": "Ամրագրումներ",
+    "subtitle": "{name} · {count} գրառում",
+    "subtitle_plural": "{name} · {count} գրառում",
+    "newBooking": "Նոր ամրագրում",
+    "filters": {
+      "all": "Բոլորը",
+      "confirmed": "Հաստատված",
+      "pending": "Սպասման մեջ",
+      "completed": "Ավարտված",
+      "cancelled": "Չեղարկված",
+      "noshow": "Չներկայացած"
+    },
+    "emptyTitle": "Ամրագրումներ չեն գտնվել",
+    "emptyDescFilter": "Փորձեք փոխել զտիչը կամ ավելացրեք նոր ամրագրում։",
+    "emptyDescCreate": "Փորձեք փոխել զտիչը կամ ստեղծեք նոր ամրագրում։",
+    "col": {
+      "client": "Հաճախորդ",
+      "service": "Ծառայություն",
+      "specialist": "Մասնագետ",
+      "datetime": "Ամսաթիվ և ժամ",
+      "price": "Գին",
+      "status": "Կարգավիճակ"
+    }
+  },
+  "services": {
+    "title": "Ծառայություններ",
+    "subtitle": "{name} · {count} ծառայություն",
+    "subtitle_plural": "{name} · {count} ծառայություն",
+    "addService": "Ավելացնել ծառայություն",
+    "emptyTitle": "Դեռ ծառայություններ չկան",
+    "emptyDesc": "Ավելացրեք ձեր առաջին ծառայությունը՝ ամրագրումներ ընդունելու համար։",
+    "otherCategory": "Այլ",
+    "col": {
+      "name": "Անվանում",
+      "category": "Կատեգորիա",
+      "duration": "Տևողություն",
+      "price": "Գին",
+      "active": "Ակտիվ"
+    },
+    "modal": {
+      "newTitle": "Նոր ծառայություն",
+      "editTitle": "Խմբագրել ծառայությունը",
+      "save": "Պահպանել ծառայությունը",
+      "nameLabel": "Ծառայության անվանում",
+      "namePlaceholder": "օր․՝ Սանրվածք",
+      "priceLabel": "Գին (֏)",
+      "pricePlaceholder": "5000",
+      "durationLabel": "Տևողություն (րոպե)",
+      "durationPlaceholder": "30",
+      "categoryLabel": "Կատեգորիա",
+      "categoryPlaceholder": "օր․՝ Մազեր",
+      "active": "Ակտիվ"
+    }
+  },
+  "specialists": {
+    "title": "Մասնագետներ",
+    "subtitle": "{name} · {count} աշխատակից",
+    "addSpecialist": "Ավելացնել մասնագետ",
+    "emptyTitle": "Դեռ մասնագետներ չկան",
+    "emptyDesc": "Ավելացրեք ձեր թիմի առաջին անդամին։",
+    "viewStats": "Դիտել վիճակագրությունը →",
+    "col": {
+      "name": "Անուն",
+      "location": "Մասնաճյուղ",
+      "services": "Ծառայություններ",
+      "active": "Ակտիվ"
+    },
+    "modal": {
+      "newTitle": "Նոր մասնագետ",
+      "editTitle": "Խմբագրել մասնագետին",
+      "nameLabel": "Անուն Ազգանուն",
+      "namePlaceholder": "օր․՝ Անուշ Պետրոսյան",
+      "titleLabel": "Պաշտոն",
+      "titlePlaceholder": "օր․՝ Ավագ վարսավիր",
+      "phoneLabel": "Հեռախոս",
+      "phonePlaceholder": "+374 91 …",
+      "locationLabel": "Մասնաճյուղ",
+      "servicesLabel": "Ծառայություններ",
+      "active": "Ակտիվ"
+    }
+  },
+  "specialistDashboard": {
+    "back": "Մասնագետներ",
+    "kpi": {
+      "total": "Ընդամենը",
+      "completed": "Ավարտված",
+      "rate": "Տոկոս",
+      "revenue": "Եկամուտ"
+    },
+    "bookingBreakdown": "Ամրագրումների բաշխում",
+    "totalBadge": "{count} ընդամենը",
+    "status": {
+      "completed": "Ավարտված",
+      "upcoming": "Առաջիկա",
+      "cancelled": "Չեղարկված",
+      "noshows": "Չներկայացածներ"
+    },
+    "revenueLast7": "Եկամուտ · վերջին 7 շաբաթ",
+    "now": "Հիմա",
+    "topServices": "Լավագույն ծառայություններ",
+    "typesBadge": "{count} տեսակ",
+    "details": "Մանրամասներ",
+    "location": "Մասնաճյուղ",
+    "phone": "Հեռախոս",
+    "avgPerBooking": "Միջինը մեկ ամրագրման",
+    "servicesOffered": "Մատուցվող ծառայություններ",
+    "recentBookings": "Վերջին ամրագրումներ",
+    "noBookings": "Դեռ ամրագրումներ չկան"
+  },
+  "clients": {
+    "title": "Հաճախորդներ",
+    "subtitle": "{name} · {count} հաճախորդ",
+    "subtitle_plural": "{name} · {count} հաճախորդ",
+    "searchPlaceholder": "Որոնել ըստ անվան կամ հեռախոսի…",
+    "emptyTitle": "Հաճախորդներ չեն գտնվել",
+    "emptyDescSearch": "Փորձեք այլ որոնում։",
+    "emptyDescDefault": "Հաճախորդները կհայտնվեն այստեղ ամրագրումներն ավարտվելուց հետո։",
+    "visits": "Այցեր",
+    "spent": "Ծախսված",
+    "lastVisit": "Վերջին այցը",
+    "totalSpent": "Ընդհանուր ծախսը",
+    "completedCount": "{count} ավարտված",
+    "stats": "Վիճակագրություն",
+    "completed": "Ավարտված",
+    "bookingHistory": "Ամրագրումների պատմություն"
+  },
+  "hours": {
+    "title": "Աշխատանքային ժամեր",
+    "subtitle": "{name} · շաբաթական ժամանակացույց ըստ մասնագետի",
+    "specialists": "Մասնագետներ",
+    "selectSpecialist": "Ընտրեք մասնագետ",
+    "selectSpecialistHint": "Ընտրեք մեկին ցանկից՝ նրա ժամերը խմբագրելու համար։",
+    "days": {
+      "mon": "Երկ",
+      "tue": "Երք",
+      "wed": "Չրք",
+      "thu": "Հնգ",
+      "fri": "Ուր",
+      "sat": "Շբթ",
+      "sun": "Կիր"
+    }
+  },
+  "locations": {
+    "title": "Մասնաճյուղեր",
+    "subtitle": "{name} · {count} մասնաճյուղ",
+    "subtitle_plural": "{name} · {count} մասնաճյուղ",
+    "addLocation": "Ավելացնել մասնաճյուղ",
+    "emptyTitle": "Դեռ մասնաճյուղեր չկան",
+    "emptyDesc": "Ավելացրեք ձեր առաջին մասնաճյուղը՝ որպեսզի հաճախորդները կարողանան ամրագրել։",
+    "modal": {
+      "newTitle": "Նոր մասնաճյուղ",
+      "editTitle": "Խմբագրել մասնաճյուղը",
+      "newSubtitle": "Ավելացրեք նոր մասնաճյուղ այս սրահի համար",
+      "addLocation": "Ավելացնել մասնաճյուղ",
+      "nameLabel": "Մասնաճյուղի անվանում",
+      "namePlaceholder": "օր․՝ Արաբկիր",
+      "addressLabel": "Հասցե",
+      "addressPlaceholder": "օր․՝ Կոմիտասի պող. 34, Երևան",
+      "phoneLabel": "Հեռախոս",
+      "phonePlaceholder": "+374 10 …"
+    },
+    "delete": {
+      "title": "Հեռացնե՞լ մասնաճյուղը",
+      "body": "Վստա՞հ եք, որ ցանկանում եք հեռացնել {name}-ը։ Այս մասնաճյուղին կցված մասնագետները պետք է վերանշանակվեն։"
+    },
+    "toast": {
+      "updated": "Մասնաճյուղը թարմացվեց",
+      "added": "Մասնաճյուղն ավելացվեց",
+      "removed": "Մասնաճյուղը հեռացվեց"
+    }
+  },
+  "calendar": {
+    "today": "Այսօր",
+    "day": "Օր",
+    "week": "Շաբաթ",
+    "new": "Նոր",
+    "allSpecialists": "Բոլոր մասնագետները",
+    "nothingBooked": "Ոչինչ ամրագրված չէ",
+    "movedTo": "Տեղափոխվեց {time}",
+    "with": "հետ"
+  },
+  "newBooking": {
+    "title": "Նոր ամրագրում",
+    "subtitle": "Լրացրեք տվյալները՝ ամրագրում ստեղծելու համար",
+    "confirm": "Հաստատել ամրագրումը",
+    "locationLabel": "Մասնաճյուղ",
+    "locationPlaceholder": "Ընտրեք մասնաճյուղը…",
+    "serviceLabel": "Ծառայություն",
+    "servicePlaceholder": "Ընտրեք ծառայությունը…",
+    "serviceSub": "{duration} րոպե · {price} ֏",
+    "specialistLabel": "Մասնագետ",
+    "specialistPlaceholder": "Ընտրեք մասնագետին…",
+    "dateLabel": "Ամսաթիվ",
+    "timeLabel": "Ժամ",
+    "slotsHint": "Ընտրեք մասնագետ և ամսաթիվ՝ հասանելի ժամերը տեսնելու համար։",
+    "clientNameLabel": "Հաճախորդի անունը",
+    "clientNamePlaceholder": "Աննա Կարապետյան",
+    "clientPhoneLabel": "Հաճախորդի հեռախոսը",
+    "clientPhonePlaceholder": "+374 91 …",
+    "summary": "{date} ժամը {time} · {service} ({duration} րոպե)",
+    "confirmedToast": "Ամրագրումը հաստատվեց {name}-ի համար"
+  },
+  "bookingDrawer": {
+    "status": "Կարգավիճակ",
+    "actions": {
+      "confirm": "Հաստատել",
+      "complete": "Ավարտել",
+      "cancel": "Չեղարկել",
+      "noshow": "Չներկայացած"
+    },
+    "statusToast": "Ամրագրումը՝ {status}",
+    "when": "Երբ",
+    "reschedule": "Վերաամրագրել",
+    "client": "Հաճախորդ",
+    "service": "Ծառայություն",
+    "serviceMeta": "{duration} · {price}",
+    "specialist": "Մասնագետ",
+    "location": "Մասնաճյուղ"
+  },
+  "reschedule": {
+    "title": "Վերաամրագրել",
+    "subtitle": "Տեղափոխեք {name}-ի այցը նոր ժամի",
+    "cancel": "Չեղարկել",
+    "save": "Պահպանել նոր ժամը",
+    "saving": "Պահպանվում է…",
+    "currently": "Ներկայումս {datetime}",
+    "newDate": "Նոր ամսաթիվ",
+    "newTime": "Նոր ժամ",
+    "preview": "Նոր ժամ՝ {date} ժամը {time} · {service} ({duration} րոպե)",
+    "movedToast": "Ամրագրումը տեղափոխվեց {datetime}"
+  },
+  "placeholder": {
+    "comingSoon": "Շուտով — այս բաժինը մշակման փուլում է։"
+  },
+  "language": {
+    "label": "Լեզու",
+    "switcherAria": "Փոխել լեզուն"
+  }
+}

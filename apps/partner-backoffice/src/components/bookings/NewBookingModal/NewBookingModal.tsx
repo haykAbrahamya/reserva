@@ -1,9 +1,11 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Calendar } from 'lucide-react'
 import { Modal, Input, Select, Button, DatePicker, useToast } from '@/components/ui'
 import { useAppStore, usePartner } from '@/store/app.store'
+import { useScopedLocationId } from '@/store/auth.hooks'
 import { bookingsService } from '@/services/bookings.service'
 import { fmtDateInput } from '@/utils/format'
+import { useT } from '@/i18n'
 import s from './NewBookingModal.module.scss'
 
 interface Props {
@@ -18,10 +20,12 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime }: Pro
   const bookings      = useAppStore(st => st.bookings)
   const upsertBooking = useAppStore(st => st.upsertBooking)
   const toast         = useToast()
+  const scopedLocationId = useScopedLocationId()
+  const t             = useT()
   const today         = fmtDateInput(new Date())
 
   // All hooks must be declared before any conditional return
-  const [locationId,   setLocationId]   = useState('')
+  const [locationId,   setLocationId]   = useState(scopedLocationId ?? '')
   const [serviceId,    setServiceId]    = useState('')
   const [specialistId, setSpecialistId] = useState('')
   const [date,         setDate]         = useState(initialDate ?? today)
@@ -50,6 +54,11 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime }: Pro
     return set
   }, [bookings, specialistId, date, partner])
 
+  // When a manager opens the modal, force their branch as the location.
+  useEffect(() => {
+    if (open && scopedLocationId) setLocationId(scopedLocationId)
+  }, [open, scopedLocationId])
+
   // Early return AFTER all hooks
   if (!partner) return null
 
@@ -77,9 +86,9 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime }: Pro
       status: 'confirmed',
     })
     upsertBooking(booking)
-    toast(`Booking confirmed for ${clientName}`)
+    toast(t('newBooking.confirmedToast', { name: clientName }))
     onClose()
-    setLocationId(''); setServiceId(''); setSpecialistId('')
+    setLocationId(scopedLocationId ?? ''); setServiceId(''); setSpecialistId('')
     setDate(today);   setTime('');   setClientName(''); setClientPhone('')
   }
 
@@ -87,55 +96,56 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime }: Pro
     <Modal
       open={open}
       onClose={onClose}
-      title="New booking"
-      subtitle="Fill in the details to create a booking"
+      title={t('newBooking.title')}
+      subtitle={t('newBooking.subtitle')}
       footer={
         <>
-          <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          <Button variant="ghost" onClick={onClose}>{t('common.cancel')}</Button>
           <Button variant="accent" disabled={!canSubmit} onClick={handleSubmit}>
-            Confirm booking
+            {t('newBooking.confirm')}
           </Button>
         </>
       }
     >
       <div className={s.grid}>
         <div className={s.full}>
-          <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>Location</label>
+          <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('newBooking.locationLabel')}</label>
           <Select
             value={locationId}
             onChange={v => { setLocationId(v); setSpecialistId('') }}
             options={locations.map(l => ({ value: l.id, label: l.name, sub: l.address }))}
-            placeholder="Select location…"
+            placeholder={t('newBooking.locationPlaceholder')}
+            disabled={!!scopedLocationId}
           />
         </div>
 
         <div className={s.full}>
-          <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>Service</label>
+          <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('newBooking.serviceLabel')}</label>
           <Select
             value={serviceId}
             onChange={setServiceId}
-            options={services.map(sv => ({ value: sv.id, label: sv.name, sub: `${sv.duration} min · ${sv.price.toLocaleString()} AMD` }))}
-            placeholder="Select service…"
+            options={services.map(sv => ({ value: sv.id, label: sv.name, sub: t('newBooking.serviceSub', { duration: sv.duration, price: sv.price.toLocaleString() }) }))}
+            placeholder={t('newBooking.servicePlaceholder')}
           />
         </div>
 
         <div className={s.full}>
-          <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>Specialist</label>
+          <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('newBooking.specialistLabel')}</label>
           <Select
             value={specialistId}
             onChange={setSpecialistId}
             options={specialists.map(sp => ({ value: sp.id, label: sp.name, sub: sp.title }))}
-            placeholder="Select specialist…"
+            placeholder={t('newBooking.specialistPlaceholder')}
             disabled={!locationId}
           />
         </div>
 
         <div>
-          <DatePicker label="Date" value={date} min={today} onChange={setDate} />
+          <DatePicker label={t('newBooking.dateLabel')} value={date} min={today} onChange={setDate} />
         </div>
 
         <div className={s.full}>
-          <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>Time</label>
+          <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('newBooking.timeLabel')}</label>
           {specialistId && date ? (
             <div className={s.slotGrid}>
               {allSlots.map(sl => (
@@ -153,20 +163,24 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime }: Pro
           ) : (
             <div className={s.infoBox}>
               <Calendar size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-              <span>Select a specialist and date to see available slots.</span>
+              <span>{t('newBooking.slotsHint')}</span>
             </div>
           )}
         </div>
 
-        <Input label="Client name"  value={clientName}  onChange={e => setClientName(e.target.value)}  placeholder="Anna Karapetyan" />
-        <Input label="Client phone" value={clientPhone} onChange={e => setClientPhone(e.target.value)} placeholder="+374 91 …" />
+        <Input label={t('newBooking.clientNameLabel')}  value={clientName}  onChange={e => setClientName(e.target.value)}  placeholder={t('newBooking.clientNamePlaceholder')} />
+        <Input label={t('newBooking.clientPhoneLabel')} value={clientPhone} onChange={e => setClientPhone(e.target.value)} placeholder={t('newBooking.clientPhonePlaceholder')} />
 
         {time && selectedService && (
           <div className={[s.full, s.infoBox].join(' ')}>
             <Calendar size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
             <span>
-              <strong>{new Date(date).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}</strong>
-              {' '}at <strong>{time}</strong> · {selectedService.name} ({selectedService.duration} min)
+              {t('newBooking.summary', {
+                date: new Date(date).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }),
+                time,
+                service: selectedService.name,
+                duration: selectedService.duration,
+              })}
             </span>
           </div>
         )}

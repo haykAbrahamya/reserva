@@ -1,0 +1,278 @@
+@use 'variables' as *;
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 104px 24px 96px;   /* clears the 60px fixed nav; extra bottom room for the scroll hint */
+  max-width: 100vw;
+
+  @media (max-width: 760px) { padding: 88px 18px 56px; }
+}
+
+/* Branded gradient wash behind the hero, tinted per partner */
+.wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.9;
+}
+.washOrb {
+  position: absolute;
+  top: -220px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 620px;
+  max-width: 160vw;
+  border-radius: 50%;
+  filter: blur(8px);
+  pointer-events: none;
+}
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 20%, #000 20%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 20%, #000 20%, transparent 70%);
+}
+
+.inner {
+  position: relative;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+/* Letter-logo (stands in for a real logo for now) */
+.logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-serif;
+  font-size: 42px;
+  font-weight: 500;
+  color: #fff;
+  letter-spacing: -0.02em;
+  box-shadow: $shadow-3;
+  border: 1.5px solid rgba(255,255,255,0.22);
+  margin-bottom: 22px;
+  animation: ph-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @media (max-width: 600px) { width: 66px; height: 66px; border-radius: 18px; font-size: 34px; }
+}
+
+.typeRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  animation: ph-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+.type {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $accent;
+  background: $accent-soft;
+  padding: 5px 11px;
+  border-radius: 999px;
+}
+
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: $fg-1;
+  .stars { color: $warn; letter-spacing: 0.5px; }
+  .reviewCount { color: $fg-3; }
+}
+
+.name {
+  font-family: $font-serif;
+  font-size: clamp(36px, 7vw, 68px);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  color: $fg-0;
+  margin: 0 0 14px;
+  overflow-wrap: break-word;
+  animation: ph-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+.tagline {
+  font-size: clamp(16px, 2.2vw, 20px);
+  line-height: 1.5;
+  color: $fg-2;
+  max-width: 560px;
+  margin: 0 0 26px;
+  animation: ph-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+  animation: ph-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+}
+
+.meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: $fg-1;
+  svg { color: $accent; flex-shrink: 0; }
+}
+
+/* clickable "N locations" meta — jumps to the locations section */
+.metaLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: $accent;
+  background: $accent-soft;
+  border: 1px solid color-mix(in srgb, $accent 22%, transparent);
+  padding: 7px 13px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: $font-sans;
+  transition: background 0.15s, transform 0.1s;
+  svg { color: $accent; flex-shrink: 0; }
+  &:hover { background: color-mix(in srgb, $accent 18%, transparent); }
+  &:active { transform: scale(0.98); }
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  animation: ph-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+}
+
+.bookCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 52px;
+  padding: 0 28px;
+  border-radius: $r-2;
+  background: $accent;
+  color: #fff;
+  font-family: $font-sans;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px color-mix(in srgb, $accent 30%, transparent), 0 10px 26px color-mix(in srgb, $accent 26%, transparent);
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  &:hover { background: $accent-strong; transform: translateY(-1px); box-shadow: 0 12px 30px color-mix(in srgb, $accent 34%, transparent); }
+  &:active { transform: translateY(0); }
+}
+
+.callBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 52px;
+  padding: 0 24px;
+  border-radius: $r-2;
+  background: $bg-1;
+  color: $fg-0;
+  font-family: $font-sans;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid $line-2;
+  box-shadow: $shadow-1;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  &:hover { background: $bg-2; border-color: $line-strong; transform: translateY(-1px); }
+  &:active { transform: translateY(0); }
+}
+
+/* ── Animated scroll hint ── */
+.scrollHint {
+  position: absolute;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $fg-2;
+  z-index: 2;
+  opacity: 1;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  animation: ph-rise 0.6s cubic-bezier(0.22, 0.86, 0.23, 1) 0.6s both;
+
+  &.hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+    pointer-events: none;
+  }
+
+  /* Hide on short screens / mobile where there's less room */
+  @media (max-width: 760px) { display: none; }
+}
+
+.scrollText {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: $fg-3;
+}
+
+/* Mouse outline with a falling wheel dot */
+.scrollMouse {
+  position: relative;
+  width: 24px;
+  height: 38px;
+  border: 2px solid $line-strong;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+}
+.scrollWheel {
+  width: 4px;
+  height: 8px;
+  border-radius: 999px;
+  background: $accent;
+  margin-top: 6px;
+  animation: scroll-wheel 1.8s cubic-bezier(0.22, 0.86, 0.23, 1) infinite;
+}
+
+.scrollChevron {
+  color: $accent;
+  animation: scroll-chev 1.8s ease-in-out infinite;
+}
+
+:global {
+  @keyframes ph-rise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+  @keyframes scroll-wheel {
+    0%   { transform: translateY(0); opacity: 0; }
+    25%  { opacity: 1; }
+    70%  { transform: translateY(12px); opacity: 0; }
+    100% { transform: translateY(12px); opacity: 0; }
+  }
+  @keyframes scroll-chev {
+    0%, 100% { transform: translateY(0); opacity: 0.5; }
+    50%      { transform: translateY(4px); opacity: 1; }
+  }
+}

@@ -1,0 +1,205 @@
+@use 'variables' as *;
+
+/* ── Final CTA panel ── */
+.ctaSection {
+  padding: 40px 24px 96px;
+  background: $bg-0;
+
+  @media (max-width: 640px) { padding: 32px 18px 72px; }
+}
+
+.panel {
+  position: relative;
+  overflow: hidden;
+  max-width: 1000px;
+  margin: 0 auto;
+  border-radius: 24px;
+  padding: 72px 32px;
+  text-align: center;
+  /* Theme-adaptive: warm cream surface in light mode, deep ink in dark. */
+  background: $bg-4;
+  border: 1px solid $line-1;
+  box-shadow: $shadow-2;
+
+  @media (max-width: 640px) { padding: 52px 22px; border-radius: 18px; }
+}
+
+[data-theme="dark"] .panel {
+  background: #100F0D;
+  border-color: $line-2;
+}
+
+.panelGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 36px 36px;
+  pointer-events: none;
+}
+.panelOrb {
+  position: absolute;
+  top: -120px;
+  right: -80px;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(circle, $accent-soft 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.panelInner { position: relative; }
+
+.panelTitle {
+  font-family: $font-serif;
+  font-size: clamp(28px, 4.5vw, 44px);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: $fg-0;
+  margin: 0 0 16px;
+  em { font-style: italic; color: $accent; }
+}
+
+.panelText {
+  font-size: clamp(15px, 2vw, 18px);
+  line-height: 1.6;
+  color: $fg-2;
+  max-width: 480px;
+  margin: 0 auto 32px;
+}
+
+.panelActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 50px;
+  padding: 0 26px;
+  border-radius: $r-2;
+  background: $accent;
+  color: #fff;
+  font-family: $font-sans;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(192,145,95,.4);
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  &:hover { background: $accent-strong; transform: translateY(-1px); }
+  &:active { transform: translateY(0); }
+}
+
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 50px;
+  padding: 0 24px;
+  border-radius: $r-2;
+  background: $bg-1;
+  color: $fg-0;
+  font-family: $font-sans;
+  font-size: 16px;
+  font-weight: 600;
+  border: 1px solid $line-2;
+  box-shadow: $shadow-1;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  &:hover { background: $bg-2; border-color: $line-strong; transform: translateY(-1px); }
+  &:active { transform: translateY(0); }
+}
+
+/* Dark mode: translucent ghost on the deep ink panel */
+[data-theme="dark"] .btnGhost {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.18);
+  color: #fff;
+  box-shadow: none;
+  &:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.28); }
+}
+
+/* ── Footer ── */
+.footer {
+  background: $bg-1;
+  border-top: 1px solid $line-1;
+  padding: 56px 24px 36px;
+}
+
+.footerInner {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 40px;
+
+  @media (max-width: 820px) { grid-template-columns: 1fr 1fr; gap: 32px; }
+  @media (max-width: 480px) { grid-template-columns: 1fr; gap: 28px; }
+}
+
+.brandCol { max-width: 280px; }
+.footerTagline {
+  font-size: 13px;
+  line-height: 1.6;
+  color: $fg-2;
+  margin: 14px 0 0;
+}
+
+.colTitle {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $fg-3;
+  margin-bottom: 14px;
+}
+
+.footLink {
+  display: block;
+  font-size: 14px;
+  color: $fg-1;
+  text-decoration: none;
+  padding: 6px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: $font-sans;
+  transition: color 0.15s;
+  &:hover { color: $accent; }
+}
+
+.bottom {
+  max-width: 1120px;
+  margin: 44px auto 0;
+  padding-top: 24px;
+  border-top: 1px solid $line-1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.copy { font-size: 13px; color: $fg-3; }
+.social { display: flex; gap: 8px; }
+.socialBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: $r-1;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  &:hover { background: $bg-2; color: $fg-0; border-color: $line-strong; }
+}

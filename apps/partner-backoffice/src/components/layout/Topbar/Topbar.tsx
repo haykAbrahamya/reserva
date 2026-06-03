@@ -3,19 +3,17 @@ import { Bell } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { UserMenu } from '../UserMenu/UserMenu'
 import { ThemeToggle } from '../ThemeToggle/ThemeToggle'
+import { LanguageSwitcher } from '../LanguageSwitcher/LanguageSwitcher'
 import { usePartner } from '@/store/app.store'
 import { initials } from '@/components/ui'
+import { useT } from '@/i18n'
 import s from './Topbar.module.scss'
-
-const TITLES: Record<string, string> = {
-  '/': 'Dashboard', '/calendar': 'Calendar', '/bookings': 'Bookings',
-  '/clients': 'Clients', '/services': 'Services', '/specialists': 'Specialists',
-  '/hours': 'Working hours', '/locations': 'Locations', '/settings': 'Settings',
-}
 
 export function Topbar() {
   const { pathname } = useLocation()
   const partner = usePartner()
+  const t = useT()
+  const title = t(`topbar.titles.${pathname}`)
 
   return (
     <header className={s.topbar}>
@@ -27,13 +25,16 @@ export function Topbar() {
         >
           {partner ? initials(partner.name) : 'R'}
         </div>
-        <span className={s.mobileTitle}>{partner?.name ?? 'Backoffice'}</span>
+        <span className={s.mobileTitle}>{partner?.name ?? t('common.backoffice')}</span>
       </div>
 
       {/* Desktop: page breadcrumb */}
-      <span className={s.breadcrumb}>{TITLES[pathname] ?? ''}</span>
+      <span className={s.breadcrumb}>{title.startsWith('topbar.') ? '' : title}</span>
 
       <div className={s.spacer} />
+
+      {/* Language switcher */}
+      <LanguageSwitcher />
 
       {/* Theme toggle */}
       <ThemeToggle />

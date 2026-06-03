@@ -1,0 +1,143 @@
+@use 'variables' as *;
+
+.section {
+  padding: 56px 24px;
+  background: $bg-4;
+  border-top: 1px solid $line-1;
+  border-bottom: 1px solid $line-1;
+  @media (max-width: 600px) { padding: 44px 18px; }
+}
+
+.inner { max-width: 1080px; margin: 0 auto; }
+
+.head { margin-bottom: 28px; }
+.eyebrow {
+  font-size: 12px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: $accent; margin-bottom: 10px;
+}
+.title {
+  font-family: $font-serif;
+  font-size: clamp(26px, 4vw, 38px);
+  letter-spacing: -0.025em;
+  color: $fg-0;
+  margin: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+
+  @media (max-width: 720px) { grid-template-columns: 1fr; }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  overflow: hidden;
+  box-shadow: $shadow-1;
+  transition: transform 0.25s cubic-bezier(0.22, 0.86, 0.23, 1), box-shadow 0.25s, border-color 0.25s;
+
+  &:hover { transform: translateY(-3px); box-shadow: $shadow-2; border-color: $line-2; }
+}
+
+/* "Map" placeholder banner (branded gradient + pin) */
+.mapBanner {
+  height: 120px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.mapGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.14) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+.mapPin {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.22);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+
+.cardBody { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+
+.branchName {
+  font-size: 18px;
+  font-weight: 600;
+  color: $fg-0;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: $fg-1;
+  margin-bottom: 8px;
+  svg { color: $accent; flex-shrink: 0; margin-top: 2px; }
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.bookBtn {
+  flex: 1;
+  height: 42px;
+  border-radius: $r-2;
+  background: $accent;
+  color: #fff;
+  border: none;
+  font-family: $font-sans;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: background 0.15s, transform 0.1s;
+  &:hover { background: $accent-strong; }
+  &:active { transform: translateY(1px); }
+}
+
+.callBtn {
+  height: 42px;
+  padding: 0 16px;
+  border-radius: $r-2;
+  background: $bg-1;
+  color: $fg-0;
+  border: 1px solid $line-2;
+  text-decoration: none;
+  font-family: $font-sans;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: background 0.15s, border-color 0.15s;
+  &:hover { background: $bg-2; border-color: $line-strong; }
+}
