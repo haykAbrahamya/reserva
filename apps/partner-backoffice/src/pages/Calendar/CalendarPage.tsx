@@ -5,11 +5,13 @@ import { Select, BookingBadge } from '@/components/ui'
 import { useNewBooking } from '@/App'
 import { isSameDay, fmtTime, fmtAMD } from '@/utils/format'
 import { bookingsService } from '@/services/bookings.service'
+import { partnersService } from '@/services/partners.service'
+import { offBandsForDay, isBookingInAnyTimeOff } from '@/utils/timeOff'
 import { useToast } from '@/components/ui'
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
 import { useScopedLocationId } from '@/store/auth.hooks'
 import { useT } from '@/i18n'
-import type { Booking } from '@/types'
+import type { Booking, SpecialistTimeOff } from '@/types'
 import s from './CalendarPage.module.scss'
 
 const HOUR_START = 8
@@ -81,6 +83,21 @@ export function CalendarPage() {
     ),
     [bookings, partner, visibleSpecialists]
   )
+
+  // Load time-off for the visible specialists. Off-bands are only drawn when a
+  // single specialist is selected (day columns aren't split per-specialist, so
+  // overlapping bands from multiple people would be ambiguous) — but conflict
+  // flagging on bookings always applies.
+  const [timeOff, setTimeOff] = useState<SpecialistTimeOff[]>([])
+  const visibleIdsKey = visibleSpecialists.map(sp => sp.id).join(',')
+  useEffect(() => {
+    let active = true
+    Promise.all(visibleSpecialists.map(sp => partnersService.listTimeOff(sp.id)))
+      .then(lists => { if (active) setTimeOff(lists.flat()) })
+    return () => { active = false }
+  }, [visibleIdsKey]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const showOffBands = filterSp !== 'all'
 
   // Desktop drag — ghost follows cursor as position:fixed so it's never clipped
   const dragRef = useRef<{
@@ -223,6 +240,9 @@ export function CalendarPage() {
                     <span className={s.mobEventTime}>{fmtTime(b.startISO)}–{fmtTime(b.endISO)}</span>
                     <BookingBadge status={b.status} />
                   </div>
+                  {isBookingInAnyTimeOff(b, timeOff) && (
+                    <div className={s.mobConflictTag}>{t('timeOff.sectionTitle')}</div>
+                  )}
                   <div className={s.mobEventName}>{b.clientName}</div>
                   <div className={s.mobEventSub}>
                     {svc?.name ?? '—'} · {t('calendar.with')} {sp?.name.split(' ')[0] ?? '—'}
@@ -303,6 +323,25 @@ export function CalendarPage() {
                     <div className={s.halfLine}  style={{ top: (i * 60 + 30) * PX_PER_MIN }} />
                   </div>
                 ))}
+                {/* Time-off bands (only when one specialist is selected) */}
+                {showOffBands && offBandsForDay(timeOff, d).map((band, bi) => {
+                  const top    = (band.startMin - HOUR_START * 60) * PX_PER_MIN
+                  const height = (band.endMin - band.startMin) * PX_PER_MIN
+                  return (
+                    <div
+                      key={`off-${bi}`}
+                      className={s.offBand}
+                      style={{ top: Math.max(top, 0), height: Math.min(height, colHeight - Math.max(top, 0)) }}
+                      title={band.off.reason || t('timeOff.allDay')}
+                    >
+                      {height > 26 && (
+                        <span className={s.offBandLabel}>
+                          {band.off.reason || t('timeOff.sectionTitle')}
+                        </span>
+                      )}
+                    </div>
+                  )
+                })}
                 {isToday && nowOffset > 0 && nowOffset < colHeight && (
                   <div className={s.nowLine} style={{ top: nowOffset }} />
                 )}
@@ -312,6 +351,7 @@ export function CalendarPage() {
                     booking={b}
                     partner={partner}
                     isDragging={ghost?.id === b.id}
+                    conflict={isBookingInAnyTimeOff(b, timeOff)}
                     onMouseDown={ev => onEventMouseDown(ev, b, colIdx)}
                     onTouchStart={ev => onEventTouchStart(ev, b, colIdx)}
                   />
@@ -353,10 +393,11 @@ export function CalendarPage() {
   )
 }
 
-function CalEvent({ booking, partner, isDragging, onMouseDown, onTouchStart }: {
+function CalEvent({ booking, partner, isDragging, conflict, onMouseDown, onTouchStart }: {
   booking: Booking
   partner: NonNullable<ReturnType<typeof usePartner>>
   isDragging?: boolean
+  conflict?: boolean
   onMouseDown: (e: React.MouseEvent) => void
   onTouchStart: (e: React.TouchEvent) => void
 }) {
@@ -373,7 +414,7 @@ function CalEvent({ booking, partner, isDragging, onMouseDown, onTouchStart }: {
 
   return (
     <div
-      className={[s.event, s[booking.status]].filter(Boolean).join(' ')}
+      className={[s.event, s[booking.status], conflict ? s.conflict : ''].filter(Boolean).join(' ')}
       style={{ top, height, opacity: isDragging ? 0.25 : 1, cursor: isDragging ? 'grabbing' : 'grab' }}
       onMouseDown={onMouseDown}
       onTouchStart={onTouchStart}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Sparkles, Pencil, Clock, Scissors } from 'lucide-react'
 import { useAppStore, usePartner } from '@/store/app.store'
-import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Empty } from '@/components/ui'
+import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Empty, Pagination, usePagination } from '@/components/ui'
 import { fmtAMD, fmtDuration } from '@/utils/format'
 import { partnersService } from '@/services/partners.service'
 import { useI18n } from '@/i18n'
@@ -29,6 +29,10 @@ export function Services() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editing,   setEditing]   = useState<Service | null>(null)
   const [form,      setForm]      = useState(EMPTY_FORM)
+
+  // Desktop pagination over the service list (mobile uses category cards).
+  const { pageItems: pagedServices, page, pageCount, setPage, pageSize, setPageSize, from, to, total } =
+    usePagination(partner?.services ?? [])
 
   if (!partner) return null
 
@@ -122,7 +126,7 @@ export function Services() {
               </tr>
             </thead>
             <tbody>
-              {partner.services.map(svc => (
+              {pagedServices.map(svc => (
                 <Tr key={svc.id}>
                   <Td><span className={s.svcName}>{svc.name}</span></Td>
                   <Td><span className={s.category}>{svc.category}</span></Td>
@@ -138,6 +142,15 @@ export function Services() {
               ))}
             </tbody>
           </Table>
+          <Pagination
+            page={page}
+            pageCount={pageCount}
+            onPageChange={setPage}
+            pageSize={pageSize}
+            onPageSizeChange={setPageSize}
+            pageSizeLabel={t('pagination.perPage')}
+            summary={t('pagination.summary', { from, to, total })}
+          />
         </div>
       )}
 

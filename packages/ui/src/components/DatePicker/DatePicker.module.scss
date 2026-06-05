@@ -38,17 +38,13 @@
 }
 
 /* â”€â”€ Popover â”€â”€ */
+/* Positioned by useAnchoredDropdown (fixed, portalled to body). */
 .popover {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  z-index: 300;
   background: $bg-1;
   border: 1px solid $line-2;
   border-radius: $r-2;
   box-shadow: $shadow-3;
   padding: 12px;
-  min-width: 280px;
   animation: datepicker-in 0.16s cubic-bezier(0.22, 0.86, 0.23, 1) both;
   user-select: none;
 }

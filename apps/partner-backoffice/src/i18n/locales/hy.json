@@ -1,4 +1,8 @@
 {
+  "pagination": {
+    "summary": "Ցուցադրվում է {from}–{to}-ը {total}-ից",
+    "perPage": "Մեկ էջում"
+  },
   "common": {
     "cancel": "Չեղարկել",
     "save": "Պահպանել",
@@ -187,6 +191,12 @@
       "cancelled": "Չեղարկված",
       "noshow": "Չներկայացած"
     },
+    "allSpecialists": "Բոլոր մասնագետները",
+    "searchPlaceholder": "Որոնել հաճախորդ, հեռախոս կամ ծառայություն…",
+    "dateFrom": "Սկսած",
+    "dateTo": "Մինչև",
+    "clearFilters": "Մաքրել զտիչները",
+    "filteredNotice": "Ցուցադրվում է զտված տեսքը",
     "emptyTitle": "Ամրագրումներ չեն գտնվել",
     "emptyDescFilter": "Փորձեք փոխել զտիչը կամ ավելացրեք նոր ամրագրում։",
     "emptyDescCreate": "Փորձեք փոխել զտիչը կամ ստեղծեք նոր ամրագրում։",
@@ -307,6 +317,7 @@
     "specialists": "Մասնագետներ",
     "selectSpecialist": "Ընտրեք մասնագետ",
     "selectSpecialistHint": "Ընտրեք մեկին ցանկից՝ նրա ժամերը խմբագրելու համար։",
+    "weeklyTitle": "Շաբաթական ժամանակացույց",
     "days": {
       "mon": "Երկ",
       "tue": "Երք",
@@ -316,6 +327,41 @@
       "sat": "Շբթ",
       "sun": "Կիր"
     }
+  },
+  "timeOff": {
+    "sectionTitle": "Արձակուրդ և բացառություններ",
+    "sectionHint": "Միանգամյա օրեր կամ ժամեր, երբ մասնագետն անհասանելի է։",
+    "add": "Ավելացնել արձակուրդ",
+    "empty": "Արձակուրդ նախատեսված չէ։",
+    "allDay": "Ամբողջ օրը",
+    "noReason": "Պատճառ նշված չէ",
+    "modalTitle": "Ավելացնել արձակուրդ",
+    "modalEditTitle": "Խմբագրել արձակուրդը",
+    "modalSubtitle": "Արգելափակեք ժամանակը, երբ {name}-ն անհասանելի է",
+    "typeLabel": "Տեսակ",
+    "typePartial": "Օրվա մի մաս",
+    "typeFullDay": "Ամբողջ օր",
+    "typeRange": "Օրերի միջակայք",
+    "dateLabel": "Ամսաթիվ",
+    "startDateLabel": "Սկսած",
+    "endDateLabel": "Մինչև",
+    "timeLabel": "Ժամեր",
+    "reasonLabel": "Պատճառ",
+    "reasonOptional": "Պատճառ (ըստ ցանկության)",
+    "reasonPlaceholder": "օր․՝ Արձակուրդ, Ատամնաբույժ…",
+    "save": "Պահպանել արձակուրդը",
+    "addedToast": "Արձակուրդն ավելացվեց",
+    "updatedToast": "Արձակուրդը թարմացվեց",
+    "removedToast": "Արձակուրդը հեռացվեց",
+    "deleteTitle": "Հեռացնե՞լ արձակուրդը",
+    "deleteBody": "Հեռացնե՞լ այս արձակուրդի գրառումը {name}-ի համար։",
+    "endBeforeStart": "Ավարտը պետք է լինի սկզբից հետո։",
+    "conflictTitle": "Նախ լուծեք ամրագրումները",
+    "conflictBody": "{name}-ն ունի {count} ամրագրում այս միջակայքում։ Նախ վերանշանակեք կամ չեղարկեք այն, ապա կկարողանաք պահպանել արձակուրդը։",
+    "conflictBody_plural": "{name}-ն ունի {count} ամրագրում այս միջակայքում։ Նախ վերանշանակեք կամ չեղարկեք դրանք, ապա կկարողանաք պահպանել արձակուրդը։",
+    "resolveBookings": "Լուծել ամրագրումները",
+    "conflictBadge": "{count} ամրագրման բախում",
+    "conflictBadge_plural": "{count} ամրագրման բախում"
   },
   "locations": {
     "title": "Մասնաճյուղեր",
@@ -334,8 +380,12 @@
       "addressLabel": "Հասցե",
       "addressPlaceholder": "օր․՝ Կոմիտասի պող. 34, Երևան",
       "phoneLabel": "Հեռախոս",
-      "phonePlaceholder": "+374 10 …"
+      "phonePlaceholder": "+374 10 …",
+      "hoursLabel": "Աշխատանքային ժամեր",
+      "presetEveryDay": "Ամեն օր",
+      "presetExceptSun": "Երկ–Շբթ"
     },
+    "closed": "Փակ է",
     "delete": {
       "title": "Հեռացնե՞լ մասնաճյուղը",
       "body": "Վստա՞հ եք, որ ցանկանում եք հեռացնել {name}-ը։ Այս մասնաճյուղին կցված մասնագետները պետք է վերանշանակվեն։"

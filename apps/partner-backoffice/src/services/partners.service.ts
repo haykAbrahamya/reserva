@@ -1,8 +1,9 @@
-import type { Partner, Service, Specialist, SpecialistHours, Location } from '@/types'
-import { PARTNERS, SPECIALIST_HOURS } from '@/mock/data'
+import type { Partner, Service, Specialist, SpecialistHours, SpecialistTimeOff, Location } from '@/types'
+import { PARTNERS, SPECIALIST_HOURS, TIME_OFF } from '@/mock/data'
 
 let _partners = PARTNERS.map(p => ({ ...p, specialists: [...p.specialists], services: [...p.services], locations: [...p.locations] }))
 let _hours = [...SPECIALIST_HOURS]
+let _timeOff = [...TIME_OFF]
 
 const delay = (ms = 200) => new Promise(r => setTimeout(r, ms))
 
@@ -98,5 +99,30 @@ export const partnersService = {
     const idx = _hours.findIndex(h => h.specialistId === specialistId)
     if (idx >= 0) _hours[idx] = { specialistId, schedule }
     else _hours.push({ specialistId, schedule })
+  },
+
+  // ── Time off ──────────────────────────────────────────────────
+  async listTimeOff(specialistId: string): Promise<SpecialistTimeOff[]> {
+    await delay(100)
+    return _timeOff
+      .filter(t => t.specialistId === specialistId)
+      .sort((a, b) => a.startISO.localeCompare(b.startISO))
+  },
+
+  async createTimeOff(data: Omit<SpecialistTimeOff, 'id'>): Promise<SpecialistTimeOff> {
+    await delay()
+    const entry: SpecialistTimeOff = { ...data, id: `to-${Date.now()}` }
+    _timeOff = [..._timeOff, entry]
+    return entry
+  },
+
+  async updateTimeOff(id: string, patch: Partial<SpecialistTimeOff>): Promise<void> {
+    await delay()
+    _timeOff = _timeOff.map(t => t.id === id ? { ...t, ...patch } : t)
+  },
+
+  async deleteTimeOff(id: string): Promise<void> {
+    await delay()
+    _timeOff = _timeOff.filter(t => t.id !== id)
   },
 }

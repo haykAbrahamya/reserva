@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Search, Users } from 'lucide-react'
 import { useAppStore, usePartner } from '@/store/app.store'
-import { Avatar, Table, Th, Td, Tr, BookingBadge, Empty, Drawer } from '@/components/ui'
+import { Avatar, Table, Th, Td, Tr, BookingBadge, Empty, Drawer, Pagination, usePagination } from '@/components/ui'
 import { fmtAMD, fmtDateTime, fmtDateShort } from '@/utils/format'
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
 import { useScopedLocationId } from '@/store/auth.hooks'
@@ -70,6 +70,9 @@ export function Clients() {
 
   const selectedClient = selectedName ? clients.find(c => c.name === selectedName) ?? null : null
 
+  // Desktop pagination (mobile uses the card list).
+  const { pageItems: pagedClients, page, pageCount, setPage, pageSize, setPageSize, from, to, total } = usePagination(filtered)
+
   if (!partner) return null
 
   return (
@@ -133,7 +136,7 @@ export function Clients() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(c => (
+              {pagedClients.map(c => (
                 <Tr key={c.phone} selected={c.name === selectedName} onClick={() => setSelectedName(c.name === selectedName ? null : c.name)}>
                   <Td>
                     <div className={s.clientInfo}>
@@ -154,6 +157,15 @@ export function Clients() {
               ))}
             </tbody>
           </Table>
+          <Pagination
+            page={page}
+            pageCount={pageCount}
+            onPageChange={setPage}
+            pageSize={pageSize}
+            onPageSizeChange={setPageSize}
+            pageSizeLabel={t('pagination.perPage')}
+            summary={t('pagination.summary', { from, to, total })}
+          />
         </div>
       )}
 

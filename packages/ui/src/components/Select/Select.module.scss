@@ -40,12 +40,8 @@
   }
 }
 
+/* Positioned by useAnchoredDropdown (fixed, portalled to body). */
 .dropdown {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
-  z-index: 200;
   background: $bg-1;
   border: 1px solid $line-2;
   border-radius: $r-2;

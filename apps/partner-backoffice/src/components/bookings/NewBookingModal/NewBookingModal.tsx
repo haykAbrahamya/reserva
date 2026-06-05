@@ -4,8 +4,11 @@ import { Modal, Input, Select, Button, DatePicker, useToast } from '@/components
 import { useAppStore, usePartner } from '@/store/app.store'
 import { useScopedLocationId } from '@/store/auth.hooks'
 import { bookingsService } from '@/services/bookings.service'
+import { partnersService } from '@/services/partners.service'
+import { slotBlockedByTimeOff } from '@/utils/timeOff'
 import { fmtDateInput } from '@/utils/format'
 import { useT } from '@/i18n'
+import type { SpecialistTimeOff } from '@/types'
 import s from './NewBookingModal.module.scss'
 
 interface Props {
@@ -41,6 +44,15 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime }: Pro
     return out
   }, [])
 
+  // Time off for the selected specialist — blocks slots just like bookings do.
+  const [timeOff, setTimeOff] = useState<SpecialistTimeOff[]>([])
+  useEffect(() => {
+    if (!specialistId) { setTimeOff([]); return }
+    let active = true
+    partnersService.listTimeOff(specialistId).then(t => { if (active) setTimeOff(t) })
+    return () => { active = false }
+  }, [specialistId])
+
   const busySlots = useMemo(() => {
     const set = new Set<string>()
     if (!specialistId || !date || !partner) return set
@@ -51,8 +63,21 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime }: Pro
       if (fmtDateInput(d) !== date) return
       set.add(`${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`)
     })
+    // Block slots that fall inside a time-off window. A slot is the service's
+    // duration (default 30m) starting at the slot time.
+    const svc = partner.services.find(sv => sv.id === serviceId)
+    const slotMin = svc?.duration ?? 30
+    for (let h = 8; h < 21; h++) {
+      for (let m = 0; m < 60; m += 30) {
+        const start = new Date(`${date}T00:00:00`); start.setHours(h, m, 0, 0)
+        const end = new Date(start.getTime() + slotMin * 60_000)
+        if (slotBlockedByTimeOff(timeOff, specialistId, start.getTime(), end.getTime())) {
+          set.add(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`)
+        }
+      }
+    }
     return set
-  }, [bookings, specialistId, date, partner])
+  }, [bookings, specialistId, date, partner, serviceId, timeOff])
 
   // When a manager opens the modal, force their branch as the location.
   useEffect(() => {

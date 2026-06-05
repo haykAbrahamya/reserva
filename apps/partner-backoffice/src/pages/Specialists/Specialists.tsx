@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, User, Pencil, MapPin } from 'lucide-react'
 import { useAppStore, usePartner } from '@/store/app.store'
-import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Select, Avatar, Empty, Badge } from '@/components/ui'
+import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Select, Avatar, Empty, Badge, Pagination, usePagination } from '@/components/ui'
 import { SpecialistDashboard } from '@/components/specialists/SpecialistDashboard/SpecialistDashboard'
 import { partnersService } from '@/services/partners.service'
 import { useScopedLocationId } from '@/store/auth.hooks'
@@ -33,12 +33,16 @@ export function Specialists() {
   const [form,        setForm]        = useState(EMPTY_FORM)
   const [dashboardSp, setDashboardSp] = useState<Specialist | null>(null)
 
+  // Managers only manage their own branch's team.
+  const specialists = (partner?.specialists ?? []).filter(
+    sp => !scopedLocationId || sp.locationId === scopedLocationId
+  )
+
+  // Desktop pagination (mobile uses the card list).
+  const { pageItems: pagedSpecialists, page, pageCount, setPage, pageSize, setPageSize, from, to, total } = usePagination(specialists)
+
   if (!partner) return null
 
-  // Managers only manage their own branch's team.
-  const specialists = scopedLocationId
-    ? partner.specialists.filter(sp => sp.locationId === scopedLocationId)
-    : partner.specialists
   // Managers can't reassign branches — lock the location select to their branch.
   const lockedLocation = scopedLocationId
 
@@ -132,7 +136,7 @@ export function Specialists() {
               </tr>
             </thead>
             <tbody>
-              {specialists.map(sp => {
+              {pagedSpecialists.map(sp => {
                 const loc = partner.locations.find(l => l.id === sp.locationId)
                 return (
                   <Tr key={sp.id} onClick={() => setDashboardSp(sp)}>
@@ -169,6 +173,15 @@ export function Specialists() {
               })}
             </tbody>
           </Table>
+          <Pagination
+            page={page}
+            pageCount={pageCount}
+            onPageChange={setPage}
+            pageSize={pageSize}
+            onPageSizeChange={setPageSize}
+            pageSizeLabel={t('pagination.perPage')}
+            summary={t('pagination.summary', { from, to, total })}
+          />
         </div>
       )}
 

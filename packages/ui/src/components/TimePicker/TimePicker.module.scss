@@ -45,14 +45,11 @@
   &.open .clock { color: $accent; }
 }
 
+/* Positioned by useAnchoredDropdown (fixed, portalled to body). */
 .dropdown {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  z-index: 300;
-  width: 130px;
   max-height: 240px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: $bg-1;
   border: 1px solid $line-2;
   border-radius: $r-2;
@@ -87,10 +84,4 @@
   &.selected:hover { background: $accent-soft; }
 
   .check { color: $accent; flex-shrink: 0; }
-}
-
-/* Open the dropdown above the trigger when near the bottom */
-.dropdown.up {
-  top: auto;
-  bottom: calc(100% + 4px);
 }

@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Clock, Check } from 'lucide-react'
+import { useAnchoredDropdown } from '../common/useAnchoredDropdown'
 import s from './TimePicker.module.scss'
 
 interface TimePickerProps {
@@ -18,10 +19,7 @@ interface TimePickerProps {
 export function TimePicker({
   value, onChange, disabled, step = 30, minHour = 0, maxHour = 23, className = '',
 }: TimePickerProps) {
-  const [open, setOpen]   = useState(false)
-  const [up, setUp]       = useState(false)
-  const ref     = useRef<HTMLDivElement>(null)
-  const listRef = useRef<HTMLDivElement>(null)
+  const { open, setOpen, triggerRef, panelRef, renderPanel } = useAnchoredDropdown('trigger')
 
   const options = useMemo(() => {
     const out: string[] = []
@@ -33,32 +31,19 @@ export function TimePicker({
     return out
   }, [step, minHour, maxHour])
 
+  // Scroll the selected option into view when opening.
   useEffect(() => {
     if (!open) return
-    const onDoc = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
-    document.addEventListener('mousedown', onDoc)
-    document.addEventListener('keydown', onKey)
-    return () => { document.removeEventListener('mousedown', onDoc); document.removeEventListener('keydown', onKey) }
-  }, [open])
-
-  // Decide whether to open above (if near viewport bottom) + scroll to selection.
-  useEffect(() => {
-    if (!open || !ref.current) return
-    const rect = ref.current.getBoundingClientRect()
-    setUp(rect.bottom + 260 > window.innerHeight)
     requestAnimationFrame(() => {
-      const el = listRef.current?.querySelector('[data-selected="true"]') as HTMLElement | undefined
+      const el = panelRef.current?.querySelector('[data-selected="true"]') as HTMLElement | undefined
       el?.scrollIntoView({ block: 'center' })
     })
-  }, [open])
+  }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const select = (t: string) => { onChange(t); setOpen(false) }
 
   return (
-    <div ref={ref} className={[s.wrap, className].filter(Boolean).join(' ')}>
+    <div ref={triggerRef} className={[s.wrap, className].filter(Boolean).join(' ')}>
       <button
         type="button"
         disabled={disabled}
@@ -69,8 +54,8 @@ export function TimePicker({
         <Clock size={13} className={s.clock} />
       </button>
 
-      {open && (
-        <div ref={listRef} className={[s.dropdown, up ? s.up : ''].filter(Boolean).join(' ')}>
+      {renderPanel(
+        <>
           {options.map(t => {
             const isSel = t === value
             return (
@@ -85,7 +70,8 @@ export function TimePicker({
               </div>
             )
           })}
-        </div>
+        </>,
+        s.dropdown,
       )}
     </div>
   )

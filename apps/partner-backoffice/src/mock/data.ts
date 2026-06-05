@@ -1,4 +1,10 @@
-import type { Partner, Booking, SpecialistHours } from '@/types'
+import type { Partner, Booking, SpecialistHours, SpecialistTimeOff, WeekSchedule } from '@/types'
+
+const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const
+const everyDay = (start: string, end: string): WeekSchedule =>
+  Object.fromEntries(DAYS.map(d => [d, { enabled: true, start, end }])) as WeekSchedule
+const exceptSunday = (start: string, end: string): WeekSchedule =>
+  Object.fromEntries(DAYS.map(d => [d, { enabled: d !== 'sun', start, end }])) as WeekSchedule
 
 export const PARTNERS: Partner[] = [
   {
@@ -8,8 +14,8 @@ export const PARTNERS: Partner[] = [
     type: 'Aesthetic clinic',
     accent: '#A8784B',
     locations: [
-      { id: 'ant-arabkir', name: 'Arabkir', address: '34 Komitas Ave, Yerevan', phone: '+374 10 24 56 78' },
-      { id: 'ant-kentron', name: 'Kentron', address: '12 Pushkin St, Yerevan', phone: '+374 10 53 11 02' },
+      { id: 'ant-arabkir', name: 'Arabkir', address: '34 Komitas Ave, Yerevan', phone: '+374 10 24 56 78', hours: everyDay('10:00', '19:00') },
+      { id: 'ant-kentron', name: 'Kentron', address: '12 Pushkin St, Yerevan', phone: '+374 10 53 11 02', hours: exceptSunday('10:00', '18:00') },
     ],
     specialists: [
       { id: 'ant-s1', name: 'Anush Petrosyan', title: 'Lead aesthetician', locationId: 'ant-arabkir', active: true, phone: '+374 91 22 11 33', services: ['ant-laser-fl', 'ant-laser-leg', 'ant-facial-im', 'ant-derma'] },
@@ -158,3 +164,29 @@ export const SPECIALIST_HOURS: SpecialistHours[] = PARTNERS.flatMap(p =>
     schedule: { ...DEFAULT_SCHEDULE },
   }))
 )
+
+// Seed a couple of upcoming time-off entries for the first specialist so the
+// Hours page has something to show out of the box.
+function seedTimeOff(): SpecialistTimeOff[] {
+  const firstSpecialist = PARTNERS[0]?.specialists[0]
+  if (!firstSpecialist) return []
+  const at = (daysAhead: number, h: number, m: number) => {
+    const d = new Date()
+    d.setHours(0, 0, 0, 0)
+    d.setDate(d.getDate() + daysAhead)
+    d.setHours(h, m, 0, 0)
+    return d.toISOString()
+  }
+  return [
+    {
+      id: 'to-seed-1',
+      specialistId: firstSpecialist.id,
+      startISO: at(2, 15, 0),
+      endISO: at(2, 17, 0),
+      allDay: false,
+      reason: 'Dentist appointment',
+    },
+  ]
+}
+
+export const TIME_OFF: SpecialistTimeOff[] = seedTimeOff()

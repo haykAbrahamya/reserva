@@ -1,0 +1,159 @@
+@use 'variables' as *;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  display: block;
+}
+.fieldLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: $fg-1;
+  margin-bottom: 6px;
+}
+
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.timeRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.timeSep {
+  color: $fg-3;
+  flex-shrink: 0;
+}
+
+.errorBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: $danger;
+  background: $danger-soft;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+/* ── Conflict confirmation phase ── */
+.conflictWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Warning banner */
+.conflictBanner {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  background: $warn-soft;
+  border: 1px solid color-mix(in srgb, $warn 30%, transparent);
+  border-radius: 12px;
+}
+.conflictIcon {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: color-mix(in srgb, $warn 22%, transparent);
+  color: $warn;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.conflictText {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: $fg-1;
+}
+
+.conflictList {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid $line-1;
+  border-radius: 12px;
+  overflow: hidden;
+  max-height: 280px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.conflictItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  background: $bg-1;
+
+  & + & { border-top: 1px solid $line-1; }
+}
+.conflictTime {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-family: $font-mono;
+  font-size: 14px;
+  font-weight: 600;
+  color: $fg-0;
+  min-width: 50px;
+  flex-shrink: 0;
+}
+.conflictDate {
+  font-family: $font-sans;
+  font-size: 11px;
+  font-weight: 500;
+  color: $fg-3;
+  margin-top: 1px;
+}
+.conflictMeta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.conflictClient {
+  font-size: 14px;
+  font-weight: 500;
+  color: $fg-0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.conflictSvc {
+  font-size: 12px;
+  color: $fg-2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Footer: Cancel on the left, the resolve CTA on the right */
+.conflictFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+@media (max-width: 480px) {
+  .conflictFooter {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}

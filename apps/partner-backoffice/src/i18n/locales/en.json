@@ -1,4 +1,8 @@
 {
+  "pagination": {
+    "summary": "Showing {from}–{to} of {total}",
+    "perPage": "Per page"
+  },
   "common": {
     "cancel": "Cancel",
     "save": "Save",
@@ -187,6 +191,12 @@
       "cancelled": "Cancelled",
       "noshow": "No-show"
     },
+    "allSpecialists": "All specialists",
+    "searchPlaceholder": "Search client, phone or service…",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "clearFilters": "Clear filters",
+    "filteredNotice": "Showing a filtered view",
     "emptyTitle": "No bookings found",
     "emptyDescFilter": "Try changing the filter or add a new booking.",
     "emptyDescCreate": "Try changing the filter or create a new booking.",
@@ -307,6 +317,7 @@
     "specialists": "Specialists",
     "selectSpecialist": "Select a specialist",
     "selectSpecialistHint": "Pick someone from the list to edit their hours.",
+    "weeklyTitle": "Weekly schedule",
     "days": {
       "mon": "Mon",
       "tue": "Tue",
@@ -316,6 +327,41 @@
       "sat": "Sat",
       "sun": "Sun"
     }
+  },
+  "timeOff": {
+    "sectionTitle": "Time off & exceptions",
+    "sectionHint": "One-off days or hours when this specialist is unavailable.",
+    "add": "Add time off",
+    "empty": "No time off scheduled.",
+    "allDay": "All day",
+    "noReason": "No reason given",
+    "modalTitle": "Add time off",
+    "modalEditTitle": "Edit time off",
+    "modalSubtitle": "Block out time when {name} is unavailable",
+    "typeLabel": "Type",
+    "typePartial": "Part of a day",
+    "typeFullDay": "Full day",
+    "typeRange": "Date range",
+    "dateLabel": "Date",
+    "startDateLabel": "From date",
+    "endDateLabel": "To date",
+    "timeLabel": "Hours",
+    "reasonLabel": "Reason",
+    "reasonOptional": "Reason (optional)",
+    "reasonPlaceholder": "e.g. Vacation, Dentist…",
+    "save": "Save time off",
+    "addedToast": "Time off added",
+    "updatedToast": "Time off updated",
+    "removedToast": "Time off removed",
+    "deleteTitle": "Remove time off?",
+    "deleteBody": "Remove this time-off entry for {name}?",
+    "endBeforeStart": "End must be after start.",
+    "conflictTitle": "Resolve bookings first",
+    "conflictBody": "{name} has {count} appointment in this window. Reschedule or cancel it first, then you can save this time off.",
+    "conflictBody_plural": "{name} has {count} appointments in this window. Reschedule or cancel them first, then you can save this time off.",
+    "resolveBookings": "Resolve bookings",
+    "conflictBadge": "{count} booking conflict",
+    "conflictBadge_plural": "{count} booking conflicts"
   },
   "locations": {
     "title": "Locations",
@@ -334,8 +380,12 @@
       "addressLabel": "Address",
       "addressPlaceholder": "e.g. 34 Komitas Ave, Yerevan",
       "phoneLabel": "Phone",
-      "phonePlaceholder": "+374 10 …"
+      "phonePlaceholder": "+374 10 …",
+      "hoursLabel": "Working hours",
+      "presetEveryDay": "Every day",
+      "presetExceptSun": "Mon–Sat"
     },
+    "closed": "Closed",
     "delete": {
       "title": "Remove location?",
       "body": "Are you sure you want to remove {name}? Specialists assigned to this branch will need to be reassigned."

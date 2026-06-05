@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react'
 import { fmtDateInput } from '@reserva/shared'
+import { useAnchoredDropdown } from '../common/useAnchoredDropdown'
 import s from './DatePicker.module.scss'
 
 const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
@@ -40,24 +41,14 @@ export function DatePicker({ value, onChange, min, max, label, placeholder = 'Se
   const selected = parseDate(value)
   const today    = new Date(); today.setHours(0,0,0,0)
 
-  const [open,  setOpen]  = useState(false)
+  const { open, setOpen, triggerRef, renderPanel } = useAnchoredDropdown(288)
   const [year,  setYear]  = useState(() => selected?.getFullYear() ?? today.getFullYear())
   const [month, setMonth] = useState(() => selected?.getMonth() ?? today.getMonth())
-  const ref = useRef<HTMLDivElement>(null)
 
   // Sync calendar view when value changes externally
   useEffect(() => {
     if (selected) { setYear(selected.getFullYear()); setMonth(selected.getMonth()) }
   }, [value])
-
-  useEffect(() => {
-    if (!open) return
-    const fn = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
-    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
-    document.addEventListener('mousedown', fn)
-    document.addEventListener('keydown', esc)
-    return () => { document.removeEventListener('mousedown', fn); document.removeEventListener('keydown', esc) }
-  }, [open])
 
   const prevMonth = () => { if (month === 0) { setMonth(11); setYear(y => y - 1) } else setMonth(m => m - 1) }
   const nextMonth = () => { if (month === 11) { setMonth(0); setYear(y => y + 1) } else setMonth(m => m + 1) }
@@ -89,7 +80,7 @@ export function DatePicker({ value, onChange, min, max, label, placeholder = 'Se
   const cells = buildCalendar(year, month)
 
   return (
-    <div className={[s.wrap, className].filter(Boolean).join(' ')} ref={ref}>
+    <div className={[s.wrap, className].filter(Boolean).join(' ')} ref={triggerRef}>
       {label && <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', marginBottom: 6 }}>{label}</label>}
 
       <button
@@ -101,8 +92,8 @@ export function DatePicker({ value, onChange, min, max, label, placeholder = 'Se
         <CalendarDays size={15} className={s.calIcon} />
       </button>
 
-      {open && (
-        <div className={s.popover}>
+      {renderPanel(
+        <>
           {/* Month navigation */}
           <div className={s.header}>
             <button className={s.navBtn} onClick={prevMonth} type="button">
@@ -155,7 +146,8 @@ export function DatePicker({ value, onChange, min, max, label, placeholder = 'Se
             <button type="button" className={s.todayBtn} onClick={goToday}>Today</button>
             {value && <button type="button" className={s.clearBtn} onClick={clear}>Clear</button>}
           </div>
-        </div>
+        </>,
+        s.popover,
       )}
     </div>
   )

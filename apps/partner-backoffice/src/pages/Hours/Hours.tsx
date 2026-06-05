@@ -1,11 +1,15 @@
-import { useState, useEffect } from 'react'
-import { Clock } from 'lucide-react'
-import { usePartner } from '@/store/app.store'
-import { Avatar, Button, TimePicker } from '@/components/ui'
+import { useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Clock, Plus, Pencil, Trash2, CalendarOff, Sun, AlertTriangle, ArrowRight } from 'lucide-react'
+import { useAppStore, usePartner } from '@/store/app.store'
+import { Avatar, Button, TimePicker, ConfirmDialog, useToast } from '@/components/ui'
 import { partnersService } from '@/services/partners.service'
 import { useScopedLocationId } from '@/store/auth.hooks'
-import { useT } from '@/i18n'
-import type { WeekSchedule, WorkingDay } from '@/types'
+import { AddTimeOffModal, type TimeOffDraft } from '@/components/specialists/AddTimeOffModal/AddTimeOffModal'
+import { findConflictingBookings } from '@/utils/timeOff'
+import { fmtTime, fmtDateInput } from '@/utils/format'
+import { useI18n } from '@/i18n'
+import type { WeekSchedule, WorkingDay, SpecialistTimeOff } from '@/types'
 import s from './Hours.module.scss'
 
 const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const
@@ -24,10 +28,27 @@ const DEFAULT_SCHEDULE: WeekSchedule = {
 export function Hours() {
   const partner = usePartner()
   const scopedLocationId = useScopedLocationId()
-  const t = useT()
+  const bookings = useAppStore(st => st.bookings)
+  const toast = useToast()
+  const navigate = useNavigate()
+  const { t } = useI18n()
   const [schedules, setSchedules] = useState<Record<string, WeekSchedule>>({})
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+
+  // Time off — loaded per selected specialist.
+  const [timeOff, setTimeOff] = useState<SpecialistTimeOff[]>([])
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editing, setEditing] = useState<SpecialistTimeOff | null>(null)
+  // Preserved draft so the form survives a trip to resolve conflicting bookings.
+  const [draft, setDraft] = useState<TimeOffDraft | null>(null)
+  // Pending time-off deletion (themed confirm dialog).
+  const [deleteTarget, setDeleteTarget] = useState<SpecialistTimeOff | null>(null)
+  const [deleting, setDeleting] = useState(false)
+
+  const loadTimeOff = useCallback((spId: string) => {
+    partnersService.listTimeOff(spId).then(setTimeOff)
+  }, [])
 
   // Managers only manage their branch's team.
   const teamSpecialists = (partner?.specialists ?? []).filter(
@@ -51,10 +72,39 @@ export function Hours() {
     })
   }, [partner, scopedLocationId])
 
+  // Reload time-off whenever the selected specialist changes.
+  useEffect(() => {
+    if (selectedId) loadTimeOff(selectedId)
+    else setTimeOff([])
+  }, [selectedId, loadTimeOff])
+
   if (!partner) return null
 
   const selectedSp = partner.specialists.find(sp => sp.id === selectedId)
   const schedule = selectedId ? (schedules[selectedId] ?? DEFAULT_SCHEDULE) : null
+
+  const confirmDeleteTimeOff = async () => {
+    if (!deleteTarget) return
+    setDeleting(true)
+    await partnersService.deleteTimeOff(deleteTarget.id)
+    setDeleting(false)
+    setDeleteTarget(null)
+    toast(t('timeOff.removedToast'))
+    if (selectedId) loadTimeOff(selectedId)
+  }
+
+  const openAddTimeOff  = () => { setEditing(null);  setModalOpen(true) }
+  const openEditTimeOff = (e: SpecialistTimeOff) => { setEditing(e); setDraft(null); setModalOpen(true) }
+
+  // Deep-link Bookings filtered to this entry's specialist + date range.
+  const reviewTimeOffConflicts = (e: SpecialistTimeOff) => {
+    const params = new URLSearchParams({
+      specialist: e.specialistId,
+      from: fmtDateInput(new Date(e.startISO)),
+      to:   fmtDateInput(new Date(e.endISO)),
+    })
+    navigate(`/bookings?${params.toString()}`)
+  }
 
   const updateDay = (day: string, patch: Partial<WorkingDay>) => {
     if (!selectedId) return
@@ -171,10 +221,122 @@ export function Hours() {
                     </div>
                   )
                 })}
+
+                {/* ── Time off & exceptions ── */}
+                <div className={s.timeOffSection}>
+                  <div className={s.timeOffHead}>
+                    <div>
+                      <div className={s.timeOffTitle}>{t('timeOff.sectionTitle')}</div>
+                      <div className={s.timeOffHint}>{t('timeOff.sectionHint')}</div>
+                    </div>
+                    <Button variant="default" size="sm" onClick={openAddTimeOff}>
+                      <Plus size={14} /> {t('timeOff.add')}
+                    </Button>
+                  </div>
+
+                  {timeOff.length === 0 ? (
+                    <div className={s.timeOffEmpty}>
+                      <CalendarOff size={18} strokeWidth={1.5} />
+                      <span>{t('timeOff.empty')}</span>
+                    </div>
+                  ) : (
+                    <div className={s.timeOffList}>
+                      {timeOff.map(entry => (
+                        <TimeOffRow
+                          key={entry.id}
+                          entry={entry}
+                          conflicts={findConflictingBookings(bookings, entry.specialistId, entry.startISO, entry.endISO).length}
+                          onEdit={() => openEditTimeOff(entry)}
+                          onDelete={() => setDeleteTarget(entry)}
+                          onReview={() => reviewTimeOffConflicts(entry)}
+                          t={t}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
               </>
             )
           }
         </div>
+      </div>
+
+      {selectedSp && (
+        <AddTimeOffModal
+          open={modalOpen}
+          specialist={selectedSp}
+          editing={editing}
+          initialDraft={draft}
+          onClose={() => setModalOpen(false)}
+          onSaved={() => { setDraft(null); if (selectedId) loadTimeOff(selectedId) }}
+          onPreserveDraft={setDraft}
+        />
+      )}
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        variant="danger"
+        title={t('timeOff.deleteTitle')}
+        message={t('timeOff.deleteBody', { name: selectedSp?.name ?? '' })}
+        confirmLabel={t('common.remove')}
+        cancelLabel={t('common.cancel')}
+        loading={deleting}
+        onConfirm={confirmDeleteTimeOff}
+        onClose={() => setDeleteTarget(null)}
+      />
+    </div>
+  )
+}
+
+/** One row in the time-off list — formats partial/full/range entries. */
+function TimeOffRow({ entry, conflicts, onEdit, onDelete, onReview, t }: {
+  entry: SpecialistTimeOff
+  conflicts: number
+  onEdit: () => void
+  onDelete: () => void
+  onReview: () => void
+  t: (key: string, vars?: Record<string, string | number>) => string
+}) {
+  const start = new Date(entry.startISO)
+  const end   = new Date(entry.endISO)
+  const sameDay = start.toDateString() === end.toDateString()
+  const dateOpts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' }
+
+  const dateLabel = sameDay
+    ? start.toLocaleDateString('en-GB', { weekday: 'short', ...dateOpts })
+    : `${start.toLocaleDateString('en-GB', dateOpts)} – ${end.toLocaleDateString('en-GB', dateOpts)}`
+
+  const timeLabel = entry.allDay
+    ? t('timeOff.allDay')
+    : `${fmtTime(entry.startISO)} – ${fmtTime(entry.endISO)}`
+
+  return (
+    <div className={s.toRow}>
+      <span className={[s.toIcon, entry.allDay ? s.toIconFull : s.toIconPartial].join(' ')}>
+        {entry.allDay ? <Sun size={15} /> : <Clock size={15} />}
+      </span>
+      <div className={s.toMeta}>
+        <div className={s.toPrimary}>
+          <span className={s.toDate}>{dateLabel}</span>
+          <span className={s.toDot}>·</span>
+          <span className={s.toTime}>{timeLabel}</span>
+        </div>
+        <div className={s.toSub}>
+          {entry.reason
+            ? <span className={s.toReason}>{entry.reason}</span>
+            : <span className={s.toNoReason}>{t('timeOff.noReason')}</span>}
+          {conflicts > 0 && (
+            <button type="button" className={s.toConflict} onClick={onReview}>
+              <AlertTriangle size={12} />
+              {t(conflicts === 1 ? 'timeOff.conflictBadge' : 'timeOff.conflictBadge_plural', { count: conflicts })}
+              <ArrowRight size={12} />
+            </button>
+          )}
+        </div>
+      </div>
+      <div className={s.toActions}>
+        <button type="button" className={s.toBtn} onClick={onEdit} aria-label="Edit"><Pencil size={14} /></button>
+        <button type="button" className={[s.toBtn, s.toBtnDanger].join(' ')} onClick={onDelete} aria-label="Delete"><Trash2 size={14} /></button>
       </div>
     </div>
   )

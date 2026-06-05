@@ -246,6 +246,66 @@
   &.cancelled { background: $danger-soft;  border-left-color: $danger; opacity: 0.65; }
   &.completed { background: $info-soft;    border-left-color: $info; }
   &.noshow    { background: $bg-3;         border-left-color: $fg-3; opacity: 0.6; }
+
+  /* Booking that overlaps a time-off window — loud warning outline so it's
+     impossible to miss until the manager reschedules or cancels it. */
+  &.conflict {
+    box-shadow: 0 0 0 2px $danger, $shadow-1;
+    z-index: 6;
+  }
+}
+
+/* ── Time-off band ── */
+.offBand {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  pointer-events: none;
+  /* Diagonal hatch so it reads clearly as "blocked", not as a booking. */
+  background:
+    repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, $fg-3 26%, transparent) 0,
+      color-mix(in srgb, $fg-3 26%, transparent) 6px,
+      transparent 6px,
+      transparent 12px
+    );
+  border-top: 1px solid color-mix(in srgb, $fg-3 40%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, $fg-3 40%, transparent);
+}
+.offBandLabel {
+  position: absolute;
+  top: 3px;
+  left: 6px;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: $fg-2;
+  background: color-mix(in srgb, $bg-1 80%, transparent);
+  padding: 1px 5px;
+  border-radius: 4px;
+  max-width: calc(100% - 12px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Mobile conflict tag on a booking card */
+.mobConflictTag {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  margin-top: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: $danger;
+  background: $danger-soft;
+  padding: 2px 8px;
+  border-radius: 999px;
 }
 
 .eventTime {

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { ChevronDown, Check, Search } from 'lucide-react'
+import { useAnchoredDropdown } from '../common/useAnchoredDropdown'
 import s from './Select.module.scss'
 
 export interface SelectOption {
@@ -26,10 +27,9 @@ export function Select({
   value, onChange, options, placeholder = 'Select…', disabled,
   size = 'md', className = '', searchable, searchPlaceholder = 'Search…',
 }: SelectProps) {
-  const [open, setOpen]       = useState(false)
+  const { open, setOpen, triggerRef, renderPanel } = useAnchoredDropdown('trigger')
   const [hovered, setHovered] = useState(0)
   const [query, setQuery]     = useState('')
-  const ref       = useRef<HTMLDivElement>(null)
   const inputRef  = useRef<HTMLInputElement>(null)
   const listRef   = useRef<HTMLDivElement>(null)
   const current   = options.find(o => o.value === value)
@@ -58,13 +58,10 @@ export function Select({
     setHovered(h => Math.min(Math.max(0, h), Math.max(0, filtered.length - 1)))
   }, [filtered.length])
 
+  // Keyboard navigation while open.
   useEffect(() => {
     if (!open) return
-    const onDoc = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { setOpen(false); return }
       if (e.key === 'ArrowDown') { e.preventDefault(); setHovered(h => Math.min(filtered.length - 1, h + 1)) }
       if (e.key === 'ArrowUp')   { e.preventDefault(); setHovered(h => Math.max(0, h - 1)) }
       if (e.key === 'Enter') {
@@ -73,10 +70,9 @@ export function Select({
         if (opt) { onChange(opt.value); setOpen(false) }
       }
     }
-    document.addEventListener('mousedown', onDoc)
     document.addEventListener('keydown', onKey)
-    return () => { document.removeEventListener('mousedown', onDoc); document.removeEventListener('keydown', onKey) }
-  }, [open, hovered, filtered, onChange])
+    return () => document.removeEventListener('keydown', onKey)
+  }, [open, hovered, filtered, onChange, setOpen])
 
   // Scroll the highlighted option into view.
   useEffect(() => {
@@ -86,7 +82,7 @@ export function Select({
   }, [hovered, open])
 
   return (
-    <div ref={ref} className={[s.wrap, className].filter(Boolean).join(' ')}>
+    <div ref={triggerRef} className={[s.wrap, className].filter(Boolean).join(' ')}>
       <button
         type="button"
         disabled={disabled}
@@ -97,8 +93,8 @@ export function Select({
         <ChevronDown size={12} className={[s.chevron, open ? s.rotated : ''].filter(Boolean).join(' ')} />
       </button>
 
-      {open && (
-        <div className={s.dropdown}>
+      {renderPanel(
+        <>
           {showSearch && (
             <div className={s.searchBox}>
               <Search size={13} className={s.searchIcon} />
@@ -136,7 +132,8 @@ export function Select({
               ))
             )}
           </div>
-        </div>
+        </>,
+        s.dropdown,
       )}
     </div>
   )

@@ -1,13 +1,17 @@
 import { useState } from 'react'
-import { MapPin, Plus, Pencil, Trash2, Phone } from 'lucide-react'
+import { MapPin, Plus, Pencil, Trash2, Phone, Clock } from 'lucide-react'
 import { useAppStore, usePartner } from '@/store/app.store'
-import { Button, Modal, Input, Empty, useToast } from '@/components/ui'
+import { Button, Modal, Input, Empty, TimePicker, Toggle, useToast } from '@/components/ui'
 import { partnersService } from '@/services/partners.service'
+import {
+  DAY_KEYS, DEFAULT_LOCATION_HOURS, everyDaySchedule, exceptSundaySchedule,
+  summarizeHours, dayOf, type DayKey,
+} from '@/utils/locationHours'
 import { useI18n } from '@/i18n'
-import type { Location } from '@/types'
+import type { Location, WeekSchedule, WorkingDay } from '@/types'
 import s from './Locations.module.scss'
 
-const EMPTY_FORM = { name: '', address: '', phone: '' }
+const EMPTY_FORM = { name: '', address: '', phone: '', hours: DEFAULT_LOCATION_HOURS as WeekSchedule }
 
 export function Locations() {
   const partner     = usePartner()
@@ -26,9 +30,15 @@ export function Locations() {
   const openNew = () => { setEditing(null); setForm(EMPTY_FORM); setModalOpen(true) }
   const openEdit = (loc: Location) => {
     setEditing(loc)
-    setForm({ name: loc.name, address: loc.address, phone: loc.phone })
+    setForm({
+      name: loc.name, address: loc.address, phone: loc.phone,
+      hours: loc.hours ?? DEFAULT_LOCATION_HOURS,
+    })
     setModalOpen(true)
   }
+
+  const updateDay = (key: DayKey, patch: Partial<WorkingDay>) =>
+    setForm(f => ({ ...f, hours: { ...f.hours, [key]: { ...dayOf(f.hours, key), ...patch } } }))
 
   const canSave = form.name.trim() !== '' && form.address.trim() !== ''
 
@@ -103,6 +113,12 @@ export function Locations() {
                       {loc.phone}
                     </div>
                   )}
+                  {loc.hours && (
+                    <div className={s.metaRow}>
+                      <Clock size={12} />
+                      {summarizeHours(loc.hours, (k) => t(`hours.days.${k}`), t('locations.closed'))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -144,6 +160,38 @@ export function Locations() {
             onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
             placeholder={t('locations.modal.phonePlaceholder')}
           />
+
+          {/* Working hours */}
+          <div className={s.hoursSection}>
+            <div className={s.hoursHead}>
+              <span className={s.hoursLabel}>{t('locations.modal.hoursLabel')}</span>
+              <div className={s.presets}>
+                <button type="button" className={s.preset} onClick={() => setForm(f => ({ ...f, hours: everyDaySchedule() }))}>
+                  {t('locations.modal.presetEveryDay')}
+                </button>
+                <button type="button" className={s.preset} onClick={() => setForm(f => ({ ...f, hours: exceptSundaySchedule() }))}>
+                  {t('locations.modal.presetExceptSun')}
+                </button>
+              </div>
+            </div>
+
+            <div className={s.dayRows}>
+              {DAY_KEYS.map(key => {
+                const day = dayOf(form.hours, key)
+                return (
+                  <div key={key} className={[s.dayRow, !day.enabled ? s.dayDisabled : ''].filter(Boolean).join(' ')}>
+                    <span className={s.dayName}>{t(`hours.days.${key}`)}</span>
+                    <div className={s.dayTimes}>
+                      <TimePicker value={day.start} step={15} disabled={!day.enabled} onChange={v => updateDay(key, { start: v })} />
+                      <span className={s.daySep}>–</span>
+                      <TimePicker value={day.end} step={15} disabled={!day.enabled} onChange={v => updateDay(key, { end: v })} />
+                    </div>
+                    <Toggle checked={day.enabled} onChange={v => updateDay(key, { enabled: v })} />
+                  </div>
+                )
+              })}
+            </div>
+          </div>
         </div>
       </Modal>
 

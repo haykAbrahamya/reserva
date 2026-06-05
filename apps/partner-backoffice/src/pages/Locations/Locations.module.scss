@@ -81,9 +81,72 @@
 /* ── Form ── */
 .formGrid { display: flex; flex-direction: column; gap: 14px; }
 
+/* ── Working-hours editor ── */
+.hoursSection {
+  border-top: 1px solid $line-1;
+  padding-top: 14px;
+}
+.hoursHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.hoursLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: $fg-1;
+}
+.presets {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.preset {
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-1;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: $font-sans;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  &:hover { background: $accent-soft; border-color: $accent; color: $accent-strong; }
+}
+
+.dayRows {
+  display: flex;
+  flex-direction: column;
+}
+.dayRow {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid $line-1;
+  &:last-child { border-bottom: none; }
+  &.dayDisabled { opacity: 0.5; }
+}
+.dayName { font-size: 13px; font-weight: 600; color: $fg-0; }
+.dayTimes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.daySep { color: $fg-3; }
+
 @media (max-width: 768px) {
   .page { padding: 16px; }
   .h1   { font-size: 26px; }
   .grid { grid-template-columns: 1fr; }
   .actions { opacity: 1; }
+  .dayTimes { gap: 6px; }
 }

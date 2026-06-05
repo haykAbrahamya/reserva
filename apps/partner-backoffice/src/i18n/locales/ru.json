@@ -1,4 +1,8 @@
 {
+  "pagination": {
+    "summary": "Показано {from}–{to} из {total}",
+    "perPage": "На странице"
+  },
   "common": {
     "cancel": "Отмена",
     "save": "Сохранить",
@@ -187,6 +191,12 @@
       "cancelled": "Отменённые",
       "noshow": "Неявки"
     },
+    "allSpecialists": "Все специалисты",
+    "searchPlaceholder": "Поиск: клиент, телефон или услуга…",
+    "dateFrom": "С",
+    "dateTo": "По",
+    "clearFilters": "Сбросить фильтры",
+    "filteredNotice": "Показан отфильтрованный вид",
     "emptyTitle": "Записи не найдены",
     "emptyDescFilter": "Измените фильтр или добавьте новую запись.",
     "emptyDescCreate": "Измените фильтр или создайте новую запись.",
@@ -307,6 +317,7 @@
     "specialists": "Специалисты",
     "selectSpecialist": "Выберите специалиста",
     "selectSpecialistHint": "Выберите кого-нибудь из списка, чтобы изменить часы работы.",
+    "weeklyTitle": "Недельное расписание",
     "days": {
       "mon": "Пн",
       "tue": "Вт",
@@ -316,6 +327,41 @@
       "sat": "Сб",
       "sun": "Вс"
     }
+  },
+  "timeOff": {
+    "sectionTitle": "Отгулы и исключения",
+    "sectionHint": "Разовые дни или часы, когда специалист недоступен.",
+    "add": "Добавить отгул",
+    "empty": "Отгулы не запланированы.",
+    "allDay": "Весь день",
+    "noReason": "Причина не указана",
+    "modalTitle": "Добавить отгул",
+    "modalEditTitle": "Изменить отгул",
+    "modalSubtitle": "Заблокируйте время, когда {name} недоступен(а)",
+    "typeLabel": "Тип",
+    "typePartial": "Часть дня",
+    "typeFullDay": "Весь день",
+    "typeRange": "Диапазон дат",
+    "dateLabel": "Дата",
+    "startDateLabel": "С даты",
+    "endDateLabel": "По дату",
+    "timeLabel": "Часы",
+    "reasonLabel": "Причина",
+    "reasonOptional": "Причина (необязательно)",
+    "reasonPlaceholder": "напр. Отпуск, Стоматолог…",
+    "save": "Сохранить отгул",
+    "addedToast": "Отгул добавлен",
+    "updatedToast": "Отгул обновлён",
+    "removedToast": "Отгул удалён",
+    "deleteTitle": "Удалить отгул?",
+    "deleteBody": "Удалить эту запись об отгуле для {name}?",
+    "endBeforeStart": "Окончание должно быть позже начала.",
+    "conflictTitle": "Сначала разберитесь с записями",
+    "conflictBody": "У {name} есть {count} запись в этом промежутке. Сначала перенесите или отмените её, затем можно будет сохранить отгул.",
+    "conflictBody_plural": "У {name} есть {count} записи(ей) в этом промежутке. Сначала перенесите или отмените их, затем можно будет сохранить отгул.",
+    "resolveBookings": "Разобраться с записями",
+    "conflictBadge": "{count} конфликт записи",
+    "conflictBadge_plural": "{count} конфликтов записей"
   },
   "locations": {
     "title": "Филиалы",
@@ -334,8 +380,12 @@
       "addressLabel": "Адрес",
       "addressPlaceholder": "напр. пр. Комитаса 34, Ереван",
       "phoneLabel": "Телефон",
-      "phonePlaceholder": "+374 10 …"
+      "phonePlaceholder": "+374 10 …",
+      "hoursLabel": "Часы работы",
+      "presetEveryDay": "Каждый день",
+      "presetExceptSun": "Пн–Сб"
     },
+    "closed": "Закрыто",
     "delete": {
       "title": "Удалить филиал?",
       "body": "Вы уверены, что хотите удалить «{name}»? Специалистов этого филиала нужно будет переназначить."

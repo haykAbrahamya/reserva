@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Plus, Calendar } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
+import { Plus, Calendar, X, Search } from 'lucide-react'
 import { useAppStore, usePartner } from '@/store/app.store'
-import { Button, Table, Th, Td, Tr, BookingBadge, Avatar, Empty } from '@/components/ui'
+import { Button, Table, Th, Td, Tr, BookingBadge, Avatar, Empty, Select, DatePicker, Pagination, usePagination } from '@/components/ui'
 import { fmtAMD, fmtDateTime, fmtDuration, fmtTime, fmtDateInput } from '@/utils/format'
 import { useNewBooking } from '@/App'
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
@@ -33,13 +34,63 @@ export function Bookings() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [selectedId,   setSelectedId]   = useState<string | null>(null)
 
-  if (!partner) return null
+  // Specialist + date-range filters are URL-driven so other pages (e.g. the
+  // time-off conflict dialog) can deep-link straight into a filtered view.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const specialistFilter = searchParams.get('specialist') ?? 'all'
+  const fromFilter       = searchParams.get('from') ?? ''
+  const toFilter         = searchParams.get('to') ?? ''
 
+  // Free-text search (client name / phone / service). Local state — debounced
+  // feel isn't needed for an in-memory list this small.
+  const [search, setSearch] = useState('')
+
+  const patchParams = (patch: Record<string, string>) => {
+    const next = new URLSearchParams(searchParams)
+    Object.entries(patch).forEach(([k, v]) => {
+      if (v && v !== 'all') next.set(k, v)
+      else next.delete(k)
+    })
+    setSearchParams(next, { replace: true })
+  }
+  const clearFilters = () => {
+    setSearch('')
+    setStatusFilter('all')
+    const next = new URLSearchParams(searchParams)
+    next.delete('specialist'); next.delete('from'); next.delete('to')
+    setSearchParams(next, { replace: true })
+  }
+  const hasExtraFilters =
+    specialistFilter !== 'all' || !!fromFilter || !!toFilter || !!search.trim() || statusFilter !== 'all'
+
+  const q = search.trim().toLowerCase()
   const partnerBookings = bookings
-    .filter(b => b.partnerId === partner.id)
+    .filter(b => b.partnerId === partner?.id)
     .filter(b => !scopedLocationId || b.locationId === scopedLocationId)
     .filter(b => statusFilter === 'all' || b.status === statusFilter)
+    .filter(b => specialistFilter === 'all' || b.specialistId === specialistFilter)
+    .filter(b => !fromFilter || fmtDateInput(new Date(b.startISO)) >= fromFilter)
+    .filter(b => !toFilter   || fmtDateInput(new Date(b.startISO)) <= toFilter)
+    .filter(b => {
+      if (!q) return true
+      const svc = partner?.services.find(sv => sv.id === b.serviceId)
+      return (
+        b.clientName.toLowerCase().includes(q) ||
+        b.clientPhone.toLowerCase().includes(q) ||
+        (svc?.name.toLowerCase().includes(q) ?? false)
+      )
+    })
     .sort((a, b) => b.startISO.localeCompare(a.startISO))
+
+  // Desktop pagination (mobile uses the grouped card list, no paging).
+  const { pageItems: pagedBookings, page, pageCount, setPage, pageSize, setPageSize, from, to, total } = usePagination(partnerBookings)
+
+  if (!partner) return null
+
+  // Specialists scoped to the manager's branch (mirrors other pages).
+  const branchSpecialists = partner.specialists.filter(
+    sp => !scopedLocationId || sp.locationId === scopedLocationId
+  )
 
   // Group by date for mobile card list
   const grouped = partnerBookings.reduce<Record<string, Booking[]>>((acc, b) => {
@@ -62,17 +113,60 @@ export function Bookings() {
         <Button variant="accent" onClick={openNewBooking}><Plus size={14} /> {t('bookings.newBooking')}</Button>
       </div>
 
-      {/* Status filter chips — horizontal scroll on mobile */}
-      <div className={s.filters}>
-        {STATUS_FILTERS.map(f => (
-          <button
-            key={f}
-            className={[s.filterChip, statusFilter === f ? s.active : ''].filter(Boolean).join(' ')}
-            onClick={() => setStatusFilter(f)}
-          >
-            {t(`bookings.filters.${f}`)}
-          </button>
-        ))}
+      {/* ── Filter toolbar ── */}
+      <div className={s.toolbar}>
+        {/* Row 1: search + specialist + dates + clear */}
+        <div className={s.controls}>
+          <div className={s.searchWrap}>
+            <Search size={15} className={s.searchIcon} />
+            <input
+              className={s.searchInput}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder={t('bookings.searchPlaceholder')}
+            />
+            {search && (
+              <button type="button" className={s.searchClear} onClick={() => setSearch('')} aria-label={t('common.cancel')}>
+                <X size={13} />
+              </button>
+            )}
+          </div>
+
+          <Select
+            className={s.spSelect}
+            value={specialistFilter}
+            onChange={v => patchParams({ specialist: v })}
+            options={[
+              { value: 'all', label: t('bookings.allSpecialists') },
+              ...branchSpecialists.map(sp => ({ value: sp.id, label: sp.name, sub: sp.title })),
+            ]}
+          />
+
+          <div className={s.dateRange}>
+            <DatePicker className={s.dateInput} value={fromFilter} onChange={v => patchParams({ from: v })} placeholder={t('bookings.dateFrom')} />
+            <span className={s.dateDash}>–</span>
+            <DatePicker className={s.dateInput} value={toFilter} min={fromFilter || undefined} onChange={v => patchParams({ to: v })} placeholder={t('bookings.dateTo')} />
+          </div>
+
+          {hasExtraFilters && (
+            <button type="button" className={s.clearBtn} onClick={clearFilters}>
+              <X size={13} /> {t('bookings.clearFilters')}
+            </button>
+          )}
+        </div>
+
+        {/* Row 2: status chips */}
+        <div className={s.filters}>
+          {STATUS_FILTERS.map(f => (
+            <button
+              key={f}
+              className={[s.filterChip, statusFilter === f ? s.active : ''].filter(Boolean).join(' ')}
+              onClick={() => setStatusFilter(f)}
+            >
+              {t(`bookings.filters.${f}`)}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* ── Mobile: card list grouped by date ── */}
@@ -136,7 +230,7 @@ export function Bookings() {
                     <Empty icon={Calendar} title={t('bookings.emptyTitle')} description={t('bookings.emptyDescCreate')} />
                   </td>
                 </tr>
-              ) : partnerBookings.map(b => {
+              ) : pagedBookings.map(b => {
                 const svc = partner.services.find(sv => sv.id === b.serviceId)
                 const sp  = partner.specialists.find(sp => sp.id === b.specialistId)
                 return (
@@ -163,6 +257,15 @@ export function Bookings() {
               })}
             </tbody>
           </Table>
+          <Pagination
+            page={page}
+            pageCount={pageCount}
+            onPageChange={setPage}
+            pageSize={pageSize}
+            onPageSizeChange={setPageSize}
+            pageSizeLabel={t('pagination.perPage')}
+            summary={t('pagination.summary', { from, to, total })}
+          />
         </div>
       )}
 

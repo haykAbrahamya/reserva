@@ -1,0 +1,82 @@
+@use '../../styles/variables' as *;
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  border-top: 1px solid $line-1;
+  flex-wrap: wrap;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.sizeWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sizeLabel {
+  font-size: 12px;
+  color: $fg-2;
+  white-space: nowrap;
+}
+.sizeSelect {
+  width: 72px;
+}
+
+.summary {
+  font-size: 12px;
+  color: $fg-2;
+}
+
+.pages {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.page,
+.navBtn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: $r-1;
+  background: none;
+  color: $fg-1;
+  font-family: $font-sans;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover:not(:disabled) { background: $bg-2; }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.page.active {
+  background: $accent-soft;
+  border-color: $accent;
+  color: $accent-strong;
+  font-weight: 600;
+}
+
+.gap {
+  min-width: 20px;
+  text-align: center;
+  color: $fg-3;
+  font-size: 13px;
+  user-select: none;
+}
