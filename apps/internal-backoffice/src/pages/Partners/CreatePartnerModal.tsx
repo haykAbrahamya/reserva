@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { Copy, Check } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Copy, Check, Loader2 } from 'lucide-react'
 import { Modal, Button, Input, useToast } from '@/components/ui'
 import { partnersService, type CreatePartnerResult } from '@/services/partners.service'
 import { ApiError } from '@/services/http'
@@ -30,25 +30,50 @@ export function CreatePartnerModal({ open, onClose, onCreated }: Props) {
   const [result, setResult] = useState<CreatePartnerResult | null>(null)
   const [copied, setCopied] = useState(false)
 
+  // Live slug availability: 'idle' | 'checking' | 'available' | 'taken'.
+  const [slugStatus, setSlugStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle')
+
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [k]: v }))
 
   // Auto-derive slug from name until the operator edits it directly.
   const effectiveSlug = slugTouched ? form.slug : slugify(form.name)
 
+  // Debounced availability check whenever the effective slug changes.
+  const checkSeq = useRef(0)
+  useEffect(() => {
+    if (!open) return
+    const slug = effectiveSlug
+    if (slug.length < 2) { setSlugStatus('idle'); return }
+    setSlugStatus('checking')
+    const seq = ++checkSeq.current
+    const id = setTimeout(() => {
+      partnersService
+        .isSlugAvailable(slug)
+        .then((free) => {
+          if (seq === checkSeq.current) setSlugStatus(free ? 'available' : 'taken')
+        })
+        .catch(() => { if (seq === checkSeq.current) setSlugStatus('idle') })
+    }, 350)
+    return () => clearTimeout(id)
+  }, [effectiveSlug, open])
+
   const valid = useMemo(
     () =>
-      form.name.trim() &&
+      !!form.name.trim() &&
       effectiveSlug.length >= 2 &&
-      form.type.trim() &&
-      form.adminName.trim() &&
+      slugStatus !== 'taken' &&
+      slugStatus !== 'checking' &&
+      !!form.type.trim() &&
+      !!form.adminName.trim() &&
       /.+@.+\..+/.test(form.adminEmail) &&
       form.adminPhone.trim().length >= 4,
-    [form, effectiveSlug],
+    [form, effectiveSlug, slugStatus],
   )
 
   const reset = () => {
     setForm(EMPTY); setSlugTouched(false); setError(''); setResult(null); setCopied(false)
+    setSlugStatus('idle')
   }
   const close = () => { reset(); onClose() }
 
@@ -75,7 +100,14 @@ export function CreatePartnerModal({ open, onClose, onCreated }: Props) {
         close()
       }
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not create partner')
+      // Backend is the source of truth — if the slug was taken between our live
+      // check and submit, reflect it on the field too.
+      if (err instanceof ApiError && err.code === 'SLUG_TAKEN') {
+        setSlugStatus('taken')
+        setError(`The slug "${effectiveSlug}" is already taken. Choose another.`)
+      } else {
+        setError(err instanceof ApiError ? err.message : 'Could not create partner')
+      }
     } finally {
       setSaving(false)
     }
@@ -139,13 +171,28 @@ export function CreatePartnerModal({ open, onClose, onCreated }: Props) {
         <div className={s.groupLabel}>Salon</div>
         <Input label="Name" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Antheris" />
         <div className={s.row}>
-          <Input
-            label="Slug (domain handle)"
-            value={effectiveSlug}
-            onChange={(e) => { setSlugTouched(true); set('slug', slugify(e.target.value)) }}
-            help="reserva.am/p/…"
-            placeholder="antheris"
-          />
+          <div className={s.slugField}>
+            <Input
+              label="Slug (domain handle)"
+              value={effectiveSlug}
+              onChange={(e) => { setSlugTouched(true); set('slug', slugify(e.target.value)) }}
+              placeholder="antheris"
+            />
+            <div className={s.slugStatus}>
+              {effectiveSlug.length >= 2 && slugStatus === 'checking' && (
+                <span className={s.slugChecking}><Loader2 size={12} className={s.spin} /> Checking…</span>
+              )}
+              {slugStatus === 'available' && (
+                <span className={s.slugOk}><Check size={12} /> {effectiveSlug}.reserva.am is available</span>
+              )}
+              {slugStatus === 'taken' && (
+                <span className={s.slugTaken}>This slug is already taken</span>
+              )}
+              {(slugStatus === 'idle' || effectiveSlug.length < 2) && (
+                <span className={s.slugHint}>{effectiveSlug ? `${effectiveSlug}.reserva.am` : 'becomes a subdomain'}</span>
+              )}
+            </div>
+          </div>
           <Input label="Type" value={form.type} onChange={(e) => set('type', e.target.value)} placeholder="Aesthetic clinic" />
         </div>
 

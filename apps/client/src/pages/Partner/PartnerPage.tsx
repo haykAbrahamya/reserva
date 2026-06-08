@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useParams } from 'react-router-dom'
 import { getPartnerBySlug } from '@/services/booking.service'
+import { useTenantSlug } from '@/hooks/useTenantSlug'
 import type { PublicPartner } from '@/mock/partners'
 import { partnerBrandVars } from './partnerBrand'
 import { PartnerNotFound } from './components/PartnerNotFound/PartnerNotFound'
@@ -19,7 +19,7 @@ import type { Specialist } from '@reserva/shared'
 import s from './PartnerPage.module.scss'
 
 export function PartnerPage() {
-  const { slug } = useParams<{ slug: string }>()
+  const slug = useTenantSlug()
   const t = useT()
   const [partner, setPartner] = useState<PublicPartner | null>(null)
   const [loading, setLoading] = useState(true)

@@ -92,4 +92,19 @@ export const partnersService = {
   setActive(id: string, active: boolean): Promise<PartnerDetail> {
     return apiPatch<PartnerDetail>(`/platform/partners/${id}/active`, { active })
   },
+
+  /**
+   * Is a slug still available? Reuses the searchable list endpoint and checks
+   * for an exact (case-insensitive) match, so no extra backend route is needed.
+   * The backend create still enforces uniqueness authoritatively (SLUG_TAKEN);
+   * this is just for live feedback in the create form.
+   */
+  async isSlugAvailable(slug: string): Promise<boolean> {
+    const normalized = slug.trim().toLowerCase()
+    if (!normalized) return false
+    const res = await apiGet<Paginated<PartnerListItem>>('/platform/partners', {
+      params: { search: normalized, pageSize: 25 },
+    })
+    return !res.items.some((p) => p.slug.toLowerCase() === normalized)
+  },
 }

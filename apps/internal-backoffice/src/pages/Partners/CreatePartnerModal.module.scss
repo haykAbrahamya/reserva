@@ -15,6 +15,15 @@
 
 .fieldLabel { display: block; font-size: 13px; color: $fg-1; margin-bottom: 6px; }
 
+/* Slug field + live availability status */
+.slugField { display: flex; flex-direction: column; }
+.slugStatus { margin-top: 5px; font-size: 12px; min-height: 16px; display: flex; align-items: center; }
+.slugHint { color: $fg-3; font-family: $font-mono; }
+.slugChecking { display: inline-flex; align-items: center; gap: 5px; color: $fg-2; }
+.slugOk { display: inline-flex; align-items: center; gap: 5px; color: $success; font-family: $font-mono; }
+.slugTaken { color: $danger; }
+.spin { animation: bo-spin 0.7s linear infinite; }
+
 .accentField { margin-top: 2px; }
 .swatches { display: flex; gap: 8px; flex-wrap: wrap; }
 .swatch {
