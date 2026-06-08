@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Calendar, Plus } from 'lucide-react'
 import { useNewBooking } from '@/App'
-import { useAppStore, usePartner } from '@/store/app.store'
+import { usePartner } from '@/store/app.store'
+import { useResource } from '@/store/useResource'
 import { useAuthStore } from '@/store/auth.store'
+import { bookingsService } from '@/services/bookings.service'
 import { Button, Card, CardHeader, CardTitle, BookingBadge, Avatar } from '@/components/ui'
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
 import { fmtAMD, fmtTime, isSameDay } from '@/utils/format'
 import { useScopedLocationId } from '@/store/auth.hooks'
 import { useI18n } from '@/i18n'
-import type { Booking, Partner } from '@/types'
+import type { Booking } from '@/types'
 import s from './Dashboard.module.scss'
 
 function useIsMobile() {
@@ -24,7 +26,19 @@ function useIsMobile() {
 
 export function Dashboard() {
   const partner        = usePartner()
-  const allBookings    = useAppStore(st => st.bookings)
+  // Dashboard summarizes a window around now (14 days back … 45 days ahead).
+  const { data: allBookings, reload } = useResource(() => {
+    const from = new Date(); from.setDate(from.getDate() - 14)
+    const to = new Date(); to.setDate(to.getDate() + 45)
+    return bookingsService.calendar(from.toISOString(), to.toISOString())
+  }, [], [])
+
+  // Refresh when a booking is created from the global New-Booking modal.
+  useEffect(() => {
+    const fn = () => reload()
+    window.addEventListener('booking-created', fn)
+    return () => window.removeEventListener('booking-created', fn)
+  }, [reload])
   const authUser       = useAuthStore(s => s.user)
   const navigate       = useNavigate()
   const openNewBooking = useNewBooking()
@@ -47,6 +61,16 @@ export function Dashboard() {
     .filter(b => b.partnerId === partner.id && isSameDay(new Date(b.startISO), now))
     .sort((a, b) => a.startISO.localeCompare(b.startISO))
 
+  // Specialists working today, derived from today's bookings (unique by id) —
+  // no separate specialists fetch needed.
+  const todayStaff = Array.from(
+    new Map(
+      todayBks
+        .filter(b => b.status !== 'cancelled' && b.specialist)
+        .map(b => [b.specialist!.id, b.specialist!]),
+    ).values(),
+  )
+
   const tomorrowBks = (() => {
     const t = new Date(now); t.setDate(t.getDate() + 1)
     return bookings
@@ -57,7 +81,7 @@ export function Dashboard() {
   const weekAgo    = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7)
   const last7      = bookings.filter(b => b.partnerId === partner.id && new Date(b.startISO) >= weekAgo && new Date(b.startISO) <= now)
   const completed7 = last7.filter(b => b.status === 'completed')
-  const revenue7   = completed7.reduce((sum, b) => sum + (partner.services.find(sv => sv.id === b.serviceId)?.price ?? 0), 0)
+  const revenue7   = completed7.reduce((sum, b) => sum + (b.service?.price ?? 0), 0)
 
   const upcoming30 = (() => {
     const t30 = new Date(now); t30.setDate(t30.getDate() + 30)
@@ -141,7 +165,6 @@ export function Dashboard() {
                   <BookingRow
                     key={b.id}
                     booking={b}
-                    partner={partner}
                     onClick={() => setOpenId(b.id)}
                   />
                 ))
@@ -162,7 +185,6 @@ export function Dashboard() {
                     <BookingRow
                       key={b.id}
                       booking={b}
-                      partner={partner}
                       compact
                       onClick={() => setOpenId(b.id)}
                     />
@@ -186,7 +208,7 @@ export function Dashboard() {
                 <div className={s.barFill} style={{ width: `${occupancy}%` }} />
               </div>
               <div className={s.staff}>
-                {partner.specialists.filter(sp => sp.active && (!scopedLocationId || sp.locationId === scopedLocationId)).slice(0, 4).map(sp => (
+                {todayStaff.slice(0, 4).map(sp => (
                   <div key={sp.id} className={s.staffMember}>
                     <Avatar name={sp.name} color={partner.accent} size="sm" />
                     <span>{sp.name.split(' ')[0]}</span>
@@ -210,15 +232,11 @@ export function Dashboard() {
   )
 }
 
-function BookingRow({ booking, partner, compact, onClick }: {
+function BookingRow({ booking, compact, onClick }: {
   booking: Booking
-  partner: Partner
   compact?: boolean
   onClick: () => void
 }) {
-  const svc = partner.services.find(sv => sv.id === booking.serviceId)
-  const sp  = partner.specialists.find(sp => sp.id === booking.specialistId)
-
   return (
     <div
       className={[s.bookingRow, compact ? s.compact : ''].filter(Boolean).join(' ')}
@@ -229,9 +247,9 @@ function BookingRow({ booking, partner, compact, onClick }: {
       </div>
       <div style={{ minWidth: 0 }}>
         <div className={s.clientName}>{booking.clientName}</div>
-        <div className={s.clientSub}>{svc?.name ?? '—'} · {sp?.name.split(' ')[0] ?? '—'}</div>
+        <div className={s.clientSub}>{booking.service?.name ?? '—'} · {booking.specialist?.name.split(' ')[0] ?? '—'}</div>
       </div>
-      <div className={s.price}>{svc ? fmtAMD(svc.price) : ''}</div>
+      <div className={s.price}>{booking.service ? fmtAMD(booking.service.price) : ''}</div>
       <BookingBadge status={booking.status} />
     </div>
   )

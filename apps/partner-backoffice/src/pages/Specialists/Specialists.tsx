@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Plus, User, Pencil, MapPin } from 'lucide-react'
-import { useAppStore, usePartner } from '@/store/app.store'
-import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Select, Avatar, Empty, Badge, Pagination, usePagination } from '@/components/ui'
+import { usePartner } from '@/store/app.store'
+import { useResource } from '@/store/useResource'
+import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Select, Avatar, Empty, Badge, Pagination } from '@/components/ui'
 import { SpecialistDashboard } from '@/components/specialists/SpecialistDashboard/SpecialistDashboard'
 import { partnersService } from '@/services/partners.service'
 import { useScopedLocationId } from '@/store/auth.hooks'
@@ -23,32 +24,48 @@ const EMPTY_FORM = { name: '', title: '', locationId: '', phone: '', active: tru
 
 export function Specialists() {
   const partner     = usePartner()
-  const setPartners = useAppStore(st => st.setPartners)
   const isMobile    = useIsMobile()
   const scopedLocationId = useScopedLocationId()
   const { t }       = useI18n()
+
+  const [page,     setPage]     = useState(1)
+  const [pageSize, setPageSize] = useState(5)
+
+  // Server-paginated roster. Managers are scoped to their own branch server-side.
+  const { data: result, reload } = useResource(
+    () => partnersService.listSpecialistsPaged({
+      page,
+      pageSize,
+      includeInactive: true,
+      ...(scopedLocationId ? { locationId: scopedLocationId } : {}),
+    }),
+    [page, pageSize, scopedLocationId],
+  )
+
+  // Catalog lookups for rendering names (full lists, not paginated).
+  const { data: services } = useResource(() => partnersService.listServices(), [], [])
+  const { data: locations } = useResource(() => partnersService.listLocations(), [], [])
 
   const [modalOpen,   setModalOpen]   = useState(false)
   const [editing,     setEditing]     = useState<Specialist | null>(null)
   const [form,        setForm]        = useState(EMPTY_FORM)
   const [dashboardSp, setDashboardSp] = useState<Specialist | null>(null)
 
-  // Managers only manage their own branch's team.
-  const specialists = (partner?.specialists ?? []).filter(
-    sp => !scopedLocationId || sp.locationId === scopedLocationId
-  )
-
-  // Desktop pagination (mobile uses the card list).
-  const { pageItems: pagedSpecialists, page, pageCount, setPage, pageSize, setPageSize, from, to, total } = usePagination(specialists)
-
   if (!partner) return null
+
+  const specialists = result?.items ?? []
+  const total       = result?.total ?? 0
+  const pageCount   = result?.pageCount ?? 1
+  const from        = total === 0 ? 0 : (page - 1) * pageSize + 1
+  const to          = Math.min(page * pageSize, total)
+  const changePageSize = (n: number) => { setPageSize(n); setPage(1) }
 
   // Managers can't reassign branches — lock the location select to their branch.
   const lockedLocation = scopedLocationId
 
   const openNew = () => {
     setEditing(null)
-    setForm({ ...EMPTY_FORM, locationId: lockedLocation ?? partner.locations[0]?.id ?? '' })
+    setForm({ ...EMPTY_FORM, locationId: lockedLocation ?? locations[0]?.id ?? '' })
     setModalOpen(true)
   }
 
@@ -59,9 +76,9 @@ export function Specialists() {
   }
 
   const handleSave = async () => {
-    if (editing) await partnersService.updateSpecialist(partner.id, editing.id, form)
-    else         await partnersService.createSpecialist(partner.id, form)
-    setPartners(await partnersService.list())
+    if (editing) await partnersService.updateSpecialist(editing.id, form)
+    else await partnersService.createSpecialist(form)
+    await reload()
     setModalOpen(false)
   }
 
@@ -73,12 +90,12 @@ export function Specialists() {
       <div className={s.head}>
         <div>
           <h1 className={s.h1}>{t('specialists.title')}</h1>
-          <p className={s.sub}>{t('specialists.subtitle', { name: partner.name, count: specialists.length })}</p>
+          <p className={s.sub}>{t('specialists.subtitle', { name: partner.name, count: total })}</p>
         </div>
         <Button variant="accent" onClick={openNew}><Plus size={14} /> {t('specialists.addSpecialist')}</Button>
       </div>
 
-      {specialists.length === 0 ? (
+      {total === 0 ? (
         <Empty icon={User} title={t('specialists.emptyTitle')} description={t('specialists.emptyDesc')}
           action={<Button variant="accent" onClick={openNew}><Plus size={14} /> {t('specialists.addSpecialist')}</Button>}
         />
@@ -86,7 +103,7 @@ export function Specialists() {
         /* ── Mobile: cards ── */
         <div className={s.cardList}>
           {specialists.map(sp => {
-            const loc = partner.locations.find(l => l.id === sp.locationId)
+            const loc = locations.find(l => l.id === sp.locationId)
             const visibleSvcs = sp.services.slice(0, 3)
             const extra = sp.services.length - visibleSvcs.length
             return (
@@ -111,7 +128,7 @@ export function Specialists() {
                   </div>
                   <div className={s.spCardSvcs}>
                     {visibleSvcs.map(sid => {
-                      const svc = partner.services.find(sv => sv.id === sid)
+                      const svc = services.find(sv => sv.id === sid)
                       return svc ? <span key={sid} className={s.svcPill}>{svc.name}</span> : null
                     })}
                     {extra > 0 && <span className={[s.svcPill, s.more].join(' ')}>{t('common.more', { count: extra })}</span>}
@@ -120,6 +137,15 @@ export function Specialists() {
               </div>
             )
           })}
+          <Pagination
+            page={page}
+            pageCount={pageCount}
+            onPageChange={setPage}
+            pageSize={pageSize}
+            onPageSizeChange={changePageSize}
+            pageSizeLabel={t('pagination.perPage')}
+            summary={t('pagination.summary', { from, to, total })}
+          />
         </div>
       ) : (
         /* ── Desktop: table ── */
@@ -136,8 +162,8 @@ export function Specialists() {
               </tr>
             </thead>
             <tbody>
-              {pagedSpecialists.map(sp => {
-                const loc = partner.locations.find(l => l.id === sp.locationId)
+              {specialists.map(sp => {
+                const loc = locations.find(l => l.id === sp.locationId)
                 return (
                   <Tr key={sp.id} onClick={() => setDashboardSp(sp)}>
                     <Td>
@@ -153,7 +179,7 @@ export function Specialists() {
                     <Td>
                       <div className={s.services}>
                         {sp.services.slice(0, 3).map(sid => {
-                          const svc = partner.services.find(sv => sv.id === sid)
+                          const svc = services.find(sv => sv.id === sid)
                           return svc ? <span key={sid} className={s.svcTag}>{svc.name}</span> : null
                         })}
                         {sp.services.length > 3 && <span className={s.svcTag}>+{sp.services.length - 3}</span>}
@@ -178,7 +204,7 @@ export function Specialists() {
             pageCount={pageCount}
             onPageChange={setPage}
             pageSize={pageSize}
-            onPageSizeChange={setPageSize}
+            onPageSizeChange={changePageSize}
             pageSizeLabel={t('pagination.perPage')}
             summary={t('pagination.summary', { from, to, total })}
           />
@@ -207,14 +233,14 @@ export function Specialists() {
             <Select
               value={form.locationId}
               onChange={v => setForm(f => ({ ...f, locationId: v }))}
-              options={partner.locations.map(l => ({ value: l.id, label: l.name }))}
+              options={locations.map(l => ({ value: l.id, label: l.name }))}
               disabled={!!lockedLocation}
             />
           </div>
           <div className={s.formFull}>
             <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', marginBottom: 8 }}>{t('specialists.modal.servicesLabel')}</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {partner.services.map(svc => (
+              {services.map(svc => (
                 <button
                   key={svc.id}
                   type="button"

@@ -1,80 +1,126 @@
 import type { Booking, Service, Specialist } from '@reserva/shared'
-import { PARTNERS, type PublicPartner } from '@/mock/partners'
+import type { PublicPartner, PartnerPresentation } from '@/mock/partners'
 
-const delay = (ms = 300) => new Promise(r => setTimeout(r, ms))
+// ─────────────────────────────────────────────────────────────
+// Public booking API client. No auth — the client app only reads a partner by
+// slug, queries availability, and creates bookings. Uses native fetch.
+// ─────────────────────────────────────────────────────────────
 
-/** Looks up a partner by its public slug. */
-export async function getPartnerBySlug(slug: string): Promise<PublicPartner | null> {
-  await delay(250)
-  return PARTNERS.find(p => p.slug === slug) ?? null
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1'
+
+class BookingApiError extends Error {
+  constructor(readonly code: string, message: string) {
+    super(message)
+  }
 }
 
-/**
- * Specialists at this partner who can perform the given service and are active.
- * When `locationId` is provided, only specialists at that branch are returned.
- */
+async function api<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${API_URL}${path}`, {
+    headers: { 'Content-Type': 'application/json' },
+    ...init,
+  })
+  const json = await res.json().catch(() => null)
+  if (!res.ok) {
+    const err = json?.error
+    throw new BookingApiError(err?.code ?? 'NETWORK', err?.message ?? 'Request failed')
+  }
+  return (json?.data ?? json) as T
+}
+
+// ── API shapes ──
+interface ApiSpecialist extends Omit<Specialist, 'services'> {
+  serviceIds: string[]
+}
+interface ApiPartner {
+  id: string
+  name: string
+  slug: string
+  type: string
+  accent: string
+  locations: PublicPartner['locations']
+  services: Service[]
+  specialists: ApiSpecialist[]
+  presentation: {
+    tagline: string
+    about: string
+    hours: string
+    rating: number | string
+    reviews: number
+    heroTints: string[]
+    gallery: { label: string; tone: string }[]
+  } | null
+}
+
+function toPublicPartner(p: ApiPartner): PublicPartner {
+  const presentation: PartnerPresentation = {
+    tagline: p.presentation?.tagline ?? '',
+    about: p.presentation?.about ?? '',
+    rating: Number(p.presentation?.rating ?? 0),
+    reviews: p.presentation?.reviews ?? 0,
+    hours: p.presentation?.hours ?? '',
+    heroTints: (p.presentation?.heroTints?.length
+      ? (p.presentation.heroTints.slice(0, 2) as [string, string])
+      : [p.accent, p.accent]) as [string, string],
+    gallery: p.presentation?.gallery ?? [],
+  }
+  return {
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    type: p.type,
+    accent: p.accent,
+    locations: p.locations,
+    services: p.services,
+    specialists: p.specialists.map(({ serviceIds, ...rest }) => ({ ...rest, services: serviceIds })),
+    presentation,
+  }
+}
+
+/** Looks up a partner by its public slug. Returns null if not found. */
+export async function getPartnerBySlug(slug: string): Promise<PublicPartner | null> {
+  try {
+    const p = await api<ApiPartner>(`/public/partners/${encodeURIComponent(slug)}`)
+    return toPublicPartner(p)
+  } catch (e) {
+    if (e instanceof BookingApiError && e.code === 'NOT_FOUND') return null
+    throw e
+  }
+}
+
+// ── Pure helpers (operate on the loaded partner; unchanged) ──
+
 export function specialistsForService(
   partner: PublicPartner,
   serviceId: string,
   locationId?: string | null,
 ): Specialist[] {
-  return partner.specialists.filter(sp =>
-    sp.active &&
-    sp.services.includes(serviceId) &&
-    (!locationId || sp.locationId === locationId)
+  return partner.specialists.filter(
+    (sp) =>
+      sp.active &&
+      sp.services.includes(serviceId) &&
+      (!locationId || sp.locationId === locationId),
   )
 }
 
-/** Services a given specialist can perform (active only). */
 export function servicesForSpecialist(partner: PublicPartner, specialist: Specialist): Service[] {
-  return partner.services.filter(sv => sv.active && specialist.services.includes(sv.id))
+  return partner.services.filter((sv) => sv.active && specialist.services.includes(sv.id))
 }
+
+// ── Availability + booking ──
 
 export interface SlotQuery {
   partner: PublicPartner
   service: Service
-  /** Specific specialist, or null for "any available". */
   specialistId: string | null
-  /** Chosen branch, or null for single-location salons. */
   locationId: string | null
-  /** 'YYYY-MM-DD' */
   date: string
 }
 
-/**
- * Generates available time slots for a date. In MVP we use a fixed daily
- * window (10:00–19:00) and just block out slots that already look "taken"
- * via a deterministic pseudo-random pattern so the UI feels real.
- */
 export async function getAvailableSlots(q: SlotQuery): Promise<string[]> {
-  await delay(350)
-
-  const DAY_START = 10 * 60 // 10:00
-  const DAY_END = 19 * 60   // 19:00
-  const STEP = 30           // 30-min granularity
-
-  const slots: string[] = []
-  const dayKey = hashString(`${q.partner.id}-${q.locationId ?? 'all'}-${q.specialistId ?? 'any'}-${q.date}`)
-
-  for (let m = DAY_START; m + q.service.duration <= DAY_END; m += STEP) {
-    const h = Math.floor(m / 60)
-    const min = m % 60
-    const label = `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`
-
-    // Deterministically "block" ~30% of slots so availability looks lived-in.
-    const seed = (dayKey + m) % 10
-    if (seed < 3) continue
-
-    // Past-time guard if the date is today.
-    if (isToday(q.date)) {
-      const now = new Date()
-      if (m <= now.getHours() * 60 + now.getMinutes()) continue
-    }
-
-    slots.push(label)
-  }
-
-  return slots
+  const params = new URLSearchParams({ serviceId: q.service.id, date: q.date })
+  if (q.specialistId) params.set('specialistId', q.specialistId)
+  if (q.locationId) params.set('locationId', q.locationId)
+  return api<string[]>(`/public/partners/${q.partner.slug}/slots?${params.toString()}`)
 }
 
 export interface CreateBookingInput {
@@ -89,56 +135,46 @@ export interface CreateBookingInput {
   notes?: string
 }
 
-/** Mock booking creation — returns a confirmed booking object. */
 export async function createBooking(input: CreateBookingInput): Promise<Booking> {
-  await delay(700)
-
-  const [h, m] = input.time.split(':').map(Number)
-  const start = new Date(`${input.date}T00:00:00`)
-  start.setHours(h, m, 0, 0)
-  const end = new Date(start.getTime() + input.service.duration * 60_000)
-
-  // If "any specialist", auto-assign the first one at the branch who can do it.
-  const specialistId =
-    input.specialistId ??
-    specialistsForService(input.partner, input.service.id, input.locationId)[0]?.id ??
-    ''
-
-  const specialist = input.partner.specialists.find(sp => sp.id === specialistId)
-  const locationId =
-    input.locationId ??
-    specialist?.locationId ??
-    input.partner.locations[0]?.id ??
-    ''
-
-  return {
-    id: `bk-${Date.now()}`,
-    partnerId: input.partner.id,
-    locationId,
-    specialistId,
+  const body = {
     serviceId: input.service.id,
+    specialistId: input.specialistId ?? undefined,
+    locationId: input.locationId ?? undefined,
+    date: input.date,
+    time: input.time,
     clientName: input.clientName,
     clientPhone: input.clientPhone,
-    startISO: start.toISOString(),
-    endISO: end.toISOString(),
-    status: 'confirmed',
     notes: input.notes,
+  }
+  const b = await api<{
+    id: string
+    partnerId: string
+    locationId: string
+    specialistId: string
+    serviceId: string
+    clientName: string
+    clientPhone: string
+    startAt: string
+    endAt: string
+    status: Booking['status']
+    notes?: string | null
+  }>(`/public/partners/${input.partner.slug}/bookings`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  })
+  return {
+    id: b.id,
+    partnerId: b.partnerId,
+    locationId: b.locationId,
+    specialistId: b.specialistId,
+    serviceId: b.serviceId,
+    clientName: b.clientName,
+    clientPhone: b.clientPhone,
+    startISO: b.startAt,
+    endISO: b.endAt,
+    status: b.status,
+    notes: b.notes ?? undefined,
   }
 }
 
-// ── helpers ──
-function hashString(s: string): number {
-  let h = 0
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0
-  return Math.abs(h)
-}
-
-function isToday(dateStr: string): boolean {
-  const d = new Date(`${dateStr}T00:00:00`)
-  const now = new Date()
-  return (
-    d.getFullYear() === now.getFullYear() &&
-    d.getMonth() === now.getMonth() &&
-    d.getDate() === now.getDate()
-  )
-}
+export { BookingApiError }

@@ -1,34 +1,63 @@
 import type { AuthUser } from '@/store/auth.store'
-import { usersService } from './users.service'
+import { apiPost, apiGet, tokenStore } from './http'
 
-const delay = (ms = 800) => new Promise(r => setTimeout(r, ms))
+// ── API response shapes ──
+interface ApiUser {
+  id: string
+  name: string
+  email: string
+  phone: string
+  role: 'admin' | 'manager'
+  partnerId: string
+  locationId: string | null
+  mustChangePassword: boolean
+}
+interface AuthResult {
+  accessToken: string
+  refreshToken: string
+  user: ApiUser
+}
 
 export interface LoginResult {
   token: string
   user: AuthUser
 }
 
+function toAuthUser(u: ApiUser): AuthUser {
+  return {
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    phone: u.phone,
+    role: u.role,
+    partnerId: u.partnerId,
+    locationId: u.locationId,
+  }
+}
+
 export const authService = {
-  /**
-   * Log in with an email OR phone number plus password. Managers created by
-   * an admin use their one-time password here. Reads from the shared mock
-   * user registry (users.service) so newly created managers can sign in.
-   */
+  /** Log in with email OR phone + password. Persists both tokens. */
   async login(login: string, password: string): Promise<LoginResult> {
-    await delay()
-
-    const found = usersService._findByLogin(login, password)
-    if (!found) {
-      throw new Error('Invalid credentials. Check the email/phone and password.')
-    }
-
-    const token = `mock-token-${found.id}-` + Math.random().toString(36).slice(2)
-    // Strip the password out of the returned user object.
-    const { password: _pw, otpChannel: _c, createdAtISO: _d, ...user } = found
-    return { token, user }
+    const res = await apiPost<AuthResult>('/auth/login', { login, password })
+    tokenStore.set(res.accessToken, res.refreshToken)
+    return { token: res.accessToken, user: toAuthUser(res.user) }
   },
 
   async logout(): Promise<void> {
-    await delay(300)
+    const refreshToken = tokenStore.refresh
+    if (refreshToken) {
+      try {
+        await apiPost('/auth/logout', { refreshToken })
+      } catch {
+        /* ignore — clear locally regardless */
+      }
+    }
+    tokenStore.clear()
+  },
+
+  /** Re-fetch the current user (e.g. on app load with a stored token). */
+  async me(): Promise<AuthUser> {
+    const u = await apiGet<ApiUser>('/auth/me')
+    return toAuthUser(u)
   },
 }

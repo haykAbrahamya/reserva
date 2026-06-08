@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
 import { CalendarClock } from 'lucide-react'
 import { Modal, Button, DatePicker, useToast } from '@/components/ui'
-import { useAppStore, usePartner } from '@/store/app.store'
+import { usePartner } from '@/store/app.store'
+import { useResource } from '@/store/useResource'
 import { bookingsService } from '@/services/bookings.service'
 import { fmtDateInput, fmtDateTime } from '@/utils/format'
 import { useT } from '@/i18n'
@@ -11,12 +12,12 @@ import s from './RescheduleModal.module.scss'
 interface Props {
   booking: Booking
   onClose: () => void
+  /** Called after a successful reschedule so the parent can refresh. */
+  onDone?: () => void
 }
 
-export function RescheduleModal({ booking, onClose }: Props) {
+export function RescheduleModal({ booking, onClose, onDone }: Props) {
   const partner       = usePartner()
-  const bookings      = useAppStore(st => st.bookings)
-  const upsertBooking = useAppStore(st => st.upsertBooking)
   const toast         = useToast()
   const t             = useT()
   const today         = fmtDateInput(new Date())
@@ -28,6 +29,13 @@ export function RescheduleModal({ booking, onClose }: Props) {
   const [date, setDate] = useState(currentDate)
   const [time, setTime] = useState(currentTime)
   const [saving, setSaving] = useState(false)
+
+  // Fresh bookings for the chosen day to mark taken slots (backend enforces overlaps).
+  const { data: bookings } = useResource(
+    () => bookingsService.calendar(`${date}T00:00:00`, `${date}T23:59:59`),
+    [date],
+    [],
+  )
 
   const allSlots = useMemo(() => {
     const out: string[] = []
@@ -53,7 +61,7 @@ export function RescheduleModal({ booking, onClose }: Props) {
 
   if (!partner) return null
 
-  const svc = partner.services.find(sv => sv.id === booking.serviceId)
+  const svc = booking.service
   const changed = date !== currentDate || time !== currentTime
   const canSave = !!time && !busySlots.has(time) && changed
 
@@ -69,9 +77,9 @@ export function RescheduleModal({ booking, onClose }: Props) {
       startISO: newStart.toISOString(),
       endISO: newEnd.toISOString(),
     })
-    upsertBooking(updated)
     setSaving(false)
     toast(t('reschedule.movedToast', { datetime: fmtDateTime(updated.startISO) }))
+    onDone?.()
     onClose()
   }
 

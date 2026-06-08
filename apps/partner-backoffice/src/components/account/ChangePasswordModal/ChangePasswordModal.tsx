@@ -11,7 +11,8 @@ interface Props {
   onClose: () => void
 }
 
-const MIN_LEN = 6
+// Must match the backend rule (auth.dto.ts: newPassword min 8 chars).
+const MIN_LEN = 8
 
 export function ChangePasswordModal({ open, onClose }: Props) {
   const user  = useAuthStore(st => st.user)
@@ -47,8 +48,15 @@ export function ChangePasswordModal({ open, onClose }: Props) {
       toast(t('changePassword.toast'))
       close()
     } catch (e) {
-      const code = e instanceof Error ? e.message : ''
-      setError(code === 'wrong-current' ? t('changePassword.wrongCurrent') : t('changePassword.failed'))
+      const code = (e as { code?: string })?.code
+      const apiMessage = (e as { message?: string })?.message
+      setError(
+        code === 'WRONG_CURRENT_PASSWORD'
+          ? t('changePassword.wrongCurrent')
+          : // Surface the backend's validation message (e.g. password too short)
+            // instead of a generic failure so the user knows what to fix.
+            (code === 'VALIDATION_FAILED' && apiMessage) || t('changePassword.failed'),
+      )
       setSaving(false)
     }
   }

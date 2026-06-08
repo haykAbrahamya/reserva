@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AlertTriangle, ArrowRight, Clock } from 'lucide-react'
 import { Modal, Select, Button, DatePicker, TimePicker, Input, BookingBadge, useToast } from '@/components/ui'
-import { useAppStore, usePartner } from '@/store/app.store'
+import { usePartner } from '@/store/app.store'
 import { partnersService } from '@/services/partners.service'
 import { fmtDateInput, fmtTime } from '@/utils/format'
 import { findConflictingBookings } from '@/utils/timeOff'
@@ -27,6 +27,8 @@ export interface TimeOffDraft {
 interface Props {
   open: boolean
   specialist: Specialist
+  /** Current bookings (passed from the page) used to detect conflicts. */
+  bookings: Booking[]
   /** When provided, the modal edits this entry instead of creating a new one. */
   editing?: SpecialistTimeOff | null
   /** Seed a fresh "add" form from a previously preserved draft. */
@@ -51,9 +53,8 @@ function classifyType(t: SpecialistTimeOff): OffType {
   return fmtDateInput(new Date(t.startISO)) === fmtDateInput(new Date(t.endISO)) ? 'fullDay' : 'range'
 }
 
-export function AddTimeOffModal({ open, specialist, editing, initialDraft, onClose, onSaved, onPreserveDraft }: Props) {
+export function AddTimeOffModal({ open, specialist, bookings, editing, initialDraft, onClose, onSaved, onPreserveDraft }: Props) {
   const partner  = usePartner()
-  const bookings = useAppStore(st => st.bookings)
   const toast    = useToast()
   const navigate = useNavigate()
   const { t, tp } = useI18n()
@@ -127,7 +128,7 @@ export function AddTimeOffModal({ open, specialist, editing, initialDraft, onClo
       reason: reason.trim() || undefined,
     }
     if (editing) {
-      await partnersService.updateTimeOff(editing.id, payload)
+      await partnersService.updateTimeOff(specialist.id, editing.id, payload)
       toast(t('timeOff.updatedToast'))
     } else {
       await partnersService.createTimeOff(payload)
@@ -216,7 +217,7 @@ export function AddTimeOffModal({ open, specialist, editing, initialDraft, onClo
 
           <div className={s.conflictList}>
             {conflicts.map(b => {
-              const svc = partner.services.find(sv => sv.id === b.serviceId)
+              const svc = b.service
               return (
                 <div key={b.id} className={s.conflictItem}>
                   <span className={s.conflictTime}>

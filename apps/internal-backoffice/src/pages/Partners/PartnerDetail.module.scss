@@ -1,0 +1,89 @@
+@use 'variables' as *;
+
+.page { padding: 28px; animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both; }
+@media (max-width: 860px) { .page { padding: 20px 16px; } }
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: $fg-2;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 16px;
+  &:hover { color: $fg-0; }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.headLeft { display: flex; align-items: center; gap: 14px; }
+.h1 { font-family: $font-serif; font-size: 26px; letter-spacing: -0.02em; margin: 0; }
+.headMeta { font-size: 13px; color: $fg-2; margin-top: 3px; }
+.slug { font-family: $font-mono; }
+.headRight { display: flex; align-items: center; gap: 10px; }
+
+.countRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 22px;
+}
+@media (max-width: 640px) { .countRow { grid-template-columns: repeat(2, 1fr); } }
+.countCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+}
+.countIcon { color: $fg-3; }
+.countValue { font-family: $font-mono; font-size: 20px; font-weight: 500; }
+.countLabel { font-size: 12px; color: $fg-2; }
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+
+.card {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  padding: 20px;
+}
+.cardTitle { font-size: 15px; font-weight: 600; margin: 0 0 16px; }
+.fields { display: flex; flex-direction: column; gap: 12px; }
+.cardFoot { margin-top: 18px; display: flex; justify-content: flex-end; }
+
+.fieldLabel { display: block; font-size: 13px; color: $fg-1; margin-bottom: 6px; }
+.swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+.swatch {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid transparent; cursor: pointer; transition: transform 0.1s;
+  &:hover { transform: scale(1.08); }
+}
+.swatchActive { border-color: $fg-0; box-shadow: 0 0 0 2px $bg-1 inset; }
+
+.error { font-size: 13px; color: $danger; background: $danger-soft; border-radius: $r-1; padding: 8px 12px; margin-bottom: 12px; }
+
+.adminList { display: flex; flex-direction: column; gap: 10px; }
+.adminRow { display: flex; align-items: center; gap: 10px; }
+.adminInfo { flex: 1; min-width: 0; }
+.adminName { font-size: 14px; font-weight: 500; }
+.adminContact { display: flex; align-items: center; gap: 5px; font-size: 12px; color: $fg-2; margin-top: 2px; }
+.muted { font-size: 13px; color: $fg-2; }
+.hint { font-size: 12px; color: $fg-3; margin: 16px 0 0; line-height: 1.5; }

@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, Plus, Calendar } from 'lucide-react'
-import { useAppStore, usePartner } from '@/store/app.store'
+import { usePartner } from '@/store/app.store'
+import { useResource } from '@/store/useResource'
 import { Select, BookingBadge } from '@/components/ui'
 import { useNewBooking } from '@/App'
 import { isSameDay, fmtTime, fmtAMD } from '@/utils/format'
@@ -30,8 +31,7 @@ function buildWeek(anchor: Date): Date[] {
 
 export function CalendarPage() {
   const partner        = usePartner()
-  const bookings       = useAppStore(st => st.bookings)
-  const upsertBooking  = useAppStore(st => st.upsertBooking)
+  const { data: allSpecialists } = useResource(() => partnersService.listSpecialists(), [], [])
   const openNewBooking = useNewBooking()
   const toast          = useToast()
   const scopedLocationId = useScopedLocationId()
@@ -56,6 +56,26 @@ export function CalendarPage() {
   const days  = view === 'week' ? buildWeek(anchor) : [anchor]
   const week  = buildWeek(mobDay) // always 7 days for mobile strip
 
+  // Fetch only the visible window's bookings (fresh on every range change).
+  const rangeStart = (isMobile ? buildWeek(mobDay)[0] : days[0])
+  const rangeEnd   = (() => {
+    const last = isMobile ? buildWeek(mobDay)[6] : days[days.length - 1]
+    const e = new Date(last); e.setHours(23, 59, 59, 999); return e
+  })()
+  const rangeKey = `${rangeStart.toISOString()}_${rangeEnd.toISOString()}`
+  const { data: bookings, reload: reloadBookings } = useResource(
+    () => bookingsService.calendar(rangeStart.toISOString(), rangeEnd.toISOString()),
+    [rangeKey],
+    [],
+  )
+
+  // Refresh when a booking is created from the global New-Booking modal.
+  useEffect(() => {
+    const fn = () => reloadBookings()
+    window.addEventListener('booking-created', fn)
+    return () => window.removeEventListener('booking-created', fn)
+  }, [reloadBookings])
+
   const move    = (dir: number) => { const d = new Date(anchor); d.setDate(d.getDate() + dir * (view === 'week' ? 7 : 1)); setAnchor(d) }
   const goToday = () => { const d = new Date(); d.setHours(0,0,0,0); setAnchor(d) }
   const mobMove = (dir: number) => {
@@ -65,8 +85,8 @@ export function CalendarPage() {
 
   // Managers only see their branch's specialists (and therefore bookings).
   const branchSpecialists = useMemo(
-    () => (partner?.specialists ?? []).filter(sp => !scopedLocationId || sp.locationId === scopedLocationId),
-    [partner, scopedLocationId]
+    () => allSpecialists.filter(sp => !scopedLocationId || sp.locationId === scopedLocationId),
+    [allSpecialists, scopedLocationId]
   )
 
   const visibleSpecialists = useMemo(() =>
@@ -157,14 +177,14 @@ export function CalendarPage() {
       newStart.setMinutes(newStart.getMinutes() + dMin)
       const dur    = new Date(dr.origEnd).getTime() - new Date(dr.origStart).getTime()
       const newEnd = new Date(newStart.getTime() + dur)
-      const updated = await bookingsService.update(dr.bookingId, { startISO: newStart.toISOString(), endISO: newEnd.toISOString() })
-      upsertBooking(updated)
+      await bookingsService.update(dr.bookingId, { startISO: newStart.toISOString(), endISO: newEnd.toISOString() })
+      await reloadBookings()
       toast(t('calendar.movedTo', { time: newStart.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) }))
     }
 
     document.addEventListener('mousemove', onMove)
     document.addEventListener('mouseup', onUp)
-  }, [days, upsertBooking, toast, t])
+  }, [days, reloadBookings, toast, t])
 
   // Touch: tap = open detail, no drag on mobile calendar (drag handled by grid)
   const onEventTouchStart = useCallback((_e: React.TouchEvent, b: Booking, _dayIdx: number) => {
@@ -229,28 +249,24 @@ export function CalendarPage() {
               </div>
             </div>
           ) : (
-            mobDayBks.map(b => {
-              const svc = partner.services.find(sv => sv.id === b.serviceId)
-              const sp  = partner.specialists.find(sp => sp.id === b.specialistId)
-              return (
-                <div key={b.id} className={s.mobEventCard} onClick={() => setOpenId(b.id)}
-                  style={{ borderLeftColor: b.status === 'completed' ? 'var(--info)' : b.status === 'pending' ? 'var(--warn)' : b.status === 'cancelled' ? 'var(--danger)' : 'var(--success)' }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <span className={s.mobEventTime}>{fmtTime(b.startISO)}–{fmtTime(b.endISO)}</span>
-                    <BookingBadge status={b.status} />
-                  </div>
-                  {isBookingInAnyTimeOff(b, timeOff) && (
-                    <div className={s.mobConflictTag}>{t('timeOff.sectionTitle')}</div>
-                  )}
-                  <div className={s.mobEventName}>{b.clientName}</div>
-                  <div className={s.mobEventSub}>
-                    {svc?.name ?? '—'} · {t('calendar.with')} {sp?.name.split(' ')[0] ?? '—'}
-                    {svc && <span> · {fmtAMD(svc.price)}</span>}
-                  </div>
+            mobDayBks.map(b => (
+              <div key={b.id} className={s.mobEventCard} onClick={() => setOpenId(b.id)}
+                style={{ borderLeftColor: b.status === 'completed' ? 'var(--info)' : b.status === 'pending' ? 'var(--warn)' : b.status === 'cancelled' ? 'var(--danger)' : 'var(--success)' }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <span className={s.mobEventTime}>{fmtTime(b.startISO)}–{fmtTime(b.endISO)}</span>
+                  <BookingBadge status={b.status} />
                 </div>
-              )
-            })
+                {isBookingInAnyTimeOff(b, timeOff) && (
+                  <div className={s.mobConflictTag}>{t('timeOff.sectionTitle')}</div>
+                )}
+                <div className={s.mobEventName}>{b.clientName}</div>
+                <div className={s.mobEventSub}>
+                  {b.service?.name ?? '—'} · {t('calendar.with')} {b.specialist?.name.split(' ')[0] ?? '—'}
+                  {b.service && <span> · {fmtAMD(b.service.price)}</span>}
+                </div>
+              </div>
+            ))
           )}
         </div>
 
@@ -349,7 +365,6 @@ export function CalendarPage() {
                   <CalEvent
                     key={b.id}
                     booking={b}
-                    partner={partner}
                     isDragging={ghost?.id === b.id}
                     conflict={isBookingInAnyTimeOff(b, timeOff)}
                     onMouseDown={ev => onEventMouseDown(ev, b, colIdx)}
@@ -365,8 +380,8 @@ export function CalendarPage() {
       {/* Floating drag ghost — position:fixed, follows cursor across columns */}
       {ghost && (() => {
         const b   = filteredBookings.find(x => x.id === ghost.id)
-        const svc = b ? partner.services.find(sv => sv.id === b.serviceId) : null
-        const sp  = b ? partner.specialists.find(sp => sp.id === b.specialistId) : null
+        const svc = b?.service ?? null
+        const sp  = b?.specialist ?? null
         const newTimeStr = b ? (() => {
           const ns = new Date(b.startISO); ns.setMinutes(ns.getMinutes() + ghost.dMin)
           return ns.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
@@ -393,9 +408,8 @@ export function CalendarPage() {
   )
 }
 
-function CalEvent({ booking, partner, isDragging, conflict, onMouseDown, onTouchStart }: {
+function CalEvent({ booking, isDragging, conflict, onMouseDown, onTouchStart }: {
   booking: Booking
-  partner: NonNullable<ReturnType<typeof usePartner>>
   isDragging?: boolean
   conflict?: boolean
   onMouseDown: (e: React.MouseEvent) => void
@@ -408,8 +422,8 @@ function CalEvent({ booking, partner, isDragging, conflict, onMouseDown, onTouch
   const top      = (startMin - HOUR_START * 60) * PX_PER_MIN
   const height   = Math.max((endMin - startMin) * PX_PER_MIN, 22)
 
-  const svc     = partner.services.find(sv => sv.id === booking.serviceId)
-  const sp      = partner.specialists.find(sp => sp.id === booking.specialistId)
+  const svc     = booking.service
+  const sp      = booking.specialist
   const timeStr = `${start.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}–${end.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`
 
   return (

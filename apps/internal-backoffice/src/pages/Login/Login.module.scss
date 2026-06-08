@@ -1,0 +1,90 @@
+@use 'variables' as *;
+
+.page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, $accent-soft, transparent 60%),
+    $bg-0;
+}
+
+.card {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 28px;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  box-shadow: $shadow-2;
+  animation: rise 0.4s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.logo {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: $r-2;
+  background: $accent;
+  color: $fg-on-accent;
+  flex-shrink: 0;
+}
+.title {
+  font-family: $font-serif;
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.subtitle {
+  font-size: 12px;
+  color: $fg-2;
+  margin-top: 3px;
+}
+
+.lead {
+  font-size: 13px;
+  color: $fg-2;
+  margin: 0 0 4px;
+}
+
+.error {
+  font-size: 13px;
+  color: $danger;
+  background: $danger-soft;
+  border: 1px solid color-mix(in srgb, $danger 30%, transparent);
+  border-radius: $r-1;
+  padding: 8px 12px;
+}
+
+/* Full-width sign-in CTA — taller and centered for a proper primary action. */
+.submit {
+  width: 100%;
+  height: 44px;
+  margin-top: 6px;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: $r-2;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 6px 18px $accent-soft;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 10px 26px $accent-soft;
+  }
+  &:disabled {
+    opacity: 0.55;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+}

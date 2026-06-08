@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { X, CalendarClock } from 'lucide-react'
-import { useAppStore, usePartner } from '@/store/app.store'
+import { usePartner } from '@/store/app.store'
+import { useResource } from '@/store/useResource'
 import { Button, Avatar, BookingBadge } from '@/components/ui'
 import { useToast } from '@/components/ui'
 import { bookingsService } from '@/services/bookings.service'
@@ -24,12 +25,13 @@ interface Props {
   onClose: () => void
   /** On mobile render as a bottom sheet instead of a side drawer */
   sheet?: boolean
+  /** Called after a status change / reschedule so the parent list can refresh. */
+  onChanged?: () => void
 }
 
-export function BookingDrawer({ bookingId, onClose, sheet }: Props) {
+export function BookingDrawer({ bookingId, onClose, sheet, onChanged }: Props) {
   const partner       = usePartner()
-  const booking       = useAppStore(st => st.bookings.find(b => b.id === bookingId))
-  const upsertBooking = useAppStore(st => st.upsertBooking)
+  const { data: booking, reload } = useResource(() => bookingsService.get(bookingId), [bookingId])
   const toast         = useToast()
   const t             = useT()
   const [closing, setClosing] = useState(false)
@@ -49,13 +51,14 @@ export function BookingDrawer({ bookingId, onClose, sheet }: Props) {
 
   if (!booking || !partner) return null
 
-  const svc = partner.services.find(sv => sv.id === booking.serviceId)
-  const sp  = partner.specialists.find(sp => sp.id === booking.specialistId)
-  const loc = partner.locations.find(l  => l.id  === booking.locationId)
+  const svc = booking.service
+  const sp  = booking.specialist
+  const loc = booking.location
 
   const handleStatus = async (status: BookingStatus) => {
-    const updated = await bookingsService.updateStatus(booking.id, status)
-    upsertBooking(updated)
+    await bookingsService.updateStatus(booking.id, status)
+    await reload()
+    onChanged?.()
     toast(t('bookingDrawer.statusToast', { status: t(`status.${status}`).toLowerCase() }))
   }
 
@@ -138,7 +141,11 @@ export function BookingDrawer({ bookingId, onClose, sheet }: Props) {
   )
 
   const rescheduleModal = rescheduling && (
-    <RescheduleModal booking={booking} onClose={() => setRescheduling(false)} />
+    <RescheduleModal
+      booking={booking}
+      onClose={() => setRescheduling(false)}
+      onDone={() => { void reload(); onChanged?.() }}
+    />
   )
 
   if (sheet) {

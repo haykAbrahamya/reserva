@@ -2,6 +2,17 @@
 
 .page { padding: 28px; animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both; }
 
+/* Staggered entrance for list items (rows + mobile cards). The --i custom
+   property carries the row index so each item fades in just after the last. */
+.row,
+.animCard {
+  animation: slide-up 0.32s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+  animation-delay: calc(var(--i, 0) * 0.035s);
+}
+@media (prefers-reduced-motion: reduce) {
+  .row, .animCard { animation: none; }
+}
+
 .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
 .h1   { font-family: $font-serif; font-size: 32px; letter-spacing: -0.022em; margin: 0 0 4px; }
 .sub  { font-size: 13px; color: $fg-2; margin: 0; }

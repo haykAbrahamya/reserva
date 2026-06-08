@@ -1,12 +1,12 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Search, Users } from 'lucide-react'
-import { useAppStore, usePartner } from '@/store/app.store'
-import { Avatar, Table, Th, Td, Tr, BookingBadge, Empty, Drawer, Pagination, usePagination } from '@/components/ui'
+import { usePartner } from '@/store/app.store'
+import { useResource } from '@/store/useResource'
+import { Avatar, Table, Th, Td, Tr, BookingBadge, Empty, Drawer, Pagination } from '@/components/ui'
 import { fmtAMD, fmtDateTime, fmtDateShort } from '@/utils/format'
+import { clientsService } from '@/services/clients.service'
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
-import { useScopedLocationId } from '@/store/auth.hooks'
 import { useI18n } from '@/i18n'
-import type { Booking } from '@/types'
 import s from './Clients.module.scss'
 
 function useIsMobile() {
@@ -19,68 +19,47 @@ function useIsMobile() {
   return m
 }
 
-interface Client {
-  name: string
-  phone: string
-  bookings: Booking[]
-  totalSpend: number
-  lastVisit: string
-}
-
 export function Clients() {
   const partner  = usePartner()
-  const bookings = useAppStore(st => st.bookings)
   const isMobile = useIsMobile()
-  const scopedLocationId = useScopedLocationId()
   const { t, tp } = useI18n()
 
-  const [query,        setQuery]        = useState('')
-  const [selectedName, setSelectedName] = useState<string | null>(null)
-  const [openBkId,     setOpenBkId]     = useState<string | null>(null)
+  const [query, setQuery] = useState('')
+  const [debounced, setDebounced] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(5)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [openBkId, setOpenBkId] = useState<string | null>(null)
 
-  const clients = useMemo<Client[]>(() => {
-    if (!partner) return []
-    const map = new Map<string, Client>()
-    bookings
-      .filter(b => b.partnerId === partner.id && b.status !== 'cancelled')
-      .filter(b => !scopedLocationId || b.locationId === scopedLocationId)
-      .forEach(b => {
-        const key = b.clientPhone
-        if (!map.has(key)) {
-          map.set(key, { name: b.clientName, phone: b.clientPhone, bookings: [], totalSpend: 0, lastVisit: b.startISO })
-        }
-        const c = map.get(key)!
-        c.bookings.push(b)
-        const svc = partner.services.find(sv => sv.id === b.serviceId)
-        if (b.status === 'completed') c.totalSpend += svc?.price ?? 0
-        if (b.startISO > c.lastVisit) c.lastVisit = b.startISO
-      })
-    return Array.from(map.values()).sort((a, b) => b.lastVisit.localeCompare(a.lastVisit))
-  }, [bookings, partner, scopedLocationId])
+  // Debounce the search box, and reset to page 1 when the term changes.
+  useEffect(() => {
+    const id = setTimeout(() => { setDebounced(query.trim()); setPage(1) }, 300)
+    return () => clearTimeout(id)
+  }, [query])
 
-  const filtered = useMemo(() =>
-    query.trim()
-      ? clients.filter(c =>
-          c.name.toLowerCase().includes(query.toLowerCase()) ||
-          c.phone.includes(query)
-        )
-      : clients,
-    [clients, query]
+  // Server-side paginated + searched list (always fresh).
+  const { data: result } = useResource(
+    () => clientsService.list({ page, pageSize, search: debounced || undefined }),
+    [page, pageSize, debounced],
   )
 
-  const selectedClient = selectedName ? clients.find(c => c.name === selectedName) ?? null : null
-
-  // Desktop pagination (mobile uses the card list).
-  const { pageItems: pagedClients, page, pageCount, setPage, pageSize, setPageSize, from, to, total } = usePagination(filtered)
+  // Detail (with bookings + stats) loads only when a client is selected.
+  const { data: detail } = useResource(
+    () => (selectedId ? clientsService.get(selectedId) : Promise.resolve(null)),
+    [selectedId],
+  )
 
   if (!partner) return null
+
+  const clients = result?.items ?? []
+  const total = result?.total ?? 0
 
   return (
     <div className={s.page}>
       <div className={s.head}>
         <div>
           <h1 className={s.h1}>{t('clients.title')}</h1>
-          <p className={s.sub}>{tp('clients.subtitle', clients.length, { name: partner.name })}</p>
+          <p className={s.sub}>{tp('clients.subtitle', total, { name: partner.name })}</p>
         </div>
         <div className={s.search}>
           <Search size={14} style={{ color: 'var(--fg-3)', flexShrink: 0 }} />
@@ -92,13 +71,13 @@ export function Clients() {
         </div>
       </div>
 
-      {filtered.length === 0 ? (
-        <Empty icon={Users} title={t('clients.emptyTitle')} description={query ? t('clients.emptyDescSearch') : t('clients.emptyDescDefault')} />
+      {clients.length === 0 ? (
+        <Empty icon={Users} title={t('clients.emptyTitle')} description={debounced ? t('clients.emptyDescSearch') : t('clients.emptyDescDefault')} />
       ) : isMobile ? (
         /* ── Mobile card list ── */
         <div className={s.cardList}>
-          {filtered.map(c => (
-            <div key={c.phone} className={s.clientCard} onClick={() => setSelectedName(c.name)}>
+          {clients.map(c => (
+            <div key={c.id} className={s.clientCard} onClick={() => setSelectedId(c.id)}>
               <div className={s.cardRow}>
                 <Avatar name={c.name} color={partner.accent} size="lg" />
                 <div className={s.cardMeta}>
@@ -108,7 +87,7 @@ export function Clients() {
               </div>
               <div className={s.cardStats}>
                 <div className={s.cardStat}>
-                  <div className={s.cardStatVal}>{c.bookings.length}</div>
+                  <div className={s.cardStatVal}>{c.visits}</div>
                   <div className={s.cardStatLabel}>{t('clients.visits')}</div>
                 </div>
                 <div className={s.cardStat}>
@@ -116,7 +95,7 @@ export function Clients() {
                   <div className={s.cardStatLabel}>{t('clients.spent')}</div>
                 </div>
                 <div className={s.cardStat}>
-                  <div className={s.cardStatVal}>{fmtDateShort(c.lastVisit)}</div>
+                  <div className={s.cardStatVal}>{c.lastVisit ? fmtDateShort(c.lastVisit) : '—'}</div>
                   <div className={s.cardStatLabel}>{t('clients.lastVisit')}</div>
                 </div>
               </div>
@@ -136,8 +115,8 @@ export function Clients() {
               </tr>
             </thead>
             <tbody>
-              {pagedClients.map(c => (
-                <Tr key={c.phone} selected={c.name === selectedName} onClick={() => setSelectedName(c.name === selectedName ? null : c.name)}>
+              {clients.map(c => (
+                <Tr key={c.id} selected={c.id === selectedId} onClick={() => setSelectedId(c.id === selectedId ? null : c.id)}>
                   <Td>
                     <div className={s.clientInfo}>
                       <Avatar name={c.name} color={partner.accent} size="md" />
@@ -147,43 +126,44 @@ export function Clients() {
                       </div>
                     </div>
                   </Td>
-                  <Td>
-                    <div className={s.stat}>{c.bookings.length}</div>
-                    <div className={s.statSub}>{t('clients.completedCount', { count: c.bookings.filter(b => b.status === 'completed').length })}</div>
-                  </Td>
+                  <Td><span className={s.stat}>{c.visits}</span></Td>
                   <Td><span className={s.stat}>{fmtAMD(c.totalSpend)}</span></Td>
-                  <Td><span className={s.lastDate}>{fmtDateTime(c.lastVisit)}</span></Td>
+                  <Td><span className={s.lastDate}>{c.lastVisit ? fmtDateTime(c.lastVisit) : '—'}</span></Td>
                 </Tr>
               ))}
             </tbody>
           </Table>
           <Pagination
-            page={page}
-            pageCount={pageCount}
+            page={result?.page ?? 1}
+            pageCount={result?.pageCount ?? 1}
             onPageChange={setPage}
             pageSize={pageSize}
-            onPageSizeChange={setPageSize}
+            onPageSizeChange={(n) => { setPageSize(n); setPage(1) }}
             pageSizeLabel={t('pagination.perPage')}
-            summary={t('pagination.summary', { from, to, total })}
+            summary={t('pagination.summary', {
+              from: total === 0 ? 0 : (page - 1) * pageSize + 1,
+              to: Math.min(page * pageSize, total),
+              total,
+            })}
           />
         </div>
       )}
 
       {/* Client detail drawer */}
-      {selectedClient && (
+      {selectedId && detail && (
         <Drawer
           open
-          onClose={() => setSelectedName(null)}
-          title={selectedClient.name}
-          subtitle={selectedClient.phone}
+          onClose={() => setSelectedId(null)}
+          title={detail.name}
+          subtitle={detail.phone}
         >
           <div className={s.drawerSection}>
             <div className={s.drawerLabel}>{t('clients.stats')}</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginTop: 4 }}>
               {[
-                { label: t('clients.visits'),     value: selectedClient.bookings.length },
-                { label: t('clients.completed'),  value: selectedClient.bookings.filter(b => b.status === 'completed').length },
-                { label: t('clients.totalSpent'), value: fmtAMD(selectedClient.totalSpend) },
+                { label: t('clients.visits'),     value: detail.stats.visits },
+                { label: t('clients.completed'),  value: detail.stats.completed },
+                { label: t('clients.totalSpent'), value: fmtAMD(detail.stats.totalSpend) },
               ].map(stat => (
                 <div key={stat.label} style={{ background: 'var(--bg-2)', borderRadius: 8, padding: '10px 12px', textAlign: 'center' }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: 16, fontWeight: 600 }}>{stat.value}</div>
@@ -195,22 +175,15 @@ export function Clients() {
 
           <div className={s.drawerSection}>
             <div className={s.drawerLabel}>{t('clients.bookingHistory')}</div>
-            {selectedClient.bookings
-              .sort((a, b) => b.startISO.localeCompare(a.startISO))
-              .map(b => {
-                const svc = partner.services.find(sv => sv.id === b.serviceId)
-                const sp  = partner.specialists.find(sp => sp.id === b.specialistId)
-                return (
-                  <div key={b.id} className={s.historyRow} onClick={() => setOpenBkId(b.id)} style={{ cursor: 'pointer' }}>
-                    <div style={{ minWidth: 0, flex: 1 }}>
-                      <div className={s.histName}>{svc?.name ?? '—'}</div>
-                      <div className={s.histSub}>{fmtDateTime(b.startISO)}{sp ? ` · ${sp.name.split(' ')[0]}` : ''}</div>
-                    </div>
-                    <BookingBadge status={b.status} />
-                  </div>
-                )
-              })
-            }
+            {detail.bookings.map(b => (
+              <div key={b.id} className={s.historyRow} onClick={() => setOpenBkId(b.id)} style={{ cursor: 'pointer' }}>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div className={s.histName}>{b.service?.name ?? '—'}</div>
+                  <div className={s.histSub}>{fmtDateTime(b.startISO)}{b.specialist ? ` · ${b.specialist.name.split(' ')[0]}` : ''}</div>
+                </div>
+                <BookingBadge status={b.status} />
+              </div>
+            ))}
           </div>
         </Drawer>
       )}

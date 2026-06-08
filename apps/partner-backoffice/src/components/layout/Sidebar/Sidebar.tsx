@@ -4,6 +4,8 @@ import {
   Clock, MapPin, Settings, ChevronLeft, ChevronRight, ShieldCheck, UserCog,
 } from 'lucide-react'
 import { useAppStore, usePartner } from '@/store/app.store'
+import { useResource } from '@/store/useResource'
+import { partnersService } from '@/services/partners.service'
 import { useIsAdmin, useScopedLocationId } from '@/store/auth.hooks'
 import { useI18n } from '@/i18n'
 import s from './Sidebar.module.scss'
@@ -49,8 +51,16 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const scopedLocationId = useScopedLocationId()
   const { t, tp } = useI18n()
 
+  // Only managers (scoped to a branch) need the branch name → only they fetch
+  // locations. Admins read the lightweight locationCount from the partner
+  // profile, so the always-mounted sidebar makes no catalog call for them.
+  const { data: locations } = useResource(
+    () => (scopedLocationId ? partnersService.listLocations() : Promise.resolve([])),
+    [scopedLocationId],
+    [],
+  )
   const branchName = scopedLocationId
-    ? partner?.locations.find(l => l.id === scopedLocationId)?.name ?? null
+    ? locations.find(l => l.id === scopedLocationId)?.name ?? null
     : null
 
   return (
@@ -83,7 +93,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
           ) : (
             <div className={s.partnerStrip}>
               <span className={s.partnerDot} />
-              <span className={s.partnerName}>{tp('sidebar.locationCount', partner.locations.length, { type: partner.type })}</span>
+              <span className={s.partnerName}>{tp('sidebar.locationCount', partner.locationCount ?? 0, { type: partner.type })}</span>
             </div>
           )
         )}

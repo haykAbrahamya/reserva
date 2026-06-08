@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Clock, Plus, Pencil, Trash2, CalendarOff, Sun, AlertTriangle, ArrowRight } from 'lucide-react'
-import { useAppStore, usePartner } from '@/store/app.store'
+import { usePartner } from '@/store/app.store'
+import { useResource } from '@/store/useResource'
 import { Avatar, Button, TimePicker, ConfirmDialog, useToast } from '@/components/ui'
 import { partnersService } from '@/services/partners.service'
+import { bookingsService } from '@/services/bookings.service'
 import { useScopedLocationId } from '@/store/auth.hooks'
 import { AddTimeOffModal, type TimeOffDraft } from '@/components/specialists/AddTimeOffModal/AddTimeOffModal'
 import { findConflictingBookings } from '@/utils/timeOff'
@@ -28,10 +30,19 @@ const DEFAULT_SCHEDULE: WeekSchedule = {
 export function Hours() {
   const partner = usePartner()
   const scopedLocationId = useScopedLocationId()
-  const bookings = useAppStore(st => st.bookings)
+  const { data: specialists } = useResource(
+    () => partnersService.listSpecialists({ includeInactive: true }), [], [],
+  )
+  // Bookings in a window — used only to count time-off conflicts.
+  const { data: bookings } = useResource(() => {
+    const from = new Date(); from.setMonth(from.getMonth() - 1)
+    const to = new Date(); to.setMonth(to.getMonth() + 3)
+    return bookingsService.calendar(from.toISOString(), to.toISOString())
+  }, [], [])
   const toast = useToast()
   const navigate = useNavigate()
   const { t } = useI18n()
+
   const [schedules, setSchedules] = useState<Record<string, WeekSchedule>>({})
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -46,31 +57,38 @@ export function Hours() {
   const [deleteTarget, setDeleteTarget] = useState<SpecialistTimeOff | null>(null)
   const [deleting, setDeleting] = useState(false)
 
+  const [timeOffLoading, setTimeOffLoading] = useState(false)
   const loadTimeOff = useCallback((spId: string) => {
-    partnersService.listTimeOff(spId).then(setTimeOff)
+    setTimeOffLoading(true)
+    partnersService
+      .listTimeOff(spId)
+      .then(setTimeOff)
+      .catch(() => setTimeOff([])) // never leave the UI hanging on an error
+      .finally(() => setTimeOffLoading(false))
   }, [])
 
   // Managers only manage their branch's team.
-  const teamSpecialists = (partner?.specialists ?? []).filter(
+  const teamSpecialists = specialists.filter(
     sp => !scopedLocationId || sp.locationId === scopedLocationId
   )
 
+  // Specialists carry their weekly schedule inline; seed the editable map from
+  // them (no extra per-specialist round-trips) and auto-select the first.
   useEffect(() => {
-    if (!partner) return
-    const team = partner.specialists.filter(sp => !scopedLocationId || sp.locationId === scopedLocationId)
-    const first = team.find(sp => sp.active) ?? team[0]
+    if (teamSpecialists.length === 0) return
+    const first = teamSpecialists.find(sp => sp.active) ?? teamSpecialists[0]
     if (first && !selectedId) setSelectedId(first.id)
 
-    Promise.all(
-      team.map(sp =>
-        partnersService.getHours(sp.id).then(h => ({ id: sp.id, schedule: h?.schedule ?? DEFAULT_SCHEDULE }))
-      )
-    ).then(results => {
-      const map: Record<string, WeekSchedule> = {}
-      results.forEach(r => { map[r.id] = r.schedule })
-      setSchedules(map)
+    const map: Record<string, WeekSchedule> = {}
+    teamSpecialists.forEach(sp => {
+      // Treat a missing OR empty schedule as the default template, so the editor
+      // is always usable (covers specialists created before defaults existed).
+      const hasSchedule = sp.schedule && Object.keys(sp.schedule).length > 0
+      map[sp.id] = hasSchedule ? sp.schedule! : DEFAULT_SCHEDULE
     })
-  }, [partner, scopedLocationId])
+    setSchedules(map)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [specialists, scopedLocationId])
 
   // Reload time-off whenever the selected specialist changes.
   useEffect(() => {
@@ -80,13 +98,13 @@ export function Hours() {
 
   if (!partner) return null
 
-  const selectedSp = partner.specialists.find(sp => sp.id === selectedId)
+  const selectedSp = specialists.find(sp => sp.id === selectedId)
   const schedule = selectedId ? (schedules[selectedId] ?? DEFAULT_SCHEDULE) : null
 
   const confirmDeleteTimeOff = async () => {
     if (!deleteTarget) return
     setDeleting(true)
-    await partnersService.deleteTimeOff(deleteTarget.id)
+    await partnersService.deleteTimeOff(deleteTarget.specialistId, deleteTarget.id)
     setDeleting(false)
     setDeleteTarget(null)
     toast(t('timeOff.removedToast'))
@@ -234,7 +252,11 @@ export function Hours() {
                     </Button>
                   </div>
 
-                  {timeOff.length === 0 ? (
+                  {timeOffLoading ? (
+                    <div className={s.timeOffEmpty}>
+                      <span>{t('common.saving')}</span>
+                    </div>
+                  ) : timeOff.length === 0 ? (
                     <div className={s.timeOffEmpty}>
                       <CalendarOff size={18} strokeWidth={1.5} />
                       <span>{t('timeOff.empty')}</span>
@@ -265,6 +287,7 @@ export function Hours() {
         <AddTimeOffModal
           open={modalOpen}
           specialist={selectedSp}
+          bookings={bookings}
           editing={editing}
           initialDraft={draft}
           onClose={() => setModalOpen(false)}

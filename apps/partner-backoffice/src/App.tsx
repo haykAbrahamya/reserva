@@ -16,10 +16,9 @@ import { Placeholder } from '@/pages/Placeholder'
 import { RequireAdmin } from '@/components/auth/RequireAdmin'
 import { ToastProvider } from '@/components/ui'
 import { NewBookingModal } from '@/components/bookings/NewBookingModal/NewBookingModal'
-import { useAppStore } from '@/store/app.store'
+import { useAppStore, usePartner } from '@/store/app.store'
 import { useAuthStore } from '@/store/auth.store'
 import { partnersService } from '@/services/partners.service'
-import { bookingsService } from '@/services/bookings.service'
 import { Settings } from 'lucide-react'
 
 export function useNewBooking() {
@@ -27,32 +26,44 @@ export function useNewBooking() {
 }
 
 function DataLoader() {
-  const setPartners  = useAppStore(s => s.setPartners)
-  const setBookings  = useAppStore(s => s.setBookings)
-  const partnerId    = useAppStore(s => s.partnerId)
+  const setPartner   = useAppStore(s => s.setPartner)
+  const setPartnerId = useAppStore(s => s.setPartnerId)
   const isAuth       = useAuthStore(s => s.isAuthenticated)
 
+  // On auth, load ONLY the partner identity + branding. Catalog and bookings are
+  // fetched per-page (no global cache) so they're always fresh.
   useEffect(() => {
-    if (isAuth) partnersService.list().then(setPartners)
-  }, [setPartners, isAuth])
-
-  useEffect(() => {
-    if (isAuth) bookingsService.list(partnerId).then(setBookings)
-  }, [partnerId, setBookings, isAuth])
+    if (!isAuth) {
+      setPartner(null)
+      return
+    }
+    partnersService.getOwn().then((partner) => {
+      setPartner(partner)
+      setPartnerId(partner.id)
+    })
+  }, [isAuth, setPartner, setPartnerId])
 
   return null
 }
 
 function ThemeApplier() {
-  const theme     = useAppStore(s => s.theme)
-  const density   = useAppStore(s => s.density)
-  const partnerId = useAppStore(s => s.partnerId)
+  const theme   = useAppStore(s => s.theme)
+  const density = useAppStore(s => s.density)
+  const partner = usePartner()
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-    document.documentElement.setAttribute('data-density', density)
-    document.documentElement.setAttribute('data-brand', partnerId)
-  }, [theme, density, partnerId])
+    const root = document.documentElement
+    root.setAttribute('data-theme', theme)
+    root.setAttribute('data-density', density)
+
+    // Drive the accent from the partner's own brand color (set per-tenant by
+    // the API) rather than a fixed CSS preset keyed by a known id.
+    if (partner?.accent) {
+      root.style.setProperty('--accent', partner.accent)
+      root.style.setProperty('--accent-strong', `color-mix(in srgb, ${partner.accent} 78%, #000)`)
+      root.style.setProperty('--accent-soft', `color-mix(in srgb, ${partner.accent} 12%, transparent)`)
+    }
+  }, [theme, density, partner])
 
   return null
 }
@@ -66,7 +77,13 @@ function GlobalModals() {
     return () => window.removeEventListener('open-new-booking', fn)
   }, [])
 
-  return <NewBookingModal open={open} onClose={() => setOpen(false)} />
+  return (
+    <NewBookingModal
+      open={open}
+      onClose={() => setOpen(false)}
+      onCreated={() => window.dispatchEvent(new CustomEvent('booking-created'))}
+    />
+  )
 }
 
 export default function App() {

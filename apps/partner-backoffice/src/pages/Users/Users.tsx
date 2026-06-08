@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { UserPlus, Users as UsersIcon, MapPin, Phone, Mail, Trash2, Copy, Check, ShieldCheck, KeyRound } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
+import { useResource } from '@/store/useResource'
 import { Button, Modal, Input, Select, Empty, Avatar, useToast } from '@/components/ui'
 import { usersService } from '@/services/users.service'
+import { partnersService } from '@/services/partners.service'
 import type { AuthUser } from '@/store/auth.store'
 import { useI18n } from '@/i18n'
 import s from './Users.module.scss'
@@ -11,6 +13,7 @@ const EMPTY_FORM = { name: '', phone: '', email: '', locationId: '', otpChannel:
 
 export function Users() {
   const partner = usePartner()
+  const { data: locations } = useResource(() => partnersService.listLocations(), [], [])
   const toast   = useToast()
   const { t }   = useI18n()
 
@@ -34,10 +37,10 @@ export function Users() {
 
   if (!partner) return null
 
-  const locName = (id: string | null) => partner.locations.find(l => l.id === id)?.name ?? '—'
+  const locName = (id: string | null) => locations.find(l => l.id === id)?.name ?? '—'
 
   const openNew = () => {
-    setForm({ ...EMPTY_FORM, locationId: partner.locations[0]?.id ?? '' })
+    setForm({ ...EMPTY_FORM, locationId: locations[0]?.id ?? '' })
     setModalOpen(true)
   }
 
@@ -167,7 +170,7 @@ export function Users() {
             <Select
               value={form.locationId}
               onChange={v => setForm(f => ({ ...f, locationId: v }))}
-              options={partner.locations.map(l => ({ value: l.id, label: l.name, sub: l.address }))}
+              options={locations.map(l => ({ value: l.id, label: l.name, sub: l.address }))}
               placeholder={t('users.modal.locationPlaceholder')}
             />
           </div>

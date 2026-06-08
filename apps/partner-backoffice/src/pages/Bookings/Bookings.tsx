@@ -1,9 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type CSSProperties } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Plus, Calendar, X, Search } from 'lucide-react'
-import { useAppStore, usePartner } from '@/store/app.store'
-import { Button, Table, Th, Td, Tr, BookingBadge, Avatar, Empty, Select, DatePicker, Pagination, usePagination } from '@/components/ui'
+import { usePartner } from '@/store/app.store'
+import { useResource } from '@/store/useResource'
+import { Button, Table, Th, Td, Tr, BookingBadge, Avatar, Empty, Select, DatePicker, Pagination } from '@/components/ui'
 import { fmtAMD, fmtDateTime, fmtDuration, fmtTime, fmtDateInput } from '@/utils/format'
+import { bookingsService } from '@/services/bookings.service'
+import { partnersService } from '@/services/partners.service'
 import { useNewBooking } from '@/App'
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
 import { useScopedLocationId } from '@/store/auth.hooks'
@@ -25,7 +28,8 @@ const STATUS_FILTERS = ['all', 'confirmed', 'pending', 'completed', 'cancelled',
 
 export function Bookings() {
   const partner        = usePartner()
-  const bookings       = useAppStore(st => st.bookings)
+  // Specialist roster is only needed for the filter dropdown.
+  const { data: specialists } = useResource(() => partnersService.listSpecialists(), [], [])
   const openNewBooking = useNewBooking()
   const isMobile       = useIsMobile()
   const scopedLocationId = useScopedLocationId()
@@ -33,6 +37,8 @@ export function Bookings() {
 
   const [statusFilter, setStatusFilter] = useState('all')
   const [selectedId,   setSelectedId]   = useState<string | null>(null)
+  const [page,         setPage]         = useState(1)
+  const [pageSize,     setPageSize]     = useState(5)
 
   // Specialist + date-range filters are URL-driven so other pages (e.g. the
   // time-off conflict dialog) can deep-link straight into a filtered view.
@@ -41,9 +47,37 @@ export function Bookings() {
   const fromFilter       = searchParams.get('from') ?? ''
   const toFilter         = searchParams.get('to') ?? ''
 
-  // Free-text search (client name / phone / service). Local state — debounced
-  // feel isn't needed for an in-memory list this small.
+  // Free-text search (debounced → server-side).
   const [search, setSearch] = useState('')
+  const [debounced, setDebounced] = useState('')
+  useEffect(() => {
+    const id = setTimeout(() => { setDebounced(search.trim()); setPage(1) }, 300)
+    return () => clearTimeout(id)
+  }, [search])
+
+  // Reset to page 1 when any server-side filter changes.
+  useEffect(() => { setPage(1) }, [statusFilter, specialistFilter, fromFilter, toFilter])
+
+  // Server-paginated, filtered list (always fresh).
+  const { data: result, reload } = useResource(
+    () => bookingsService.list({
+      page,
+      pageSize,
+      status: statusFilter === 'all' ? undefined : statusFilter,
+      specialistId: specialistFilter === 'all' ? undefined : specialistFilter,
+      from: fromFilter || undefined,
+      to: toFilter || undefined,
+      search: debounced || undefined,
+    }),
+    [page, pageSize, statusFilter, specialistFilter, fromFilter, toFilter, debounced],
+  )
+
+  // Refresh when a booking is created from the global New-Booking modal.
+  useEffect(() => {
+    const fn = () => reload()
+    window.addEventListener('booking-created', fn)
+    return () => window.removeEventListener('booking-created', fn)
+  }, [reload])
 
   const patchParams = (patch: Record<string, string>) => {
     const next = new URLSearchParams(searchParams)
@@ -63,32 +97,13 @@ export function Bookings() {
   const hasExtraFilters =
     specialistFilter !== 'all' || !!fromFilter || !!toFilter || !!search.trim() || statusFilter !== 'all'
 
-  const q = search.trim().toLowerCase()
-  const partnerBookings = bookings
-    .filter(b => b.partnerId === partner?.id)
-    .filter(b => !scopedLocationId || b.locationId === scopedLocationId)
-    .filter(b => statusFilter === 'all' || b.status === statusFilter)
-    .filter(b => specialistFilter === 'all' || b.specialistId === specialistFilter)
-    .filter(b => !fromFilter || fmtDateInput(new Date(b.startISO)) >= fromFilter)
-    .filter(b => !toFilter   || fmtDateInput(new Date(b.startISO)) <= toFilter)
-    .filter(b => {
-      if (!q) return true
-      const svc = partner?.services.find(sv => sv.id === b.serviceId)
-      return (
-        b.clientName.toLowerCase().includes(q) ||
-        b.clientPhone.toLowerCase().includes(q) ||
-        (svc?.name.toLowerCase().includes(q) ?? false)
-      )
-    })
-    .sort((a, b) => b.startISO.localeCompare(a.startISO))
-
-  // Desktop pagination (mobile uses the grouped card list, no paging).
-  const { pageItems: pagedBookings, page, pageCount, setPage, pageSize, setPageSize, from, to, total } = usePagination(partnerBookings)
-
   if (!partner) return null
 
+  const partnerBookings = result?.items ?? []
+  const total = result?.total ?? 0
+
   // Specialists scoped to the manager's branch (mirrors other pages).
-  const branchSpecialists = partner.specialists.filter(
+  const branchSpecialists = specialists.filter(
     sp => !scopedLocationId || sp.locationId === scopedLocationId
   )
 
@@ -182,29 +197,30 @@ export function Bookings() {
                 <div className={s.dateHeader}>
                   {new Date(dateKey).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
                 </div>
-                {bks.map(b => {
-                  const svc = partner.services.find(sv => sv.id === b.serviceId)
-                  const sp  = partner.specialists.find(sp => sp.id === b.specialistId)
-                  return (
-                    <div key={b.id} className={s.bookingCard} onClick={() => openBooking(b.id)}>
-                      <div className={s.cardTop}>
-                        <div>
-                          <div className={s.cardTime}>{fmtTime(b.startISO)} – {fmtTime(b.endISO)}</div>
-                        </div>
-                        <BookingBadge status={b.status} />
+                {bks.map((b, i) => (
+                  <div
+                    key={b.id}
+                    className={[s.bookingCard, s.animCard].join(' ')}
+                    style={{ '--i': i } as CSSProperties}
+                    onClick={() => openBooking(b.id)}
+                  >
+                    <div className={s.cardTop}>
+                      <div>
+                        <div className={s.cardTime}>{fmtTime(b.startISO)} – {fmtTime(b.endISO)}</div>
                       </div>
-                      <div className={s.cardClient}>{b.clientName}</div>
-                      <div className={s.cardPhone}>{b.clientPhone}</div>
-                      <div className={s.cardMeta}>
-                        <div style={{ minWidth: 0 }}>
-                          <div className={s.cardSvc}>{svc?.name ?? '—'}</div>
-                          <div className={s.cardSpec}>{sp?.name ?? '—'}{svc ? ` · ${fmtDuration(svc.duration)}` : ''}</div>
-                        </div>
-                        {svc && <div className={s.cardPrice}>{fmtAMD(svc.price)}</div>}
-                      </div>
+                      <BookingBadge status={b.status} />
                     </div>
-                  )
-                })}
+                    <div className={s.cardClient}>{b.clientName}</div>
+                    <div className={s.cardPhone}>{b.clientPhone}</div>
+                    <div className={s.cardMeta}>
+                      <div style={{ minWidth: 0 }}>
+                        <div className={s.cardSvc}>{b.service?.name ?? '—'}</div>
+                        <div className={s.cardSpec}>{b.specialist?.name ?? '—'}{b.service ? ` · ${fmtDuration(b.service.duration)}` : ''}</div>
+                      </div>
+                      {b.service && <div className={s.cardPrice}>{fmtAMD(b.service.price)}</div>}
+                    </div>
+                  </div>
+                ))}
               </div>
             ))
           )}
@@ -230,11 +246,14 @@ export function Bookings() {
                     <Empty icon={Calendar} title={t('bookings.emptyTitle')} description={t('bookings.emptyDescCreate')} />
                   </td>
                 </tr>
-              ) : pagedBookings.map(b => {
-                const svc = partner.services.find(sv => sv.id === b.serviceId)
-                const sp  = partner.specialists.find(sp => sp.id === b.specialistId)
-                return (
-                  <Tr key={b.id} selected={b.id === selectedId} onClick={() => setSelectedId(b.id === selectedId ? null : b.id)}>
+              ) : partnerBookings.map((b, i) => (
+                  <Tr
+                    key={b.id}
+                    selected={b.id === selectedId}
+                    onClick={() => setSelectedId(b.id === selectedId ? null : b.id)}
+                    className={s.row}
+                    style={{ '--i': i } as CSSProperties}
+                  >
                     <Td>
                       <div className={s.clientInfo}>
                         <Avatar name={b.clientName} size="sm" />
@@ -245,26 +264,29 @@ export function Bookings() {
                       </div>
                     </Td>
                     <Td>
-                      <div className={s.svcName}>{svc?.name ?? '—'}</div>
-                      {svc && <div className={s.svcDur}>{fmtDuration(svc.duration)}</div>}
+                      <div className={s.svcName}>{b.service?.name ?? '—'}</div>
+                      {b.service && <div className={s.svcDur}>{fmtDuration(b.service.duration)}</div>}
                     </Td>
-                    <Td><span className={s.specialistName}>{sp?.name ?? '—'}</span></Td>
+                    <Td><span className={s.specialistName}>{b.specialist?.name ?? '—'}</span></Td>
                     <Td style={{ whiteSpace: 'nowrap' }}>{fmtDateTime(b.startISO)}</Td>
-                    <Td><span className={s.price}>{svc ? fmtAMD(svc.price) : '—'}</span></Td>
+                    <Td><span className={s.price}>{b.service ? fmtAMD(b.service.price) : '—'}</span></Td>
                     <Td><BookingBadge status={b.status} /></Td>
                   </Tr>
-                )
-              })}
+              ))}
             </tbody>
           </Table>
           <Pagination
-            page={page}
-            pageCount={pageCount}
+            page={result?.page ?? 1}
+            pageCount={result?.pageCount ?? 1}
             onPageChange={setPage}
             pageSize={pageSize}
-            onPageSizeChange={setPageSize}
+            onPageSizeChange={(n) => { setPageSize(n); setPage(1) }}
             pageSizeLabel={t('pagination.perPage')}
-            summary={t('pagination.summary', { from, to, total })}
+            summary={t('pagination.summary', {
+              from: total === 0 ? 0 : (page - 1) * pageSize + 1,
+              to: Math.min(page * pageSize, total),
+              total,
+            })}
           />
         </div>
       )}
@@ -274,6 +296,7 @@ export function Bookings() {
         <BookingDrawer
           bookingId={selectedId}
           onClose={closeBooking}
+          onChanged={reload}
           sheet={isMobile}
         />
       )}

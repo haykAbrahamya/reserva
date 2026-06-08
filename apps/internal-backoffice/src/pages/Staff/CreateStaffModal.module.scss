@@ -1,0 +1,25 @@
+@use 'variables' as *;
+
+.form { display: flex; flex-direction: column; gap: 12px; }
+.fieldLabel { display: block; font-size: 13px; color: $fg-1; margin-bottom: 6px; }
+.error { font-size: 13px; color: $danger; background: $danger-soft; border-radius: $r-1; padding: 8px 12px; }
+
+.otpWrap { display: flex; flex-direction: column; gap: 14px; }
+.otpLead { font-size: 13px; color: $fg-1; line-height: 1.5; margin: 0; }
+.otpBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: $bg-2;
+  border: 1px dashed $line-strong;
+  border-radius: $r-2;
+}
+.otpCode { font-family: $font-mono; font-size: 22px; letter-spacing: 0.12em; color: $fg-0; }
+.copyBtn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 12px; font-size: 13px;
+  border: 1px solid $line-1; border-radius: $r-1; background: $bg-1; color: $fg-0; cursor: pointer;
+  &:hover { background: $bg-3; }
+}

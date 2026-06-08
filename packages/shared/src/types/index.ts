@@ -3,6 +3,22 @@
 // internal-backoffice and the public client app.
 // ─────────────────────────────────────────────────────────────
 
+/** Server-side pagination envelope returned by every list endpoint. */
+export interface Paginated<T> {
+  items: T[]
+  page: number
+  pageSize: number
+  total: number
+  pageCount: number
+}
+
+/** Query params accepted by every paginated list endpoint. */
+export interface PageParams {
+  page?: number
+  pageSize?: number
+  search?: string
+}
+
 export type BookingStatus =
   | 'pending'
   | 'confirmed'
@@ -27,6 +43,8 @@ export interface Specialist {
   active: boolean
   phone: string
   services: string[]
+  /** Recurring weekly schedule. Present when loaded from the API. */
+  schedule?: WeekSchedule
 }
 
 export interface Service {
@@ -50,6 +68,13 @@ export interface Booking {
   endISO: string
   status: BookingStatus
   notes?: string
+  /**
+   * Embedded display data joined from the API so a booking row is
+   * self-contained (no catalog lookup needed to render names/price).
+   */
+  service?: { id: string; name: string; price: number; duration: number } | null
+  specialist?: { id: string; name: string; title: string } | null
+  location?: { id: string; name: string; address: string } | null
 }
 
 export interface WorkingDay {

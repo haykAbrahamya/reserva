@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { MapPin, Plus, Pencil, Trash2, Phone, Clock } from 'lucide-react'
-import { useAppStore, usePartner } from '@/store/app.store'
-import { Button, Modal, Input, Empty, TimePicker, Toggle, useToast } from '@/components/ui'
+import { usePartner } from '@/store/app.store'
+import { useResource } from '@/store/useResource'
+import { Button, Modal, Input, Empty, TimePicker, Toggle, Pagination, useToast } from '@/components/ui'
 import { partnersService } from '@/services/partners.service'
 import {
   DAY_KEYS, DEFAULT_LOCATION_HOURS, everyDaySchedule, exceptSundaySchedule,
@@ -15,9 +16,17 @@ const EMPTY_FORM = { name: '', address: '', phone: '', hours: DEFAULT_LOCATION_H
 
 export function Locations() {
   const partner     = usePartner()
-  const setPartners = useAppStore(st => st.setPartners)
   const toast       = useToast()
   const { t, tp }   = useI18n()
+
+  const [page,     setPage]     = useState(1)
+  const [pageSize, setPageSize] = useState(5)
+
+  // Server-paginated branches (always fresh).
+  const { data: result, reload } = useResource(
+    () => partnersService.listLocationsPaged({ page, pageSize }),
+    [page, pageSize],
+  )
 
   const [modalOpen,   setModalOpen]   = useState(false)
   const [editing,     setEditing]     = useState<Location | null>(null)
@@ -26,6 +35,13 @@ export function Locations() {
   const [saving,      setSaving]      = useState(false)
 
   if (!partner) return null
+
+  const locations  = result?.items ?? []
+  const total      = result?.total ?? 0
+  const pageCount  = result?.pageCount ?? 1
+  const from       = total === 0 ? 0 : (page - 1) * pageSize + 1
+  const to         = Math.min(page * pageSize, total)
+  const changePageSize = (n: number) => { setPageSize(n); setPage(1) }
 
   const openNew = () => { setEditing(null); setForm(EMPTY_FORM); setModalOpen(true) }
   const openEdit = (loc: Location) => {
@@ -45,22 +61,18 @@ export function Locations() {
   const handleSave = async () => {
     if (!canSave) return
     setSaving(true)
-    if (editing) {
-      await partnersService.updateLocation(partner.id, editing.id, form)
-      toast(t('locations.toast.updated'))
-    } else {
-      await partnersService.createLocation(partner.id, form)
-      toast(t('locations.toast.added'))
-    }
-    setPartners(await partnersService.list())
+    if (editing) await partnersService.updateLocation(editing.id, form)
+    else await partnersService.createLocation(form)
+    await reload()
+    toast(editing ? t('locations.toast.updated') : t('locations.toast.added'))
     setSaving(false)
     setModalOpen(false)
   }
 
   const handleDelete = async () => {
     if (!confirmDel) return
-    await partnersService.deleteLocation(partner.id, confirmDel.id)
-    setPartners(await partnersService.list())
+    await partnersService.deleteLocation(confirmDel.id)
+    await reload()
     toast(t('locations.toast.removed'))
     setConfirmDel(null)
   }
@@ -71,13 +83,13 @@ export function Locations() {
         <div>
           <h1 className={s.h1}>{t('locations.title')}</h1>
           <p className={s.sub}>
-            {tp('locations.subtitle', partner.locations.length, { name: partner.name })}
+            {tp('locations.subtitle', total, { name: partner.name })}
           </p>
         </div>
         <Button variant="accent" onClick={openNew}><Plus size={14} /> {t('locations.addLocation')}</Button>
       </div>
 
-      {partner.locations.length === 0 ? (
+      {total === 0 ? (
         <Empty
           icon={MapPin}
           title={t('locations.emptyTitle')}
@@ -86,7 +98,7 @@ export function Locations() {
         />
       ) : (
         <div className={s.grid}>
-          {partner.locations.map(loc => (
+          {locations.map(loc => (
             <div key={loc.id} className={s.card}>
               <div className={s.actions}>
                 <Button variant="ghost" size="sm" icon onClick={() => openEdit(loc)}>
@@ -124,6 +136,18 @@ export function Locations() {
             </div>
           ))}
         </div>
+      )}
+
+      {total > 0 && (
+        <Pagination
+          page={page}
+          pageCount={pageCount}
+          onPageChange={setPage}
+          pageSize={pageSize}
+          onPageSizeChange={changePageSize}
+          pageSizeLabel={t('pagination.perPage')}
+          summary={t('pagination.summary', { from, to, total })}
+        />
       )}
 
       {/* Add / edit modal */}

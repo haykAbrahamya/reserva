@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Calendar } from 'lucide-react'
 import { Modal, Input, Select, Button, DatePicker, useToast } from '@/components/ui'
-import { useAppStore, usePartner } from '@/store/app.store'
+import { usePartner } from '@/store/app.store'
+import { useResource } from '@/store/useResource'
 import { useScopedLocationId } from '@/store/auth.hooks'
 import { bookingsService } from '@/services/bookings.service'
 import { partnersService } from '@/services/partners.service'
@@ -16,12 +17,16 @@ interface Props {
   onClose: () => void
   initialDate?: string
   initialTime?: string
+  /** Called after a booking is created so any open list can refresh. */
+  onCreated?: () => void
 }
 
-export function NewBookingModal({ open, onClose, initialDate, initialTime }: Props) {
+export function NewBookingModal({ open, onClose, initialDate, initialTime, onCreated }: Props) {
   const partner       = usePartner()
-  const bookings      = useAppStore(st => st.bookings)
-  const upsertBooking = useAppStore(st => st.upsertBooking)
+  // Catalog is fetched only while the modal is open (it's mounted globally).
+  const { data: svcCatalog }  = useResource(() => (open ? partnersService.listServices() : Promise.resolve([])), [open], [])
+  const { data: spCatalog }   = useResource(() => (open ? partnersService.listSpecialists() : Promise.resolve([])), [open], [])
+  const { data: locCatalog }  = useResource(() => (open ? partnersService.listLocations() : Promise.resolve([])), [open], [])
   const toast         = useToast()
   const scopedLocationId = useScopedLocationId()
   const t             = useT()
@@ -35,6 +40,13 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime }: Pro
   const [time,         setTime]         = useState(initialTime ?? '')
   const [clientName,   setClientName]   = useState('')
   const [clientPhone,  setClientPhone]  = useState('')
+
+  // Fresh bookings for the chosen day for slot availability (backend enforces overlaps).
+  const { data: bookings } = useResource(
+    () => (open && date ? bookingsService.calendar(`${date}T00:00:00`, `${date}T23:59:59`) : Promise.resolve([])),
+    [open, date],
+    [],
+  )
 
   const allSlots = useMemo(() => {
     const out: string[] = []
@@ -65,7 +77,7 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime }: Pro
     })
     // Block slots that fall inside a time-off window. A slot is the service's
     // duration (default 30m) starting at the slot time.
-    const svc = partner.services.find(sv => sv.id === serviceId)
+    const svc = svcCatalog.find(sv => sv.id === serviceId)
     const slotMin = svc?.duration ?? 30
     for (let h = 8; h < 21; h++) {
       for (let m = 0; m < 60; m += 30) {
@@ -77,7 +89,7 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime }: Pro
       }
     }
     return set
-  }, [bookings, specialistId, date, partner, serviceId, timeOff])
+  }, [bookings, specialistId, date, partner, serviceId, timeOff, svcCatalog])
 
   // When a manager opens the modal, force their branch as the location.
   useEffect(() => {
@@ -87,14 +99,14 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime }: Pro
   // Early return AFTER all hooks
   if (!partner) return null
 
-  const locations   = partner.locations
-  const specialists = partner.specialists.filter(sp =>
+  const locations   = locCatalog
+  const specialists = spCatalog.filter(sp =>
     sp.active && (!locationId || sp.locationId === locationId)
   )
-  const services = partner.services.filter(sv =>
-    sv.active && (!specialistId || partner.specialists.find(sp => sp.id === specialistId)?.services.includes(sv.id))
+  const services = svcCatalog.filter(sv =>
+    sv.active && (!specialistId || spCatalog.find(sp => sp.id === specialistId)?.services.includes(sv.id))
   )
-  const selectedService = partner.services.find(sv => sv.id === serviceId)
+  const selectedService = svcCatalog.find(sv => sv.id === serviceId)
   const canSubmit = locationId && serviceId && specialistId && date && time && clientName && clientPhone
 
   const handleSubmit = async () => {
@@ -104,13 +116,13 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime }: Pro
     start.setHours(h, m, 0, 0)
     const end = new Date(start.getTime() + selectedService.duration * 60_000)
 
-    const booking = await bookingsService.create({
+    await bookingsService.create({
       partnerId: partner.id, locationId, specialistId, serviceId,
       clientName, clientPhone,
       startISO: start.toISOString(), endISO: end.toISOString(),
       status: 'confirmed',
     })
-    upsertBooking(booking)
+    onCreated?.()
     toast(t('newBooking.confirmedToast', { name: clientName }))
     onClose()
     setLocationId(scopedLocationId ?? ''); setServiceId(''); setSpecialistId('')

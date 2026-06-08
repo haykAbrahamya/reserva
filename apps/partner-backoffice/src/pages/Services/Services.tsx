@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Plus, Sparkles, Pencil, Clock, Scissors } from 'lucide-react'
-import { useAppStore, usePartner } from '@/store/app.store'
-import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Empty, Pagination, usePagination } from '@/components/ui'
+import { usePartner } from '@/store/app.store'
+import { useResource } from '@/store/useResource'
+import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Empty, Pagination } from '@/components/ui'
 import { fmtAMD, fmtDuration } from '@/utils/format'
 import { partnersService } from '@/services/partners.service'
 import { useI18n } from '@/i18n'
@@ -22,19 +23,30 @@ const EMPTY_FORM = { name: '', price: '', duration: '', category: '', active: tr
 
 export function Services() {
   const partner     = usePartner()
-  const setPartners = useAppStore(st => st.setPartners)
   const isMobile    = useIsMobile()
   const { t, tp }   = useI18n()
+
+  const [page,     setPage]     = useState(1)
+  const [pageSize, setPageSize] = useState(5)
+
+  // Server-side paginated list (always fresh; back end does the slicing).
+  const { data: result, reload } = useResource(
+    () => partnersService.listServicesPaged({ page, pageSize, includeInactive: true }),
+    [page, pageSize],
+  )
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editing,   setEditing]   = useState<Service | null>(null)
   const [form,      setForm]      = useState(EMPTY_FORM)
 
-  // Desktop pagination over the service list (mobile uses category cards).
-  const { pageItems: pagedServices, page, pageCount, setPage, pageSize, setPageSize, from, to, total } =
-    usePagination(partner?.services ?? [])
-
   if (!partner) return null
+
+  const services  = result?.items ?? []
+  const total     = result?.total ?? 0
+  const pageCount = result?.pageCount ?? 1
+  const from      = total === 0 ? 0 : (page - 1) * pageSize + 1
+  const to        = Math.min(page * pageSize, total)
+  const changePageSize = (n: number) => { setPageSize(n); setPage(1) }
 
   const openNew = () => { setEditing(null); setForm(EMPTY_FORM); setModalOpen(true) }
   const openEdit = (svc: Service) => {
@@ -45,19 +57,19 @@ export function Services() {
 
   const handleSave = async () => {
     const data = { name: form.name, price: Number(form.price), duration: Number(form.duration), category: form.category, active: form.active }
-    if (editing) await partnersService.updateService(partner.id, editing.id, data)
-    else         await partnersService.createService(partner.id, data)
-    setPartners(await partnersService.list())
+    if (editing) await partnersService.updateService(editing.id, data)
+    else await partnersService.createService(data)
+    await reload()
     setModalOpen(false)
   }
 
   const handleToggleActive = async (svc: Service) => {
-    await partnersService.updateService(partner.id, svc.id, { active: !svc.active })
-    setPartners(await partnersService.list())
+    await partnersService.updateService(svc.id, { active: !svc.active })
+    await reload()
   }
 
   // Group by category for mobile
-  const grouped = partner.services.reduce<Record<string, Service[]>>((acc, svc) => {
+  const grouped = services.reduce<Record<string, Service[]>>((acc, svc) => {
     const cat = svc.category || t('services.otherCategory')
     if (!acc[cat]) acc[cat] = []
     acc[cat].push(svc)
@@ -69,12 +81,12 @@ export function Services() {
       <div className={s.head}>
         <div>
           <h1 className={s.h1}>{t('services.title')}</h1>
-          <p className={s.sub}>{tp('services.subtitle', partner.services.length, { name: partner.name })}</p>
+          <p className={s.sub}>{tp('services.subtitle', total, { name: partner.name })}</p>
         </div>
         <Button variant="accent" onClick={openNew}><Plus size={14} /> {t('services.addService')}</Button>
       </div>
 
-      {partner.services.length === 0 ? (
+      {total === 0 ? (
         <Empty icon={Sparkles} title={t('services.emptyTitle')} description={t('services.emptyDesc')}
           action={<Button variant="accent" onClick={openNew}><Plus size={14} /> {t('services.addService')}</Button>}
         />
@@ -110,6 +122,15 @@ export function Services() {
               </div>
             </div>
           ))}
+          <Pagination
+            page={page}
+            pageCount={pageCount}
+            onPageChange={setPage}
+            pageSize={pageSize}
+            onPageSizeChange={changePageSize}
+            pageSizeLabel={t('pagination.perPage')}
+            summary={t('pagination.summary', { from, to, total })}
+          />
         </div>
       ) : (
         /* ── Desktop: table ── */
@@ -126,7 +147,7 @@ export function Services() {
               </tr>
             </thead>
             <tbody>
-              {pagedServices.map(svc => (
+              {services.map(svc => (
                 <Tr key={svc.id}>
                   <Td><span className={s.svcName}>{svc.name}</span></Td>
                   <Td><span className={s.category}>{svc.category}</span></Td>
@@ -147,7 +168,7 @@ export function Services() {
             pageCount={pageCount}
             onPageChange={setPage}
             pageSize={pageSize}
-            onPageSizeChange={setPageSize}
+            onPageSizeChange={changePageSize}
             pageSizeLabel={t('pagination.perPage')}
             summary={t('pagination.summary', { from, to, total })}
           />

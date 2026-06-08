@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { X, ChevronLeft, MapPin, Phone, CheckCircle2, XCircle, Clock, TrendingUp } from 'lucide-react'
-import { useAppStore, usePartner } from '@/store/app.store'
+import { usePartner } from '@/store/app.store'
+import { useResource } from '@/store/useResource'
+import { bookingsService } from '@/services/bookings.service'
+import { partnersService } from '@/services/partners.service'
 import { BookingBadge } from '@/components/ui'
 import { fmtAMD, fmtTime, fmtDateShort, initials } from '@/utils/format'
 import { useT } from '@/i18n'
@@ -26,9 +29,16 @@ interface Props {
 
 export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
   const partner   = usePartner()
-  const bookings  = useAppStore(st => st.bookings)
+  const { data: locations } = useResource(() => partnersService.listLocations(), [], [])
+  // This specialist's bookings (server-filtered).
+  const { data: bookings } = useResource(
+    () => bookingsService.list({ specialistId: sp.id, pageSize: 100 }).then(r => r.items),
+    [sp.id],
+    [],
+  )
   const isMobile  = useIsMobile()
   const t         = useT()
+
   const [closing, setClosing] = useState(false)
 
   const handleClose = useCallback(() => {
@@ -43,13 +53,10 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
     return () => { document.removeEventListener('keydown', fn); document.body.style.overflow = '' }
   }, [handleClose])
 
-  const loc = partner?.locations.find(l => l.id === sp.locationId)
+  const loc = locations.find(l => l.id === sp.locationId)
 
-  // ── Stats ──────────────────────────────────────────────────
-  const spBookings = useMemo(() =>
-    bookings.filter(b => b.specialistId === sp.id),
-    [bookings, sp.id]
-  )
+  // ── Stats ── (bookings already scoped to this specialist) ──
+  const spBookings = bookings
 
   const total      = spBookings.length
   const completed  = spBookings.filter(b => b.status === 'completed').length
@@ -60,25 +67,25 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
   const totalRevenue = useMemo(() =>
     spBookings
       .filter(b => b.status === 'completed')
-      .reduce((sum, b) => sum + (partner?.services.find(sv => sv.id === b.serviceId)?.price ?? 0), 0),
-    [spBookings, partner]
+      .reduce((sum, b) => sum + (b.service?.price ?? 0), 0),
+    [spBookings]
   )
 
   const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0
 
-  // Services breakdown — count per service
+  // Services breakdown — count per service (by embedded service name)
   const svcBreakdown = useMemo(() => {
-    if (!partner) return []
-    const map = new Map<string, number>()
-    spBookings.filter(b => b.status === 'completed').forEach(b => {
-      map.set(b.serviceId, (map.get(b.serviceId) ?? 0) + 1)
+    const map = new Map<string, { name: string; count: number }>()
+    spBookings.filter(b => b.status === 'completed' && b.service).forEach(b => {
+      const svc = b.service!
+      const cur = map.get(svc.id)
+      if (cur) cur.count += 1
+      else map.set(svc.id, { name: svc.name, count: 1 })
     })
-    return Array.from(map.entries())
-      .map(([id, count]) => ({ svc: partner.services.find(sv => sv.id === id), count }))
-      .filter(x => x.svc)
+    return Array.from(map.values())
       .sort((a, b) => b.count - a.count)
       .slice(0, 6)
-  }, [spBookings, partner])
+  }, [spBookings])
 
   const maxSvcCount = svcBreakdown[0]?.count ?? 1
 
@@ -90,12 +97,11 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
       const daysAgo = (now - new Date(b.startISO).getTime()) / 86_400_000
       const weekIdx = Math.floor(daysAgo / 7)
       if (weekIdx < 7) {
-        const price = partner?.services.find(sv => sv.id === b.serviceId)?.price ?? 0
-        weeks[6 - weekIdx] += price
+        weeks[6 - weekIdx] += b.service?.price ?? 0
       }
     })
     return weeks
-  }, [spBookings, partner])
+  }, [spBookings])
 
   const maxWeekRev = Math.max(...weeklyRevenue, 1)
 
@@ -218,9 +224,9 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
               <span className={s.sectionTitle}>{t('specialistDashboard.topServices')}</span>
               <span className={s.sectionBadge}>{t('specialistDashboard.typesBadge', { count: svcBreakdown.length })}</span>
             </div>
-            {svcBreakdown.map(({ svc, count }) => (
-              <div key={svc!.id} className={s.progressRow}>
-                <span className={s.progressLabel}>{svc!.name}</span>
+            {svcBreakdown.map(({ name, count }) => (
+              <div key={name} className={s.progressRow}>
+                <span className={s.progressLabel}>{name}</span>
                 <div className={s.progressBar}>
                   <div className={s.progressFill} style={{ width: `${(count / maxSvcCount) * 100}%` }} />
                 </div>
@@ -261,20 +267,17 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
           </div>
           {recent.length === 0
             ? <div className={s.emptySection}>{t('specialistDashboard.noBookings')}</div>
-            : recent.map(b => {
-              const svc = partner.services.find(sv => sv.id === b.serviceId)
-              return (
+            : recent.map(b => (
                 <div key={b.id} className={s.bookingRow}>
                   <div className={s.bkTime}>{fmtTime(b.startISO)}</div>
                   <div className={s.bkInfo}>
                     <div className={s.bkClient}>{b.clientName}</div>
-                    <div className={s.bkSvc}>{fmtDateShort(b.startISO)}{svc ? ` · ${svc.name}` : ''}</div>
+                    <div className={s.bkSvc}>{fmtDateShort(b.startISO)}{b.service ? ` · ${b.service.name}` : ''}</div>
                   </div>
-                  {svc && <div className={s.bkPrice}>{fmtAMD(svc.price)}</div>}
+                  {b.service && <div className={s.bkPrice}>{fmtAMD(b.service.price)}</div>}
                   <BookingBadge status={b.status} />
                 </div>
-              )
-            })
+            ))
           }
         </div>
       </div>

@@ -1,0 +1,45 @@
+@use 'variables' as *;
+
+.page { padding: 28px; animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both; }
+@media (max-width: 860px) { .page { padding: 20px 16px; } }
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.h1 { font-family: $font-serif; font-size: 30px; letter-spacing: -0.022em; margin: 0 0 4px; }
+.sub { font-size: 13px; color: $fg-2; margin: 0; }
+
+.toolbar { margin-bottom: 16px; }
+.searchWrap { position: relative; max-width: 360px; }
+.searchIcon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: $fg-3; }
+.searchInput {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px 0 34px;
+  font-size: 14px;
+  color: $fg-0;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  outline: none;
+  transition: border-color 0.15s;
+  &:focus { border-color: $accent; }
+  &::placeholder { color: $fg-3; }
+}
+
+.tableWrap {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  overflow: hidden;
+}
+
+.partner { display: flex; align-items: center; gap: 10px; }
+.partnerName { font-weight: 500; }
+.slug { font-family: $font-mono; font-size: 13px; color: $fg-2; }
+.num { font-family: $font-mono; }

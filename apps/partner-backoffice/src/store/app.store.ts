@@ -1,56 +1,60 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { Partner, Booking } from '@/types'
+import type { Partner } from '@/types'
+
+/**
+ * The partner profile held in the store: identity + branding only. The catalog
+ * (locations / services / specialists) and bookings are fetched per-page with
+ * useResource (no global cache), so the UI always reflects current server state.
+ * Typing the profile without the catalog makes any stale `partner.specialists`
+ * access a compile error rather than a silent empty array.
+ */
+export type PartnerProfile = Omit<Partner, 'locations' | 'services' | 'specialists'> & {
+  /** Number of active branches — provided by the API for lightweight chrome. */
+  locationCount?: number
+}
 
 interface AppState {
   partnerId: string
   theme: 'light' | 'dark'
   density: 'compact' | 'default' | 'comfy'
   sidebarCollapsed: boolean
-  partners: Partner[]
-  bookings: Booking[]
+  partner: PartnerProfile | null
 
   setPartnerId: (id: string) => void
   setTheme: (t: 'light' | 'dark') => void
   setDensity: (d: 'compact' | 'default' | 'comfy') => void
   setSidebarCollapsed: (v: boolean) => void
-  setPartners: (p: Partner[]) => void
-  setBookings: (b: Booking[]) => void
-  upsertBooking: (b: Booking) => void
-  removeBooking: (id: string) => void
+  setPartner: (p: PartnerProfile | null) => void
 }
 
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      partnerId: 'antheris',
+      partnerId: '',
       theme: 'light',
       density: 'default',
       sidebarCollapsed: false,
-      partners: [],
-      bookings: [],
+      partner: null,
 
-      setPartnerId: (id) => set({ partnerId: id }),
+      setPartnerId: (partnerId) => set({ partnerId }),
       setTheme: (theme) => set({ theme }),
       setDensity: (density) => set({ density }),
       setSidebarCollapsed: (sidebarCollapsed) => set({ sidebarCollapsed }),
-      setPartners: (partners) => set({ partners }),
-      setBookings: (bookings) => set({ bookings }),
-      upsertBooking: (b) => set(s => ({
-        bookings: s.bookings.some(x => x.id === b.id)
-          ? s.bookings.map(x => x.id === b.id ? b : x)
-          : [...s.bookings, b]
-      })),
-      removeBooking: (id) => set(s => ({ bookings: s.bookings.filter(b => b.id !== id) })),
+      setPartner: (partner) => set({ partner }),
     }),
     {
       name: 'reserva-bo',
-      partialize: (s) => ({ partnerId: s.partnerId, theme: s.theme, density: s.density, sidebarCollapsed: s.sidebarCollapsed }),
-    }
-  )
+      // Persist only UI prefs + the active partner id; all data is re-fetched.
+      partialize: (s) => ({
+        partnerId: s.partnerId,
+        theme: s.theme,
+        density: s.density,
+        sidebarCollapsed: s.sidebarCollapsed,
+      }),
+    },
+  ),
 )
 
-export const usePartner = () => {
-  const { partners, partnerId } = useAppStore()
-  return partners.find(p => p.id === partnerId) ?? null
-}
+/** The current partner (identity + branding). Catalog/bookings load per page. */
+export const usePartner = () => useAppStore((s) => s.partner)

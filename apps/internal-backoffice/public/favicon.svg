@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Background -->
+  <rect width="32" height="32" rx="8" fill="#14110E"/>
+  <!-- Person icon: head + shoulders -->
+  <circle cx="16" cy="11" r="4.5" fill="#A8784B"/>
+  <path d="M7 27c0-4.971 4.029-9 9-9s9 4.029 9 9" stroke="#A8784B" stroke-width="2.2" stroke-linecap="round"/>
+</svg>
