@@ -1,0 +1,54 @@
+@use 'variables' as *;
+
+.page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, $accent-soft, transparent 60%),
+    $bg-0;
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 36px 28px;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  box-shadow: $shadow-2;
+  animation: rise 0.4s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: $r-2;
+  background: $accent;
+  color: $fg-on-accent;
+  margin-bottom: 4px;
+}
+
+.spinner { color: $accent; }
+.spin { animation: bo-spin 0.8s linear infinite; }
+.errIcon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: $danger-soft;
+  color: $danger;
+}
+
+.title { font-family: $font-serif; font-size: 22px; letter-spacing: -0.02em; margin: 4px 0 0; }
+.text { font-size: 14px; color: $fg-2; line-height: 1.5; margin: 0 0 8px; }

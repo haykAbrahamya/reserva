@@ -287,6 +287,7 @@
     "companyType": "Business type",
     "companyTypePlaceholder": "e.g. Beauty & aesthetics",
     "optional": "optional",
+    "accent": "Brand color",
     "accountTitle": "Create your admin account",
     "accountSubtitle": "You'll use this to sign in and manage everything.",
     "adminName": "Full name",
@@ -310,12 +311,16 @@
     "errPhone": "Enter a valid phone number.",
     "errPassword": "Must be at least {n} characters.",
     "errMismatch": "Passwords don't match.",
+    "errGeneric": "Something went wrong. Please try again.",
     "success": {
-      "title": "Welcome to Reserva!",
-      "textPre": "Your free trial for ",
-      "textPost": " is ready. We've set up your account — check your email to finish.",
+      "title": "Check your email",
+      "textPre": "We sent an activation link to ",
+      "textPost": ". Click it to verify your account and sign in to your dashboard.",
+      "step1": "Account details saved",
+      "step2": "Open the email and click \"Activate & sign in\"",
+      "step3": "You'll land in your backoffice, ready to go",
       "cta": "Back to home",
-      "note": "Our team will reach out shortly to help you get set up."
+      "note": "Didn't get it? Check spam, or sign up again. The link expires in 24 hours."
     }
   },
   "notFound": {

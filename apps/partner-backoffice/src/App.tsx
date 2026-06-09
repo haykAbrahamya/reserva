@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout/AppLayout'
 import { RequireAuth } from '@/components/auth/RequireAuth'
 import { Login } from '@/pages/Login/Login'
+import { Activate } from '@/pages/Activate/Activate'
 import { Dashboard } from '@/pages/Dashboard/Dashboard'
 import { Bookings } from '@/pages/Bookings/Bookings'
 import { Services } from '@/pages/Services/Services'
@@ -95,6 +96,8 @@ export default function App() {
         <Routes>
           {/* Public */}
           <Route path="/login" element={<Login />} />
+          {/* Self-serve signup activation (magic link from email) */}
+          <Route path="/activate" element={<Activate />} />
 
           {/* Protected */}
           <Route element={<RequireAuth><AppLayout /></RequireAuth>}>

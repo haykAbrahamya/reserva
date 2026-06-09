@@ -7,12 +7,15 @@ import {
 import { LogoMark } from '@/components/Logo/Logo'
 import { ThemeToggle } from '@/components/ThemeToggle/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher'
+import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
+import { signupService, SignupApiError } from '@/services/signup.service'
 import { useT } from '@/i18n'
 import s from './SignUp.module.scss'
 
 type Step = 'company' | 'account' | 'success'
 
-const MIN_PW = 6
+// Must match the backend rule (signup.dto.ts: password min 8).
+const MIN_PW = 8
 
 export function SignUp() {
   const t = useT()
@@ -27,6 +30,8 @@ export function SignUp() {
   // Company
   const [company, setCompany] = useState('')
   const [companyType, setCompanyType] = useState('')
+  const [accent, setAccent] = useState('#A8784B')
+  const [submitError, setSubmitError] = useState('')
 
   // Admin account
   const [name, setName]       = useState('')
@@ -37,7 +42,7 @@ export function SignUp() {
 
   const [touched, setTouched] = useState(false)
 
-  const companyValid = company.trim().length > 1
+  const companyValid = company.trim().length > 1 && companyType.trim().length > 0
   const emailValid   = /\S+@\S+\.\S+/.test(email.trim())
   const phoneValid   = phone.trim().length >= 6
   const nameValid    = name.trim().length > 1
@@ -54,12 +59,27 @@ export function SignUp() {
 
   const handleSubmit = async () => {
     setTouched(true)
+    setSubmitError('')
     if (!accountValid) return
     setSubmitting(true)
-    // Mock: pretend to create the partner + admin user.
-    await new Promise(r => setTimeout(r, 1100))
-    setSubmitting(false)
-    setStep('success')
+    try {
+      await signupService.start({
+        companyName: company.trim(),
+        companyType: companyType.trim(),
+        accent,
+        adminName: name.trim(),
+        adminEmail: email.trim(),
+        adminPhone: phone.trim(),
+        password,
+      })
+      setStep('success')
+    } catch (err) {
+      setSubmitError(
+        err instanceof SignupApiError ? err.message : t('signup.errGeneric'),
+      )
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const PANEL_FEATURES = [
@@ -118,23 +138,20 @@ export function SignUp() {
 
         {step === 'success' ? (
           <div className={s.success}>
-            <div className={s.successIcon}><CheckCircle2 size={40} /></div>
+            <div className={s.successIcon}><Mail size={38} /></div>
             <h1 className={s.successTitle}>{t('signup.success.title')}</h1>
             <p className={s.successText}>
-              {t('signup.success.textPre')}<strong>{company}</strong>{t('signup.success.textPost')}
+              {t('signup.success.textPre')}<strong>{email}</strong>{t('signup.success.textPost')}
             </p>
             <div className={s.successCard}>
               <div className={s.successRow}>
-                <span className={s.successRowLabel}><Building2 size={14} /> {t('signup.companyName')}</span>
-                <span className={s.successRowValue}>{company}</span>
+                <span className={s.successRowLabel}><CheckCircle2 size={14} /> {t('signup.success.step1')}</span>
               </div>
               <div className={s.successRow}>
-                <span className={s.successRowLabel}><User size={14} /> {t('signup.adminName')}</span>
-                <span className={s.successRowValue}>{name}</span>
+                <span className={s.successRowLabel}><Mail size={14} /> {t('signup.success.step2')}</span>
               </div>
               <div className={s.successRow}>
-                <span className={s.successRowLabel}><Mail size={14} /> {t('signup.email')}</span>
-                <span className={s.successRowValue}>{email}</span>
+                <span className={s.successRowLabel}><ShieldCheck size={14} /> {t('signup.success.step3')}</span>
               </div>
             </div>
             <button className={s.submit} onClick={() => navigate('/')}>
@@ -178,13 +195,20 @@ export function SignUp() {
                   />
                   <Field
                     label={t('signup.companyType')}
-                    optional={t('signup.optional')}
                     icon={<Sparkles size={16} />}
                     value={companyType}
                     onChange={setCompanyType}
                     placeholder={t('signup.companyTypePlaceholder')}
                     onEnter={goAccount}
                   />
+
+                  <div className={s.accentField}>
+                    <AccentPicker
+                      label={t('signup.accent')}
+                      value={accent}
+                      onChange={setAccent}
+                    />
+                  </div>
 
                   <button className={s.submit} onClick={goAccount} disabled={!companyValid}>
                     {t('signup.continue')} <ArrowRight size={17} />
@@ -262,6 +286,13 @@ export function SignUp() {
                     valid={matchValid}
                     onEnter={handleSubmit}
                   />
+
+                  {submitError && (
+                    <div className={s.submitError}>
+                      <AlertCircle size={15} style={{ flexShrink: 0 }} />
+                      {submitError}
+                    </div>
+                  )}
 
                   <button
                     className={[s.submit, submitting ? s.loading : ''].filter(Boolean).join(' ')}

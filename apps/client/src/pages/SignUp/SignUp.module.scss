@@ -227,6 +227,18 @@
 
 /* ── Form ── */
 .form { display: flex; flex-direction: column; gap: 15px; }
+.accentField { margin-top: 2px; }
+.submitError {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: $danger;
+  background: $danger-soft;
+  border: 1px solid color-mix(in srgb, $danger 30%, transparent);
+  border-radius: $r-1;
+  padding: 9px 12px;
+}
 .row {
   display: grid;
   grid-template-columns: 1fr 1fr;

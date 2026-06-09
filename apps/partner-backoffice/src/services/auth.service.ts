@@ -44,6 +44,14 @@ export const authService = {
     return { token: res.accessToken, user: toAuthUser(res.user) }
   },
 
+  /** Activate a self-serve signup via the magic-link token → creates the
+   *  partner+admin on the backend and returns a ready session (auto-login). */
+  async activate(token: string): Promise<LoginResult> {
+    const res = await apiPost<AuthResult>('/public/signup/activate', { token })
+    tokenStore.set(res.accessToken, res.refreshToken)
+    return { token: res.accessToken, user: toAuthUser(res.user) }
+  },
+
   async logout(): Promise<void> {
     // Remove this device's push subscription BEFORE clearing tokens — the
     // unsubscribe endpoint is authenticated, and we don't want booking

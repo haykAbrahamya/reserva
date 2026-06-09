@@ -1,0 +1,43 @@
+@use 'variables' as *;
+
+.wrap { display: flex; flex-direction: column; }
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: $fg-1;
+  margin-bottom: 8px;
+}
+.swatches { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+.swatch,
+.custom {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  transition: transform 0.1s;
+  &:hover { transform: scale(1.08); }
+}
+.active { border-color: $bg-1; box-shadow: 0 0 0 2px $fg-0; }
+.tick { color: #fff; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.35)); }
+
+.custom {
+  background: $bg-2;
+  border: 2px dashed $line-strong;
+  color: $fg-2;
+  &:hover { color: $fg-0; }
+  &.active { border-style: solid; color: #fff; }
+}
+
+.native {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
