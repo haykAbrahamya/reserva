@@ -6,6 +6,9 @@ import * as Sentry from '@sentry/react'
  */
 export function initSentry() {
   const dsn = import.meta.env.VITE_SENTRY_DSN
+  // TEMP debug — confirms at runtime whether the DSN baked in + which mode.
+  // eslint-disable-next-line no-console
+  console.log('[sentry] mode=', import.meta.env.MODE, 'dsn?', !!dsn)
   if (!dsn) return
 
   Sentry.init({
