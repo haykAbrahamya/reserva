@@ -1,9 +1,17 @@
 /* Reserva partner-backoffice service worker — Web Push only.
    Kept intentionally minimal: no asset caching (the app is API-driven and we
-   want always-fresh data), just push display + click-to-open. */
+   want always-fresh data), just push display + click-to-open.
+
+   SW_VERSION: bump this string on every change so the browser detects a
+   byte-difference and installs the new worker (browsers only re-install sw.js
+   when its bytes change). v3 — notification icons. */
+const SW_VERSION = 'v5-2026-06-09'
 
 self.addEventListener('install', () => self.skipWaiting())
-self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()))
+self.addEventListener('activate', (event) => {
+  console.log('[sw] activated', SW_VERSION)
+  event.waitUntil(self.clients.claim())
+})
 
 self.addEventListener('push', (event) => {
   let data = {}
