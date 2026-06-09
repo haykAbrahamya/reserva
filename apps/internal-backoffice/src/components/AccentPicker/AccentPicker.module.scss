@@ -1,0 +1,76 @@
+@use 'variables' as *;
+
+.wrap { display: flex; flex-direction: column; }
+.label { display: block; font-size: 13px; color: $fg-1; margin-bottom: 8px; }
+
+.swatches { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+.swatch,
+.customSwatch {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.12s;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  &:hover { transform: scale(1.08); }
+}
+.active {
+  border-color: $bg-1;
+  box-shadow: 0 0 0 2px $fg-0;
+}
+.tick { color: #fff; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.35)); }
+
+/* Custom-color trigger — dashed when no custom value is active */
+.customSwatch {
+  background: $bg-2;
+  border: 2px dashed $line-strong;
+  color: $fg-2;
+  &:hover { color: $fg-0; }
+  &.active { border-style: solid; color: #fff; }
+}
+
+/* Native color input is visually hidden; we trigger it from .customSwatch */
+.nativeInput {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hexRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.preview {
+  width: 26px;
+  height: 26px;
+  border-radius: $r-1;
+  border: 1px solid $line-2;
+  flex-shrink: 0;
+}
+.hash { color: $fg-3; font-family: $font-mono; font-size: 14px; }
+.hexInput {
+  width: 110px;
+  height: 34px;
+  padding: 0 10px;
+  font-family: $font-mono;
+  font-size: 14px;
+  text-transform: uppercase;
+  color: $fg-0;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-1;
+  outline: none;
+  transition: border-color 0.15s;
+  &:focus { border-color: $accent; }
+  &.invalid { border-color: $danger; }
+}
+.hint { font-size: 12px; color: $danger; }

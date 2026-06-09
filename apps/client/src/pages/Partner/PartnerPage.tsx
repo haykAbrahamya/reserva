@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { getPartnerBySlug } from '@/services/booking.service'
 import { useTenantSlug } from '@/hooks/useTenantSlug'
+import { useAppSelector } from '@/store/hooks'
 import type { PublicPartner } from '@/mock/partners'
 import { partnerBrandVars } from './partnerBrand'
 import { PartnerNotFound } from './components/PartnerNotFound/PartnerNotFound'
@@ -21,6 +22,7 @@ import s from './PartnerPage.module.scss'
 export function PartnerPage() {
   const slug = useTenantSlug()
   const t = useT()
+  const theme = useAppSelector((st) => st.theme.theme)
   const [partner, setPartner] = useState<PublicPartner | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -74,7 +76,7 @@ export function PartnerPage() {
   // the shared SCSS `$accent*` aliases), so overriding them here scopes the
   // partner's palette to this page — the same brand color used for the
   // specialist avatars. See partnerBrand.ts.
-  const brandVars = partnerBrandVars(partner)
+  const brandVars = partnerBrandVars(partner, theme === 'dark')
 
   return (
     <div className={s.page} style={brandVars}>

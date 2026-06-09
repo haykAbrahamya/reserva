@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Copy, Check, Loader2 } from 'lucide-react'
 import { Modal, Button, Input, useToast } from '@/components/ui'
+import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
 import { partnersService, type CreatePartnerResult } from '@/services/partners.service'
 import { ApiError } from '@/services/http'
 import s from './CreatePartnerModal.module.scss'
@@ -11,13 +12,13 @@ interface Props {
   onCreated: () => void
 }
 
-const ACCENTS = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', '#14b8a6']
+const DEFAULT_ACCENT = '#4f46e5'
 
 const slugify = (v: string) =>
   v.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60)
 
 const EMPTY = {
-  name: '', slug: '', type: '', accent: ACCENTS[0],
+  name: '', slug: '', type: '', accent: DEFAULT_ACCENT,
   adminName: '', adminEmail: '', adminPhone: '',
 }
 
@@ -196,21 +197,7 @@ export function CreatePartnerModal({ open, onClose, onCreated }: Props) {
           <Input label="Type" value={form.type} onChange={(e) => set('type', e.target.value)} placeholder="Aesthetic clinic" />
         </div>
 
-        <div className={s.accentField}>
-          <label className={s.fieldLabel}>Accent</label>
-          <div className={s.swatches}>
-            {ACCENTS.map((c) => (
-              <button
-                key={c}
-                type="button"
-                className={[s.swatch, form.accent === c ? s.swatchActive : ''].filter(Boolean).join(' ')}
-                style={{ background: c }}
-                onClick={() => set('accent', c)}
-                aria-label={c}
-              />
-            ))}
-          </div>
-        </div>
+        <AccentPicker value={form.accent} onChange={(c) => set('accent', c)} />
 
         <div className={s.groupLabel}>First admin</div>
         <Input label="Full name" value={form.adminName} onChange={(e) => set('adminName', e.target.value)} placeholder="Jane Doe" />

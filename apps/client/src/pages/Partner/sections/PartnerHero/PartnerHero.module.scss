@@ -14,18 +14,23 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.9;
 }
 .washOrb {
   position: absolute;
-  top: -220px;
+  top: -240px;
   left: 50%;
   transform: translateX(-50%);
-  width: 900px;
-  height: 620px;
-  max-width: 160vw;
+  width: 1100px;
+  height: 720px;
+  max-width: 170vw;
   border-radius: 50%;
-  filter: blur(8px);
+  filter: blur(20px);
+  pointer-events: none;
+}
+/* Subtle full-width tint from the top so the hero never reads as flat white. */
+.washTint {
+  position: absolute;
+  inset: 0;
   pointer-events: none;
 }
 .grid {

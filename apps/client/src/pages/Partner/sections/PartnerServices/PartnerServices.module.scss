@@ -45,7 +45,14 @@
   transition: background 0.15s, border-color 0.15s, color 0.15s;
   -webkit-tap-highlight-color: transparent;
   &:hover { background: $bg-2; }
-  &.active { background: $accent-soft; border-color: $accent; color: $accent-strong; }
+  /* Filled accent with on-accent text — always legible in light AND dark,
+     regardless of the partner's brand color (a soft-tint bg + accent text
+     could collide with the accent in dark mode and vanish). */
+  &.active {
+    background: $accent;
+    border-color: $accent;
+    color: $fg-on-accent;
+  }
 }
 
 /* Service rows */

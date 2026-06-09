@@ -2,12 +2,11 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Save, Mail, Phone, MapPin, Users, CalendarDays } from 'lucide-react'
 import { Avatar, Badge, Button, Input, Textarea, Toggle, Empty, useToast } from '@/components/ui'
+import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
 import { useResource } from '@/store/useResource'
 import { partnersService, type UpdatePartnerInput } from '@/services/partners.service'
 import { ApiError } from '@/services/http'
 import s from './PartnerDetail.module.scss'
-
-const ACCENTS = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', '#14b8a6']
 
 export function PartnerDetailPage() {
   const { id = '' } = useParams()
@@ -121,21 +120,10 @@ export function PartnerDetailPage() {
             <Input label="Name" value={form.name ?? ''} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
             <Input label="Type" value={form.type ?? ''} onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))} />
 
-            <div>
-              <label className={s.fieldLabel}>Accent</label>
-              <div className={s.swatches}>
-                {ACCENTS.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    className={[s.swatch, form.accent === c ? s.swatchActive : ''].filter(Boolean).join(' ')}
-                    style={{ background: c }}
-                    onClick={() => setForm((f) => ({ ...f, accent: c }))}
-                    aria-label={c}
-                  />
-                ))}
-              </div>
-            </div>
+            <AccentPicker
+              value={form.accent ?? ''}
+              onChange={(c) => setForm((f) => ({ ...f, accent: c }))}
+            />
 
             <Input label="Tagline" value={form.presentation?.tagline ?? ''} onChange={(e) => setP('tagline', e.target.value)} placeholder="Short public tagline" />
             <Input label="Hours (summary)" value={form.presentation?.hours ?? ''} onChange={(e) => setP('hours', e.target.value)} placeholder="Mon–Sat · 10:00–19:00" />

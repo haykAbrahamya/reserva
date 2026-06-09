@@ -13,7 +13,11 @@ export function PartnerHero({ partner, onBook }: Props) {
   const { presentation: p } = partner
   const primaryLocation = partner.locations[0]
   const multiLocation = partner.locations.length > 1
-  const [t1, t2] = p.heroTints
+  // Hero tints: use the partner's explicit pair when set, otherwise derive a
+  // tasteful two-stop ramp from the brand accent so every salon (incl. ones
+  // created without tints) gets a branded hero instead of flat white.
+  const t1 = p.heroTints[0] ?? partner.accent
+  const t2 = p.heroTints[1] ?? `color-mix(in srgb, ${partner.accent} 55%, #7c3aed)`
   const t = useT()
 
   // Hide the scroll hint once the user starts scrolling.
@@ -30,12 +34,25 @@ export function PartnerHero({ partner, onBook }: Props) {
 
   return (
     <section className={s.hero}>
-      {/* Branded background wash */}
+      {/* Branded background wash. color-mix keeps this valid whether the tint is
+          a hex value or a derived color-mix() string, and reads well in both
+          light and dark themes. */}
       <div className={s.wash}>
         <div
           className={s.washOrb}
           style={{
-            background: `radial-gradient(ellipse at center, ${t1}22 0%, ${t2}10 45%, transparent 70%)`,
+            background: `radial-gradient(ellipse at center,
+              color-mix(in srgb, ${t1} 38%, transparent) 0%,
+              color-mix(in srgb, ${t2} 20%, transparent) 42%,
+              transparent 72%)`,
+          }}
+        />
+        <div
+          className={s.washTint}
+          style={{
+            background: `linear-gradient(180deg,
+              color-mix(in srgb, ${t1} 10%, transparent) 0%,
+              transparent 60%)`,
           }}
         />
       </div>
