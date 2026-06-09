@@ -9,6 +9,7 @@ import { ThemeToggle } from '@/components/ThemeToggle/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher'
 import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
 import { signupService, SignupApiError } from '@/services/signup.service'
+import { isValidPhone, normalizePhoneInput } from '@reserva/shared'
 import { useT } from '@/i18n'
 import s from './SignUp.module.scss'
 
@@ -30,6 +31,7 @@ export function SignUp() {
   // Company
   const [company, setCompany] = useState('')
   const [companyType, setCompanyType] = useState('')
+  const [slug, setSlug] = useState('')
   const [accent, setAccent] = useState('#A8784B')
   const [submitError, setSubmitError] = useState('')
 
@@ -44,7 +46,7 @@ export function SignUp() {
 
   const companyValid = company.trim().length > 1 && companyType.trim().length > 0
   const emailValid   = /\S+@\S+\.\S+/.test(email.trim())
-  const phoneValid   = phone.trim().length >= 6
+  const phoneValid   = isValidPhone(phone)
   const nameValid    = name.trim().length > 1
   const pwValid      = password.length >= MIN_PW
   const matchValid   = confirm.length > 0 && password === confirm
@@ -67,9 +69,10 @@ export function SignUp() {
         companyName: company.trim(),
         companyType: companyType.trim(),
         accent,
+        slug: slug.trim() || undefined,
         adminName: name.trim(),
         adminEmail: email.trim(),
-        adminPhone: phone.trim(),
+        adminPhone: normalizePhoneInput(phone),
         password,
       })
       setStep('success')
@@ -201,6 +204,16 @@ export function SignUp() {
                     placeholder={t('signup.companyTypePlaceholder')}
                     onEnter={goAccount}
                   />
+                  <Field
+                    label={t('signup.slug')}
+                    optional={t('signup.optional')}
+                    icon={<Sparkles size={16} />}
+                    value={slug}
+                    onChange={(v) => setSlug(v.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                    placeholder={t('signup.slugPlaceholder')}
+                    hint={slug ? `${slug}.reserva.am` : t('signup.slugHint')}
+                    onEnter={goAccount}
+                  />
 
                   <div className={s.accentField}>
                     <AccentPicker
@@ -254,8 +267,8 @@ export function SignUp() {
                       label={t('signup.phone')}
                       icon={<Phone size={16} />}
                       value={phone}
-                      onChange={setPhone}
-                      placeholder="+374 …"
+                      onChange={(v) => setPhone(normalizePhoneInput(v))}
+                      placeholder={t('signup.phonePlaceholder')}
                       error={touched && !phoneValid ? t('signup.errPhone') : undefined}
                     />
                   </div>
@@ -333,12 +346,13 @@ interface FieldProps {
   type?: string
   error?: string
   valid?: boolean
+  hint?: string
   trailing?: React.ReactNode
   onEnter?: () => void
   autoFocus?: boolean
 }
 
-function Field({ label, optional, icon, value, onChange, placeholder, type = 'text', error, valid, trailing, onEnter, autoFocus }: FieldProps) {
+function Field({ label, optional, icon, value, onChange, placeholder, type = 'text', error, valid, hint, trailing, onEnter, autoFocus }: FieldProps) {
   return (
     <div className={s.field}>
       <label className={s.label}>
@@ -359,6 +373,7 @@ function Field({ label, optional, icon, value, onChange, placeholder, type = 'te
         {valid && !trailing && <span className={s.validIcon}><Check size={16} /></span>}
       </div>
       {error && <span className={s.fieldError}><AlertCircle size={12} /> {error}</span>}
+      {!error && hint && <span className={s.fieldHint}>{hint}</span>}
     </div>
   )
 }

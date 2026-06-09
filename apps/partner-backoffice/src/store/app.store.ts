@@ -9,7 +9,9 @@ import type { Partner } from '@/types'
  * Typing the profile without the catalog makes any stale `partner.specialists`
  * access a compile error rather than a silent empty array.
  */
-export type PartnerProfile = Omit<Partner, 'locations' | 'services' | 'specialists'> & {
+export type PartnerProfile = Omit<Partner, 'locations' | 'services' | 'specialists' | 'slug'> & {
+  /** Public handle for slug.reserva.am — null until the partner sets one. */
+  slug: string | null
   /** Number of active branches — provided by the API for lightweight chrome. */
   locationCount?: number
   /** When true, public bookings are auto-confirmed; else they land as pending. */

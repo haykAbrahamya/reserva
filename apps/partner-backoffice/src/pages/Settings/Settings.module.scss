@@ -60,3 +60,21 @@
 }
 .on { color: $success; }
 .off { color: $warn; }
+
+/* Slug editor */
+.slugRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.slugRow > :first-child { flex: 1; min-width: 160px; }
+.slugSuffix {
+  font-family: $font-mono;
+  font-size: 13px;
+  color: $fg-2;
+  align-self: center;
+  white-space: nowrap;
+}
+.slugHint { font-size: 12px; color: $fg-2; margin-top: 8px; }

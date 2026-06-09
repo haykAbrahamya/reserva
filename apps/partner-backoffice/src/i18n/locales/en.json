@@ -75,6 +75,7 @@
       "nameLabel": "Full name",
       "namePlaceholder": "e.g. Nare Avetisyan",
       "phoneLabel": "Phone",
+      "phoneFormat": "Use format +37493813296 (no spaces or symbols).",
       "emailLabel": "Email",
       "locationLabel": "Location",
       "locationPlaceholder": "Select branch…",
@@ -221,6 +222,7 @@
       "name": "Name",
       "category": "Category",
       "duration": "Duration",
+      "repeat": "Repeat",
       "price": "Price",
       "active": "Active"
     },
@@ -236,6 +238,19 @@
       "durationPlaceholder": "30",
       "categoryLabel": "Category",
       "categoryPlaceholder": "e.g. Hair",
+      "repeatLabel": "Repeat every (how often clients should rebook)",
+      "months": "months",
+      "days": "days",
+      "repeatHint": "Repeats every {n} days",
+      "repeatNone": "No repeat set",
+      "repeatPreset": {
+        "15d": "15 days",
+        "25d": "25 days",
+        "1mo": "1 month",
+        "1mo10d": "1 mo 10 d",
+        "2mo": "2 months",
+        "none": "No repeat"
+      },
       "active": "Active"
     }
   },

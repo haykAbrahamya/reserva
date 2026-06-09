@@ -100,6 +100,32 @@
 .formGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .formFull { grid-column: span 2; }
 
+.repeat { font-size: 13px; color: $fg-2; font-family: $font-mono; }
+
+/* Repeat-period field */
+.repeatLabel { display: block; font-size: 13px; color: $fg-1; margin-bottom: 8px; }
+.repeatPresets { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.repeatChip {
+  font-size: 12px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-1;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  &:hover { background: $bg-2; }
+}
+.repeatChipActive { background: $accent-soft; border-color: $accent; color: $accent-strong; }
+.repeatInputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.repeatInputs > :nth-child(1), .repeatInputs > :nth-child(3) { width: 80px; }
+.repeatUnit { font-size: 13px; color: $fg-2; }
+.repeatHint { font-size: 12px; color: $fg-3; margin-top: 8px; }
+
 @media (max-width: 768px) {
   .page { padding: 16px; }
   .h1   { font-size: 26px; }

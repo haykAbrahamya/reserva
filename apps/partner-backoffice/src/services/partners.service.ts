@@ -58,7 +58,9 @@ export interface ListSpecialistsOpts {
   locationId?: string
 }
 
-export type PartnerProfileResponse = Partner & {
+export type PartnerProfileResponse = Omit<Partner, 'slug'> & {
+  /** Null until the partner sets a public handle in Settings. */
+  slug: string | null
   locationCount?: number
   autoConfirmBookings?: boolean
 }
@@ -69,6 +71,7 @@ export interface PartnerSettingsPatch {
   name?: string
   type?: string
   accent?: string
+  slug?: string
 }
 
 export const partnersService = {

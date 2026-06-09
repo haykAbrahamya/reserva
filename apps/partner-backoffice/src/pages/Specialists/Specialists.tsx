@@ -4,6 +4,7 @@ import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Select, Avatar, Empty, Badge, Pagination } from '@/components/ui'
 import { SpecialistDashboard } from '@/components/specialists/SpecialistDashboard/SpecialistDashboard'
+import { normalizePhoneInput } from '@reserva/shared'
 import { partnersService } from '@/services/partners.service'
 import { useScopedLocationId } from '@/store/auth.hooks'
 import { useI18n } from '@/i18n'
@@ -227,7 +228,7 @@ export function Specialists() {
             <Input label={t('specialists.modal.nameLabel')} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder={t('specialists.modal.namePlaceholder')} />
           </div>
           <Input label={t('specialists.modal.titleLabel')} value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder={t('specialists.modal.titlePlaceholder')} />
-          <Input label={t('specialists.modal.phoneLabel')} value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder={t('specialists.modal.phonePlaceholder')} />
+          <Input label={t('specialists.modal.phoneLabel')} value={form.phone} onChange={e => setForm(f => ({ ...f, phone: normalizePhoneInput(e.target.value) }))} placeholder="+37491234567" />
           <div className={s.formFull}>
             <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('specialists.modal.locationLabel')}</label>
             <Select

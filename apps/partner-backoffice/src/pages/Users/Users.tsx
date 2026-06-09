@@ -3,6 +3,7 @@ import { UserPlus, Users as UsersIcon, MapPin, Phone, Mail, Trash2, Copy, Check,
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import { Button, Modal, Input, Select, Empty, Avatar, useToast } from '@/components/ui'
+import { isValidPhone, normalizePhoneInput } from '@reserva/shared'
 import { usersService } from '@/services/users.service'
 import { partnersService } from '@/services/partners.service'
 import type { AuthUser } from '@/store/auth.store'
@@ -46,7 +47,7 @@ export function Users() {
 
   const canSave =
     form.name.trim().length > 1 &&
-    form.phone.trim().length >= 6 &&
+    isValidPhone(form.phone) &&
     /\S+@\S+\.\S+/.test(form.email.trim()) &&
     !!form.locationId
 
@@ -154,8 +155,9 @@ export function Users() {
             <Input
               label={t('users.modal.phoneLabel')}
               value={form.phone}
-              onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-              placeholder="+374 91 …"
+              onChange={e => setForm(f => ({ ...f, phone: normalizePhoneInput(e.target.value) }))}
+              placeholder="+37491234567"
+              error={form.phone.length > 0 && !isValidPhone(form.phone) ? t('users.modal.phoneFormat') : undefined}
             />
             <Input
               label={t('users.modal.emailLabel')}

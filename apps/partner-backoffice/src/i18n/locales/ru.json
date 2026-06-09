@@ -75,6 +75,7 @@
       "nameLabel": "Имя и фамилия",
       "namePlaceholder": "напр. Наре Аветисян",
       "phoneLabel": "Телефон",
+      "phoneFormat": "Используйте формат +37493813296 (без пробелов и символов).",
       "emailLabel": "Эл. почта",
       "locationLabel": "Филиал",
       "locationPlaceholder": "Выберите филиал…",
@@ -221,6 +222,7 @@
       "name": "Название",
       "category": "Категория",
       "duration": "Длительность",
+      "repeat": "Повтор",
       "price": "Цена",
       "active": "Активна"
     },
@@ -236,6 +238,19 @@
       "durationPlaceholder": "30",
       "categoryLabel": "Категория",
       "categoryPlaceholder": "напр. Волосы",
+      "repeatLabel": "Повторять каждые (как часто записываться снова)",
+      "months": "мес.",
+      "days": "дн.",
+      "repeatHint": "Повтор каждые {n} дн.",
+      "repeatNone": "Повтор не задан",
+      "repeatPreset": {
+        "15d": "15 дней",
+        "25d": "25 дней",
+        "1mo": "1 месяц",
+        "1mo10d": "1 мес 10 дн",
+        "2mo": "2 месяца",
+        "none": "Без повтора"
+      },
       "active": "Активна"
     }
   },

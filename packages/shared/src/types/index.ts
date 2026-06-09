@@ -54,6 +54,8 @@ export interface Service {
   duration: number
   active: boolean
   category: string
+  /** Recurrence interval in total days (null = no repeat). Backoffice-only. */
+  repeatEveryDays?: number | null
 }
 
 export interface Booking {

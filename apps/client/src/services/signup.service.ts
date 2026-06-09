@@ -28,6 +28,8 @@ export interface SignupInput {
   companyName: string
   companyType: string
   accent: string
+  /** Optional public handle; omitted → partner created without one. */
+  slug?: string
   adminName: string
   adminEmail: string
   adminPhone: string
