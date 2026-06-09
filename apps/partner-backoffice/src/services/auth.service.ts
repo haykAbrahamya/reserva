@@ -1,5 +1,6 @@
 import type { AuthUser } from '@/store/auth.store'
 import { apiPost, apiGet, tokenStore } from './http'
+import { disablePush } from './push.service'
 
 // ── API response shapes ──
 interface ApiUser {
@@ -44,6 +45,15 @@ export const authService = {
   },
 
   async logout(): Promise<void> {
+    // Remove this device's push subscription BEFORE clearing tokens — the
+    // unsubscribe endpoint is authenticated, and we don't want booking
+    // notifications to keep arriving on a logged-out phone.
+    try {
+      await disablePush()
+    } catch {
+      /* best-effort */
+    }
+
     const refreshToken = tokenStore.refresh
     if (refreshToken) {
       try {

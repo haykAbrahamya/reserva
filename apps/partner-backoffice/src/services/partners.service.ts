@@ -58,12 +58,28 @@ export interface ListSpecialistsOpts {
   locationId?: string
 }
 
-export type PartnerProfileResponse = Partner & { locationCount?: number }
+export type PartnerProfileResponse = Partner & {
+  locationCount?: number
+  autoConfirmBookings?: boolean
+}
+
+/** Admin-editable partner settings (PATCH /partner). */
+export interface PartnerSettingsPatch {
+  autoConfirmBookings?: boolean
+  name?: string
+  type?: string
+  accent?: string
+}
 
 export const partnersService = {
   // ── Partner profile (identity + branding + lightweight counts) ──
   async getOwn(): Promise<PartnerProfileResponse> {
     return apiGet<PartnerProfileResponse>('/partner')
+  },
+
+  /** Update partner profile/settings (admin-only on the backend). */
+  async updateProfile(patch: PartnerSettingsPatch): Promise<PartnerProfileResponse> {
+    return apiPatch<PartnerProfileResponse>('/partner', patch)
   },
 
   // ── Services ──

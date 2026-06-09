@@ -1,0 +1,62 @@
+@use 'variables' as *;
+
+.page { padding: 28px; max-width: 760px; animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both; }
+@media (max-width: 768px) { .page { padding: 20px 16px; } }
+
+.head { margin-bottom: 22px; }
+.h1 { font-family: $font-serif; font-size: 30px; letter-spacing: -0.022em; margin: 0 0 4px; }
+.sub { font-size: 13px; color: $fg-2; margin: 0; }
+
+.card {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  padding: 20px;
+}
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.cardTitle { font-size: 15px; font-weight: 600; margin: 0; }
+.adminOnly {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: $fg-2;
+  background: $bg-2;
+  padding: 3px 9px;
+  border-radius: 99px;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px;
+  background: $bg-2;
+  border-radius: $r-2;
+}
+.rowIcon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: $r-1;
+  background: $accent-soft;
+  color: $accent-strong;
+}
+.rowBody { flex: 1; min-width: 0; }
+.rowTitle { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+.rowDesc { font-size: 13px; color: $fg-2; line-height: 1.5; }
+
+.statusLine {
+  margin-top: 14px;
+  font-size: 13px;
+  color: $fg-2;
+}
+.on { color: $success; }
+.off { color: $warn; }

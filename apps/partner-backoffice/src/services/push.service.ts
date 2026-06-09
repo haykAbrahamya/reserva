@@ -59,7 +59,24 @@ export async function enablePush(): Promise<boolean> {
 
   const permission = await Notification.requestPermission()
   if (permission !== 'granted') return false
+  return subscribeAndSync()
+}
 
+/**
+ * Re-subscribe silently IF the user already granted permission before (e.g.
+ * after re-login on a device they'd previously enabled). No prompt, no user
+ * gesture needed — browsers allow subscribe() without a gesture when permission
+ * is already 'granted'. Returns false (no-op) otherwise. Lets push "just work"
+ * again after login without making the user re-tap Enable.
+ */
+export async function resyncPush(): Promise<boolean> {
+  if (!pushSupported()) return false
+  if (Notification.permission !== 'granted') return false
+  return subscribeAndSync()
+}
+
+/** Core: ensure a subscription exists and register it with the backend. */
+async function subscribeAndSync(): Promise<boolean> {
   const { publicKey } = await apiGet<{ publicKey: string }>('/push/vapid-public-key')
   if (!publicKey) return false
 

@@ -9,7 +9,7 @@ import {
   type NotificationType,
 } from '@/services/notifications.service'
 import {
-  pushSupported, isSubscribed, enablePush, disablePush, notificationPermission, isIosSafari,
+  pushSupported, isSubscribed, enablePush, disablePush, resyncPush, notificationPermission, isIosSafari,
 } from '@/services/push.service'
 import s from './NotificationsBell.module.scss'
 
@@ -35,7 +35,9 @@ const ICONS: Record<NotificationType, typeof Bell> = {
   booking_noshow: XCircle,
 }
 
-const POLL_MS = 60_000
+// Lightweight polling: the unread-count query is a cheap indexed COUNT. We
+// only poll while the tab is visible, and refresh immediately on focus.
+const POLL_MS = 25_000
 
 export function NotificationsBell() {
   const navigate = useNavigate()
@@ -48,20 +50,50 @@ export function NotificationsBell() {
   const [pushOn, setPushOn] = useState(false)
   const [pushBusy, setPushBusy] = useState(false)
 
-  // Poll the unread badge in the background.
-  const refreshCount = useCallback(() => {
-    notificationsService.unreadCount().then(setUnread).catch(() => {})
+  // Keep the live count in a ref so the poller can detect changes and refresh
+  // the open dropdown without re-creating the interval.
+  const unreadRef = useRef(0)
+  const openRef = useRef(false)
+  unreadRef.current = unread
+  openRef.current = open
+
+  const refreshCount = useCallback(async () => {
+    try {
+      const count = await notificationsService.unreadCount()
+      // If new ones arrived while the panel is open, refresh the list too.
+      if (count !== unreadRef.current && openRef.current) loadListRef.current()
+      setUnread(count)
+    } catch {
+      /* ignore transient/auth errors */
+    }
   }, [])
 
+  // loadList is defined below; keep a stable ref so refreshCount can call it.
+  const loadListRef = useRef<() => void>(() => {})
+
+  // Poll only while the tab is visible; refresh instantly when it regains focus.
   useEffect(() => {
-    refreshCount()
-    const id = setInterval(refreshCount, POLL_MS)
-    return () => clearInterval(id)
+    let id: ReturnType<typeof setInterval> | null = null
+    const start = () => {
+      if (id) return
+      refreshCount()
+      id = setInterval(refreshCount, POLL_MS)
+    }
+    const stop = () => { if (id) { clearInterval(id); id = null } }
+    const onVisibility = () => (document.hidden ? stop() : start())
+
+    start()
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => { stop(); document.removeEventListener('visibilitychange', onVisibility) }
   }, [refreshCount])
 
-  // Reflect current push subscription state.
+  // Reflect push state + silently re-subscribe if permission was already granted
+  // (so push "just works" again after re-login without making the user re-tap).
   useEffect(() => {
-    if (pushSupported()) isSubscribed().then(setPushOn).catch(() => {})
+    if (!pushSupported()) return
+    resyncPush()
+      .then((ok) => (ok ? setPushOn(true) : isSubscribed().then(setPushOn)))
+      .catch(() => isSubscribed().then(setPushOn).catch(() => {}))
   }, [])
 
   // Load the list whenever the panel opens.
@@ -73,6 +105,7 @@ export function NotificationsBell() {
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
+  loadListRef.current = loadList
 
   useEffect(() => { if (open) loadList() }, [open, loadList])
 

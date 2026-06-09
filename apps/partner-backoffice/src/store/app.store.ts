@@ -12,6 +12,8 @@ import type { Partner } from '@/types'
 export type PartnerProfile = Omit<Partner, 'locations' | 'services' | 'specialists'> & {
   /** Number of active branches — provided by the API for lightweight chrome. */
   locationCount?: number
+  /** When true, public bookings are auto-confirmed; else they land as pending. */
+  autoConfirmBookings?: boolean
 }
 
 interface AppState {

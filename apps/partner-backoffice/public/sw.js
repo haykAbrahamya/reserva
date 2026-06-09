@@ -16,8 +16,11 @@ self.addEventListener('push', (event) => {
   const title = data.title || 'Reserva'
   const options = {
     body: data.body || '',
-    icon: '/favicon.svg',
-    badge: '/favicon.svg',
+    // Colored icon shown in the notification body.
+    icon: '/notif-icon.png',
+    // Monochrome (white + alpha) glyph for the Android status bar — Android
+    // tints this; a colored/SVG image renders as an empty block, so use the PNG.
+    badge: '/notif-badge.png',
     tag: data.tag, // collapse duplicates for the same booking
     data: { url: data.url || '/' },
     renotify: !!data.tag,
