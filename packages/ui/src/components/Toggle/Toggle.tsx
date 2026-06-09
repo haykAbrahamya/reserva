@@ -15,8 +15,11 @@ export function Toggle({ checked, onChange, disabled }: ToggleProps) {
       disabled={disabled}
       onClick={() => !disabled && onChange(!checked)}
       className={[s.toggle, checked ? s.on : ''].filter(Boolean).join(' ')}
+      // Inline fallbacks so the on/off visual never depends solely on the hashed
+      // CSS-module class resolving (which was failing for this control).
+      style={{ background: checked ? 'var(--accent)' : 'var(--line-2)' }}
     >
-      <span className={s.knob} />
+      <span className={s.knob} style={{ left: checked ? 16 : 2 }} />
     </button>
   )
 }

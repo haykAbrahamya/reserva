@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { CheckCircle2, Lock } from 'lucide-react'
 import { Toggle, useToast } from '@/components/ui'
 import { usePartner, useAppStore } from '@/store/app.store'
@@ -14,30 +14,31 @@ export function Settings() {
   const toast = useToast()
 
   const [saving, setSaving] = useState(false)
-  const autoConfirm = partner?.autoConfirmBookings ?? false
+  // Drive the toggle from LOCAL state so the visual flips instantly and never
+  // depends on a global-store re-render round-trip (the previous source of the
+  // "toast fired but toggle didn't move" bug). Seed + resync from the profile.
+  const [autoConfirm, setAutoConfirm] = useState(partner?.autoConfirmBookings ?? false)
+  useEffect(() => {
+    setAutoConfirm(partner?.autoConfirmBookings ?? false)
+  }, [partner?.autoConfirmBookings])
 
   if (!partner) return null
 
   const toggleAutoConfirm = async (next: boolean) => {
     if (!isAdmin || saving) return
     setSaving(true)
+    setAutoConfirm(next) // instant visual
 
-    // Always read the LATEST partner from the store (not the stale render
-    // closure) when merging, so the optimistic update and the post-save merge
-    // never overwrite the profile with an outdated snapshot. The stale-closure
-    // bug here was what made the toggle "stick" until a refresh.
-    const patch = (value: boolean) => {
-      const current = useAppStore.getState().partner
-      if (current) setPartner({ ...current, autoConfirmBookings: value })
-    }
-
-    patch(next) // optimistic
     try {
       const updated = await partnersService.updateProfile({ autoConfirmBookings: next })
-      patch(updated.autoConfirmBookings ?? next) // reconcile with server truth
+      const saved = updated.autoConfirmBookings ?? next
+      setAutoConfirm(saved)
+      // Keep the global profile in sync (merge onto the freshest snapshot).
+      const current = useAppStore.getState().partner
+      if (current) setPartner({ ...current, autoConfirmBookings: saved })
       toast(next ? 'Bookings will be auto-confirmed' : 'Bookings now require manual confirmation')
     } catch (err) {
-      patch(!next) // revert
+      setAutoConfirm(!next) // revert visual
       toast(err instanceof ApiError ? err.message : 'Could not save setting')
     } finally {
       setSaving(false)
