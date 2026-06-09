@@ -1,9 +1,8 @@
 import { useLocation } from 'react-router-dom'
-import { Bell } from 'lucide-react'
-import { Button } from '@/components/ui'
 import { UserMenu } from '../UserMenu/UserMenu'
 import { ThemeToggle } from '../ThemeToggle/ThemeToggle'
 import { LanguageSwitcher } from '../LanguageSwitcher/LanguageSwitcher'
+import { NotificationsBell } from '../NotificationsBell/NotificationsBell'
 import { usePartner } from '@/store/app.store'
 import { initials } from '@/components/ui'
 import { useT } from '@/i18n'
@@ -39,15 +38,8 @@ export function Topbar() {
       {/* Theme toggle */}
       <ThemeToggle />
 
-      {/* Bell notification */}
-      <Button variant="default" size="sm" icon style={{ position: 'relative', flexShrink: 0 }}>
-        <Bell size={14} />
-        <span style={{
-          position: 'absolute', top: 6, right: 6,
-          width: 6, height: 6, borderRadius: '50%',
-          background: 'var(--accent)', border: '1.5px solid var(--bg-0)',
-        }} />
-      </Button>
+      {/* Notifications */}
+      <NotificationsBell />
 
       <div className={s.divider} />
 

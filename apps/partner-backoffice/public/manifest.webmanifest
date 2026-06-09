@@ -1,0 +1,17 @@
+{
+  "name": "Reserva Backoffice",
+  "short_name": "Reserva",
+  "description": "Manage your salon — bookings, schedule, team.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAFAF7",
+  "theme_color": "#FAFAF7",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

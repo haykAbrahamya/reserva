@@ -1,0 +1,189 @@
+@use 'variables' as *;
+
+.wrap { position: relative; flex-shrink: 0; }
+
+.bellBtn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid $line-2;
+  border-radius: $r-1;
+  background: $bg-1;
+  color: $fg-1;
+  cursor: pointer;
+  box-shadow: $shadow-1;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  &:hover { background: $bg-2; border-color: $line-strong; color: $fg-0; }
+  &.open { background: $bg-2; border-color: $line-strong; color: $fg-0; }
+}
+
+.badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 99px;
+  background: $danger;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 17px;
+  text-align: center;
+  border: 1.5px solid $bg-0;
+}
+
+.panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 360px;
+  max-width: calc(100vw - 24px);
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  box-shadow: $shadow-3;
+  overflow: hidden;
+  z-index: 60;
+  animation: pop 0.16s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid $line-1;
+}
+.title { font-size: 14px; font-weight: 600; }
+.markAll {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: $accent;
+  background: none;
+  border: none;
+  cursor: pointer;
+  &:hover { color: $accent-strong; }
+}
+
+/* Push enable row */
+.pushRow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 10px 14px;
+  background: $bg-2;
+  border: none;
+  border-bottom: 1px solid $line-1;
+  color: $fg-1;
+  cursor: pointer;
+  text-align: left;
+  &:hover:not(:disabled) { background: $bg-3; }
+  &:disabled { cursor: default; opacity: 0.8; }
+}
+.pushText { flex: 1; font-size: 13px; }
+.pushPill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: $bg-3;
+  color: $fg-2;
+}
+.pushPillOn { background: $success-soft; color: $success; }
+.iosHint {
+  padding: 8px 14px;
+  font-size: 11px;
+  color: $fg-2;
+  background: $bg-2;
+  border-bottom: 1px solid $line-1;
+  line-height: 1.4;
+}
+
+.list { max-height: 60vh; overflow-y: auto; }
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 36px 16px;
+  color: $fg-3;
+  font-size: 13px;
+}
+
+.item {
+  position: relative;
+  display: flex;
+  gap: 11px;
+  width: 100%;
+  padding: 12px 14px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid $line-1;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+  &:hover { background: $bg-2; }
+  &:last-child { border-bottom: none; }
+}
+.unread { background: $accent-soft; &:hover { background: color-mix(in srgb, var(--accent) 16%, transparent); } }
+
+.itemIcon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: $r-1;
+  background: $bg-3;
+  color: $fg-1;
+}
+.unread .itemIcon { background: $accent; color: #fff; }
+
+.itemBody { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.itemTitle { font-size: 13px; font-weight: 600; color: $fg-0; }
+.itemText {
+  font-size: 12px;
+  color: $fg-2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.itemTime { font-size: 11px; color: $fg-3; margin-top: 1px; }
+
+.dot {
+  position: absolute;
+  top: 14px;
+  right: 12px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: $accent;
+}
+
+.del {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  align-self: center;
+  border-radius: $r-1;
+  color: $fg-3;
+  opacity: 0;
+  transition: opacity 0.12s, background 0.12s, color 0.12s;
+  flex-shrink: 0;
+}
+.item:hover .del { opacity: 1; }
+.del:hover { background: $danger-soft; color: $danger; }
+
+@media (max-width: 768px) {
+  .del { opacity: 1; } /* no hover on touch — always show */
+  .panel { width: 340px; }
+}
