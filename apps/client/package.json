@@ -13,6 +13,7 @@
     "@reduxjs/toolkit": "^2.5.0",
     "@reserva/shared": "workspace:*",
     "@reserva/ui": "workspace:*",
+    "@sentry/react": "10.56.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.511.0",
     "react": "^19.1.0",

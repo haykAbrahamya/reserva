@@ -1,0 +1,34 @@
+@use 'variables' as *;
+
+.wrap {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: $bg-0;
+}
+.card {
+  max-width: 380px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.emoji { font-size: 44px; }
+.title { font-family: $font-serif; font-size: 26px; letter-spacing: -0.02em; margin: 0; }
+.text { font-size: 14px; color: $fg-2; line-height: 1.5; margin: 0 0 8px; }
+.btn {
+  height: 44px;
+  padding: 0 24px;
+  border: none;
+  border-radius: $r-2;
+  background: $accent;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  &:hover { background: $accent-strong; }
+}
