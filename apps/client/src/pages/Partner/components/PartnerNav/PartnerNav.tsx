@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import { CalendarCheck } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher'
 import { LogoMark } from '@/components/Logo/Logo'
+import { marketingSiteUrl } from '@/hooks/useTenantSlug'
 import { useT } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
 import s from './PartnerNav.module.scss'
@@ -36,11 +36,12 @@ export function PartnerNav({ partner, onBook }: Props) {
           <span className={s.salonName}>{partner.name}</span>
         </div>
 
-        {/* Reserva back-link — fades out as the salon name fades in */}
-        <Link to="/" className={[s.back, scrolled ? s.hide : ''].filter(Boolean).join(' ')}>
+        {/* Reserva back-link → the marketing site (apex), not the tenant page.
+            Plain <a> with an absolute URL so it leaves the subdomain. */}
+        <a href={marketingSiteUrl()} className={[s.back, scrolled ? s.hide : ''].filter(Boolean).join(' ')}>
           <span className={s.backMark}><LogoMark size={24} /></span>
           <span className={s.poweredText}>{t('partner.poweredBy')}</span>
-        </Link>
+        </a>
 
         <div className={s.spacer} />
 

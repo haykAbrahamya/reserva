@@ -42,6 +42,8 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   const [phone, setPhone]               = useState('')
   const [notes, setNotes]               = useState('')
   const [submitting, setSubmitting]     = useState(false)
+  // Status of the just-created booking — drives confirmed vs pending success copy.
+  const [bookedStatus, setBookedStatus] = useState<'confirmed' | 'pending'>('confirmed')
 
   // slots
   const [slots, setSlots]           = useState<string[]>([])
@@ -152,7 +154,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   const handleConfirm = async () => {
     if (!service) return
     setSubmitting(true)
-    await createBooking({
+    const booking = await createBooking({
       partner,
       service,
       specialistId: specialistId === ANY_SPECIALIST ? null : specialistId,
@@ -163,6 +165,9 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
       clientPhone: phone.trim(),
       notes: notes.trim() || undefined,
     })
+    // Reflect the real outcome: auto-confirm partners → 'confirmed', otherwise
+    // the booking lands as 'pending' awaiting staff confirmation.
+    setBookedStatus(booking.status === 'confirmed' ? 'confirmed' : 'pending')
     setSubmitting(false)
     setStep('success')
   }
@@ -222,10 +227,18 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
         {/* ── BODY ── */}
         {step === 'success' ? (
           <div className={s.success}>
-            <div className={s.successIcon}><CheckCircle2 size={38} /></div>
-            <h2 className={s.successTitle}>{t('booking.successTitle')}</h2>
+            <div className={[s.successIcon, bookedStatus === 'pending' ? s.successIconPending : ''].filter(Boolean).join(' ')}>
+              {bookedStatus === 'pending' ? <Clock size={38} /> : <CheckCircle2 size={38} />}
+            </div>
+            <h2 className={s.successTitle}>
+              {bookedStatus === 'pending' ? t('booking.pendingTitle') : t('booking.successTitle')}
+            </h2>
             <p className={s.successText}>
-              {t('booking.successTextPre')}<strong>{partner.name}</strong>{t('booking.successTextPost')}
+              {bookedStatus === 'pending' ? (
+                <>{t('booking.pendingTextPre')}<strong>{partner.name}</strong>{t('booking.pendingTextPost')}</>
+              ) : (
+                <>{t('booking.successTextPre')}<strong>{partner.name}</strong>{t('booking.successTextPost')}</>
+              )}
             </p>
             <div className={s.successCard}>
               <SummaryRows

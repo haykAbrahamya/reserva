@@ -15,11 +15,145 @@
   justify-content: center;
 }
 
+/* ── Tier cards ── */
+.tierGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin: 0 0 26px;
+
+  @media (max-width: 760px) { grid-template-columns: repeat(2, 1fr); }
+}
+.tierCell { display: flex; }
+.tierCard {
+  position: relative;
+  width: 100%;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  padding: 20px 18px;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.tierActive {
+  border-color: $accent;
+  box-shadow: 0 0 0 4px $accent-soft, $shadow-2;
+  transform: translateY(-2px);
+}
+.tierBadge {
+  position: absolute;
+  top: -10px;
+  left: 18px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #fff;
+  background: $accent;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.tierRange {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: $fg-1;
+  margin-bottom: 12px;
+}
+.tierRangeIcon { color: $fg-3; }
+.tierPrice { display: flex; flex-direction: column; gap: 2px; }
+.tierAmount {
+  font-family: $font-serif;
+  font-size: clamp(22px, 3.5vw, 28px);
+  letter-spacing: -0.02em;
+  color: $fg-0;
+  line-height: 1;
+}
+.tierPer { font-size: 12px; color: $fg-2; }
+
+/* ── Calculator ── */
+.calcLabel {
+  font-family: $font-serif;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  color: $fg-0;
+}
+.calcDesc { font-size: 14px; color: $fg-2; margin: 8px 0 22px; line-height: 1.5; }
+
+.counter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.counterBtn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: $r-2;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-0;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s, border-color 0.12s;
+  &:hover { background: $bg-2; border-color: $line-strong; }
+}
+.counterValue {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 44px;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  background: $bg-2;
+}
+.counterInput {
+  /* width is set inline to the digit count (ch) so the number+unit pair stays
+     centered as a group; box-sizing keeps the ch width exact. */
+  box-sizing: content-box;
+  min-width: 1ch;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-family: $font-mono;
+  font-size: 22px;
+  font-weight: 600;
+  color: $fg-0;
+  outline: none;
+  padding: 0;
+  -moz-appearance: textfield;
+  &::-webkit-outer-spin-button, &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+}
+.counterUnit { font-size: 13px; color: $fg-2; }
+
+.totalBlock { margin-bottom: 24px; }
+.totalRow { display: flex; align-items: flex-end; gap: 8px; }
+.totalValue {
+  font-family: $font-serif;
+  font-size: clamp(40px, 7vw, 54px);
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  color: $fg-0;
+}
+.totalPeriod { font-size: 15px; color: $fg-2; margin-bottom: 8px; }
+.totalBreak {
+  font-size: 13px;
+  color: $accent;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
 /* ── Special-offer card ── */
 .card {
   position: relative;
   width: 100%;
-  max-width: 860px;
+  /* Full width so the calculator card lines up with the tier grid above. */
+  max-width: none;
   background: $bg-1;
   border: 1.5px solid $accent;
   border-radius: $r-3;

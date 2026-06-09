@@ -363,6 +363,11 @@
   margin-bottom: 18px;
   animation: bf-pop 0.4s cubic-bezier(0.22, 0.86, 0.23, 1) both;
 }
+/* Pending (awaiting confirmation) uses a warm/amber tint instead of green. */
+.successIconPending {
+  background: $warn-soft;
+  color: $warn;
+}
 .successTitle {
   font-family: $font-serif;
   font-size: 28px;

@@ -1,8 +1,8 @@
-import { Link } from 'react-router-dom'
 import { CalendarCheck } from 'lucide-react'
 import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { LogoMark } from '@/components/Logo/Logo'
+import { marketingSiteUrl } from '@/hooks/useTenantSlug'
 import { useT } from '@/i18n'
 import s from './PartnerFooter.module.scss'
 
@@ -43,10 +43,10 @@ export function PartnerFooter({ partner, onBook }: Props) {
             <span className={s.salonName}>{partner.name}</span>
             {loc && <> · {loc.address} · {loc.phone}</>}
           </div>
-          <Link to="/" className={s.powered}>
+          <a href={marketingSiteUrl()} className={s.powered}>
             <span className={s.poweredMark}><LogoMark size={22} /></span>
             {t('partner.footer.poweredBy')}
-          </Link>
+          </a>
         </div>
       </footer>
     </>
