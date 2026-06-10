@@ -1,80 +1,153 @@
 @use 'variables' as *;
 
-.page { padding: 28px; max-width: 760px; animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both; }
+.page {
+  padding: 28px;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+}
 @media (max-width: 768px) { .page { padding: 20px 16px; } }
 
-.head { margin-bottom: 22px; }
+.head { margin-bottom: 4px; }
 .h1 { font-family: $font-serif; font-size: 30px; letter-spacing: -0.022em; margin: 0 0 4px; }
 .sub { font-size: 13px; color: $fg-2; margin: 0; }
 
+/* ── Loading skeletons ── */
+.skeleton {
+  height: 150px;
+  border-radius: $r-2;
+  border: 1px solid $line-1;
+  background: linear-gradient(100deg, $bg-1 30%, $bg-2 50%, $bg-1 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.3s ease-in-out infinite;
+}
+
+/* ── Card ── */
 .card {
   background: $bg-1;
   border: 1px solid $line-1;
   border-radius: $r-2;
-  padding: 20px;
-}
-.cardHead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-.cardTitle { font-size: 15px; font-weight: 600; margin: 0; }
-.adminOnly {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  color: $fg-2;
-  background: $bg-2;
-  padding: 3px 9px;
-  border-radius: 99px;
+  padding: 22px;
 }
 
-.row {
+.cardHead {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
-  padding: 16px;
-  background: $bg-2;
-  border-radius: $r-2;
+  gap: 13px;
+  margin-bottom: 18px;
 }
-.rowIcon {
+.cardIcon {
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   flex-shrink: 0;
   border-radius: $r-1;
   background: $accent-soft;
   color: $accent-strong;
 }
-.rowBody { flex: 1; min-width: 0; }
-.rowTitle { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
-.rowDesc { font-size: 13px; color: $fg-2; line-height: 1.5; }
+.cardHeadText { flex: 1; min-width: 0; }
+.cardTitle { font-size: 15px; font-weight: 600; margin: 0 0 3px; }
+.cardDesc { font-size: 13px; color: $fg-2; line-height: 1.5; margin: 0; }
 
+.adminOnly {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: $fg-2;
+  background: $bg-2;
+  padding: 4px 9px;
+  border-radius: 99px;
+}
+
+.cardBody { display: flex; flex-direction: column; }
+
+/* ── Status line shared across cards ── */
 .statusLine {
   margin-top: 14px;
   font-size: 13px;
   color: $fg-2;
+  line-height: 1.5;
 }
-.on { color: $success; }
-.off { color: $warn; }
+.on { color: $success; font-weight: 600; }
+.off { color: $warn; font-weight: 600; }
 
-/* Slug editor */
+.liveLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: $accent;
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+}
+
+/* ── Slug editor ── */
 .slugRow {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 10px;
   flex-wrap: wrap;
 }
-.slugRow > :first-child { flex: 1; min-width: 160px; }
+.slugInputWrap {
+  position: relative;
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.slugInputWrap > :first-child { flex: 1; }
 .slugSuffix {
   font-family: $font-mono;
   font-size: 13px;
   color: $fg-2;
-  align-self: center;
   white-space: nowrap;
+  /* align with the input field's text baseline (input has no label here) */
+  padding-top: 11px;
 }
-.slugHint { font-size: 12px; color: $fg-2; margin-top: 8px; }
+
+/* ── Social links editor ── */
+.socialField {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.socialField > :last-child { flex: 1; }
+.socialIcon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: $r-1;
+  background: $bg-2;
+  color: $fg-2;
+}
+
+.actionsRow { display: flex; justify-content: flex-end; margin-top: 2px; }
+
+/* ── Bookings toggle ── */
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  background: $bg-2;
+  border-radius: $r-1;
+}
+.toggleText { flex: 1; min-width: 0; }
+.toggleTitle { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+.toggleDesc { font-size: 13px; color: $fg-2; line-height: 1.5; }
+
+:global {
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+}

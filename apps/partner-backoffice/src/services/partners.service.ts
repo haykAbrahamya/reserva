@@ -58,11 +58,17 @@ export interface ListSpecialistsOpts {
   locationId?: string
 }
 
+export interface PartnerPresentationFields {
+  instagram?: string
+  facebook?: string
+}
+
 export type PartnerProfileResponse = Omit<Partner, 'slug'> & {
   /** Null until the partner sets a public handle in Settings. */
   slug: string | null
   locationCount?: number
   autoConfirmBookings?: boolean
+  presentation?: PartnerPresentationFields | null
 }
 
 /** Admin-editable partner settings (PATCH /partner). */
@@ -72,6 +78,7 @@ export interface PartnerSettingsPatch {
   type?: string
   accent?: string
   slug?: string
+  presentation?: PartnerPresentationFields
 }
 
 export const partnersService = {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { CalendarCheck, MapPin, Clock, Phone, ChevronDown } from 'lucide-react'
+import { CalendarCheck, MapPin, Clock, Phone, ChevronDown, Instagram, Facebook } from 'lucide-react'
 import { useT } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
 import s from './PartnerHero.module.scss'
@@ -105,6 +105,20 @@ export function PartnerHero({ partner, onBook }: Props) {
             <a className={s.callBtn} href={`tel:${primaryLocation.phone.replace(/\s/g, '')}`}>
               <Phone size={17} /> {t('partner.hero.call')}
             </a>
+          )}
+          {(p.instagram || p.facebook) && (
+            <div className={s.socials}>
+              {p.instagram && (
+                <a className={s.social} href={p.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                  <Instagram size={18} />
+                </a>
+              )}
+              {p.facebook && (
+                <a className={s.social} href={p.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                  <Facebook size={18} />
+                </a>
+              )}
+            </div>
           )}
         </div>
       </div>

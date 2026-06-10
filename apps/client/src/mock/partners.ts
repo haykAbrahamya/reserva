@@ -14,6 +14,9 @@ export interface PartnerPresentation {
   hours: string
   /** Soft brand tints for the hero gradient. */
   heroTints: [string, string]
+  /** Public social links (full URLs). Empty = not shown. */
+  instagram?: string
+  facebook?: string
 }
 
 export type PublicPartner = Partner & { presentation: PartnerPresentation }

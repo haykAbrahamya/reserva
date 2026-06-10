@@ -16,6 +16,11 @@ export type PartnerProfile = Omit<Partner, 'locations' | 'services' | 'specialis
   locationCount?: number
   /** When true, public bookings are auto-confirmed; else they land as pending. */
   autoConfirmBookings?: boolean
+  /** Public marketing fields (we only edit social links here for now). */
+  presentation?: {
+    instagram?: string
+    facebook?: string
+  } | null
 }
 
 interface AppState {

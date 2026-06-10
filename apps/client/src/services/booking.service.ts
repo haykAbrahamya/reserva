@@ -44,6 +44,8 @@ interface ApiPartner {
     tagline: string
     about: string
     hours: string
+    instagram?: string
+    facebook?: string
     rating: number | string
     reviews: number
     heroTints: string[]
@@ -58,6 +60,8 @@ function toPublicPartner(p: ApiPartner): PublicPartner {
     rating: Number(p.presentation?.rating ?? 0),
     reviews: p.presentation?.reviews ?? 0,
     hours: p.presentation?.hours ?? '',
+    instagram: p.presentation?.instagram || undefined,
+    facebook: p.presentation?.facebook || undefined,
     heroTints: (p.presentation?.heroTints?.length
       ? (p.presentation.heroTints.slice(0, 2) as [string, string])
       : [p.accent, p.accent]) as [string, string],

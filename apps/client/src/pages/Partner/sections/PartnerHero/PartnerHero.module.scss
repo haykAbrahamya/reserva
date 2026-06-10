@@ -207,6 +207,27 @@
   &:active { transform: translateY(0); }
 }
 
+/* Social icon links — square buttons aligned with the action row. */
+.socials { display: inline-flex; gap: 10px; align-items: center; }
+.social {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: $r-2;
+  background: $bg-1;
+  color: $fg-1;
+  border: 1px solid $line-2;
+  box-shadow: $shadow-1;
+  transition: color 0.15s, border-color 0.15s, background 0.15s, transform 0.1s;
+  &:hover {
+    color: $accent;
+    border-color: $accent;
+    background: $accent-soft;
+    transform: translateY(-1px);
+  }
+}
+
 /* ── Animated scroll hint ── */
 .scrollHint {
   position: absolute;
