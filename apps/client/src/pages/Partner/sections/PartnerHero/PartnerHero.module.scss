@@ -27,6 +27,20 @@
   filter: blur(20px);
   pointer-events: none;
 }
+/* Secondary offset orb — adds asymmetric depth so the hero isn't a flat wash. */
+.washOrb2 {
+  position: absolute;
+  top: -140px;
+  right: -120px;
+  width: 640px;
+  height: 560px;
+  max-width: 90vw;
+  border-radius: 50%;
+  filter: blur(30px);
+  pointer-events: none;
+
+  @media (max-width: 760px) { right: -180px; width: 460px; height: 420px; }
+}
 /* Subtle full-width tint from the top so the hero never reads as flat white. */
 .washTint {
   position: absolute;
@@ -86,8 +100,9 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: $accent;
+  color: $accent-strong;
   background: $accent-soft;
+  border: 1px solid color-mix(in srgb, $accent 24%, transparent);
   padding: 5px 11px;
   border-radius: 999px;
 }
@@ -228,12 +243,14 @@
   }
 }
 
-/* ── Animated scroll hint ── */
+/* ── Animated scroll hint ──
+   Anchored to the bottom-RIGHT (not center): the action buttons are left-aligned
+   and grow wider in ru/hy, so a centered hint collided with them. Pinning it to
+   the right edge keeps it clear of the buttons in every language. */
 .scrollHint {
   position: absolute;
-  left: 50%;
+  right: 32px;
   bottom: 24px;
-  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -249,7 +266,7 @@
 
   &.hidden {
     opacity: 0;
-    transform: translateX(-50%) translateY(10px);
+    transform: translateY(10px);
     pointer-events: none;
   }
 
@@ -263,6 +280,12 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: $fg-3;
+  /* Keep the label centered under the mouse icon and wrapping tightly, so a
+     longer translation (ru/hy) never sprawls sideways into the action buttons. */
+  max-width: 120px;
+  text-align: center;
+  line-height: 1.35;
+  white-space: normal;
 }
 
 /* Mouse outline with a falling wheel dot */

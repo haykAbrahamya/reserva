@@ -1,5 +1,39 @@
 /* Client-app global guards. Imported after the shared design tokens. */
 
+/* ── Light-mode surface refinement (client booking pages only) ───────────────
+   The shared tokens ship a near-white page (#FAFAF7) over pure-white cards, so
+   the public page reads as flat and glary in light mode — page and cards are
+   almost the same value, the hero grid is barely there. Here we warm the page
+   to a soft paper tone and keep cards pure white, restoring real elevation:
+   cards now lift off the page, lines/shadows read without harshness.
+
+   Scoped to light mode via :not([data-theme="dark"]) so DARK MODE IS UNTOUCHED,
+   and this file is only imported by the client app — the backoffices keep the
+   stock tokens. Loaded after @reserva/ui/styles, so these win by cascade. */
+:root:not([data-theme="dark"]) {
+  /* Surfaces — warm paper page, white cards float above it. The page is now a
+     clearly-warm sand tone (not near-white) so the booking page reads as a
+     designed surface, and pure-white cards lift off it with real elevation. */
+  --bg-0: #EFEBE1;   /* page — warm paper, distinctly off-white */
+  --bg-1: #FFFFFF;   /* cards / panels — float above the page */
+  --bg-2: #E7E2D6;   /* muted slabs / hover */
+  --bg-3: #DCD6C8;   /* stronger hover / chips */
+  --bg-4: #FBF6EA;   /* warm highlight tint */
+
+  /* Lines — lifted so borders & the hero grid actually read on paper */
+  --line-1: rgba(31, 24, 14, 0.11);
+  --line-2: rgba(31, 24, 14, 0.18);
+  --line-strong: rgba(31, 24, 14, 0.30);
+
+  /* Shadows — warm + deeper so cards read as floating on paper */
+  --shadow-1: 0 1px 0 rgba(60, 48, 32, .05), 0 1px 2px rgba(60, 48, 32, .06);
+  --shadow-2: 0 8px 26px rgba(55, 44, 28, .10), 0 1px 0 rgba(55, 44, 28, .05);
+  --shadow-3: 0 30px 70px rgba(40, 32, 22, .18), 0 10px 22px rgba(40, 32, 22, .09);
+
+  /* Decorative hero grid — stronger so the texture is clearly legible */
+  --grid-line: rgba(31, 24, 14, 0.07);
+}
+
 /* Contain horizontal overflow WITHOUT creating a scroll container.
    `overflow-x: clip` (unlike `hidden`) doesn't break position:fixed
    navs or backdrop-filter blur on the landing header. */

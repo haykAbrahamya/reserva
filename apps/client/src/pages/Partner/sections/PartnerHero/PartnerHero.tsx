@@ -47,12 +47,23 @@ export function PartnerHero({ partner, onBook }: Props) {
               transparent 72%)`,
           }}
         />
+        {/* Second, tighter orb offset to the right adds depth + a sense of light
+            coming from one side, so the hero never reads as a flat panel. */}
+        <div
+          className={s.washOrb2}
+          style={{
+            background: `radial-gradient(ellipse at center,
+              color-mix(in srgb, ${t2} 30%, transparent) 0%,
+              transparent 65%)`,
+          }}
+        />
         <div
           className={s.washTint}
           style={{
             background: `linear-gradient(180deg,
-              color-mix(in srgb, ${t1} 10%, transparent) 0%,
-              transparent 60%)`,
+              color-mix(in srgb, ${t1} 18%, transparent) 0%,
+              color-mix(in srgb, ${t1} 5%, transparent) 38%,
+              transparent 64%)`,
           }}
         />
       </div>

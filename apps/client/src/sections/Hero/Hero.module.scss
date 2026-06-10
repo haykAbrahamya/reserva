@@ -83,13 +83,13 @@
   text-wrap: balance;     /* even, elegant line wrapping */
   animation: hero-rise 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
 
-  em { font-style: italic; color: $accent; }
+  /* Emphasis is upright in the brand accent (not italic): Fraunces italic has
+     weak Armenian glyphs and reads awkwardly, so we color the phrase instead. */
+  em { font-style: normal; color: $accent; }
 
-  /* Keep the italic phrase on one line on wider screens; allow wrap on mobile */
-  .nowrap { white-space: nowrap; }
-  @media (max-width: 760px) {
-    .nowrap { white-space: normal; }
-  }
+  /* Let the emphasized phrase wrap naturally — forcing it onto one line pushed
+     the longer Armenian/Russian copy off the right edge. */
+  .nowrap { white-space: normal; }
 }
 
 .subtitle {
