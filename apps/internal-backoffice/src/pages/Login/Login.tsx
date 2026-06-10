@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ShieldCheck } from 'lucide-react'
+import { ReservaMark } from '@/components/ReservaMark'
 import { Button, Input } from '@/components/ui'
 import { authService } from '@/services/auth.service'
 import { useAuthStore } from '@/store/auth.store'
@@ -35,7 +35,7 @@ export function Login() {
     <div className={s.page}>
       <form className={s.card} onSubmit={submit}>
         <div className={s.brand}>
-          <span className={s.logo}><ShieldCheck size={20} /></span>
+          <span className={s.logo}><ReservaMark size={24} /></span>
           <div>
             <div className={s.title}>Reserva</div>
             <div className={s.subtitle}>Internal Console</div>

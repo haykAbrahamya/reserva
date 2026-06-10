@@ -147,6 +147,35 @@
 .toggleTitle { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
 .toggleDesc { font-size: 13px; color: $fg-2; line-height: 1.5; }
 
+/* ── Install app (PWA) ── */
+.installRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.installHint { font-size: 13px; color: $fg-2; }
+
+.iosSteps {
+  background: $bg-2;
+  border-radius: $r-1;
+  padding: 14px 16px;
+}
+.iosLead { font-size: 13px; font-weight: 600; color: $fg-1; margin: 0 0 8px; }
+.iosList {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: $fg-2;
+  line-height: 1.5;
+  li { padding-left: 2px; }
+  strong { color: $fg-1; }
+}
+.iosIcon { vertical-align: -2px; color: $accent; }
+
 :global {
   @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
   @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }

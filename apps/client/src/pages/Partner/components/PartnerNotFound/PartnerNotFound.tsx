@@ -24,7 +24,7 @@ export function PartnerNotFound() {
       {/* Top bar */}
       <header className={s.top}>
         <Link to="/" className={s.brand}>
-          <span className={s.brandMark}><LogoMark size={26} /></span>
+          <span className={s.brandMark}><LogoMark size={38} /></span>
           <span className={s.brandName}>Reserva</span>
         </Link>
         <div className={s.topActions}>

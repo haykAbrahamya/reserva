@@ -1,20 +1,36 @@
 import s from './Logo.module.scss'
 
-/** Reserva logo mark — person silhouette inside an accent square. */
+/**
+ * Reserva logo mark — the "Petal R": an R whose bowl is a soft petal.
+ * Theme-aware: filled (accent tile, white R) in light mode, outline (accent
+ * stroke on transparent) in dark mode — toggled purely via CSS on
+ * <html data-theme>, so a single component covers both everywhere.
+ *
+ * Colors come from the `--accent` CSS var, so the mark still re-skins per tenant.
+ */
 export function LogoMark({ size = 32 }: { size?: number }) {
   return (
     <span className={s.mark} style={{ width: size, height: size }}>
-      <svg width={size * 0.56} height={size * 0.56} viewBox="0 0 24 24" fill="none">
-        <path
-          d="M12 3C10.3431 3 9 4.34315 9 6C9 7.65685 10.3431 9 12 9C13.6569 9 15 7.65685 15 6C15 4.34315 13.6569 3 12 3Z"
-          fill="#fff"
-        />
-        <path
-          d="M6 21C6 17.6863 8.68629 15 12 15C15.3137 15 18 17.6863 18 21"
-          stroke="#fff"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
+      <svg
+        className={s.markSvg}
+        width={size}
+        height={size}
+        viewBox="0 0 48 48"
+        fill="none"
+        aria-hidden="true"
+      >
+        {/* Filled tile (light mode) */}
+        <rect className={s.tileFill} x="2" y="2" width="44" height="44" rx="14" />
+        {/* Outline tile (dark mode) */}
+        <rect className={s.tileOutline} x="3" y="3" width="42" height="42" rx="14" strokeWidth="2.4" />
+
+        {/* Petal-R strokes — `.rStroke` is recolored per theme (white on the
+            filled tile, accent on the outline tile). */}
+        <g className={s.rStroke} strokeWidth="3.2" strokeLinecap="round" fill="none">
+          <path d="M17 36V12" />
+          <path d="M17 12c10 0 16 4 16 11s-7 8-16 8" />
+          <path d="M24 31l10 5" />
+        </g>
       </svg>
     </span>
   )

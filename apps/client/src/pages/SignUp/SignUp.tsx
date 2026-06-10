@@ -99,7 +99,7 @@ export function SignUp() {
         <div className={s.panelOrb} />
 
         <Link to="/" className={s.panelLogo}>
-          <span className={s.panelLogoMark}><LogoMark size={22} /></span>
+          <span className={s.panelLogoMark}><LogoMark size={38} /></span>
           <div>
             <div className={s.panelLogoName}>Reserva</div>
             <div className={s.panelLogoTag}>{t('signup.panelTag')}</div>
@@ -135,7 +135,7 @@ export function SignUp() {
 
         {/* Mobile logo */}
         <Link to="/" className={s.mobileLogo}>
-          <span className={s.mobileLogoMark}><LogoMark size={26} /></span>
+          <span className={s.mobileLogoMark}><LogoMark size={44} /></span>
           <span className={s.mobileLogoName}>Reserva</span>
         </Link>
 

@@ -57,10 +57,7 @@
 }
 .panelLogoMark {
   width: 38px; height: 38px;
-  border-radius: 10px;
-  background: $accent;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: $shadow-2;
   flex-shrink: 0;
 }
 .panelLogoName { font-family: $font-serif; font-size: 22px; letter-spacing: -0.015em; color: $fg-0; line-height: 1; }
@@ -134,10 +131,7 @@
 }
 .mobileLogoMark {
   width: 44px; height: 44px;
-  border-radius: 12px;
-  background: $accent;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: $shadow-2;
 }
 .mobileLogoName { font-family: $font-serif; font-size: 24px; letter-spacing: -0.02em; color: $fg-0; }
 

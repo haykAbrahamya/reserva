@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
-import { CheckCircle2, Lock, Globe, ExternalLink } from 'lucide-react'
+import { CheckCircle2, Lock, Globe, ExternalLink, Download, Share, CheckCircle } from 'lucide-react'
 import { Toggle, Button, Input, useToast } from '@/components/ui'
 import { useAppStore } from '@/store/app.store'
 import { useIsAdmin } from '@/store/auth.hooks'
 import { partnersService, type PartnerProfileResponse } from '@/services/partners.service'
 import { useResource } from '@/store/useResource'
+import { useInstallPrompt } from '@/hooks/useInstallPrompt'
 import { ApiError } from '@/services/http'
 import s from './Settings.module.scss'
 
@@ -15,6 +16,12 @@ export function Settings() {
   const setPartner = useAppStore((st) => st.setPartner)
   const isAdmin = useIsAdmin()
   const toast = useToast()
+  const { platform, promptInstall } = useInstallPrompt()
+
+  const handleInstall = async () => {
+    const outcome = await promptInstall()
+    if (outcome === 'accepted') toast('App installed')
+  }
 
   // Fetch the profile fresh on mount — never depends on whether the global
   // DataLoader has run yet, so fields are always populated on direct open.
@@ -173,6 +180,49 @@ export function Settings() {
           </div>
         </div>
       </section>
+
+      {/* ── Install app (PWA) ── */}
+      {platform !== 'unsupported' && (
+        <section className={s.card}>
+          <div className={s.cardHead}>
+            <span className={s.cardIcon}><Download size={18} /></span>
+            <div className={s.cardHeadText}>
+              <h2 className={s.cardTitle}>Install app</h2>
+              <p className={s.cardDesc}>
+                Add Reserva to your device for a full-screen app — faster access, no browser bar.
+              </p>
+            </div>
+          </div>
+
+          <div className={s.cardBody}>
+            {platform === 'installed' && (
+              <div className={s.statusLine}>
+                <CheckCircle size={14} className={s.on} /> <strong className={s.on}>Installed</strong> — you’re running the app.
+              </div>
+            )}
+
+            {platform === 'installable' && (
+              <div className={s.installRow}>
+                <Button variant="accent" onClick={handleInstall}>
+                  <Download size={15} /> Install Reserva
+                </Button>
+                <span className={s.installHint}>It’ll appear on your home screen / app list.</span>
+              </div>
+            )}
+
+            {platform === 'ios' && (
+              <div className={s.iosSteps}>
+                <p className={s.iosLead}>On iPhone/iPad, install from Safari:</p>
+                <ol className={s.iosList}>
+                  <li>Tap the <Share size={13} className={s.iosIcon} /> <strong>Share</strong> button in Safari’s toolbar.</li>
+                  <li>Scroll and choose <strong>Add to Home Screen</strong>.</li>
+                  <li>Tap <strong>Add</strong> — Reserva appears as an app icon.</li>
+                </ol>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
     </div>
   )
 }

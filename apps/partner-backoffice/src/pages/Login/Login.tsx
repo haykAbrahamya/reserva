@@ -13,14 +13,17 @@ const FEATURES = [
   { icon: TrendingUp,    key: 'revenue' },
 ]
 
-// Logo mark SVG — reusable
+// Reserva "Petal R" mark — strokes only, painted in a single color so it reads
+// on both the colored login panel (light=white) and light surfaces (accent).
 function LogoMark({ size = 20, light = false }: { size?: number; light?: boolean }) {
   const c = light ? 'white' : 'var(--accent)'
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <path d="M12 3C10.3431 3 9 4.34315 9 6C9 7.65685 10.3431 9 12 9C13.6569 9 15 7.65685 15 6C15 4.34315 13.6569 3 12 3Z" fill={c} />
-      <path d="M6 21C6 17.6863 8.68629 15 12 15C15.3137 15 18 17.6863 18 21" stroke={c} strokeWidth="2" strokeLinecap="round" />
-      <circle cx="12" cy="6" r="3" stroke={light ? 'white' : 'var(--accent)'} strokeWidth="0" fill={c} opacity="0" />
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
+      <g stroke={c} strokeWidth="3.2" strokeLinecap="round" fill="none">
+        <path d="M17 36V12" />
+        <path d="M17 12c10 0 16 4 16 11s-7 8-16 8" />
+        <path d="M24 31l10 5" />
+      </g>
     </svg>
   )
 }

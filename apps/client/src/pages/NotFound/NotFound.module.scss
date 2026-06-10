@@ -55,10 +55,7 @@
 .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
 .brandMark {
   width: 38px; height: 38px;
-  border-radius: 10px;
-  background: $accent;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: $shadow-2;
 }
 .brandName { font-family: $font-serif; font-size: 21px; letter-spacing: -0.015em; color: $fg-0; }
 .topActions { display: flex; align-items: center; gap: 8px; }

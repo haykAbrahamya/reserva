@@ -4,6 +4,7 @@ import {
   LayoutDashboard, Building2, Users, ShieldCheck, LogOut, Menu, X, KeyRound,
 } from 'lucide-react'
 import { Avatar } from '@/components/ui'
+import { ReservaMark } from '@/components/ReservaMark'
 import { useAuthStore, useIsOwner } from '@/store/auth.store'
 import { authService } from '@/services/auth.service'
 import { ChangePasswordModal } from '@/components/account/ChangePasswordModal'
@@ -51,7 +52,7 @@ export function AppLayout() {
   const sidebar = (
     <>
       <div className={s.brand}>
-        <span className={s.logo}><ShieldCheck size={18} /></span>
+        <span className={s.logo}><ReservaMark size={22} /></span>
         <div>
           <div className={s.brandName}>Reserva</div>
           <div className={s.brandSub}>Internal</div>
