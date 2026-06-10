@@ -6,6 +6,7 @@ import type { Service, Specialist } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
 import {
   specialistsForService,
+  bookableLocations,
   getAvailableSlots,
   createBooking,
 } from '@/services/booking.service'
@@ -28,11 +29,13 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   const t = useT()
   const [closing, setClosing] = useState(false)
 
-  const multiLocation = partner.locations.length > 1
+  // Only branches that can actually be booked (active + ≥1 active specialist).
+  const locations = useMemo(() => bookableLocations(partner), [partner])
+  const multiLocation = locations.length > 1
 
   // selections
   const [locationId, setLocationId]     = useState<string | null>(
-    multiLocation ? null : partner.locations[0]?.id ?? null
+    multiLocation ? null : locations[0]?.id ?? null
   )
   const [serviceId, setServiceId]       = useState<string | null>(seedServiceId)
   const [specialistId, setSpecialistId] = useState<string | null>(null) // null = not chosen, ANY_SPECIALIST = any
@@ -66,8 +69,8 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   )
 
   const chosenLocation = useMemo(
-    () => partner.locations.find(l => l.id === locationId) ?? null,
-    [partner, locationId]
+    () => locations.find(l => l.id === locationId) ?? null,
+    [locations, locationId]
   )
 
   const animatedClose = useCallback(() => {
@@ -262,7 +265,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
               {/* STEP: location (multi-branch only) */}
               {step === 'location' && (
                 <div>
-                  {partner.locations.map(loc => (
+                  {locations.map(loc => (
                     <button
                       key={loc.id}
                       className={[s.option, locationId === loc.id ? s.selected : ''].filter(Boolean).join(' ')}

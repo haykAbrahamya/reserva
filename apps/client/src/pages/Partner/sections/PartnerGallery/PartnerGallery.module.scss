@@ -60,6 +60,26 @@
   }
 }
 
+/* Uploaded photo — covers the tile, gently zooms on hover. */
+.image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s cubic-bezier(0.22, 0.86, 0.23, 1);
+}
+.tile:hover .image { transform: scale(1.05); }
+
+/* Brand-tinted wash over photos (color set inline). Normal blend so the hue is
+   dependably visible (blend modes can vanish on mid-tone photos). The gradient
+   keeps it to the corners so the photo stays clear through the middle. */
+.tint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
 .icon {
   position: absolute;
   top: 14px;

@@ -3,6 +3,7 @@ import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { LogoMark } from '@/components/Logo/Logo'
 import { marketingSiteUrl } from '@/hooks/useTenantSlug'
+import { bookableLocations } from '@/services/booking.service'
 import { useT } from '@/i18n'
 import s from './PartnerFooter.module.scss'
 
@@ -13,7 +14,7 @@ interface Props {
 
 export function PartnerFooter({ partner, onBook }: Props) {
   const [t1, t2] = partner.presentation.heroTints
-  const loc = partner.locations[0]
+  const loc = bookableLocations(partner)[0] ?? partner.locations[0]
   const t = useT()
 
   return (

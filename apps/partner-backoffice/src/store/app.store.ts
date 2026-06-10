@@ -16,10 +16,13 @@ export type PartnerProfile = Omit<Partner, 'locations' | 'services' | 'specialis
   locationCount?: number
   /** When true, public bookings are auto-confirmed; else they land as pending. */
   autoConfirmBookings?: boolean
-  /** Public marketing fields (we only edit social links here for now). */
+  /** Public marketing fields edited in the Storefront section. */
   presentation?: {
+    about?: string
     instagram?: string
     facebook?: string
+    heroTints?: string[]
+    gallery?: { url?: string; label?: string; tone?: string }[]
   } | null
 }
 

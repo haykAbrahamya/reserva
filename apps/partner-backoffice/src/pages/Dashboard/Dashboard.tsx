@@ -139,7 +139,7 @@ export function Dashboard() {
 
       <div className={s.twoCol}>
         {/* Today's schedule */}
-        <Card style={{ animation: 'rise 0.35s cubic-bezier(.2,.7,.1,1) both' }}>
+        <Card className={s.scheduleCard} style={{ animation: 'rise 0.35s cubic-bezier(.2,.7,.1,1) both' }}>
           <CardHeader>
             <CardTitle sub={
               todayBks.length === 0
@@ -152,7 +152,7 @@ export function Dashboard() {
               {t('dashboard.viewCalendar')}
             </Button>
           </CardHeader>
-          <div style={{ padding: 6 }}>
+          <div className={s.scheduleBody}>
             {todayBks.length === 0
               ? (
                 <div className={s.emptyDay}>

@@ -175,6 +175,7 @@
       "factLocation": "Հասցե",
       "factBranchesValue": "{count}-ը Երևանում",
       "factHours": "Ժամեր",
+      "factCategory": "Կատեգորիա",
       "factServices": "Ծառայություններ",
       "factServicesValue": "{count} հասանելի",
       "factSpecialists": "Մասնագետներ",
@@ -182,11 +183,13 @@
     },
     "locations": {
       "eyebrow": "Մասնաճյուղեր",
-      "title": "Ընտրելու {count} մասնաճյուղ",
+      "title": "{count} մասնաճյուղ",
+      "title_plural": "Ընտրելու {count} մասնաճյուղ",
       "specialistsHere": "Այստեղ՝ {count} մասնագետ",
       "specialistsHere_plural": "Այստեղ՝ {count} մասնագետ",
       "bookHere": "Ամրագրել այստեղ",
-      "call": "Զանգահարել"
+      "call": "Զանգահարել",
+      "closed": "Փակ է"
     },
     "team": {
       "eyebrow": "Թիմը",

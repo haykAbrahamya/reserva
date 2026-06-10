@@ -114,7 +114,23 @@
 
 .spacer { flex: 1; }
 
-.actions { display: flex; align-items: center; gap: 10px; }
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  @media (max-width: 600px) { gap: 6px; }
+}
+
+/* Salon name truncates instead of pushing into the actions on narrow screens. */
+@media (max-width: 600px) {
+  .salon { max-width: 46%; }
+  .salonName {
+    font-size: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
 
 /* Compact book button in nav — always available */
 .bookBtn {
@@ -137,4 +153,14 @@
 
   &:hover { background: $accent-strong; }
   &:active { transform: translateY(1px); }
+
+  /* On phones, collapse to an icon-only button so the header never overflows. */
+  @media (max-width: 600px) {
+    padding: 0;
+    width: 38px;
+    justify-content: center;
+    gap: 0;
+  }
 }
+
+.bookLabel { @media (max-width: 600px) { display: none; } }

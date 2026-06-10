@@ -1,6 +1,7 @@
-import { MapPin, Clock, Sparkles, Users } from 'lucide-react'
+import { MapPin, Sparkles, Users, Tag } from 'lucide-react'
 import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
+import { bookableLocations } from '@/services/booking.service'
 import { useT } from '@/i18n'
 import s from './PartnerAbout.module.scss'
 
@@ -10,8 +11,10 @@ interface Props {
 
 export function PartnerAbout({ partner }: Props) {
   const { presentation: p } = partner
-  const loc = partner.locations[0]
-  const multiLocation = partner.locations.length > 1
+  // Count only functional branches (active + ≥1 active specialist).
+  const locations = bookableLocations(partner)
+  const loc = locations[0]
+  const multiLocation = locations.length > 1
   const activeStaff = partner.specialists.filter(sp => sp.active).length
   const serviceCount = partner.services.filter(sv => sv.active).length
   const t = useT()
@@ -20,9 +23,11 @@ export function PartnerAbout({ partner }: Props) {
     {
       icon: MapPin,
       label: multiLocation ? t('partner.about.factBranches') : t('partner.about.factLocation'),
-      value: multiLocation ? t('partner.about.factBranchesValue', { count: partner.locations.length }) : (loc ? loc.name : '—'),
+      value: multiLocation ? t('partner.about.factBranchesValue', { count: locations.length }) : (loc ? loc.name : '—'),
     },
-    { icon: Clock, label: t('partner.about.factHours'), value: p.hours },
+    // Category — always meaningful (replaces the old free-text hours summary,
+    // which was ambiguous across branches and has been removed).
+    { icon: Tag, label: t('partner.about.factCategory'), value: partner.type },
     { icon: Sparkles, label: t('partner.about.factServices'), value: t('partner.about.factServicesValue', { count: serviceCount }) },
     { icon: Users, label: t('partner.about.factSpecialists'), value: t('partner.about.factSpecialistsValue', { count: activeStaff }) },
   ]

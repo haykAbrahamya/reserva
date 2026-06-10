@@ -8,6 +8,23 @@ import type { PublicPartner, PartnerPresentation } from '@/mock/partners'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1'
 
+// Uploaded gallery images may be stored as same-origin paths ("/uploads/..")
+// when the backend's UPLOADS_PUBLIC_URL is unset. Those are relative to the API
+// ORIGIN (not under /api/v1), so resolve them against the API origin. Absolute
+// URLs (http..) are returned unchanged.
+const API_ORIGIN = (() => {
+  try {
+    return new URL(API_URL).origin
+  } catch {
+    return ''
+  }
+})()
+function resolveImageUrl(url?: string): string | undefined {
+  if (!url) return undefined
+  if (/^https?:\/\//i.test(url)) return url
+  return `${API_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`
+}
+
 class BookingApiError extends Error {
   constructor(readonly code: string, message: string) {
     super(message)
@@ -49,7 +66,7 @@ interface ApiPartner {
     rating: number | string
     reviews: number
     heroTints: string[]
-    gallery: { label: string; tone: string }[]
+    gallery: { url?: string; label?: string; tone?: string }[]
   } | null
 }
 
@@ -65,7 +82,10 @@ function toPublicPartner(p: ApiPartner): PublicPartner {
     heroTints: (p.presentation?.heroTints?.length
       ? (p.presentation.heroTints.slice(0, 2) as [string, string])
       : [p.accent, p.accent]) as [string, string],
-    gallery: p.presentation?.gallery ?? [],
+    gallery: (p.presentation?.gallery ?? []).map((g) => ({
+      ...g,
+      url: resolveImageUrl(g.url),
+    })),
   }
   return {
     id: p.id,
@@ -103,6 +123,18 @@ export function specialistsForService(
       sp.active &&
       sp.services.includes(serviceId) &&
       (!locationId || sp.locationId === locationId),
+  )
+}
+
+/**
+ * Branches that are actually bookable: a location is functional only when it has
+ * at least one ACTIVE specialist (otherwise nothing can be booked there). Used
+ * everywhere the public page lists or COUNTS locations, so the hero count, the
+ * About facts, the Locations section and the booking flow all agree.
+ */
+export function bookableLocations(partner: PublicPartner): PublicPartner['locations'] {
+  return partner.locations.filter((loc) =>
+    partner.specialists.some((sp) => sp.active && sp.locationId === loc.id),
   )
 }
 

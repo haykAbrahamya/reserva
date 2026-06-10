@@ -175,6 +175,7 @@
       "factLocation": "Location",
       "factBranchesValue": "{count} in Yerevan",
       "factHours": "Hours",
+      "factCategory": "Category",
       "factServices": "Services",
       "factServicesValue": "{count} available",
       "factSpecialists": "Specialists",
@@ -182,11 +183,13 @@
     },
     "locations": {
       "eyebrow": "Locations",
-      "title": "{count} branches to choose from",
+      "title": "{count} location",
+      "title_plural": "{count} branches to choose from",
       "specialistsHere": "{count} specialist here",
       "specialistsHere_plural": "{count} specialists here",
       "bookHere": "Book here",
-      "call": "Call"
+      "call": "Call",
+      "closed": "Closed"
     },
     "team": {
       "eyebrow": "The team",
@@ -197,8 +200,7 @@
       "viewProfileAria": "View {name}'s profile"
     },
     "gallery": {
-      "title": "Inside {name}",
-      "hint": "Photos coming soon"
+      "title": "Inside {name}"
     },
     "footer": {
       "title": "Ready when you are",

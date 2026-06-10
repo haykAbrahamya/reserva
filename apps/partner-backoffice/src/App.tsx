@@ -14,6 +14,7 @@ import { Users } from '@/pages/Users/Users'
 import { CalendarPage } from '@/pages/Calendar/CalendarPage'
 import { Clients } from '@/pages/Clients/Clients'
 import { Settings as SettingsPage } from '@/pages/Settings/Settings'
+import { Storefront } from '@/pages/Storefront/Storefront'
 import { RequireAdmin } from '@/components/auth/RequireAdmin'
 import { ToastProvider } from '@/components/ui'
 import { NewBookingModal } from '@/components/bookings/NewBookingModal/NewBookingModal'
@@ -111,6 +112,7 @@ export default function App() {
             {/* Admin-only: branches + team management */}
             <Route path="locations"   element={<RequireAdmin><Locations /></RequireAdmin>} />
             <Route path="users"       element={<RequireAdmin><Users /></RequireAdmin>} />
+            <Route path="storefront"  element={<RequireAdmin><Storefront /></RequireAdmin>} />
             <Route path="settings"    element={<SettingsPage />} />
           </Route>
 

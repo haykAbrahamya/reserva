@@ -9,7 +9,7 @@ import type {
   Paginated,
   PageParams,
 } from '@/types'
-import { apiGet, apiPost, apiPatch, apiDelete } from './http'
+import http, { apiGet, apiPost, apiPatch, apiDelete } from './http'
 
 // ─────────────────────────────────────────────────────────────
 // API client for the partner-scoped backoffice resources. Each resource is
@@ -58,9 +58,21 @@ export interface ListSpecialistsOpts {
   locationId?: string
 }
 
+/** A storefront gallery tile. New tiles carry an uploaded image `url`. */
+export interface GalleryItem {
+  url?: string
+  label?: string
+  tone?: string
+}
+
 export interface PartnerPresentationFields {
+  about?: string
+  tagline?: string
   instagram?: string
   facebook?: string
+  /** Hero gradient tints [from, to]. */
+  heroTints?: string[]
+  gallery?: GalleryItem[]
 }
 
 export type PartnerProfileResponse = Omit<Partner, 'slug'> & {
@@ -81,6 +93,18 @@ export interface PartnerSettingsPatch {
   presentation?: PartnerPresentationFields
 }
 
+// Gallery URLs may come back as same-origin paths ("/uploads/..") relative to
+// the API ORIGIN (not /api/v1). Resolve those for <img> display in the UI.
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1'
+const API_ORIGIN = (() => {
+  try { return new URL(API_URL).origin } catch { return '' }
+})()
+export function galleryImageUrl(url?: string): string {
+  if (!url) return ''
+  if (/^https?:\/\//i.test(url)) return url
+  return `${API_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`
+}
+
 export const partnersService = {
   // ── Partner profile (identity + branding + lightweight counts) ──
   async getOwn(): Promise<PartnerProfileResponse> {
@@ -90,6 +114,27 @@ export const partnersService = {
   /** Update partner profile/settings (admin-only on the backend). */
   async updateProfile(patch: PartnerSettingsPatch): Promise<PartnerProfileResponse> {
     return apiPatch<PartnerProfileResponse>('/partner', patch)
+  },
+
+  // ── Storefront gallery (admin) ──
+  /** Upload one image; returns the updated gallery list. */
+  async uploadGalleryImage(file: File, label = ''): Promise<GalleryItem[]> {
+    const form = new FormData()
+    form.append('file', file)
+    if (label) form.append('label', label)
+    const res = await http.post('/partner/gallery', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    return (res.data?.data ?? res.data) as GalleryItem[]
+  },
+  /** Remove an image by its url; returns the updated gallery list. */
+  async removeGalleryImage(url: string): Promise<GalleryItem[]> {
+    const res = await http.delete('/partner/gallery', { data: { url } })
+    return (res.data?.data ?? res.data) as GalleryItem[]
+  },
+  /** Persist a new tile order; returns the updated gallery list. */
+  async reorderGallery(urls: string[]): Promise<GalleryItem[]> {
+    return apiPatch<GalleryItem[]>('/partner/gallery/order', { urls })
   },
 
   // ── Services ──

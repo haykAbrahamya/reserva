@@ -28,7 +28,6 @@ export function PartnerDetailPage() {
         presentation: {
           tagline: partner.presentation?.tagline ?? '',
           about: partner.presentation?.about ?? '',
-          hours: partner.presentation?.hours ?? '',
         },
       })
     }
@@ -126,7 +125,6 @@ export function PartnerDetailPage() {
             />
 
             <Input label="Tagline" value={form.presentation?.tagline ?? ''} onChange={(e) => setP('tagline', e.target.value)} placeholder="Short public tagline" />
-            <Input label="Hours (summary)" value={form.presentation?.hours ?? ''} onChange={(e) => setP('hours', e.target.value)} placeholder="Mon–Sat · 10:00–19:00" />
             <Textarea label="About" rows={4} value={form.presentation?.about ?? ''} onChange={(e) => setP('about', e.target.value)} placeholder="Public description shown on the booking page" />
           </div>
           <div className={s.cardFoot}>

@@ -9,8 +9,9 @@ export interface PartnerPresentation {
   about: string
   rating: number
   reviews: number
-  /** Decorative gallery tiles — accent + label until real photos exist. */
-  gallery: { label: string; tone: string }[]
+  /** Gallery tiles. New tiles carry an uploaded image `url`; legacy/seed tiles
+   *  carry only a color `tone` + label (rendered as a colored placeholder). */
+  gallery: { url?: string; label?: string; tone?: string }[]
   hours: string
   /** Soft brand tints for the hero gradient. */
   heroTints: [string, string]

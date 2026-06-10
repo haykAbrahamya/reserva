@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Calendar, List, Users, Sparkles, User,
-  Clock, MapPin, Settings, ChevronLeft, ChevronRight, ShieldCheck, UserCog,
+  Clock, MapPin, Settings, ChevronLeft, ChevronRight, ShieldCheck, UserCog, Store,
 } from 'lucide-react'
 import { useAppStore, usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
@@ -33,8 +33,9 @@ const NAV: { section: string; items: NavItem[] }[] = [
     { to: '/locations',   labelKey: 'nav.locations',   icon: MapPin, adminOnly: true },
   ]},
   { section: 'account', items: [
-    { to: '/users',    labelKey: 'nav.users',    icon: UserCog,  adminOnly: true },
-    { to: '/settings', labelKey: 'nav.settings', icon: Settings },
+    { to: '/storefront', labelKey: 'nav.storefront', icon: Store,    adminOnly: true },
+    { to: '/users',      labelKey: 'nav.users',      icon: UserCog,  adminOnly: true },
+    { to: '/settings',   labelKey: 'nav.settings',   icon: Settings },
   ]},
 ]
 

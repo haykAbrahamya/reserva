@@ -175,6 +175,7 @@
       "factLocation": "Адрес",
       "factBranchesValue": "{count} в Ереване",
       "factHours": "Часы",
+      "factCategory": "Категория",
       "factServices": "Услуги",
       "factServicesValue": "{count} доступно",
       "factSpecialists": "Специалисты",
@@ -182,11 +183,13 @@
     },
     "locations": {
       "eyebrow": "Филиалы",
-      "title": "{count} филиала на выбор",
+      "title": "{count} филиал",
+      "title_plural": "{count} филиала на выбор",
       "specialistsHere": "{count} специалист здесь",
       "specialistsHere_plural": "{count} специалистов здесь",
       "bookHere": "Записаться сюда",
-      "call": "Позвонить"
+      "call": "Позвонить",
+      "closed": "Закрыто"
     },
     "team": {
       "eyebrow": "Команда",

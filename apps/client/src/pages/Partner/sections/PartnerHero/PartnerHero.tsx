@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { CalendarCheck, MapPin, Clock, Phone, ChevronDown, Instagram, Facebook } from 'lucide-react'
+import { CalendarCheck, MapPin, Phone, ChevronDown, Instagram, Facebook } from 'lucide-react'
 import { useT } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
+import { bookableLocations } from '@/services/booking.service'
 import s from './PartnerHero.module.scss'
 
 interface Props {
@@ -11,8 +12,11 @@ interface Props {
 
 export function PartnerHero({ partner, onBook }: Props) {
   const { presentation: p } = partner
-  const primaryLocation = partner.locations[0]
-  const multiLocation = partner.locations.length > 1
+  // Count only functional branches (active + ≥1 active specialist) so the hero
+  // matches the Locations section and the booking flow.
+  const locations = bookableLocations(partner)
+  const primaryLocation = locations[0]
+  const multiLocation = locations.length > 1
   // Hero tints: use the partner's explicit pair when set, otherwise derive a
   // tasteful two-stop ramp from the brand accent so every salon (incl. ones
   // created without tints) gets a branded hero instead of flat white.
@@ -94,7 +98,7 @@ export function PartnerHero({ partner, onBook }: Props) {
           {multiLocation ? (
             <button className={s.metaLink} onClick={() => document.getElementById('locations')?.scrollIntoView({ behavior: 'smooth' })}>
               <MapPin size={16} />
-              {t('partner.hero.locationsInYerevan', { count: partner.locations.length })}
+              {t('partner.hero.locationsInYerevan', { count: locations.length })}
             </button>
           ) : primaryLocation && (
             <span className={s.meta}>
@@ -102,10 +106,8 @@ export function PartnerHero({ partner, onBook }: Props) {
               {primaryLocation.address}
             </span>
           )}
-          <span className={s.meta}>
-            <Clock size={16} />
-            {p.hours}
-          </span>
+          {/* Per-branch hours live in the Locations section (branches may differ),
+              so the hero no longer shows a single ambiguous hours summary. */}
         </div>
 
         <div className={s.actions}>

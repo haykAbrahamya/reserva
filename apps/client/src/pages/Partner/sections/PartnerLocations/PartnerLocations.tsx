@@ -1,7 +1,9 @@
-import { MapPin, Phone, CalendarCheck } from 'lucide-react'
+import { MapPin, Phone, CalendarCheck, Clock, Users } from 'lucide-react'
 import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { useI18n } from '@/i18n'
+import { bookableLocations } from '@/services/booking.service'
+import { summarizeHours } from './summarizeHours'
 import s from './PartnerLocations.module.scss'
 
 interface Props {
@@ -11,8 +13,13 @@ interface Props {
 
 export function PartnerLocations({ partner, onBook }: Props) {
   const { t, tp } = useI18n()
-  // Only meaningful for multi-branch salons.
-  if (partner.locations.length < 2) return null
+
+  // Only functional branches (active + ≥1 active specialist). Shared helper so
+  // every place that lists/counts locations agrees.
+  const bookable = bookableLocations(partner)
+
+  // Render the section whenever there's at least one bookable branch.
+  if (bookable.length === 0) return null
 
   const [t1, t2] = partner.presentation.heroTints
 
@@ -21,12 +28,13 @@ export function PartnerLocations({ partner, onBook }: Props) {
       <div className={s.inner}>
         <div className={s.head}>
           <div className={s.eyebrow}>{t('partner.locations.eyebrow')}</div>
-          <h2 className={s.title}>{t('partner.locations.title', { count: partner.locations.length })}</h2>
+          <h2 className={s.title}>{tp('partner.locations.title', bookable.length, { count: bookable.length })}</h2>
         </div>
 
         <div className={s.grid}>
-          {partner.locations.map((loc, i) => {
+          {bookable.map((loc, i) => {
             const staffHere = partner.specialists.filter(sp => sp.active && sp.locationId === loc.id).length
+            const hours = summarizeHours(loc.hours, t('partner.locations.closed'))
             return (
               <Reveal key={loc.id} className={s.card} delay={(i % 2) * 60}>
                 <div
@@ -48,12 +56,16 @@ export function PartnerLocations({ partner, onBook }: Props) {
                     <Phone size={15} />
                     <span>{loc.phone}</span>
                   </div>
-                  {staffHere > 0 && (
+                  {hours && (
                     <div className={s.row}>
-                      <span style={{ width: 15, textAlign: 'center', color: 'var(--accent)' }}>·</span>
-                      <span>{tp('partner.locations.specialistsHere', staffHere)}</span>
+                      <Clock size={15} />
+                      <span>{hours}</span>
                     </div>
                   )}
+                  <div className={s.row}>
+                    <Users size={15} />
+                    <span>{tp('partner.locations.specialistsHere', staffHere)}</span>
+                  </div>
 
                   <div className={s.actions}>
                     <button className={s.bookBtn} onClick={onBook}>

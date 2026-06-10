@@ -49,8 +49,8 @@ export function PartnerNav({ partner, onBook }: Props) {
           <LanguageSwitcher />
           <ThemeToggle />
           {/* Always available — booking is the primary action on this page */}
-          <button className={s.bookBtn} onClick={onBook}>
-            <CalendarCheck size={15} /> {t('partner.bookNow')}
+          <button className={s.bookBtn} onClick={onBook} aria-label={t('partner.bookNow')}>
+            <CalendarCheck size={15} /> <span className={s.bookLabel}>{t('partner.bookNow')}</span>
           </button>
         </div>
       </div>

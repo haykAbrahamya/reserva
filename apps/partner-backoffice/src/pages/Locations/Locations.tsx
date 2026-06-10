@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { MapPin, Plus, Pencil, Trash2, Phone, Clock } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
-import { Button, Modal, Input, Empty, TimePicker, Toggle, Pagination, useToast } from '@/components/ui'
+import { Button, Modal, Input, Empty, TimePicker, Toggle, useToast } from '@/components/ui'
 import { partnersService } from '@/services/partners.service'
 import {
   DAY_KEYS, DEFAULT_LOCATION_HOURS, everyDaySchedule, exceptSundaySchedule,
@@ -19,13 +19,11 @@ export function Locations() {
   const toast       = useToast()
   const { t, tp }   = useI18n()
 
-  const [page,     setPage]     = useState(1)
-  const [pageSize, setPageSize] = useState(5)
-
-  // Server-paginated branches (always fresh).
-  const { data: result, reload } = useResource(
-    () => partnersService.listLocationsPaged({ page, pageSize }),
-    [page, pageSize],
+  // Branches are few per partner — load them all as cards, no pagination.
+  const { data: locations, reload } = useResource(
+    () => partnersService.listLocations(),
+    [],
+    [],
   )
 
   const [modalOpen,   setModalOpen]   = useState(false)
@@ -36,12 +34,7 @@ export function Locations() {
 
   if (!partner) return null
 
-  const locations  = result?.items ?? []
-  const total      = result?.total ?? 0
-  const pageCount  = result?.pageCount ?? 1
-  const from       = total === 0 ? 0 : (page - 1) * pageSize + 1
-  const to         = Math.min(page * pageSize, total)
-  const changePageSize = (n: number) => { setPageSize(n); setPage(1) }
+  const total = locations.length
 
   const openNew = () => { setEditing(null); setForm(EMPTY_FORM); setModalOpen(true) }
   const openEdit = (loc: Location) => {
@@ -136,18 +129,6 @@ export function Locations() {
             </div>
           ))}
         </div>
-      )}
-
-      {total > 0 && (
-        <Pagination
-          page={page}
-          pageCount={pageCount}
-          onPageChange={setPage}
-          pageSize={pageSize}
-          onPageSizeChange={changePageSize}
-          pageSizeLabel={t('pagination.perPage')}
-          summary={t('pagination.summary', { from, to, total })}
-        />
       )}
 
       {/* Add / edit modal */}

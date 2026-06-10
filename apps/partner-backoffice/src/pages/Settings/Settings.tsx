@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { CheckCircle2, Lock, Globe, Instagram, Facebook, ExternalLink } from 'lucide-react'
+import { CheckCircle2, Lock, Globe, ExternalLink } from 'lucide-react'
 import { Toggle, Button, Input, useToast } from '@/components/ui'
 import { useAppStore } from '@/store/app.store'
 import { useIsAdmin } from '@/store/auth.hooks'
@@ -11,8 +11,6 @@ import s from './Settings.module.scss'
 const slugify = (v: string) =>
   v.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60)
 
-const isUrl = (v: string) => v.trim() === '' || /^https?:\/\/.+/i.test(v.trim())
-
 export function Settings() {
   const setPartner = useAppStore((st) => st.setPartner)
   const isAdmin = useIsAdmin()
@@ -22,26 +20,18 @@ export function Settings() {
   // DataLoader has run yet, so fields are always populated on direct open.
   const { data: profile, reload } = useResource(() => partnersService.getOwn(), [])
 
-  // ── Editable field state, re-seeded whenever the loaded value changes
-  //    (on load + after a successful save). This is what fixes "empty on open"
-  //    and "save doesn't update local state". ──
+  // Editable field state, re-seeded whenever the loaded value changes (on load
+  // + after a successful save) — fills on open and stays in sync after saving.
   const [slug, setSlug] = useState('')
-  const [instagram, setInstagram] = useState('')
-  const [facebook, setFacebook] = useState('')
   const [autoConfirm, setAutoConfirm] = useState(false)
 
   const savedSlug = profile?.slug ?? ''
-  const savedIg = profile?.presentation?.instagram ?? ''
-  const savedFb = profile?.presentation?.facebook ?? ''
   const savedAuto = profile?.autoConfirmBookings ?? false
 
   useEffect(() => { setSlug(savedSlug) }, [savedSlug])
-  useEffect(() => { setInstagram(savedIg) }, [savedIg])
-  useEffect(() => { setFacebook(savedFb) }, [savedFb])
   useEffect(() => { setAutoConfirm(savedAuto) }, [savedAuto])
 
   const [slugSaving, setSlugSaving] = useState(false)
-  const [socialSaving, setSocialSaving] = useState(false)
   const [autoSaving, setAutoSaving] = useState(false)
 
   if (!profile) {
@@ -49,7 +39,7 @@ export function Settings() {
       <div className={s.page}>
         <div className={s.head}>
           <h1 className={s.h1}>Settings</h1>
-          <p className={s.sub}>Manage your public page and how bookings work.</p>
+          <p className={s.sub}>Manage your public address and how bookings work.</p>
         </div>
         <div className={s.skeleton} />
         <div className={s.skeleton} />
@@ -66,13 +56,9 @@ export function Settings() {
         ...current,
         slug: updated.slug,
         autoConfirmBookings: updated.autoConfirmBookings,
-        presentation: {
-          instagram: updated.presentation?.instagram ?? '',
-          facebook: updated.presentation?.facebook ?? '',
-        },
       })
     }
-    reload() // refresh the useResource copy → re-seeds the fields
+    reload()
   }
 
   // ── Slug ──
@@ -93,38 +79,16 @@ export function Settings() {
     }
   }
 
-  // ── Social ──
-  const socialChanged = instagram.trim() !== savedIg || facebook.trim() !== savedFb
-  const socialValid = isUrl(instagram) && isUrl(facebook)
-  const canSaveSocial = isAdmin && socialChanged && socialValid && !socialSaving
-
-  const saveSocials = async () => {
-    if (!canSaveSocial) return
-    setSocialSaving(true)
-    try {
-      applyUpdate(
-        await partnersService.updateProfile({
-          presentation: { instagram: instagram.trim(), facebook: facebook.trim() },
-        }),
-      )
-      toast('Social links updated')
-    } catch (err) {
-      toast(err instanceof ApiError ? err.message : 'Could not save social links')
-    } finally {
-      setSocialSaving(false)
-    }
-  }
-
   // ── Auto-confirm (optimistic toggle) ──
   const toggleAutoConfirm = async (next: boolean) => {
     if (!isAdmin || autoSaving) return
     setAutoSaving(true)
-    setAutoConfirm(next) // instant
+    setAutoConfirm(next)
     try {
       applyUpdate(await partnersService.updateProfile({ autoConfirmBookings: next }))
       toast(next ? 'Online bookings will be auto-confirmed' : 'Online bookings now need manual confirmation')
     } catch (err) {
-      setAutoConfirm(!next) // revert
+      setAutoConfirm(!next)
       toast(err instanceof ApiError ? err.message : 'Could not save setting')
     } finally {
       setAutoSaving(false)
@@ -139,7 +103,7 @@ export function Settings() {
     <div className={s.page}>
       <div className={s.head}>
         <h1 className={s.h1}>Settings</h1>
-        <p className={s.sub}>Manage your public page and how bookings work.</p>
+        <p className={s.sub}>Manage your public address and how bookings work.</p>
       </div>
 
       {/* ── Public address ── */}
@@ -177,46 +141,6 @@ export function Settings() {
             ) : (
               <span className={s.off}>No public address yet — your page is offline until you set one.</span>
             )}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Social links ── */}
-      <section className={s.card}>
-        <div className={s.cardHead}>
-          <span className={s.cardIcon}><Instagram size={18} /></span>
-          <div className={s.cardHeadText}>
-            <h2 className={s.cardTitle}>Social links</h2>
-            <p className={s.cardDesc}>Shown as icons on your public page. Paste a full URL, or leave blank to hide.</p>
-          </div>
-          {adminLock}
-        </div>
-
-        <div className={s.cardBody}>
-          <div className={s.socialField}>
-            <span className={s.socialIcon}><Instagram size={16} /></span>
-            <Input
-              value={instagram}
-              disabled={!isAdmin || socialSaving}
-              onChange={(e) => setInstagram(e.target.value)}
-              placeholder="https://instagram.com/yoursalon"
-              error={!isUrl(instagram) ? 'Enter a full URL (https://…)' : undefined}
-            />
-          </div>
-          <div className={s.socialField}>
-            <span className={s.socialIcon}><Facebook size={16} /></span>
-            <Input
-              value={facebook}
-              disabled={!isAdmin || socialSaving}
-              onChange={(e) => setFacebook(e.target.value)}
-              placeholder="https://facebook.com/yoursalon"
-              error={!isUrl(facebook) ? 'Enter a full URL (https://…)' : undefined}
-            />
-          </div>
-          <div className={s.actionsRow}>
-            <Button variant="accent" disabled={!canSaveSocial} onClick={saveSocials}>
-              {socialSaving ? 'Saving…' : 'Save links'}
-            </Button>
           </div>
         </div>
       </section>
