@@ -258,6 +258,7 @@
     "pendingTextPre": "Ձեր ամրագրումը ",
     "pendingTextPost": "-ում ստացվել է և սպասում է հաստատման։ Շուտով կկապվենք Ձեզ հետ։",
     "done": "Պատրաստ է",
+    "telegramConnect": "Ստանալ ծանուցումներ Telegram-ով",
     "summary": {
       "branch": "Մասնաճյուղ",
       "service": "Ծառայություն",

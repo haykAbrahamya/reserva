@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { ArrowLeft, X, Check, Users, Calendar, Clock, CheckCircle2, ArrowRight, Sparkles, MapPin } from 'lucide-react'
+import { ArrowLeft, X, Check, Users, Calendar, Clock, CheckCircle2, ArrowRight, Sparkles, MapPin, Send } from 'lucide-react'
 import { fmtAMD, fmtDuration, fmtDateInput, initials } from '@reserva/shared'
 import { DatePicker } from '@reserva/ui'
 import type { Service, Specialist } from '@reserva/shared'
@@ -10,6 +10,7 @@ import {
   getAvailableSlots,
   createBooking,
 } from '@/services/booking.service'
+import { getTelegramConnectLink } from '@/services/telegram.service'
 import { useT } from '@/i18n'
 import s from './BookingFlow.module.scss'
 
@@ -47,6 +48,9 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   const [submitting, setSubmitting]     = useState(false)
   // Status of the just-created booking — drives confirmed vs pending success copy.
   const [bookedStatus, setBookedStatus] = useState<'confirmed' | 'pending'>('confirmed')
+  // Telegram connect deep link for the just-created booking (null = unavailable
+  // / already connected / telegram disabled → button hidden).
+  const [telegramLink, setTelegramLink] = useState<string | null>(null)
 
   // slots
   const [slots, setSlots]           = useState<string[]>([])
@@ -173,6 +177,8 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
     setBookedStatus(booking.status === 'confirmed' ? 'confirmed' : 'pending')
     setSubmitting(false)
     setStep('success')
+    // Offer free Telegram updates for this booking (best-effort, non-blocking).
+    getTelegramConnectLink(booking.id).then(setTelegramLink)
   }
 
   const chosenSpecialist: Specialist | null =
@@ -254,6 +260,19 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
                 hidePrice
               />
             </div>
+
+            {/* Free customer notifications via Telegram — one tap to connect. */}
+            {telegramLink && (
+              <a
+                className={s.telegramBtn}
+                href={telegramLink}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Send size={17} /> {t('booking.telegramConnect')}
+              </a>
+            )}
+
             <button className={s.doneBtn} onClick={animatedClose}>{t('booking.done')}</button>
           </div>
         ) : (

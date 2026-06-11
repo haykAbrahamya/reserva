@@ -257,6 +257,7 @@
     "pendingTextPre": "Your booking at ",
     "pendingTextPost": " has been received and is awaiting confirmation. We'll be in touch shortly.",
     "done": "Done",
+    "telegramConnect": "Get notified on Telegram",
     "summary": {
       "branch": "Branch",
       "service": "Service",

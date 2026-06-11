@@ -258,6 +258,7 @@
     "pendingTextPre": "Ваша запись в ",
     "pendingTextPost": " получена и ожидает подтверждения. Мы скоро свяжемся с вами.",
     "done": "Готово",
+    "telegramConnect": "Получать уведомления в Telegram",
     "summary": {
       "branch": "Филиал",
       "service": "Услуга",

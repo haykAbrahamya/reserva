@@ -386,6 +386,30 @@
   padding: 4px 0;
   margin-bottom: 24px;
 }
+/* Primary "Get notified on Telegram" CTA — Telegram blue so it's recognizable. */
+.telegramBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  height: 50px;
+  width: 100%;
+  max-width: 360px;
+  border-radius: $r-2;
+  background: #229ED9;
+  color: #fff;
+  border: none;
+  text-decoration: none;
+  font-family: $font-sans;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(34, 158, 217, 0.32);
+  transition: background 0.15s, transform 0.1s;
+  &:hover { background: #1d8cc2; transform: translateY(-1px); }
+  &:active { transform: translateY(0); }
+}
+
 .doneBtn {
   height: 48px;
   width: 100%;
@@ -401,6 +425,8 @@
   transition: background 0.15s;
   &:hover { background: $accent-strong; }
 }
+/* When the telegram CTA is present, the two buttons stack with a small gap. */
+.telegramBtn + .doneBtn { margin-top: 10px; background: $bg-2; color: $fg-1; &:hover { background: $bg-3; } }
 
 :global {
   @keyframes bf-fade      { from { opacity: 0 } to { opacity: 1 } }
