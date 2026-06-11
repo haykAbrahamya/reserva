@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { CheckCircle2, Lock, Globe, ExternalLink, Download, Share, CheckCircle } from 'lucide-react'
+import { CheckCircle2, Lock, Globe, ExternalLink, Download, Share, CheckCircle, Store } from 'lucide-react'
 import { Toggle, Button, Input, useToast } from '@/components/ui'
 import { useAppStore } from '@/store/app.store'
 import { useIsAdmin } from '@/store/auth.hooks'
@@ -177,6 +177,34 @@ export function Settings() {
             {autoConfirm
               ? <>New online bookings are <strong className={s.on}>auto-confirmed</strong>.</>
               : <>New online bookings start as <strong className={s.off}>pending</strong> until confirmed.</>}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Marketplace listing (read-only — curated by Reserva) ── */}
+      <section className={s.card}>
+        <div className={s.cardHead}>
+          <span className={s.cardIcon}><Store size={18} /></span>
+          <div className={s.cardHeadText}>
+            <h2 className={s.cardTitle}>Reserva marketplace</h2>
+            <p className={s.cardDesc}>
+              Featured salons appear on the public Reserva directory at reserva.am/salons.
+            </p>
+          </div>
+        </div>
+        <div className={s.cardBody}>
+          <div className={s.statusLine}>
+            {profile.marketplaceListed ? (
+              <>
+                <CheckCircle size={14} className={s.on} />{' '}
+                Your salon is <strong className={s.on}>featured</strong> in the marketplace.
+              </>
+            ) : (
+              <>
+                Not featured yet. Listing is curated by the Reserva team — reach out if you’d like
+                to be included.
+              </>
+            )}
           </div>
         </div>
       </section>

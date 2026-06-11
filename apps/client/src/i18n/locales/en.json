@@ -1,6 +1,7 @@
 {
   "common": {
-    "dash": "—"
+    "dash": "—",
+    "close": "Close"
   },
   "nav": {
     "features": "Features",
@@ -339,5 +340,53 @@
   "language": {
     "label": "Language",
     "switcherAria": "Change language"
+  },
+  "salons": {
+    "hero": {
+      "eyebrow": "Reserva marketplace",
+      "title": "Find your next salon",
+      "subtitle": "Discover beauty & wellness studios near you — browse, compare, and book in seconds."
+    },
+    "search": {
+      "name": "Search salons",
+      "service": "Service",
+      "location": "Location",
+      "clear": "Clear search",
+      "triggerMain": "Search salons",
+      "triggerSub": "Name · service · location",
+      "sheetTitle": "Find a salon",
+      "nameLabel": "Salon",
+      "serviceLabel": "Service",
+      "locationLabel": "Location",
+      "showResults": "Show {count} salons"
+    },
+    "results": {
+      "allTitle": "All salons",
+      "searchTitle": "Search results",
+      "total": "{count} salons",
+      "found": "{count} found",
+      "searching": "Searching…"
+    },
+    "card": {
+      "view": "View salon"
+    },
+    "empty": {
+      "allTitle": "No salons yet",
+      "allText": "There are no featured salons here yet. Check back soon.",
+      "searchTitle": "No matches found",
+      "searchText": "Try a different name, service, or location.",
+      "clear": "Clear search"
+    },
+    "error": {
+      "title": "Couldn't load salons",
+      "text": "Something went wrong while fetching salons. Please try again.",
+      "retry": "Try again"
+    },
+    "footer": {
+      "tagline": "The easiest way to discover and book beauty & wellness in Armenia.",
+      "home": "Home",
+      "forSalons": "List your salon",
+      "copyright": "© {year} Reserva. All rights reserved."
+    }
   }
 }

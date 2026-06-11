@@ -7,6 +7,7 @@ import { Home } from '@/pages/Home/Home'
 import { PartnerPage } from '@/pages/Partner/PartnerPage'
 import { SignUp } from '@/pages/SignUp/SignUp'
 import { NotFound } from '@/pages/NotFound/NotFound'
+import { Salons } from '@/pages/Salons/Salons'
 import { slugFromHost } from '@/hooks/useTenantSlug'
 
 /** Reflects the persisted theme onto <html data-theme="…">. */
@@ -33,6 +34,8 @@ export default function App() {
           <Route path="/" element={isTenant ? <PartnerPage /> : <Home />} />
           {/* Sign up / start free trial */}
           <Route path="/signup" element={<SignUp />} />
+          {/* Public salon marketplace directory */}
+          <Route path="/salons" element={<Salons />} />
           {/* Partner booking page — reserva.am/p/:slug (kept for dev + direct links) */}
           <Route path="/p/:slug" element={<PartnerPage />} />
           {/* Creative 404 for any unknown route */}

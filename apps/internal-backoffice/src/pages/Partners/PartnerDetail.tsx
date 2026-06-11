@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Save, Mail, Phone, MapPin, Users, CalendarDays } from 'lucide-react'
+import { ArrowLeft, Save, Mail, Phone, MapPin, Users, CalendarDays, Store, ExternalLink } from 'lucide-react'
 import { Avatar, Badge, Button, Input, Textarea, Toggle, Empty, useToast } from '@/components/ui'
 import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
 import { useResource } from '@/store/useResource'
@@ -63,6 +63,16 @@ export function PartnerDetailPage() {
     try {
       await partnersService.setActive(id, !partner.active)
       toast(partner.active ? 'Partner disabled' : 'Partner enabled')
+      await reload()
+    } catch (err) {
+      toast(err instanceof ApiError ? err.message : 'Could not update')
+    }
+  }
+
+  const toggleMarketplace = async (next: boolean) => {
+    try {
+      await partnersService.setMarketplace(id, next)
+      toast(next ? 'Featured in marketplace' : 'Removed from marketplace')
       await reload()
     } catch (err) {
       toast(err instanceof ApiError ? err.message : 'Could not update')
@@ -157,6 +167,36 @@ export function PartnerDetailPage() {
           <p className={s.hint}>
             Admin accounts are managed by the partner from their own backoffice.
           </p>
+        </section>
+
+        {/* Marketplace listing (platform-curated) */}
+        <section className={s.card}>
+          <h2 className={s.cardTitle}><Store size={15} className={s.cardTitleIcon} /> Marketplace</h2>
+          <div className={s.marketRow}>
+            <div className={s.marketText}>
+              <div className={s.marketLabel}>Feature in public marketplace</div>
+              <div className={s.marketDesc}>
+                When on, this salon appears on the public <strong>/salons</strong> directory and is
+                discoverable in search.
+              </div>
+            </div>
+            <Toggle
+              checked={partner.marketplaceListed}
+              onChange={toggleMarketplace}
+              disabled={!partner.active || !partner.slug}
+            />
+          </div>
+          {!partner.active && (
+            <p className={s.hint}>Enable the partner first — inactive salons can’t be listed.</p>
+          )}
+          {!partner.slug && (
+            <p className={s.hint}>This partner has no public slug yet, so it can’t be listed.</p>
+          )}
+          {partner.marketplaceListed && partner.slug && (
+            <a className={s.marketLink} href={`/p/${partner.slug}`} target="_blank" rel="noopener noreferrer">
+              <ExternalLink size={13} /> View public page
+            </a>
+          )}
         </section>
       </div>
     </div>

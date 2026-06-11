@@ -16,6 +16,8 @@ export interface PartnerListItem {
   type: string
   accent: string
   active: boolean
+  /** Featured in the public marketplace (/salons). Curated here by platform staff. */
+  marketplaceListed: boolean
   createdAt: string
   counts: PartnerCounts
 }
@@ -91,6 +93,11 @@ export const partnersService = {
 
   setActive(id: string, active: boolean): Promise<PartnerDetail> {
     return apiPatch<PartnerDetail>(`/platform/partners/${id}/active`, { active })
+  },
+
+  /** Feature/unfeature a salon in the public marketplace (/salons). */
+  setMarketplace(id: string, listed: boolean): Promise<PartnerDetail> {
+    return apiPatch<PartnerDetail>(`/platform/partners/${id}/marketplace`, { listed })
   },
 
   /**

@@ -80,6 +80,9 @@ export type PartnerProfileResponse = Omit<Partner, 'slug'> & {
   slug: string | null
   locationCount?: number
   autoConfirmBookings?: boolean
+  /** Featured in the public marketplace (/salons). Read-only here — curated by
+   *  Reserva platform staff from the internal console. */
+  marketplaceListed?: boolean
   presentation?: PartnerPresentationFields | null
 }
 

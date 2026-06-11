@@ -87,3 +87,29 @@
 .adminContact { display: flex; align-items: center; gap: 5px; font-size: 12px; color: $fg-2; margin-top: 2px; }
 .muted { font-size: 13px; color: $fg-2; }
 .hint { font-size: 12px; color: $fg-3; margin: 16px 0 0; line-height: 1.5; }
+
+/* ── Marketplace card ── */
+.cardTitleIcon { vertical-align: -2px; margin-right: 6px; color: $accent; }
+.marketRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px;
+  background: $bg-2;
+  border-radius: $r-1;
+}
+.marketText { flex: 1; min-width: 0; }
+.marketLabel { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+.marketDesc { font-size: 13px; color: $fg-2; line-height: 1.5; }
+.marketLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: $accent;
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+}
