@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Sparkles, Pencil, Clock, Scissors } from 'lucide-react'
+import { Plus, Sparkles, Pencil, Clock, Scissors, RotateCcw, X } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Empty, Pagination } from '@/components/ui'
@@ -61,6 +61,9 @@ export function Services() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editing,   setEditing]   = useState<Service | null>(null)
   const [form,      setForm]      = useState(EMPTY_FORM)
+  // Repeat-period editor is collapsed behind a button until the user opens it
+  // (or it auto-opens when editing a service that already has a period set).
+  const [repeatOpen, setRepeatOpen] = useState(false)
 
   if (!partner) return null
 
@@ -71,7 +74,7 @@ export function Services() {
   const to        = Math.min(page * pageSize, total)
   const changePageSize = (n: number) => { setPageSize(n); setPage(1) }
 
-  const openNew = () => { setEditing(null); setForm(EMPTY_FORM); setModalOpen(true) }
+  const openNew = () => { setEditing(null); setForm(EMPTY_FORM); setRepeatOpen(false); setModalOpen(true) }
   const openEdit = (svc: Service) => {
     setEditing(svc)
     setForm({
@@ -79,7 +82,13 @@ export function Services() {
       category: svc.category, active: svc.active,
       ...fromTotalDays(svc.repeatEveryDays),
     })
+    setRepeatOpen(!!svc.repeatEveryDays) // auto-expand if a period already exists
     setModalOpen(true)
+  }
+
+  const clearRepeat = () => {
+    setForm(f => ({ ...f, repeatMonths: '', repeatDays: '' }))
+    setRepeatOpen(false)
   }
 
   const handleSave = async () => {
@@ -232,53 +241,87 @@ export function Services() {
             <Input label={t('services.modal.categoryLabel')} value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} placeholder={t('services.modal.categoryPlaceholder')} />
           </div>
 
-          {/* Repeat period — how often this service should be re-booked.
-              Entered as months + days, stored as total days. Backoffice-only. */}
+          {/* Repeat period — collapsed behind a button until needed, so the form
+              stays clean. Entered as months + days, stored as total days. */}
           <div className={s.formFull}>
-            <label className={s.repeatLabel}>{t('services.modal.repeatLabel')}</label>
-            <div className={s.repeatPresets}>
-              {[
-                { m: '', d: '15', key: '15d' },
-                { m: '', d: '25', key: '25d' },
-                { m: '1', d: '', key: '1mo' },
-                { m: '1', d: '10', key: '1mo10d' },
-                { m: '2', d: '', key: '2mo' },
-                { m: '', d: '', key: 'none' },
-              ].map(p => {
-                const isActive = form.repeatMonths === p.m && form.repeatDays === p.d
-                return (
-                  <button
-                    key={p.key}
-                    type="button"
-                    className={[s.repeatChip, isActive ? s.repeatChipActive : ''].filter(Boolean).join(' ')}
-                    onClick={() => setForm(f => ({ ...f, repeatMonths: p.m, repeatDays: p.d }))}
-                  >
-                    {t(`services.modal.repeatPreset.${p.key}`)}
+            {!repeatOpen ? (
+              (() => {
+                const total = toTotalDays(form.repeatMonths, form.repeatDays)
+                return total ? (
+                  // A period is set → show a summary chip with edit + clear.
+                  <div className={s.repeatSummary}>
+                    <span className={s.repeatSummaryIcon}><RotateCcw size={15} /></span>
+                    <div className={s.repeatSummaryBody}>
+                      <span className={s.repeatSummaryLabel}>{t('services.modal.repeatLabel')}</span>
+                      <span className={s.repeatSummaryValue}>{t('services.modal.repeatHint', { n: total })}</span>
+                    </div>
+                    <button type="button" className={s.repeatEditBtn} onClick={() => setRepeatOpen(true)}>
+                      {t('common.edit')}
+                    </button>
+                    <button type="button" className={s.repeatClearBtn} onClick={clearRepeat} aria-label={t('common.remove')}>
+                      <X size={15} />
+                    </button>
+                  </div>
+                ) : (
+                  // Nothing set → a single inviting "setup" button.
+                  <button type="button" className={s.repeatSetupBtn} onClick={() => setRepeatOpen(true)}>
+                    <RotateCcw size={15} /> {t('services.modal.repeatSetup')}
                   </button>
                 )
-              })}
-            </div>
-            <div className={s.repeatInputs}>
-              <Input
-                type="number"
-                value={form.repeatMonths}
-                onChange={e => setForm(f => ({ ...f, repeatMonths: e.target.value }))}
-                placeholder="0"
-              />
-              <span className={s.repeatUnit}>{t('services.modal.months')}</span>
-              <Input
-                type="number"
-                value={form.repeatDays}
-                onChange={e => setForm(f => ({ ...f, repeatDays: e.target.value }))}
-                placeholder="0"
-              />
-              <span className={s.repeatUnit}>{t('services.modal.days')}</span>
-            </div>
-            <div className={s.repeatHint}>
-              {toTotalDays(form.repeatMonths, form.repeatDays)
-                ? t('services.modal.repeatHint', { n: toTotalDays(form.repeatMonths, form.repeatDays)! })
-                : t('services.modal.repeatNone')}
-            </div>
+              })()
+            ) : (
+              <div className={s.repeatPanel}>
+                <div className={s.repeatPanelHead}>
+                  <label className={s.repeatLabel}>{t('services.modal.repeatLabel')}</label>
+                  <button type="button" className={s.repeatRemove} onClick={clearRepeat}>
+                    {t('services.modal.repeatRemove')}
+                  </button>
+                </div>
+                <div className={s.repeatHelp}>{t('services.modal.repeatHelp')}</div>
+                <div className={s.repeatPresets}>
+                  {[
+                    { m: '', d: '15', key: '15d' },
+                    { m: '', d: '25', key: '25d' },
+                    { m: '1', d: '', key: '1mo' },
+                    { m: '1', d: '10', key: '1mo10d' },
+                    { m: '2', d: '', key: '2mo' },
+                  ].map(p => {
+                    const isActive = form.repeatMonths === p.m && form.repeatDays === p.d
+                    return (
+                      <button
+                        key={p.key}
+                        type="button"
+                        className={[s.repeatChip, isActive ? s.repeatChipActive : ''].filter(Boolean).join(' ')}
+                        onClick={() => setForm(f => ({ ...f, repeatMonths: p.m, repeatDays: p.d }))}
+                      >
+                        {t(`services.modal.repeatPreset.${p.key}`)}
+                      </button>
+                    )
+                  })}
+                </div>
+                <div className={s.repeatInputs}>
+                  <Input
+                    type="number"
+                    value={form.repeatMonths}
+                    onChange={e => setForm(f => ({ ...f, repeatMonths: e.target.value }))}
+                    placeholder="0"
+                  />
+                  <span className={s.repeatUnit}>{t('services.modal.months')}</span>
+                  <Input
+                    type="number"
+                    value={form.repeatDays}
+                    onChange={e => setForm(f => ({ ...f, repeatDays: e.target.value }))}
+                    placeholder="0"
+                  />
+                  <span className={s.repeatUnit}>{t('services.modal.days')}</span>
+                </div>
+                <div className={s.repeatHint}>
+                  {toTotalDays(form.repeatMonths, form.repeatDays)
+                    ? t('services.modal.repeatHint', { n: toTotalDays(form.repeatMonths, form.repeatDays)! })
+                    : t('services.modal.repeatNone')}
+                </div>
+              </div>
+            )}
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

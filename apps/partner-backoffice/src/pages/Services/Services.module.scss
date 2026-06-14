@@ -126,6 +126,107 @@
 .repeatUnit { font-size: 13px; color: $fg-2; }
 .repeatHint { font-size: 12px; color: $fg-3; margin-top: 8px; }
 
+/* ── Collapsed: "Setup repeat period" button ── */
+.repeatSetupBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: $r-2;
+  border: 1px dashed $line-strong;
+  background: $bg-1;
+  color: $fg-1;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: $font-sans;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  svg { color: $fg-3; transition: color 0.15s; }
+  &:hover {
+    background: $accent-soft;
+    border-color: $accent;
+    color: $accent-strong;
+    svg { color: $accent; }
+  }
+}
+
+/* ── Collapsed: summary chip when a period is already set ── */
+.repeatSummary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: $r-2;
+  border: 1px solid $line-2;
+  background: $bg-2;
+}
+.repeatSummaryIcon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: $r-1;
+  background: $accent-soft;
+  color: $accent-strong;
+}
+.repeatSummaryBody { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.repeatSummaryLabel { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: $fg-3; }
+.repeatSummaryValue { font-size: 14px; font-weight: 600; color: $fg-0; }
+.repeatEditBtn {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: $accent;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  &:hover { text-decoration: underline; }
+}
+.repeatClearBtn {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: $r-1;
+  border: none;
+  background: transparent;
+  color: $fg-3;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  &:hover { background: $danger-soft; color: $danger; }
+}
+
+/* ── Expanded panel ── */
+.repeatPanel {
+  border: 1px solid $line-2;
+  border-radius: $r-2;
+  background: $bg-1;
+  padding: 14px;
+  animation: svc-expand 0.2s ease both;
+}
+.repeatPanelHead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.repeatPanelHead .repeatLabel { margin-bottom: 0; }
+.repeatRemove {
+  font-size: 12px;
+  font-weight: 500;
+  color: $fg-3;
+  background: none;
+  border: none;
+  cursor: pointer;
+  &:hover { color: $danger; }
+}
+.repeatHelp { font-size: 12px; color: $fg-2; line-height: 1.5; margin-bottom: 12px; }
+
+:global {
+  @keyframes svc-expand {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
 @media (max-width: 768px) {
   .page { padding: 16px; }
   .h1   { font-size: 26px; }

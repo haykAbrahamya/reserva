@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Calendar, List, Sparkles, MoreHorizontal, Plus, Settings, LogOut, UserCog, KeyRound } from 'lucide-react'
+import {
+  LayoutDashboard, Calendar, List, Sparkles, MoreHorizontal, Plus, Settings, LogOut,
+  UserCog, KeyRound, Users, User, Clock, MapPin, Store,
+} from 'lucide-react'
 import { useAuthStore } from '@/store/auth.store'
 import { useIsAdmin } from '@/store/auth.hooks'
 import { authService } from '@/services/auth.service'
@@ -15,6 +18,24 @@ const TABS = [
   { to: '/calendar', labelKey: 'nav.calendar', icon: Calendar },
   { to: '/bookings', labelKey: 'nav.bookings', icon: List },
   { to: '/services', labelKey: 'nav.services', icon: Sparkles },
+]
+
+// Everything NOT in the bottom bar lives in the "More" sheet — kept in sync with
+// the desktop Sidebar, including admin-only gating. `adminOnly` items are hidden
+// for managers.
+interface MoreItem { to: string; labelKey: string; icon: typeof Users; adminOnly?: boolean }
+const MORE_NAV: { section: string; items: MoreItem[] }[] = [
+  { section: 'catalog', items: [
+    { to: '/clients',     labelKey: 'nav.clients',     icon: Users },
+    { to: '/specialists', labelKey: 'nav.specialists', icon: User },
+    { to: '/hours',       labelKey: 'nav.hours',       icon: Clock },
+    { to: '/locations',   labelKey: 'nav.locations',   icon: MapPin, adminOnly: true },
+  ]},
+  { section: 'account', items: [
+    { to: '/storefront',  labelKey: 'nav.storefront',  icon: Store,    adminOnly: true },
+    { to: '/users',       labelKey: 'nav.users',       icon: UserCog,  adminOnly: true },
+    { to: '/settings',    labelKey: 'nav.settings',    icon: Settings },
+  ]},
 ]
 
 export function MobileTabBar() {
@@ -94,52 +115,27 @@ export function MobileTabBar() {
             )}
 
             <div className={s.sheetItems}>
-              <button
-                className={s.sheetItem}
-                onClick={() => closeMore(() => navigate('/clients'))}
-              >
-                <span className={s.sheetItemIcon}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                  </svg>
-                </span>
-                {t('nav.clients')}
-              </button>
+              {MORE_NAV.map(group => {
+                const items = group.items.filter(item => isAdmin || !item.adminOnly)
+                if (items.length === 0) return null
+                return (
+                  <div key={group.section} className={s.sheetGroup}>
+                    <div className={s.sheetGroupLabel}>{t(`nav.sections.${group.section}`)}</div>
+                    {items.map(item => (
+                      <button
+                        key={item.to}
+                        className={s.sheetItem}
+                        onClick={() => closeMore(() => navigate(item.to))}
+                      >
+                        <span className={s.sheetItemIcon}><item.icon size={18} /></span>
+                        {t(item.labelKey)}
+                      </button>
+                    ))}
+                  </div>
+                )
+              })}
 
-              <button
-                className={s.sheetItem}
-                onClick={() => closeMore(() => navigate('/specialists'))}
-              >
-                <span className={s.sheetItemIcon}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/>
-                  </svg>
-                </span>
-                {t('nav.specialists')}
-              </button>
-
-              <button
-                className={s.sheetItem}
-                onClick={() => closeMore(() => navigate('/hours'))}
-              >
-                <span className={s.sheetItemIcon}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                  </svg>
-                </span>
-                {t('nav.hours')}
-              </button>
-
-              {isAdmin && (
-                <button
-                  className={s.sheetItem}
-                  onClick={() => closeMore(() => navigate('/users'))}
-                >
-                  <span className={s.sheetItemIcon}><UserCog size={18} /></span>
-                  {t('nav.users')}
-                </button>
-              )}
+              <div className={s.sheetDivider} />
 
               <button
                 className={s.sheetItem}
@@ -148,16 +144,6 @@ export function MobileTabBar() {
                 <span className={s.sheetItemIcon}><KeyRound size={18} /></span>
                 {t('changePassword.title')}
               </button>
-
-              <button
-                className={s.sheetItem}
-                onClick={() => closeMore(() => navigate('/settings'))}
-              >
-                <span className={s.sheetItemIcon}><Settings size={18} /></span>
-                {t('nav.settings')}
-              </button>
-
-              <div className={s.sheetDivider} />
 
               <button className={[s.sheetItem, s.danger].join(' ')} onClick={handleLogout}>
                 <span className={s.sheetItemIcon}><LogOut size={18} /></span>
