@@ -1,6 +1,8 @@
 // Public marketplace API client — lists curated salons for /salons, with search.
 // No auth. Mirrors the backend SalonCard shape.
 
+import type { WeekSchedule } from '@reserva/shared'
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1'
 
 export interface SalonCard {
@@ -13,7 +15,7 @@ export interface SalonCard {
   rating: number
   reviews: number
   heroTints: string[]
-  locations: { id: string; name: string; address: string }[]
+  locations: { id: string; name: string; address: string; hours?: WeekSchedule }[]
   categories: string[]
   serviceCount: number
   specialistCount: number

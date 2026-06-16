@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Search, Scissors, MapPin, X, SearchX, Sparkles, Loader2, SlidersHorizontal } from 'lucide-react'
+import { Search, Scissors, MapPin, X, SearchX, Sparkles, Loader2, SlidersHorizontal, ArrowUpDown } from 'lucide-react'
+import { Select } from '@reserva/ui'
 import { Logo } from '@/components/Logo/Logo'
 import { ThemeToggle } from '@/components/ThemeToggle/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher'
@@ -11,6 +12,8 @@ import s from './Salons.module.scss'
 
 interface Filters { q: string; service: string; location: string }
 const EMPTY: Filters = { q: '', service: '', location: '' }
+
+type SortKey = 'rating' | 'name' | 'services'
 
 /** Read filters from the URL query string. */
 function filtersFromParams(params: URLSearchParams): Filters {
@@ -47,6 +50,11 @@ export function Salons() {
   // Mobile: the search lives in a focused full-screen sheet rather than three
   // cramped rows in the hero.
   const [sheetOpen, setSheetOpen] = useState(false)
+  // Sort of the displayed list (client-side, instant).
+  const [sort, setSort] = useState<SortKey>('rating')
+  // Distinct categories captured from the FIRST unfiltered load, so the quick
+  // chips stay stable even after the result set narrows.
+  const [allCategories, setAllCategories] = useState<string[]>([])
 
   const hasSearch = !!(filters.q || filters.service || filters.location)
   // Compact summary of active filters for the mobile trigger pill.
@@ -62,7 +70,18 @@ export function Salons() {
     else setSearching(true)
     setError(false)
     listSalons(f, ctrl.signal)
-      .then((data) => { setSalons(data); setInitialLoading(false); setSearching(false) })
+      .then((data) => {
+        setSalons(data)
+        setInitialLoading(false)
+        setSearching(false)
+        // Seed the quick-filter chips from the first unfiltered load only.
+        if (isInitial) {
+          const cats = Array.from(new Set(data.flatMap((sl) => sl.categories)))
+            .filter(Boolean)
+            .sort((a, b) => a.localeCompare(b))
+          setAllCategories(cats)
+        }
+      })
       .catch((e) => {
         if (e?.name === 'AbortError') return
         setError(true); setInitialLoading(false); setSearching(false)
@@ -109,7 +128,25 @@ export function Salons() {
   }, [sheetOpen])
 
   const openSalon = useCallback((slug: string) => navigate(`/p/${slug}`), [navigate])
+
+  // Sorted view of the loaded salons (sort is purely client-side).
+  const sortedSalons = useMemo(() => {
+    if (!salons) return null
+    const copy = [...salons]
+    if (sort === 'rating') copy.sort((a, b) => b.rating - a.rating || b.reviews - a.reviews)
+    else if (sort === 'name') copy.sort((a, b) => a.name.localeCompare(b.name))
+    else if (sort === 'services') copy.sort((a, b) => b.serviceCount - a.serviceCount)
+    return copy
+  }, [salons, sort])
+
   const count = salons?.length ?? 0
+
+  // A category chip is "active" when it's the current service filter.
+  const activeCategory = filters.service.trim().toLowerCase()
+  const toggleCategory = (cat: string) => {
+    const next = activeCategory === cat.toLowerCase() ? '' : cat
+    update({ service: next })
+  }
 
   return (
     <div className={s.page}>
@@ -258,6 +295,29 @@ export function Salons() {
         </div>
       )}
 
+      {/* ── Category quick filters ── */}
+      {!initialLoading && !error && allCategories.length > 0 && (
+        <div className={s.categories}>
+          <div className={s.categoriesInner}>
+            <button
+              className={[s.catChip, !activeCategory ? s.catChipActive : ''].filter(Boolean).join(' ')}
+              onClick={() => update({ service: '' })}
+            >
+              {t('salons.categories.all')}
+            </button>
+            {allCategories.map((cat) => (
+              <button
+                key={cat}
+                className={[s.catChip, activeCategory === cat.toLowerCase() ? s.catChipActive : ''].filter(Boolean).join(' ')}
+                onClick={() => toggleCategory(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ── Results ── */}
       <section className={s.results}>
         <div className={s.resultsInner}>
@@ -277,6 +337,25 @@ export function Salons() {
                 down the results below. */}
             {searching && !initialLoading && (
               <span className={s.searchingTag}><Loader2 size={13} className={s.searchingSpin} /> {t('salons.results.searching')}</span>
+            )}
+
+            {/* Sort control — design-system Select (themed, keyboard-accessible) */}
+            {!initialLoading && !error && count > 1 && (
+              <div className={s.sort}>
+                <ArrowUpDown size={14} className={s.sortIcon} />
+                <span className={s.sortLabel}>{t('salons.sort.label')}</span>
+                <Select
+                  size="sm"
+                  value={sort}
+                  onChange={(v) => setSort(v as SortKey)}
+                  panelMinWidth={180}
+                  options={[
+                    { value: 'rating', label: t('salons.sort.rating') },
+                    { value: 'name', label: t('salons.sort.name') },
+                    { value: 'services', label: t('salons.sort.services') },
+                  ]}
+                />
+              </div>
             )}
           </div>
 
@@ -318,7 +397,7 @@ export function Salons() {
           {/* Grid — stays mounted during re-search; dims slightly while searching */}
           {!initialLoading && !error && count > 0 && (
             <div className={[s.grid, searching ? s.gridSearching : ''].filter(Boolean).join(' ')}>
-              {salons!.map((salon) => (
+              {sortedSalons!.map((salon) => (
                 <SalonCard
                   key={salon.id}
                   salon={salon}

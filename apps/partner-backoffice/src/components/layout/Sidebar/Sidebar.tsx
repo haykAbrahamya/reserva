@@ -1,43 +1,12 @@
 import { NavLink } from 'react-router-dom'
-import {
-  LayoutDashboard, Calendar, List, Users, Sparkles, User,
-  Clock, MapPin, Settings, ChevronLeft, ChevronRight, ShieldCheck, UserCog, Store,
-} from 'lucide-react'
+import { MapPin, ChevronLeft, ChevronRight, ShieldCheck } from 'lucide-react'
 import { useAppStore, usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import { partnersService } from '@/services/partners.service'
 import { useIsAdmin, useScopedLocationId } from '@/store/auth.hooks'
 import { useI18n } from '@/i18n'
+import { NAV } from '../nav.config'
 import s from './Sidebar.module.scss'
-
-interface NavItem {
-  to: string
-  labelKey: string
-  icon: typeof LayoutDashboard
-  end?: boolean
-  /** Only visible to admins (managers are scoped to a single branch). */
-  adminOnly?: boolean
-}
-
-const NAV: { section: string; items: NavItem[] }[] = [
-  { section: 'operations', items: [
-    { to: '/',            labelKey: 'nav.dashboard', icon: LayoutDashboard, end: true },
-    { to: '/calendar',    labelKey: 'nav.calendar',  icon: Calendar },
-    { to: '/bookings',    labelKey: 'nav.bookings',  icon: List },
-    { to: '/clients',     labelKey: 'nav.clients',   icon: Users },
-  ]},
-  { section: 'catalog', items: [
-    { to: '/services',    labelKey: 'nav.services',    icon: Sparkles },
-    { to: '/specialists', labelKey: 'nav.specialists', icon: User },
-    { to: '/hours',       labelKey: 'nav.hours',       icon: Clock },
-    { to: '/locations',   labelKey: 'nav.locations',   icon: MapPin, adminOnly: true },
-  ]},
-  { section: 'account', items: [
-    { to: '/storefront', labelKey: 'nav.storefront', icon: Store,    adminOnly: true },
-    { to: '/users',      labelKey: 'nav.users',      icon: UserCog,  adminOnly: true },
-    { to: '/settings',   labelKey: 'nav.settings',   icon: Settings },
-  ]},
-]
 
 interface SidebarProps {
   mobileOpen?: boolean
@@ -70,12 +39,12 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       {mobileOpen && <div className={s.overlay} onClick={onMobileClose} />}
 
       <aside className={[s.sidebar, collapsed ? s.collapsed : '', mobileOpen ? s.mobileOpen : ''].filter(Boolean).join(' ')}>
-        {/* Logo — Antheris branded */}
+        {/* Logo — the partner's own initial + name. */}
         <div className={s.logo}>
-          <div className={s.logoIcon}>A</div>
+          <div className={s.logoIcon}>{(partner?.name?.trim()?.[0] ?? 'R').toUpperCase()}</div>
           {!collapsed && (
             <div className={s.logoText}>
-              <div className={s.name}>{partner?.name ?? 'Antheris'}</div>
+              <div className={s.name}>{partner?.name ?? 'Reserva'}</div>
               <div className={s.tag}>{t('common.backoffice')}</div>
             </div>
           )}

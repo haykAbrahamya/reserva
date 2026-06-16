@@ -375,8 +375,23 @@
       "found": "Գտնվեց {count}",
       "searching": "Որոնում…"
     },
+    "categories": {
+      "all": "Բոլորը"
+    },
+    "sort": {
+      "label": "Դասավորել",
+      "rating": "Բարձր գնահատված",
+      "name": "Անուն (Ա–Ֆ)",
+      "services": "Ամենաշատ ծառայություն"
+    },
     "card": {
       "view": "Դիտել սրահը"
+    },
+    "open": {
+      "now": "Բաց է հիմա",
+      "closed": "Փակ է",
+      "opensAt": "Բացվում է {time}",
+      "opensDay": "Բացվում է {day} {time}"
     },
     "empty": {
       "allTitle": "Դեռ սրահներ չկան",

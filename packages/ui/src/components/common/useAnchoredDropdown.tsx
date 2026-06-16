@@ -63,13 +63,20 @@ export function useAnchoredDropdown(panelWidth?: number | 'trigger') {
     }
   }, [open])
 
-  /** Render `children` in a fixed-positioned portal anchored to the trigger. */
-  const renderPanel = useCallback((children: ReactNode, className?: string): ReactNode => {
+  /** Render `children` in a fixed-positioned portal anchored to the trigger.
+   *  `minWidth` lets the panel grow wider than a small trigger (e.g. a compact
+   *  sort control) so option labels aren't truncated; it's also right-aligned to
+   *  the trigger in that case so it doesn't overflow the viewport edge. */
+  const renderPanel = useCallback((children: ReactNode, className?: string, minWidth?: number): ReactNode => {
     if (!open) return null
+    const widenBy = minWidth && minWidth > pos.width ? minWidth - pos.width : 0
+    // When widening, anchor to the trigger's right edge so it grows leftward.
+    const left = Math.max(8, pos.left - widenBy)
     const style: React.CSSProperties = {
       position: 'fixed',
-      left: pos.left,
+      left,
       width: pos.width,
+      minWidth,
       zIndex: 4000,
       ...(pos.openUp
         ? { bottom: window.innerHeight - pos.top + 4 }

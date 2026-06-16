@@ -136,6 +136,34 @@
   border-radius: 999px;
 }
 
+/* Open-now status pill */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  svg { flex-shrink: 0; }
+}
+.statusOpen {
+  color: $success;
+  background: color-mix(in srgb, $success 12%, transparent);
+}
+.statusClosed {
+  color: $fg-2;
+  background: $bg-2;
+}
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: $success;
+  box-shadow: 0 0 0 3px color-mix(in srgb, $success 22%, transparent);
+}
+
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip {
   font-size: 11.5px;

@@ -1,6 +1,7 @@
 import { memo } from 'react'
-import { MapPin, Star, Scissors, Users, ArrowRight } from 'lucide-react'
+import { MapPin, Star, Scissors, Users, ArrowRight, Clock } from 'lucide-react'
 import type { SalonCard as Salon } from '@/services/salons.service'
+import { salonOpenStatus } from './openStatus'
 import { useT } from '@/i18n'
 import s from './SalonCard.module.scss'
 
@@ -19,6 +20,7 @@ export const SalonCard = memo(function SalonCard({ salon, isResult, query, onOpe
   const t2 = salon.heroTints[1] ?? `color-mix(in srgb, ${salon.accent} 55%, #000)`
   const city = salon.locations[0]?.address ?? salon.locations[0]?.name ?? ''
   const q = query?.trim().toLowerCase() ?? ''
+  const status = salonOpenStatus(salon)
 
   const open = () => salon.slug && onOpen(salon.slug)
 
@@ -56,6 +58,24 @@ export const SalonCard = memo(function SalonCard({ salon, isResult, query, onOpe
               <span className={s.more}>+{salon.locations.length - 1}</span>
             )}
           </div>
+        )}
+
+        {/* Open-now status (hidden when we have no schedule to judge by) */}
+        {!status.unknown && (
+          status.open ? (
+            <span className={[s.status, s.statusOpen].join(' ')}>
+              <span className={s.statusDot} /> {t('salons.open.now')}
+            </span>
+          ) : (
+            <span className={[s.status, s.statusClosed].join(' ')}>
+              <Clock size={12} />
+              {status.opensAt
+                ? (status.opensDay
+                    ? t('salons.open.opensDay', { day: status.opensDay, time: status.opensAt })
+                    : t('salons.open.opensAt', { time: status.opensAt }))
+                : t('salons.open.closed')}
+            </span>
+          )
         )}
 
         {/* Category chips */}

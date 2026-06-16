@@ -1,9 +1,6 @@
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import {
-  LayoutDashboard, Calendar, List, Sparkles, MoreHorizontal, Plus, Settings, LogOut,
-  UserCog, KeyRound, Users, User, Clock, MapPin, Store,
-} from 'lucide-react'
+import { MoreHorizontal, Plus, LogOut, KeyRound } from 'lucide-react'
 import { useAuthStore } from '@/store/auth.store'
 import { useIsAdmin } from '@/store/auth.hooks'
 import { authService } from '@/services/auth.service'
@@ -11,32 +8,12 @@ import { ChangePasswordModal } from '@/components/account/ChangePasswordModal/Ch
 import { Avatar } from '@/components/ui'
 import { useNewBooking } from '@/App'
 import { useT } from '@/i18n'
+import { PRIMARY_TABS, MORE_SECTIONS } from '../nav.config'
 import s from './MobileTabBar.module.scss'
 
-const TABS = [
-  { to: '/',         labelKey: 'nav.home',     icon: LayoutDashboard, end: true },
-  { to: '/calendar', labelKey: 'nav.calendar', icon: Calendar },
-  { to: '/bookings', labelKey: 'nav.bookings', icon: List },
-  { to: '/services', labelKey: 'nav.services', icon: Sparkles },
-]
-
-// Everything NOT in the bottom bar lives in the "More" sheet — kept in sync with
-// the desktop Sidebar, including admin-only gating. `adminOnly` items are hidden
-// for managers.
-interface MoreItem { to: string; labelKey: string; icon: typeof Users; adminOnly?: boolean }
-const MORE_NAV: { section: string; items: MoreItem[] }[] = [
-  { section: 'catalog', items: [
-    { to: '/clients',     labelKey: 'nav.clients',     icon: Users },
-    { to: '/specialists', labelKey: 'nav.specialists', icon: User },
-    { to: '/hours',       labelKey: 'nav.hours',       icon: Clock },
-    { to: '/locations',   labelKey: 'nav.locations',   icon: MapPin, adminOnly: true },
-  ]},
-  { section: 'account', items: [
-    { to: '/storefront',  labelKey: 'nav.storefront',  icon: Store,    adminOnly: true },
-    { to: '/users',       labelKey: 'nav.users',       icon: UserCog,  adminOnly: true },
-    { to: '/settings',    labelKey: 'nav.settings',    icon: Settings },
-  ]},
-]
+// Bottom bar = the shared "primary" nav items. The dashboard tab shows the
+// shorter "Home" label on mobile.
+const TABS = PRIMARY_TABS.map(t => ({ ...t, labelKey: t.to === '/' ? 'nav.home' : t.labelKey }))
 
 export function MobileTabBar() {
   const openNewBooking = useNewBooking()
@@ -115,7 +92,7 @@ export function MobileTabBar() {
             )}
 
             <div className={s.sheetItems}>
-              {MORE_NAV.map(group => {
+              {MORE_SECTIONS.map(group => {
                 const items = group.items.filter(item => isAdmin || !item.adminOnly)
                 if (items.length === 0) return null
                 return (

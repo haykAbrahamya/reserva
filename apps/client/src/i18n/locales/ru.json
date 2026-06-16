@@ -375,8 +375,23 @@
       "found": "Найдено: {count}",
       "searching": "Поиск…"
     },
+    "categories": {
+      "all": "Все"
+    },
+    "sort": {
+      "label": "Сортировка",
+      "rating": "По рейтингу",
+      "name": "По названию",
+      "services": "Больше услуг"
+    },
     "card": {
       "view": "Открыть салон"
+    },
+    "open": {
+      "now": "Открыто сейчас",
+      "closed": "Закрыто",
+      "opensAt": "Открытие в {time}",
+      "opensDay": "Открытие {day} {time}"
     },
     "empty": {
       "allTitle": "Пока нет салонов",

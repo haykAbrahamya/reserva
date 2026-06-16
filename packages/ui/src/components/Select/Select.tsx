@@ -21,11 +21,14 @@ interface SelectProps {
   searchable?: boolean
   /** Placeholder for the search input. */
   searchPlaceholder?: string
+  /** Minimum dropdown-panel width (px). Use when the trigger is narrow (e.g. a
+   *  compact control) so option labels aren't truncated. */
+  panelMinWidth?: number
 }
 
 export function Select({
   value, onChange, options, placeholder = 'Select…', disabled,
-  size = 'md', className = '', searchable, searchPlaceholder = 'Search…',
+  size = 'md', className = '', searchable, searchPlaceholder = 'Search…', panelMinWidth,
 }: SelectProps) {
   const { open, setOpen, triggerRef, renderPanel } = useAnchoredDropdown('trigger')
   const [hovered, setHovered] = useState(0)
@@ -134,6 +137,7 @@ export function Select({
           </div>
         </>,
         s.dropdown,
+        panelMinWidth,
       )}
     </div>
   )

@@ -346,9 +346,10 @@
 
 .resultHead {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 12px;
-  margin: 24px 0 18px;
+  margin: 22px 0 18px;
+  flex-wrap: wrap;
 }
 .resultTitle { font-family: $font-serif; font-size: 22px; letter-spacing: -0.02em; margin: 0; }
 .resultCount {
@@ -365,9 +366,61 @@
   gap: 6px;
   font-size: 13px;
   color: $fg-2;
-  margin-left: auto;
 }
 .searchingSpin { animation: salons-spin 0.7s linear infinite; color: $accent; }
+
+/* Sort control — icon + label + the shared design-system <Select>, pushed to
+   the far right of the result header. */
+.sort {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: $fg-2;
+}
+.sortIcon { color: $accent; flex-shrink: 0; }
+.sortLabel { @media (max-width: 480px) { display: none; } }
+/* Give the Select trigger a comfortable width so its label never truncates. */
+.sort > :last-child { min-width: 150px; }
+
+/* ── Category quick filters ── */
+.categories {
+  border-bottom: 1px solid $line-1;
+  background: color-mix(in srgb, $bg-1 60%, transparent);
+}
+.categoriesInner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  gap: 9px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+  @media (max-width: 600px) { padding: 12px 16px; }
+}
+.catChip {
+  flex-shrink: 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  font-family: $font-sans;
+  color: $fg-1;
+  background: $bg-1;
+  border: 1px solid $line-2;
+  border-radius: 999px;
+  padding: 8px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  &:hover { border-color: $accent; color: $accent-strong; }
+}
+.catChipActive {
+  background: $accent;
+  border-color: $accent;
+  color: $fg-on-accent;
+  &:hover { color: $fg-on-accent; }
+}
 
 .grid {
   display: grid;

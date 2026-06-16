@@ -374,8 +374,23 @@
       "found": "{count} found",
       "searching": "Searching…"
     },
+    "categories": {
+      "all": "All"
+    },
+    "sort": {
+      "label": "Sort",
+      "rating": "Top rated",
+      "name": "Name (A–Z)",
+      "services": "Most services"
+    },
     "card": {
       "view": "View salon"
+    },
+    "open": {
+      "now": "Open now",
+      "closed": "Closed",
+      "opensAt": "Opens {time}",
+      "opensDay": "Opens {day} {time}"
     },
     "empty": {
       "allTitle": "No salons yet",
