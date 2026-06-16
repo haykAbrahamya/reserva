@@ -246,6 +246,12 @@
     "phonePlaceholder": "+374 …",
     "notesLabel": "Notes (optional)",
     "notesPlaceholder": "Anything the salon should know?",
+    "validation": {
+      "nameRequired": "Please enter your name",
+      "nameTooShort": "Name is too short",
+      "phoneRequired": "Please enter your phone number",
+      "phoneInvalid": "Enter a valid phone number"
+    },
     "continue": "Continue",
     "reviewBooking": "Review booking",
     "confirmBooking": "Confirm booking",
@@ -388,6 +394,24 @@
       "home": "Home",
       "forSalons": "List your salon",
       "copyright": "© {year} Reserva. All rights reserved."
+    }
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Connection problem. Check your internet and try again.",
+    "codes": {
+      "BOOKING_OVERLAP": "Sorry, that time was just taken. Please pick another slot.",
+      "SPECIALIST_TIME_OFF": "The specialist isn't available at that time. Please choose another slot.",
+      "OUTSIDE_WORKING_HOURS": "That time is outside the salon's working hours. Please pick another slot.",
+      "SERVICE_NOT_OFFERED": "This service isn't available at the selected branch or specialist.",
+      "INVALID_TIME_RANGE": "That time isn't valid. Please choose another slot.",
+      "PAST_DATE": "That time has already passed. Please pick a future slot.",
+      "VALIDATION_FAILED": "Please check the details and try again.",
+      "NOT_FOUND": "We couldn't find what you're looking for. It may have changed.",
+      "RATE_LIMITED": "Too many attempts. Please wait a moment and try again.",
+      "EMAIL_TAKEN": "This email is already registered.",
+      "PHONE_TAKEN": "This phone number is already registered.",
+      "SLUG_TAKEN": "That address is already taken. Try another."
     }
   }
 }

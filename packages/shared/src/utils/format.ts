@@ -23,8 +23,18 @@ export function fmtDateShort(iso: string): string {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
 }
 
+/**
+ * Format a Date as a LOCAL 'YYYY-MM-DD' (the calendar day the user sees).
+ *
+ * NOTE: must use local parts, NOT toISOString() — toISOString converts to UTC,
+ * which in east-of-UTC timezones (e.g. Armenia, UTC+4) rolls a local-midnight
+ * date back to the previous day, producing an off-by-one in date pickers.
+ */
 export function fmtDateInput(date: Date): string {
-  return date.toISOString().slice(0, 10)
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
 }
 
 export function fmtDateTime(iso: string): string {

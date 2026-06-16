@@ -79,6 +79,18 @@ export function Bookings() {
     return () => window.removeEventListener('booking-created', fn)
   }, [reload])
 
+  // Deep-link: ?focus=<bookingId> (e.g. from a notification) opens that booking's
+  // detail drawer straight away, then the param is stripped so it doesn't re-open
+  // on later renders / navigation.
+  useEffect(() => {
+    const focus = searchParams.get('focus')
+    if (!focus) return
+    setSelectedId(focus)
+    const next = new URLSearchParams(searchParams)
+    next.delete('focus')
+    setSearchParams(next, { replace: true })
+  }, [searchParams, setSearchParams])
+
   const patchParams = (patch: Record<string, string>) => {
     const next = new URLSearchParams(searchParams)
     Object.entries(patch).forEach(([k, v]) => {

@@ -8,7 +8,8 @@ import { LogoMark } from '@/components/Logo/Logo'
 import { ThemeToggle } from '@/components/ThemeToggle/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher'
 import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
-import { signupService, SignupApiError } from '@/services/signup.service'
+import { signupService } from '@/services/signup.service'
+import { friendlyError } from '@/services/errors'
 import { isValidPhone, normalizePhoneInput } from '@reserva/shared'
 import { useT } from '@/i18n'
 import s from './SignUp.module.scss'
@@ -77,9 +78,9 @@ export function SignUp() {
       })
       setStep('success')
     } catch (err) {
-      setSubmitError(
-        err instanceof SignupApiError ? err.message : t('signup.errGeneric'),
-      )
+      // Map known backend codes (SLUG_TAKEN, EMAIL_TAKEN, …) to friendly,
+      // localized copy; fall back to a generic message for anything else.
+      setSubmitError(friendlyError(err, t))
     } finally {
       setSubmitting(false)
     }

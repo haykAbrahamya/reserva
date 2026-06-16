@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { ArrowLeft, X, Check, Users, Calendar, Clock, CheckCircle2, ArrowRight, Sparkles, MapPin, Send } from 'lucide-react'
+import { ArrowLeft, X, Check, Users, Calendar, Clock, CheckCircle2, ArrowRight, Sparkles, MapPin, Send, AlertCircle } from 'lucide-react'
 import { fmtAMD, fmtDuration, fmtDateInput, initials } from '@reserva/shared'
 import { DatePicker } from '@reserva/ui'
 import type { Service, Specialist } from '@reserva/shared'
@@ -11,6 +11,7 @@ import {
   createBooking,
 } from '@/services/booking.service'
 import { getTelegramConnectLink } from '@/services/telegram.service'
+import { friendlyError } from '@/services/errors'
 import { useT } from '@/i18n'
 import s from './BookingFlow.module.scss'
 
@@ -45,6 +46,10 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   const [name, setName]                 = useState('')
   const [phone, setPhone]               = useState('')
   const [notes, setNotes]               = useState('')
+  // Field-level validation — errors show only after a field is touched / on submit.
+  const [touched, setTouched]           = useState<{ name?: boolean; phone?: boolean }>({})
+  // Backend error from the final confirm call (slot taken, etc.).
+  const [submitError, setSubmitError]   = useState<string | null>(null)
   const [submitting, setSubmitting]     = useState(false)
   // Status of the just-created booking — drives confirmed vs pending success copy.
   const [bookedStatus, setBookedStatus] = useState<'confirmed' | 'pending'>('confirmed')
@@ -158,27 +163,45 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
     setStep('datetime')
   }
 
+  // Codes that mean "this slot won't work" → send the user back to pick a new time.
+  const SLOT_ERROR_CODES = new Set([
+    'BOOKING_OVERLAP', 'SPECIALIST_TIME_OFF', 'OUTSIDE_WORKING_HOURS', 'PAST_DATE', 'INVALID_TIME_RANGE',
+  ])
+
   const handleConfirm = async () => {
     if (!service) return
+    setSubmitError(null)
     setSubmitting(true)
-    const booking = await createBooking({
-      partner,
-      service,
-      specialistId: specialistId === ANY_SPECIALIST ? null : specialistId,
-      locationId,
-      date,
-      time: time!,
-      clientName: name.trim(),
-      clientPhone: phone.trim(),
-      notes: notes.trim() || undefined,
-    })
-    // Reflect the real outcome: auto-confirm partners → 'confirmed', otherwise
-    // the booking lands as 'pending' awaiting staff confirmation.
-    setBookedStatus(booking.status === 'confirmed' ? 'confirmed' : 'pending')
-    setSubmitting(false)
-    setStep('success')
-    // Offer free Telegram updates for this booking (best-effort, non-blocking).
-    getTelegramConnectLink(booking.id).then(setTelegramLink)
+    try {
+      const booking = await createBooking({
+        partner,
+        service,
+        specialistId: specialistId === ANY_SPECIALIST ? null : specialistId,
+        locationId,
+        date,
+        time: time!,
+        clientName: name.trim(),
+        clientPhone: phone.trim(),
+        notes: notes.trim() || undefined,
+      })
+      // Reflect the real outcome: auto-confirm partners → 'confirmed', otherwise
+      // the booking lands as 'pending' awaiting staff confirmation.
+      setBookedStatus(booking.status === 'confirmed' ? 'confirmed' : 'pending')
+      setStep('success')
+      // Offer free Telegram updates for this booking (best-effort, non-blocking).
+      getTelegramConnectLink(booking.id).then(setTelegramLink)
+    } catch (err) {
+      const code = (err as { code?: string } | null)?.code
+      setSubmitError(friendlyError(err, t))
+      // If the chosen slot is no longer valid, bounce back to time selection so
+      // the user can immediately pick another (and refresh slots).
+      if (code && SLOT_ERROR_CODES.has(code)) {
+        setTime(null)
+        setStep('datetime')
+      }
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const chosenSpecialist: Specialist | null =
@@ -201,14 +224,36 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
     success:    { title: '', sub: '' },
   }
 
+  // ── Field validation. Returns an i18n key for the error, or null if valid. ──
+  const nameError = (): string | null => {
+    const v = name.trim()
+    if (!v) return 'booking.validation.nameRequired'
+    if (v.length < 2) return 'booking.validation.nameTooShort'
+    return null
+  }
+  const phoneError = (): string | null => {
+    const v = phone.trim()
+    if (!v) return 'booking.validation.phoneRequired'
+    // Allow +, spaces, dashes, parens; require at least 6 digits.
+    const digits = v.replace(/\D/g, '')
+    if (digits.length < 6) return 'booking.validation.phoneInvalid'
+    return null
+  }
+  const detailsValid = !nameError() && !phoneError()
+
   const canNext = () => {
     if (step === 'datetime') return !!time
-    if (step === 'details') return name.trim().length > 1 && phone.trim().length >= 6
+    if (step === 'details') return detailsValid
     return true
   }
 
   const nextFromDatetime = () => setStep('details')
-  const nextFromDetails = () => setStep('confirm')
+  const nextFromDetails = () => {
+    // Surface any field errors if the user taps Continue with invalid input.
+    setTouched({ name: true, phone: true })
+    if (!detailsValid) return
+    setStep('confirm')
+  }
 
   return (
     <div className={[s.overlay, closing ? s.closing : ''].filter(Boolean).join(' ')} onClick={animatedClose}>
@@ -280,6 +325,15 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
             <div className={s.body}>
               <h2 className={s.stepTitle}>{stepTitles[step].title}</h2>
               <p className={s.stepSub}>{stepTitles[step].sub}</p>
+
+              {/* Backend error (e.g. slot taken). Shows on confirm, and on the
+                  datetime step after a conflict bounced the user back. */}
+              {submitError && (step === 'confirm' || step === 'datetime') && (
+                <div className={s.errorBanner} role="alert">
+                  <AlertCircle size={17} />
+                  <span>{submitError}</span>
+                </div>
+              )}
 
               {/* STEP: location (multi-branch only) */}
               {step === 'location' && (
@@ -369,7 +423,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
                           <button
                             key={sl}
                             className={[s.slot, time === sl ? s.selected : ''].filter(Boolean).join(' ')}
-                            onClick={() => setTime(sl)}
+                            onClick={() => { setTime(sl); setSubmitError(null) }}
                           >
                             {sl}
                           </button>
@@ -385,11 +439,26 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
                 <div>
                   <div className={s.formField}>
                     <label className={s.fieldLabel}>{t('booking.fullNameLabel')}</label>
-                    <input className={s.input} placeholder={t('booking.fullNamePlaceholder')} value={name} onChange={e => setName(e.target.value)} />
+                    <input
+                      className={[s.input, touched.name && nameError() ? s.inputError : ''].filter(Boolean).join(' ')}
+                      placeholder={t('booking.fullNamePlaceholder')}
+                      value={name}
+                      onChange={e => setName(e.target.value)}
+                      onBlur={() => setTouched(p => ({ ...p, name: true }))}
+                    />
+                    {touched.name && nameError() && <span className={s.fieldError}>{t(nameError()!)}</span>}
                   </div>
                   <div className={s.formField}>
                     <label className={s.fieldLabel}>{t('booking.phoneLabel')}</label>
-                    <input className={s.input} placeholder={t('booking.phonePlaceholder')} value={phone} onChange={e => setPhone(e.target.value)} inputMode="tel" />
+                    <input
+                      className={[s.input, touched.phone && phoneError() ? s.inputError : ''].filter(Boolean).join(' ')}
+                      placeholder={t('booking.phonePlaceholder')}
+                      value={phone}
+                      onChange={e => setPhone(e.target.value)}
+                      onBlur={() => setTouched(p => ({ ...p, phone: true }))}
+                      inputMode="tel"
+                    />
+                    {touched.phone && phoneError() && <span className={s.fieldError}>{t(phoneError()!)}</span>}
                   </div>
                   <div className={s.formField}>
                     <label className={s.fieldLabel}>{t('booking.notesLabel')}</label>
