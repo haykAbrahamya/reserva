@@ -203,7 +203,11 @@
       "viewProfileAria": "View {name}'s profile"
     },
     "gallery": {
-      "title": "Inside {name}"
+      "title": "Inside {name}",
+      "openImage": "View photo",
+      "counter": "{current} / {total}",
+      "prev": "Previous photo",
+      "next": "Next photo"
     },
     "footer": {
       "title": "Ready when you are",

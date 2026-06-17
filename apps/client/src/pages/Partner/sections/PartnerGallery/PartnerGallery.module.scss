@@ -52,12 +52,28 @@
   &:hover { transform: translateY(-3px); box-shadow: $shadow-2; }
   &:hover .icon { transform: scale(1.08) rotate(-4deg); }
 
+  /* Clickable photo tiles get a pointer + a subtle zoom-in cue on hover. */
+  &.clickable { cursor: pointer; }
+  &.clickable:hover .image { transform: scale(1.08); }
+
   /* first tile spans 2x2 */
   &:first-child {
     grid-column: span 2;
     grid-row: span 2;
     @media (max-width: 760px) { grid-column: span 2; grid-row: span 1; }
   }
+}
+
+/* Clickable photo button — full-cover layer holding the image + tint. */
+.tileBtn {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Uploaded photo — covers the tile, gently zooms on hover. */
@@ -103,6 +119,7 @@
   color: #fff;
   text-shadow: 0 1px 6px rgba(0,0,0,0.35);
   letter-spacing: 0.01em;
+  pointer-events: none; /* let clicks fall through to the photo button below */
 }
 
 /* grain/sheen overlay for depth */

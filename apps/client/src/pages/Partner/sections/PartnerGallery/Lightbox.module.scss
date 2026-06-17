@@ -1,0 +1,151 @@
+@use 'variables' as *;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 6, 4, 0.92);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  /* Backdrop blur + fade eases in; a touch longer for a softer entrance. */
+  animation: lb-fade 0.28s ease both;
+  &.closing { animation: lb-fade-out 0.2s ease both; }
+}
+
+/* ── Top bar ── */
+.topBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  z-index: 2;
+}
+.counter {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.12);
+  padding: 5px 12px;
+  border-radius: 999px;
+  backdrop-filter: blur(4px);
+}
+.close {
+  margin-left: auto;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  &:hover { background: rgba(255, 255, 255, 0.22); }
+  &:active { transform: scale(0.94); }
+}
+
+/* ── Image stage ── */
+.stage {
+  position: relative;
+  max-width: 92vw;
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Gentle, slightly slower entrance so the first open reads as smooth, not snappy. */
+  animation: lb-pop 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+  .closing & { animation: lb-pop-out 0.2s ease both; }
+}
+.image {
+  max-width: 92vw;
+  max-height: 80vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: $r-2;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+}
+/* Directional slide+fade when navigating between photos. */
+.fromRight { animation: lb-slide-right 0.38s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.fromLeft  { animation: lb-slide-left  0.38s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* Respect reduced-motion: keep a gentle fade, drop the slide/scale transforms. */
+@media (prefers-reduced-motion: reduce) {
+  .stage, .fromRight, .fromLeft { animation: lb-fade 0.2s ease both; }
+}
+.caption {
+  margin-top: 14px;
+  max-width: 80vw;
+  text-align: center;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ── Nav arrows ── */
+.nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  &:hover { background: rgba(255, 255, 255, 0.22); }
+  &:active { transform: translateY(-50%) scale(0.92); }
+}
+.prev { left: 18px; }
+.next { right: 18px; }
+
+/* ── Mobile ── */
+@media (max-width: 600px) {
+  .image { max-height: 72vh; }
+  .nav {
+    width: 44px;
+    height: 44px;
+    bottom: 24px;
+    top: auto;
+    transform: none;
+    background: rgba(255, 255, 255, 0.16);
+    &:active { transform: scale(0.92); }
+  }
+  /* Move arrows to the bottom corners on phones (thumb-reachable). */
+  .prev { left: 24px; }
+  .next { right: 24px; }
+}
+
+:global {
+  @keyframes lb-fade { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes lb-fade-out { from { opacity: 1 } to { opacity: 0 } }
+  @keyframes lb-pop {
+    from { opacity: 0; transform: scale(0.96) translateY(10px) }
+    to   { opacity: 1; transform: none }
+  }
+  @keyframes lb-pop-out {
+    from { opacity: 1; transform: none }
+    to   { opacity: 0; transform: scale(0.96) translateY(8px) }
+  }
+  /* Directional photo transitions — slide in + fade from the chosen side. */
+  @keyframes lb-slide-right {
+    from { opacity: 0; transform: translateX(32px) scale(0.985) }
+    to   { opacity: 1; transform: none }
+  }
+  @keyframes lb-slide-left {
+    from { opacity: 0; transform: translateX(-32px) scale(0.985) }
+    to   { opacity: 1; transform: none }
+  }
+}
