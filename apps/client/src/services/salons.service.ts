@@ -15,7 +15,7 @@ export interface SalonCard {
   rating: number
   reviews: number
   heroTints: string[]
-  locations: { id: string; name: string; address: string; hours?: WeekSchedule }[]
+  locations: { id: string; name: string; address: string; hours?: WeekSchedule; lat?: number | null; lng?: number | null }[]
   categories: string[]
   serviceCount: number
   specialistCount: number

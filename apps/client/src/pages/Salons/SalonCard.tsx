@@ -1,6 +1,7 @@
 import { memo } from 'react'
-import { MapPin, Star, Scissors, Users, ArrowRight, Clock } from 'lucide-react'
+import { MapPin, Star, Sparkles, Users, ArrowRight, Clock, Navigation } from 'lucide-react'
 import type { SalonCard as Salon } from '@/services/salons.service'
+import { formatDistance } from '@/lib/geo'
 import { salonOpenStatus } from './openStatus'
 import { useT } from '@/i18n'
 import s from './SalonCard.module.scss'
@@ -11,10 +12,12 @@ interface Props {
   isResult?: boolean
   /** The active query — used to subtly highlight matching chips. */
   query?: string
+  /** Distance to the user's nearest branch (km), or null when not located. */
+  distanceKm?: number | null
   onOpen: (slug: string) => void
 }
 
-export const SalonCard = memo(function SalonCard({ salon, isResult, query, onOpen }: Props) {
+export const SalonCard = memo(function SalonCard({ salon, isResult, query, distanceKm, onOpen }: Props) {
   const t = useT()
   const t1 = salon.heroTints[0] ?? salon.accent
   const t2 = salon.heroTints[1] ?? `color-mix(in srgb, ${salon.accent} 55%, #000)`
@@ -57,6 +60,11 @@ export const SalonCard = memo(function SalonCard({ salon, isResult, query, onOpe
             {salon.locations.length > 1 && (
               <span className={s.more}>+{salon.locations.length - 1}</span>
             )}
+            {typeof distanceKm === 'number' && (
+              <span className={s.distance}>
+                <Navigation size={11} /> {formatDistance(distanceKm)}
+              </span>
+            )}
           </div>
         )}
 
@@ -94,7 +102,7 @@ export const SalonCard = memo(function SalonCard({ salon, isResult, query, onOpe
 
         <div className={s.footer}>
           <div className={s.counts}>
-            <span className={s.count}><Scissors size={13} /> {salon.serviceCount}</span>
+            <span className={s.count}><Sparkles size={13} /> {salon.serviceCount}</span>
             <span className={s.count}><Users size={13} /> {salon.specialistCount}</span>
           </div>
           <span className={s.cta}>

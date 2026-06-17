@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Search, Scissors, MapPin, X, SearchX, Sparkles, Loader2, SlidersHorizontal, ArrowUpDown } from 'lucide-react'
+import { Search, Scissors, MapPin, X, SearchX, Sparkles, Loader2, SlidersHorizontal, ArrowUpDown, Navigation } from 'lucide-react'
 import { Select } from '@reserva/ui'
 import { Logo } from '@/components/Logo/Logo'
 import { ThemeToggle } from '@/components/ThemeToggle/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher'
 import { listSalons, type SalonCard as Salon } from '@/services/salons.service'
+import { useGeolocation } from '@/hooks/useGeolocation'
+import { distanceKm, type LatLng } from '@/lib/geo'
 import { useT } from '@/i18n'
 import { SalonCard } from './SalonCard'
 import s from './Salons.module.scss'
@@ -13,7 +15,17 @@ import s from './Salons.module.scss'
 interface Filters { q: string; service: string; location: string }
 const EMPTY: Filters = { q: '', service: '', location: '' }
 
-type SortKey = 'rating' | 'name' | 'services'
+type SortKey = 'rating' | 'name' | 'services' | 'nearest'
+
+/** Distance (km) from the user to a salon's NEAREST located branch, or null if
+ *  the user position is unknown or the salon has no coordinates. */
+function salonDistanceKm(salon: Salon, me: LatLng | null): number | null {
+  if (!me) return null
+  const dists = salon.locations
+    .filter((l) => typeof l.lat === 'number' && typeof l.lng === 'number')
+    .map((l) => distanceKm(me, { lat: l.lat as number, lng: l.lng as number }))
+  return dists.length ? Math.min(...dists) : null
+}
 
 /** Read filters from the URL query string. */
 function filtersFromParams(params: URLSearchParams): Filters {
@@ -52,6 +64,8 @@ export function Salons() {
   const [sheetOpen, setSheetOpen] = useState(false)
   // Sort of the displayed list (client-side, instant).
   const [sort, setSort] = useState<SortKey>('rating')
+  // "Near me" — geolocation-driven distance + nearest sort.
+  const geo = useGeolocation()
   // Distinct categories captured from the FIRST unfiltered load, so the quick
   // chips stay stable even after the result set narrows.
   const [allCategories, setAllCategories] = useState<string[]>([])
@@ -129,6 +143,19 @@ export function Salons() {
 
   const openSalon = useCallback((slug: string) => navigate(`/p/${slug}`), [navigate])
 
+  // "Near me" reactions: switch to nearest sort once we have a position; revert
+  // away from nearest if location is cleared/denied.
+  const located = geo.status === 'granted' && !!geo.coords
+  useEffect(() => { if (located) setSort('nearest') }, [located])
+  useEffect(() => { if (!located && sort === 'nearest') setSort('rating') }, [located, sort])
+
+  // Precompute each salon's distance (km) to the user's nearest branch.
+  const distances = useMemo(() => {
+    const map = new Map<string, number | null>()
+    if (salons) for (const sl of salons) map.set(sl.id, salonDistanceKm(sl, geo.coords))
+    return map
+  }, [salons, geo.coords])
+
   // Sorted view of the loaded salons (sort is purely client-side).
   const sortedSalons = useMemo(() => {
     if (!salons) return null
@@ -136,8 +163,18 @@ export function Salons() {
     if (sort === 'rating') copy.sort((a, b) => b.rating - a.rating || b.reviews - a.reviews)
     else if (sort === 'name') copy.sort((a, b) => a.name.localeCompare(b.name))
     else if (sort === 'services') copy.sort((a, b) => b.serviceCount - a.serviceCount)
+    else if (sort === 'nearest') {
+      // Salons with a known distance first (ascending); unlocated ones sink.
+      copy.sort((a, b) => {
+        const da = distances.get(a.id), db = distances.get(b.id)
+        if (da == null && db == null) return 0
+        if (da == null) return 1
+        if (db == null) return -1
+        return da - db
+      })
+    }
     return copy
-  }, [salons, sort])
+  }, [salons, sort, distances])
 
   const count = salons?.length ?? 0
 
@@ -339,22 +376,41 @@ export function Salons() {
               <span className={s.searchingTag}><Loader2 size={13} className={s.searchingSpin} /> {t('salons.results.searching')}</span>
             )}
 
-            {/* Sort control — design-system Select (themed, keyboard-accessible) */}
-            {!initialLoading && !error && count > 1 && (
-              <div className={s.sort}>
-                <ArrowUpDown size={14} className={s.sortIcon} />
-                <span className={s.sortLabel}>{t('salons.sort.label')}</span>
-                <Select
-                  size="sm"
-                  value={sort}
-                  onChange={(v) => setSort(v as SortKey)}
-                  panelMinWidth={180}
-                  options={[
-                    { value: 'rating', label: t('salons.sort.rating') },
-                    { value: 'name', label: t('salons.sort.name') },
-                    { value: 'services', label: t('salons.sort.services') },
-                  ]}
-                />
+            {/* Controls: Near me + Sort */}
+            {!initialLoading && !error && count > 0 && (
+              <div className={s.controls}>
+                {geo.supported && (
+                  <button
+                    className={[s.nearBtn, located ? s.nearBtnOn : ''].filter(Boolean).join(' ')}
+                    onClick={() => (located ? geo.clear() : geo.request())}
+                    disabled={geo.status === 'loading'}
+                    title={geo.status === 'denied' ? t('salons.near.denied') : undefined}
+                  >
+                    {geo.status === 'loading'
+                      ? <Loader2 size={14} className={s.searchingSpin} />
+                      : <Navigation size={14} />}
+                    {located ? t('salons.near.on') : t('salons.near.button')}
+                  </button>
+                )}
+
+                {count > 1 && (
+                  <div className={s.sort}>
+                    <ArrowUpDown size={14} className={s.sortIcon} />
+                    <span className={s.sortLabel}>{t('salons.sort.label')}</span>
+                    <Select
+                      size="sm"
+                      value={sort}
+                      onChange={(v) => setSort(v as SortKey)}
+                      panelMinWidth={180}
+                      options={[
+                        ...(located ? [{ value: 'nearest', label: t('salons.sort.nearest') }] : []),
+                        { value: 'rating', label: t('salons.sort.rating') },
+                        { value: 'name', label: t('salons.sort.name') },
+                        { value: 'services', label: t('salons.sort.services') },
+                      ]}
+                    />
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -403,6 +459,7 @@ export function Salons() {
                   salon={salon}
                   isResult={hasSearch}
                   query={filters.q || filters.service || filters.location}
+                  distanceKm={distances.get(salon.id) ?? null}
                   onOpen={openSalon}
                 />
               ))}

@@ -135,6 +135,21 @@
   padding: 1px 7px;
   border-radius: 999px;
 }
+/* "Near me" distance chip — accent-tinted, pushed to the end of the meta row. */
+.distance {
+  flex-shrink: 0;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--salon-accent);
+  background: color-mix(in srgb, var(--salon-accent) 12%, transparent);
+  padding: 2px 8px;
+  border-radius: 999px;
+  svg { color: var(--salon-accent) !important; }
+}
 
 /* Open-now status pill */
 .status {

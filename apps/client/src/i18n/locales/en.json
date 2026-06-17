@@ -387,7 +387,13 @@
       "label": "Sort",
       "rating": "Top rated",
       "name": "Name (A–Z)",
-      "services": "Most services"
+      "services": "Most services",
+      "nearest": "Nearest"
+    },
+    "near": {
+      "button": "Near me",
+      "on": "Near me",
+      "denied": "Location access was blocked. Enable it in your browser settings to sort by distance."
     },
     "card": {
       "view": "View salon"

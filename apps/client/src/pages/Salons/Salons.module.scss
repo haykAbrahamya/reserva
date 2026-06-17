@@ -371,8 +371,45 @@
 
 /* Sort control — icon + label + the shared design-system <Select>, pushed to
    the far right of the result header. */
-.sort {
+/* Right-aligned controls cluster: Near me + Sort. */
+.controls {
   margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* "Near me" toggle button */
+.nearBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-1;
+  font-family: $font-sans;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  svg { color: $accent; flex-shrink: 0; }
+  &:hover { border-color: $accent; color: $accent-strong; }
+  &:disabled { opacity: 0.65; cursor: default; }
+}
+.nearBtnOn {
+  background: $accent;
+  border-color: $accent;
+  color: $fg-on-accent;
+  svg { color: $fg-on-accent; }
+  &:hover { background: $accent-strong; border-color: $accent-strong; color: $fg-on-accent; }
+}
+
+.sort {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -386,8 +423,10 @@
 
 /* ── Category quick filters ── */
 .categories {
+  /* Transparent so it flows from the hero into the results — no muddy band.
+     A hairline divider keeps it feeling like a distinct filter row. */
+  background: transparent;
   border-bottom: 1px solid $line-1;
-  background: color-mix(in srgb, $bg-1 60%, transparent);
 }
 .categoriesInner {
   max-width: 1180px;
