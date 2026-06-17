@@ -95,15 +95,28 @@
   svg { color: $accent; flex-shrink: 0; margin-top: 2px; }
 }
 
+/* Address is a link to Google Maps — subtle affordance, accent on hover. */
+.addressLink {
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color 0.15s;
+  &:hover { color: $accent; }
+  &:hover span { text-decoration: underline; }
+}
+
+/* "Book here" gets its own full-width row (primary action); Call + Directions
+   share the row below. Avoids the 3-in-a-row cramping that wrapped the labels. */
 .actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-top: auto;
   padding-top: 16px;
 }
 
 .bookBtn {
-  flex: 1;
+  grid-column: 1 / -1; /* full width, own row */
   height: 42px;
   border-radius: $r-2;
   background: $accent;
@@ -112,6 +125,7 @@
   font-family: $font-sans;
   font-size: 14px;
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -122,9 +136,9 @@
   &:active { transform: translateY(1px); }
 }
 
-.callBtn {
+.callBtn, .mapBtn {
   height: 42px;
-  padding: 0 16px;
+  padding: 0 14px;
   border-radius: $r-2;
   background: $bg-1;
   color: $fg-0;
@@ -133,11 +147,15 @@
   font-family: $font-sans;
   font-size: 14px;
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 7px;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
   &:hover { background: $bg-2; border-color: $line-strong; }
 }
+/* Directions stands out a touch with the accent icon. */
+.mapBtn svg { color: $accent; }
+.mapBtn:hover { color: $accent-strong; border-color: $accent; }

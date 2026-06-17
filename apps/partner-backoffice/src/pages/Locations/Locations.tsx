@@ -8,11 +8,23 @@ import {
   DAY_KEYS, DEFAULT_LOCATION_HOURS, everyDaySchedule, exceptSundaySchedule,
   summarizeHours, dayOf, type DayKey,
 } from '@/utils/locationHours'
+import { MapPicker } from '@/components/maps/MapPicker/MapPicker'
+import { mapsEnabled } from '@/lib/googleMaps'
 import { useI18n } from '@/i18n'
 import type { Location, WeekSchedule, WorkingDay } from '@/types'
 import s from './Locations.module.scss'
 
-const EMPTY_FORM = { name: '', address: '', phone: '', hours: DEFAULT_LOCATION_HOURS as WeekSchedule }
+interface LocationForm {
+  name: string
+  address: string
+  phone: string
+  hours: WeekSchedule
+  lat: number | null
+  lng: number | null
+}
+const EMPTY_FORM: LocationForm = {
+  name: '', address: '', phone: '', hours: DEFAULT_LOCATION_HOURS as WeekSchedule, lat: null, lng: null,
+}
 
 export function Locations() {
   const partner     = usePartner()
@@ -42,6 +54,7 @@ export function Locations() {
     setForm({
       name: loc.name, address: loc.address, phone: loc.phone,
       hours: loc.hours ?? DEFAULT_LOCATION_HOURS,
+      lat: loc.lat ?? null, lng: loc.lng ?? null,
     })
     setModalOpen(true)
   }
@@ -153,12 +166,38 @@ export function Locations() {
             onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
             placeholder={t('locations.modal.namePlaceholder')}
           />
-          <Input
-            label={t('locations.modal.addressLabel')}
-            value={form.address}
-            onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
-            placeholder={t('locations.modal.addressPlaceholder')}
-          />
+          {/* Address. When Google Maps is configured, the MapPicker IS the address
+              input (search → pin → auto-filled, editable line) — a single source,
+              no duplicate field. Without a key, fall back to a plain text input. */}
+          {mapsEnabled ? (
+            <div className={s.mapField}>
+              <label className={s.mapLabel}>{t('locations.modal.mapLabel')}</label>
+              <MapPicker
+                lat={form.lat}
+                lng={form.lng}
+                address={form.address}
+                onAddressChange={(address) => setForm(f => ({ ...f, address }))}
+                onChange={({ lat, lng, address }) =>
+                  setForm(f => ({
+                    ...f,
+                    lat,
+                    lng,
+                    // Picking a place / moving the pin always refreshes the address
+                    // (the owner can still edit it afterwards).
+                    address: address ?? f.address,
+                  }))
+                }
+              />
+            </div>
+          ) : (
+            <Input
+              label={t('locations.modal.addressLabel')}
+              value={form.address}
+              onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
+              placeholder={t('locations.modal.addressPlaceholder')}
+            />
+          )}
+
           <Input
             label={t('locations.modal.phoneLabel')}
             value={form.phone}

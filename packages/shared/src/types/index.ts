@@ -33,6 +33,9 @@ export interface Location {
   phone: string
   /** Opening hours per weekday. Optional — older locations may not have it set. */
   hours?: WeekSchedule
+  /** Geo coordinates from the map picker. Null/absent until an owner sets a pin. */
+  lat?: number | null
+  lng?: number | null
 }
 
 export interface Specialist {

@@ -256,3 +256,36 @@ input, textarea, select { font-family: inherit; }
 @keyframes overlay-out { from { opacity: 1 }                   to { opacity: 0 } }
 @keyframes modal-out  { from { opacity:1; transform: none }    to { opacity:0; transform: scale(0.96) translateY(8px) } }
 @keyframes drawer-out { from { opacity:1; transform: none }    to { opacity:0; transform: translateX(24px) } }
+
+/* ── Google Places Autocomplete dropdown (.pac-container) ──────────────────
+   Google renders this widget itself; we can only restyle via these classes.
+   Theme it to the Reserva design tokens so it doesn't show as stark white. */
+.pac-container {
+  background: var(--bg-1);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-2);
+  box-shadow: var(--shadow-3);
+  margin-top: 6px;
+  padding: 4px;
+  font-family: var(--font-sans);
+  z-index: 5000; /* above modals */
+}
+.pac-container::after { display: none !important; } /* hide the "powered by Google" image row */
+.pac-item {
+  border: none;
+  border-radius: var(--r-1);
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--fg-2);
+  cursor: pointer;
+}
+.pac-item:hover,
+.pac-item-selected {
+  background: var(--bg-2);
+}
+.pac-item-query {
+  font-size: 13px;
+  color: var(--fg-0);
+}
+.pac-matched { color: var(--accent); font-weight: 600; }
+.pac-icon { display: none; } /* drop Google's pin sprite; cleaner list */

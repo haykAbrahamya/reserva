@@ -190,6 +190,8 @@
       "specialistsHere_plural": "{count} специалистов здесь",
       "bookHere": "Записаться сюда",
       "call": "Позвонить",
+      "directions": "Маршрут",
+      "openInMaps": "Открыть в Google Maps",
       "closed": "Закрыто"
     },
     "team": {

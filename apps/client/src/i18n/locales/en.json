@@ -190,6 +190,8 @@
       "specialistsHere_plural": "{count} specialists here",
       "bookHere": "Book here",
       "call": "Call",
+      "directions": "Directions",
+      "openInMaps": "Open in Google Maps",
       "closed": "Closed"
     },
     "team": {

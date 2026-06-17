@@ -1,4 +1,4 @@
-import { MapPin, Phone, CalendarCheck, Clock, Users } from 'lucide-react'
+import { MapPin, Phone, CalendarCheck, Clock, Users, Navigation } from 'lucide-react'
 import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { useI18n } from '@/i18n'
@@ -9,6 +9,16 @@ import s from './PartnerLocations.module.scss'
 interface Props {
   partner: PublicPartner
   onBook: () => void
+}
+
+/** Google Maps URL for a location — exact pin when coordinates exist, else the
+ *  address text. Opens directions/place view in a new tab. */
+function mapsUrl(loc: { address: string; name: string; lat?: number | null; lng?: number | null }): string {
+  const base = 'https://www.google.com/maps/search/?api=1&query='
+  if (typeof loc.lat === 'number' && typeof loc.lng === 'number') {
+    return base + encodeURIComponent(`${loc.lat},${loc.lng}`)
+  }
+  return base + encodeURIComponent(`${loc.name} ${loc.address}`.trim())
 }
 
 export function PartnerLocations({ partner, onBook }: Props) {
@@ -48,10 +58,16 @@ export function PartnerLocations({ partner, onBook }: Props) {
                 <div className={s.cardBody}>
                   <div className={s.branchName}>{loc.name}</div>
 
-                  <div className={s.row}>
+                  <a
+                    className={[s.row, s.addressLink].join(' ')}
+                    href={mapsUrl(loc)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={t('partner.locations.openInMaps')}
+                  >
                     <MapPin size={15} />
                     <span>{loc.address}</span>
-                  </div>
+                  </a>
                   <div className={s.row}>
                     <Phone size={15} />
                     <span>{loc.phone}</span>
@@ -73,6 +89,14 @@ export function PartnerLocations({ partner, onBook }: Props) {
                     </button>
                     <a className={s.callBtn} href={`tel:${loc.phone.replace(/\s/g, '')}`}>
                       <Phone size={15} /> {t('partner.locations.call')}
+                    </a>
+                    <a
+                      className={s.mapBtn}
+                      href={mapsUrl(loc)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Navigation size={15} /> {t('partner.locations.directions')}
                     </a>
                   </div>
                 </div>

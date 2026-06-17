@@ -99,6 +99,8 @@
   font-weight: 500;
   color: $fg-1;
 }
+.mapField { display: flex; flex-direction: column; gap: 8px; }
+.mapLabel { font-size: 12px; font-weight: 500; color: $fg-1; }
 .presets {
   display: flex;
   gap: 6px;

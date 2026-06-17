@@ -190,6 +190,8 @@
       "specialistsHere_plural": "Այստեղ՝ {count} մասնագետ",
       "bookHere": "Ամրագրել այստեղ",
       "call": "Զանգահարել",
+      "directions": "Երթուղի",
+      "openInMaps": "Բացել Google Maps-ում",
       "closed": "Փակ է"
     },
     "team": {
