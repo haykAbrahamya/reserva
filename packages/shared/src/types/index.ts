@@ -59,13 +59,23 @@ export interface Service {
   category: string
   /** Recurrence interval in total days (null = no repeat). Backoffice-only. */
   repeatEveryDays?: number | null
+  /**
+   * When false this is a facility/entry service (spa sauna, pool, day pass):
+   * it isn't tied to a person, so booking skips specialist selection and uses
+   * the location's hours + `capacity` instead. Defaults to true. Optional
+   * because older fixtures / partial payloads may omit it — treat absent as true.
+   */
+  requiresSpecialist?: boolean
+  /** Max concurrent bookings per slot for a facility service (≥1, default 1). */
+  capacity?: number
 }
 
 export interface Booking {
   id: string
   partnerId: string
   locationId: string
-  specialistId: string
+  /** Null for facility/entry services (spa) that aren't tied to a specialist. */
+  specialistId: string | null
   serviceId: string
   clientName: string
   clientPhone: string

@@ -232,12 +232,30 @@
   "booking": {
     "stepLabel": "Step {current} of {total}",
     "steps": {
-      "location": { "title": "Choose a branch", "sub": "Which location works best for you?" },
-      "service": { "title": "Choose a service", "sub": "What would you like to book?" },
-      "specialist": { "title": "Pick your specialist", "sub": "Choose someone specific, or let us assign the best available." },
-      "datetime": { "title": "Select a time", "sub": "Pick a day and an available slot." },
-      "details": { "title": "Your details", "sub": "So the salon knows who to expect." },
-      "confirm": { "title": "Review & confirm", "sub": "Make sure everything looks right." }
+      "location": {
+        "title": "Choose a branch",
+        "sub": "Which location works best for you?"
+      },
+      "service": {
+        "title": "Choose a service",
+        "sub": "What would you like to book?"
+      },
+      "specialist": {
+        "title": "Pick your specialist",
+        "sub": "Choose someone specific, or let us assign the best available."
+      },
+      "datetime": {
+        "title": "Select a time",
+        "sub": "Pick a day and an available slot."
+      },
+      "details": {
+        "title": "Your details",
+        "sub": "So the salon knows who to expect."
+      },
+      "confirm": {
+        "title": "Review & confirm",
+        "sub": "Make sure everything looks right."
+      }
     },
     "anySpecialist": "Any available specialist",
     "anySpecialistMeta": "We'll match you with the best fit",
@@ -280,7 +298,8 @@
       "name": "Name",
       "phone": "Phone",
       "total": "Total"
-    }
+    },
+    "spots": "{n} spots"
   },
   "signup": {
     "panelTag": "For salons",
@@ -289,9 +308,18 @@
     "panelQuotePost": " in days.",
     "panelBy": "Reserva · Booking platform for Armenian salons",
     "features": {
-      "bookings": { "title": "Bookings around the clock", "desc": "Clients book online, day or night" },
-      "page": { "title": "Your own branded page", "desc": "Live at reserva.am in minutes" },
-      "trial": { "title": "14-day free trial", "desc": "No card required, cancel anytime" }
+      "bookings": {
+        "title": "Bookings around the clock",
+        "desc": "Clients book online, day or night"
+      },
+      "page": {
+        "title": "Your own branded page",
+        "desc": "Live at reserva.am in minutes"
+      },
+      "trial": {
+        "title": "14-day free trial",
+        "desc": "No card required, cancel anytime"
+      }
     },
     "stepCompany": "Company",
     "stepAccount": "Your account",

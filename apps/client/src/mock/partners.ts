@@ -162,6 +162,9 @@ export const PARTNERS: PublicPartner[] = [
       { id: 'av-aroma', name: 'Aromatherapy', price: 14000, duration: 60, active: true, category: 'Therapy' },
       { id: 'av-body', name: 'Body scrub', price: 11000, duration: 45, active: true, category: 'Body' },
       { id: 'av-wrap', name: 'Detox body wrap', price: 20000, duration: 90, active: true, category: 'Body' },
+      // Facility / entry services — no specialist, gated by concurrent capacity.
+      { id: 'av-sauna', name: 'Sauna access', price: 4000, duration: 60, active: true, category: 'Facilities', requiresSpecialist: false, capacity: 10 },
+      { id: 'av-pool', name: 'Pool day pass', price: 6000, duration: 120, active: true, category: 'Facilities', requiresSpecialist: false, capacity: 25 },
     ],
     presentation: {
       tagline: 'Restore, recharge, renew — naturally',

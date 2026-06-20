@@ -6,7 +6,8 @@ export interface ApiBooking {
   id: string
   partnerId: string
   locationId: string
-  specialistId: string
+  /** Null for facility/entry services (spa) that aren't tied to a specialist. */
+  specialistId: string | null
   serviceId: string
   clientId: string
   clientName: string

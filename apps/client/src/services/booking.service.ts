@@ -186,7 +186,7 @@ export async function createBooking(input: CreateBookingInput): Promise<Booking>
     id: string
     partnerId: string
     locationId: string
-    specialistId: string
+    specialistId: string | null
     serviceId: string
     clientName: string
     clientPhone: string

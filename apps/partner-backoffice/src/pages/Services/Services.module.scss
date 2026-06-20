@@ -220,6 +220,55 @@
 }
 .repeatHelp { font-size: 12px; color: $fg-2; line-height: 1.5; margin-bottom: 12px; }
 
+/* ── Booking type (specialist vs facility/entry) ── */
+.bookingType {
+  border: 1px solid $line-2;
+  border-radius: $r-2;
+  background: $bg-1;
+  padding: 14px;
+}
+.bookingTypeRow { display: flex; align-items: center; gap: 12px; }
+.bookingTypeIcon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: $r-1;
+  background: $accent-soft;
+  color: $accent-strong;
+}
+.bookingTypeBody { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.bookingTypeLabel { font-size: 14px; font-weight: 600; color: $fg-0; }
+.bookingTypeHint { font-size: 12px; color: $fg-2; line-height: 1.4; }
+
+.capacityRow {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid $line-1;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  animation: svc-expand 0.2s ease both;
+}
+.capacityRow > :first-child { width: 120px; flex-shrink: 0; }
+.capacityHint { font-size: 12px; color: $fg-3; line-height: 1.4; padding-bottom: 10px; }
+
+/* ── Facility badge on the service rows/cards ── */
+.facilityBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: $accent-soft;
+  color: $accent-strong;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
 :global {
   @keyframes svc-expand {
     from { opacity: 0; transform: translateY(-4px); }

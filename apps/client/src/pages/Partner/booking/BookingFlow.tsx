@@ -71,6 +71,10 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
     [partner, serviceId]
   )
 
+  // Facility/entry service (spa sauna, pool, day pass): no specialist — the
+  // flow skips the specialist step entirely and books against capacity.
+  const isFacility = service?.requiresSpecialist === false
+
   // Specialists eligible for the service AND at the chosen branch.
   const eligibleSpecialists = useMemo(
     () => (serviceId ? specialistsForService(partner, serviceId, locationId) : []),
@@ -118,13 +122,15 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
     return () => { active = false }
   }, [step, service, partner, specialistId, locationId, date])
 
-  // ── Step navigation ── (location step only present for multi-branch salons)
-  const STEP_ORDER: Step[] = useMemo(
-    () => (multiLocation
-      ? ['location', 'service', 'specialist', 'datetime', 'details', 'confirm']
-      : ['service', 'specialist', 'datetime', 'details', 'confirm']),
-    [multiLocation]
-  )
+  // ── Step navigation ──
+  //  - location step only for multi-branch salons
+  //  - specialist step is dropped for facility/entry services (no specialist)
+  const STEP_ORDER: Step[] = useMemo(() => {
+    const steps: Step[] = ['service', 'datetime', 'details', 'confirm']
+    if (!isFacility) steps.splice(1, 0, 'specialist')
+    if (multiLocation) steps.unshift('location')
+    return steps
+  }, [multiLocation, isFacility])
   const stepIndex = STEP_ORDER.indexOf(step)
   const totalSteps = STEP_ORDER.length
 
@@ -143,6 +149,12 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   const selectService = (id: string) => {
     setServiceId(id)
     setTime(null)
+    setSpecialistId(null)
+    // Facility/entry service (spa): no specialist → jump straight to date/time.
+    if (partner.services.find(sv => sv.id === id)?.requiresSpecialist === false) {
+      setStep('datetime')
+      return
+    }
     // If we're seeded to a specific specialist and they offer this service at
     // the chosen branch, pre-select them and skip straight to date/time.
     if (seedSpecialistId) {
@@ -153,7 +165,6 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
         return
       }
     }
-    setSpecialistId(null)
     setStep('specialist')
   }
 
@@ -299,6 +310,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
                 service={service}
                 specialist={chosenSpecialist}
                 anySpecialist={specialistId === ANY_SPECIALIST}
+                hideSpecialist={isFacility}
                 location={multiLocation ? chosenLocation?.name ?? null : null}
                 date={date}
                 time={time}
@@ -474,6 +486,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
                     service={service}
                     specialist={chosenSpecialist}
                     anySpecialist={specialistId === ANY_SPECIALIST}
+                    hideSpecialist={isFacility}
                     location={multiLocation ? chosenLocation?.name ?? null : null}
                     date={date}
                     time={time}
@@ -520,6 +533,7 @@ function ServiceStep({ partner, selectedId, onSelect }: {
   selectedId: string | null
   onSelect: (id: string) => void
 }) {
+  const t = useT()
   const services = partner.services.filter(sv => sv.active)
   const categories = Array.from(new Set(services.map(sv => sv.category)))
 
@@ -538,6 +552,12 @@ function ServiceStep({ partner, selectedId, onSelect }: {
                 <div className={s.optName}>{sv.name}</div>
                 <div className={s.optMeta}>
                   <span><Clock size={12} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 4 }} />{fmtDuration(sv.duration)}</span>
+                  {sv.requiresSpecialist === false && (
+                    <span style={{ marginLeft: 10 }}>
+                      <Users size={12} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 4 }} />
+                      {t('booking.spots', { n: sv.capacity ?? 1 })}
+                    </span>
+                  )}
                 </div>
               </div>
               <span className={s.optPrice}>{fmtAMD(sv.price)}</span>
@@ -549,10 +569,12 @@ function ServiceStep({ partner, selectedId, onSelect }: {
   )
 }
 
-function SummaryRows({ service, specialist, anySpecialist, location, date, time, name, phone, hidePrice }: {
+function SummaryRows({ service, specialist, anySpecialist, hideSpecialist, location, date, time, name, phone, hidePrice }: {
   service: Service | null
   specialist: Specialist | null
   anySpecialist: boolean
+  /** Facility/entry service has no specialist — hide the row entirely. */
+  hideSpecialist?: boolean
   location?: string | null
   date: string
   time: string | null
@@ -577,10 +599,12 @@ function SummaryRows({ service, specialist, anySpecialist, location, date, time,
         <span className={s.sumLabel}><Sparkles size={13} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 6 }} />{t('booking.summary.service')}</span>
         <span className={s.sumValue}>{service?.name ?? '—'}</span>
       </div>
-      <div className={s.sumRow}>
-        <span className={s.sumLabel}><Users size={13} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 6 }} />{t('booking.summary.specialist')}</span>
-        <span className={s.sumValue}>{anySpecialist ? t('booking.summary.anyAvailable') : specialist?.name ?? '—'}</span>
-      </div>
+      {!hideSpecialist && (
+        <div className={s.sumRow}>
+          <span className={s.sumLabel}><Users size={13} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 6 }} />{t('booking.summary.specialist')}</span>
+          <span className={s.sumValue}>{anySpecialist ? t('booking.summary.anyAvailable') : specialist?.name ?? '—'}</span>
+        </div>
+      )}
       <div className={s.sumRow}>
         <span className={s.sumLabel}><Calendar size={13} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 6 }} />{t('booking.summary.date')}</span>
         <span className={s.sumValue}>{dateLabel}</span>

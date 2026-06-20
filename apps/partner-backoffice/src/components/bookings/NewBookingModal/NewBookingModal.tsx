@@ -67,7 +67,39 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
 
   const busySlots = useMemo(() => {
     const set = new Set<string>()
-    if (!specialistId || !date || !partner) return set
+    if (!date || !partner) return set
+    const svc = svcCatalog.find(sv => sv.id === serviceId)
+    if (!svc) return set
+    const slotMin = svc.duration || 30
+
+    // ── Facility/entry service: gate by concurrent capacity ──
+    // A slot is full when `capacity` active bookings for this service+location
+    // overlap its [start, end) window. No specialist / time-off involved.
+    if (svc.requiresSpecialist === false) {
+      const capacity = Math.max(1, svc.capacity ?? 1)
+      const windows = bookings
+        .filter(b =>
+          b.serviceId === serviceId &&
+          (!locationId || b.locationId === locationId) &&
+          b.status !== 'cancelled' && b.status !== 'noshow',
+        )
+        .map(b => [new Date(b.startISO).getTime(), new Date(b.endISO).getTime()] as const)
+
+      for (let h = 8; h < 21; h++) {
+        for (let m = 0; m < 60; m += 30) {
+          const start = new Date(`${date}T00:00:00`); start.setHours(h, m, 0, 0)
+          const s0 = start.getTime(), e0 = s0 + slotMin * 60_000
+          const overlapping = windows.filter(([bs, be]) => s0 < be && bs < e0).length
+          if (overlapping >= capacity) {
+            set.add(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`)
+          }
+        }
+      }
+      return set
+    }
+
+    // ── Person service: a specialist's own bookings + time-off block slots ──
+    if (!specialistId) return set
     bookings.forEach(b => {
       if (b.specialistId !== specialistId) return
       if (b.status === 'cancelled' || b.status === 'noshow') return
@@ -77,8 +109,6 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
     })
     // Block slots that fall inside a time-off window. A slot is the service's
     // duration (default 30m) starting at the slot time.
-    const svc = svcCatalog.find(sv => sv.id === serviceId)
-    const slotMin = svc?.duration ?? 30
     for (let h = 8; h < 21; h++) {
       for (let m = 0; m < 60; m += 30) {
         const start = new Date(`${date}T00:00:00`); start.setHours(h, m, 0, 0)
@@ -89,7 +119,7 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
       }
     }
     return set
-  }, [bookings, specialistId, date, partner, serviceId, timeOff, svcCatalog])
+  }, [bookings, specialistId, date, partner, serviceId, locationId, timeOff, svcCatalog])
 
   // When a manager opens the modal, force their branch as the location.
   useEffect(() => {
@@ -107,7 +137,14 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
     sv.active && (!specialistId || spCatalog.find(sp => sp.id === specialistId)?.services.includes(sv.id))
   )
   const selectedService = svcCatalog.find(sv => sv.id === serviceId)
-  const canSubmit = locationId && serviceId && specialistId && date && time && clientName && clientPhone
+  // Facility/entry service (spa): no specialist — a walk-in just needs a spot.
+  const isFacility = selectedService?.requiresSpecialist === false
+  // The time grid is ready once we can resolve availability: a specialist for a
+  // person service, or just the service itself for a facility/entry one.
+  const slotsReady = isFacility ? !!serviceId : !!specialistId
+  const canSubmit =
+    locationId && serviceId && date && time && clientName && clientPhone &&
+    (isFacility || specialistId)
 
   const handleSubmit = async () => {
     if (!canSubmit || !selectedService) return
@@ -117,7 +154,9 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
     const end = new Date(start.getTime() + selectedService.duration * 60_000)
 
     await bookingsService.create({
-      partnerId: partner.id, locationId, specialistId, serviceId,
+      partnerId: partner.id, locationId,
+      specialistId: isFacility ? null : specialistId,
+      serviceId,
       clientName, clientPhone,
       startISO: start.toISOString(), endISO: end.toISOString(),
       status: 'confirmed',
@@ -160,22 +199,36 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
           <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('newBooking.serviceLabel')}</label>
           <Select
             value={serviceId}
-            onChange={setServiceId}
-            options={services.map(sv => ({ value: sv.id, label: sv.name, sub: t('newBooking.serviceSub', { duration: sv.duration, price: sv.price.toLocaleString() }) }))}
+            onChange={v => {
+              setServiceId(v)
+              setTime('')
+              // Facility services have no specialist — clear any prior pick.
+              if (svcCatalog.find(sv => sv.id === v)?.requiresSpecialist === false) setSpecialistId('')
+            }}
+            options={services.map(sv => ({
+              value: sv.id,
+              label: sv.name,
+              sub: sv.requiresSpecialist === false
+                ? t('newBooking.facilitySub', { duration: sv.duration, capacity: sv.capacity ?? 1 })
+                : t('newBooking.serviceSub', { duration: sv.duration, price: sv.price.toLocaleString() }),
+            }))}
             placeholder={t('newBooking.servicePlaceholder')}
           />
         </div>
 
-        <div className={s.full}>
-          <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('newBooking.specialistLabel')}</label>
-          <Select
-            value={specialistId}
-            onChange={setSpecialistId}
-            options={specialists.map(sp => ({ value: sp.id, label: sp.name, sub: sp.title }))}
-            placeholder={t('newBooking.specialistPlaceholder')}
-            disabled={!locationId}
-          />
-        </div>
+        {/* Specialist — hidden for facility/entry services (spa walk-ins). */}
+        {!isFacility && (
+          <div className={s.full}>
+            <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('newBooking.specialistLabel')}</label>
+            <Select
+              value={specialistId}
+              onChange={v => { setSpecialistId(v); setTime('') }}
+              options={specialists.map(sp => ({ value: sp.id, label: sp.name, sub: sp.title }))}
+              placeholder={t('newBooking.specialistPlaceholder')}
+              disabled={!locationId}
+            />
+          </div>
+        )}
 
         <div>
           <DatePicker label={t('newBooking.dateLabel')} value={date} min={today} onChange={setDate} />
@@ -183,7 +236,7 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
 
         <div className={s.full}>
           <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('newBooking.timeLabel')}</label>
-          {specialistId && date ? (
+          {slotsReady && date ? (
             <div className={s.slotGrid}>
               {allSlots.map(sl => (
                 <button
@@ -200,7 +253,7 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
           ) : (
             <div className={s.infoBox}>
               <Calendar size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-              <span>{t('newBooking.slotsHint')}</span>
+              <span>{t(isFacility ? 'newBooking.slotsHintFacility' : 'newBooking.slotsHint')}</span>
             </div>
           )}
         </div>

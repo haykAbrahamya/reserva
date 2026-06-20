@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Sparkles, Pencil, Clock, Scissors, RotateCcw, X } from 'lucide-react'
+import { Plus, Sparkles, Pencil, Clock, RotateCcw, X, Users, Waves } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Empty, Pagination } from '@/components/ui'
@@ -19,7 +19,12 @@ function useIsMobile() {
   return m
 }
 
-const EMPTY_FORM = { name: '', price: '', duration: '', category: '', active: true, repeatMonths: '', repeatDays: '' }
+const EMPTY_FORM = {
+  name: '', price: '', duration: '', category: '', active: true,
+  repeatMonths: '', repeatDays: '',
+  // Facility/entry service (spa): no specialist, N concurrent spots per slot.
+  requiresSpecialist: true, capacity: '1',
+}
 
 // Repeat period is stored as TOTAL DAYS. The form edits months + days; 1 month
 // is treated as 30 days for entry convenience.
@@ -80,6 +85,8 @@ export function Services() {
     setForm({
       name: svc.name, price: String(svc.price), duration: String(svc.duration),
       category: svc.category, active: svc.active,
+      requiresSpecialist: svc.requiresSpecialist ?? true,
+      capacity: String(svc.capacity ?? 1),
       ...fromTotalDays(svc.repeatEveryDays),
     })
     setRepeatOpen(!!svc.repeatEveryDays) // auto-expand if a period already exists
@@ -99,6 +106,9 @@ export function Services() {
       category: form.category,
       active: form.active,
       repeatEveryDays: toTotalDays(form.repeatMonths, form.repeatDays),
+      requiresSpecialist: form.requiresSpecialist,
+      // Capacity only matters for facility services; force 1 otherwise.
+      capacity: form.requiresSpecialist ? 1 : Math.max(1, Number(form.capacity) || 1),
     }
     if (editing) await partnersService.updateService(editing.id, data)
     else await partnersService.createService(data)
@@ -143,13 +153,18 @@ export function Services() {
                 {svcs.map(svc => (
                   <div key={svc.id} className={s.svcCard} onClick={() => openEdit(svc)}>
                     <div className={s.svcIconWrap}>
-                      <Scissors size={18} />
+                      {svc.requiresSpecialist === false ? <Waves size={18} /> : <Sparkles size={18} />}
                     </div>
                     <div className={s.svcCardBody}>
                       <div className={s.svcCardName}>{svc.name}</div>
                       <div className={s.svcCardMeta}>
                         <Clock size={11} style={{ display: 'inline', marginRight: 3, verticalAlign: 'middle' }} />
                         {fmtDuration(svc.duration)}
+                        {svc.requiresSpecialist === false && (
+                          <span className={s.facilityBadge}>
+                            <Users size={10} /> {t('services.capacityShort', { n: svc.capacity ?? 1 })}
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div className={s.svcCardRight}>
@@ -193,7 +208,14 @@ export function Services() {
             <tbody>
               {services.map(svc => (
                 <Tr key={svc.id}>
-                  <Td><span className={s.svcName}>{svc.name}</span></Td>
+                  <Td>
+                    <span className={s.svcName}>{svc.name}</span>
+                    {svc.requiresSpecialist === false && (
+                      <span className={s.facilityBadge}>
+                        <Waves size={10} /> {t('services.capacityShort', { n: svc.capacity ?? 1 })}
+                      </span>
+                    )}
+                  </Td>
                   <Td><span className={s.category}>{svc.category}</span></Td>
                   <Td><span className={s.duration}>{fmtDuration(svc.duration)}</span></Td>
                   <Td><span className={s.repeat}>{repeatLabel(svc.repeatEveryDays)}</span></Td>
@@ -322,6 +344,46 @@ export function Services() {
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Booking type — a person-based service needs a specialist; a
+              facility/entry service (spa sauna, pool, day pass) doesn't and is
+              gated by concurrent capacity instead. */}
+          <div className={s.formFull}>
+            <div className={s.bookingType}>
+              <div className={s.bookingTypeRow}>
+                <span className={s.bookingTypeIcon}>
+                  {form.requiresSpecialist ? <Users size={16} /> : <Waves size={16} />}
+                </span>
+                <div className={s.bookingTypeBody}>
+                  <span className={s.bookingTypeLabel}>{t('services.modal.requiresSpecialist')}</span>
+                  <span className={s.bookingTypeHint}>
+                    {form.requiresSpecialist
+                      ? t('services.modal.requiresSpecialistOn')
+                      : t('services.modal.requiresSpecialistOff')}
+                  </span>
+                </div>
+                <Toggle
+                  checked={form.requiresSpecialist}
+                  onChange={v => setForm(f => ({ ...f, requiresSpecialist: v }))}
+                />
+              </div>
+
+              {!form.requiresSpecialist && (
+                <div className={s.capacityRow}>
+                  <Input
+                    label={t('services.modal.capacityLabel')}
+                    type="number"
+                    min={1}
+                    max={200}
+                    value={form.capacity}
+                    onChange={e => setForm(f => ({ ...f, capacity: e.target.value }))}
+                    placeholder="10"
+                  />
+                  <span className={s.capacityHint}>{t('services.modal.capacityHint')}</span>
+                </div>
+              )}
+            </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

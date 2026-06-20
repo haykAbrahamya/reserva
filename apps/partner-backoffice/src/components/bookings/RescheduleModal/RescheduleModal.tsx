@@ -45,9 +45,37 @@ export function RescheduleModal({ booking, onClose, onDone }: Props) {
     return out
   }, [])
 
-  // Slots taken by *other* live bookings for the same specialist on this day.
+  // A facility/entry booking (spa, no specialist) is gated by concurrent
+  // capacity for its service+location; a person booking by the specialist.
+  const isFacility = booking.specialistId === null
+  const capacity = Math.max(1, booking.service?.capacity ?? 1)
+  const slotMin = booking.service?.duration ?? 30
+
   const busySlots = useMemo(() => {
     const set = new Set<string>()
+
+    if (isFacility) {
+      // Other live facility bookings for THIS service+location.
+      const windows = bookings
+        .filter(b =>
+          b.id !== booking.id &&
+          b.serviceId === booking.serviceId &&
+          b.locationId === booking.locationId &&
+          b.status !== 'cancelled' && b.status !== 'noshow',
+        )
+        .map(b => [new Date(b.startISO).getTime(), new Date(b.endISO).getTime()] as const)
+      for (let h = 8; h < 21; h++) {
+        for (let m = 0; m < 60; m += 30) {
+          const start = new Date(`${date}T00:00:00`); start.setHours(h, m, 0, 0)
+          const s0 = start.getTime(), e0 = s0 + slotMin * 60_000
+          const overlapping = windows.filter(([bs, be]) => s0 < be && bs < e0).length
+          if (overlapping >= capacity) set.add(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`)
+        }
+      }
+      return set
+    }
+
+    // Slots taken by *other* live bookings for the same specialist on this day.
     bookings.forEach(b => {
       if (b.id === booking.id) return // never block our own slot
       if (b.specialistId !== booking.specialistId) return
@@ -57,7 +85,7 @@ export function RescheduleModal({ booking, onClose, onDone }: Props) {
       set.add(`${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`)
     })
     return set
-  }, [bookings, booking.id, booking.specialistId, date])
+  }, [bookings, booking.id, booking.specialistId, booking.serviceId, booking.locationId, date, isFacility, capacity, slotMin])
 
   if (!partner) return null
 

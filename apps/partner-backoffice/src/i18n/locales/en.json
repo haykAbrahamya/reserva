@@ -67,7 +67,9 @@
     "addManager": "Add manager",
     "emptyTitle": "No managers yet",
     "emptyDesc": "Create a manager to give a branch its own login.",
-    "toast": { "removed": "Manager removed" },
+    "toast": {
+      "removed": "Manager removed"
+    },
     "modal": {
       "title": "New manager",
       "subtitle": "Create a branch login. We'll send them a one-time password.",
@@ -116,9 +118,18 @@
   },
   "login": {
     "features": {
-      "bookings": { "title": "Bookings around the clock", "desc": "Clients book online, day or night" },
-      "team": { "title": "Your whole team, organized", "desc": "Specialists, services & schedules" },
-      "revenue": { "title": "Revenue at a glance", "desc": "Track every booking and earning" }
+      "bookings": {
+        "title": "Bookings around the clock",
+        "desc": "Clients book online, day or night"
+      },
+      "team": {
+        "title": "Your whole team, organized",
+        "desc": "Specialists, services & schedules"
+      },
+      "revenue": {
+        "title": "Revenue at a glance",
+        "desc": "Track every booking and earning"
+      }
     },
     "quote": "Your salon, beautifully managed.",
     "tagline": "Reserva · Booking platform for Armenian salons",
@@ -255,8 +266,14 @@
         "2mo": "2 months",
         "none": "No repeat"
       },
-      "active": "Active"
-    }
+      "active": "Active",
+      "requiresSpecialist": "Requires a specialist",
+      "requiresSpecialistOn": "Clients pick a specialist when booking this service.",
+      "requiresSpecialistOff": "Entry / facility service (sauna, pool, day pass) — no specialist; spots are limited by capacity.",
+      "capacityLabel": "Capacity",
+      "capacityHint": "How many people can use it at the same time."
+    },
+    "capacityShort": "{n} spots"
   },
   "specialists": {
     "title": "Specialists",
@@ -447,7 +464,9 @@
     "clientPhoneLabel": "Client phone",
     "clientPhonePlaceholder": "+374 91 …",
     "summary": "{date} at {time} · {service} ({duration} min)",
-    "confirmedToast": "Booking confirmed for {name}"
+    "confirmedToast": "Booking confirmed for {name}",
+    "facilitySub": "{duration} min · {capacity} spots",
+    "slotsHintFacility": "Select a date to see available slots."
   },
   "bookingDrawer": {
     "status": "Status",
