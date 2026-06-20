@@ -17,7 +17,7 @@ export interface ApiBooking {
   status: BookingStatus
   notes?: string | null
   // Joined display data (see backend BOOKING_INCLUDE).
-  service?: { id: string; name: string; price: number; duration: number } | null
+  service?: { id: string; name: string; price: number; duration: number; capacity?: number } | null
   specialist?: { id: string; name: string; title: string } | null
   location?: { id: string; name: string; address: string } | null
 }

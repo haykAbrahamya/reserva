@@ -87,7 +87,7 @@ export interface Booking {
    * Embedded display data joined from the API so a booking row is
    * self-contained (no catalog lookup needed to render names/price).
    */
-  service?: { id: string; name: string; price: number; duration: number } | null
+  service?: { id: string; name: string; price: number; duration: number; capacity?: number } | null
   specialist?: { id: string; name: string; title: string } | null
   location?: { id: string; name: string; address: string } | null
 }
