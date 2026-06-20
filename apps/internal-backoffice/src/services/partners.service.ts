@@ -31,6 +31,26 @@ export interface PartnerAdmin {
   active: boolean
 }
 
+/** A partner's user (admin or manager) as seen by platform staff. */
+export interface PartnerUser {
+  id: string
+  name: string
+  email: string
+  phone: string
+  role: 'admin' | 'manager'
+  active: boolean
+  mustChangePassword: boolean
+  lastLogin: string | null
+  createdAt: string
+  location: { id: string; name: string } | null
+}
+
+export interface UpdatePartnerUserInput {
+  name?: string
+  phone?: string
+  active?: boolean
+}
+
 export interface PartnerPresentation {
   tagline: string
   about: string
@@ -98,6 +118,23 @@ export const partnersService = {
   /** Feature/unfeature a salon in the public marketplace (/salons). */
   setMarketplace(id: string, listed: boolean): Promise<PartnerDetail> {
     return apiPatch<PartnerDetail>(`/platform/partners/${id}/marketplace`, { listed })
+  },
+
+  // ── Partner users (platform support) ──
+  listUsers(partnerId: string): Promise<PartnerUser[]> {
+    return apiGet<PartnerUser[]>(`/platform/partners/${partnerId}/users`)
+  },
+
+  updateUser(partnerId: string, userId: string, patch: UpdatePartnerUserInput): Promise<PartnerUser> {
+    return apiPatch<PartnerUser>(`/platform/partners/${partnerId}/users/${userId}`, patch)
+  },
+
+  /** Reset a user's password. Omit `password` to auto-generate; returns it once. */
+  resetUserPassword(partnerId: string, userId: string, password?: string): Promise<{ password: string }> {
+    return apiPost<{ password: string }>(
+      `/platform/partners/${partnerId}/users/${userId}/reset-password`,
+      password ? { password } : {},
+    )
   },
 
   /**

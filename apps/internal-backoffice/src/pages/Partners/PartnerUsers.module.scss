@@ -1,0 +1,143 @@
+@use 'variables' as *;
+
+.card {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  padding: 20px;
+}
+.cardTitle {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+.titleIcon { margin-right: 7px; color: $accent; }
+.muted { font-size: 13px; color: $fg-2; margin: 0; }
+
+/* ── User list ── */
+.list { display: flex; flex-direction: column; gap: 10px; }
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid $line-1;
+  border-radius: $r-1;
+  background: $bg-2;
+}
+.rowInactive { opacity: 0.62; }
+
+.info { flex: 1; min-width: 0; }
+.nameRow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+.name { font-size: 14px; font-weight: 600; color: $fg-0; }
+
+.role {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: $fg-2;
+  background: $bg-3;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.roleAdmin { color: $accent-strong; background: $accent-soft; }
+
+.contact {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: $fg-2;
+  margin-top: 2px;
+  svg { color: $fg-3; flex-shrink: 0; }
+}
+.flag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: $warn;
+  margin-top: 5px;
+  svg { flex-shrink: 0; }
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+  @media (max-width: 600px) { flex-direction: row; flex-wrap: wrap; }
+}
+
+/* ── Modal fields ── */
+.fields { display: flex; flex-direction: column; gap: 14px; }
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  background: $bg-2;
+  border-radius: $r-1;
+}
+.toggleLabel { font-size: 14px; font-weight: 500; }
+.toggleHint { font-size: 12px; color: $fg-2; margin-top: 2px; }
+
+/* ── Reset password modal ── */
+.modeRow { display: flex; gap: 8px; }
+.modeBtn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 40px;
+  border-radius: $r-1;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-1;
+  font-family: $font-sans;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  &:hover { background: $bg-2; }
+}
+.modeOn {
+  border-color: $accent;
+  background: $accent-soft;
+  color: $accent-strong;
+}
+
+.resultBox { display: flex; flex-direction: column; gap: 12px; }
+.resultLead { font-size: 13.5px; color: $fg-1; margin: 0; line-height: 1.5; }
+.passwordRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  background: $bg-2;
+  border: 1px dashed $line-strong;
+  border-radius: $r-1;
+}
+.password {
+  font-family: $font-mono;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: $fg-0;
+  user-select: all;
+}
+.resultNote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: $fg-2;
+  margin: 0;
+  line-height: 1.5;
+  svg { color: $success; flex-shrink: 0; }
+}

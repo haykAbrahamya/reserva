@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Save, Mail, Phone, MapPin, Users, CalendarDays, Store, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Save, MapPin, Users, CalendarDays, Store, ExternalLink } from 'lucide-react'
 import { Avatar, Badge, Button, Input, Textarea, Toggle, Empty, useToast } from '@/components/ui'
 import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
 import { useResource } from '@/store/useResource'
 import { partnersService, type UpdatePartnerInput } from '@/services/partners.service'
 import { ApiError } from '@/services/http'
+import { PartnerUsers } from './PartnerUsers'
 import s from './PartnerDetail.module.scss'
 
 export function PartnerDetailPage() {
@@ -144,30 +145,8 @@ export function PartnerDetailPage() {
           </div>
         </section>
 
-        {/* Admins */}
-        <section className={s.card}>
-          <h2 className={s.cardTitle}>Admins</h2>
-          {partner.users.length === 0 ? (
-            <p className={s.muted}>No admin users.</p>
-          ) : (
-            <div className={s.adminList}>
-              {partner.users.map((u) => (
-                <div key={u.id} className={s.adminRow}>
-                  <Avatar name={u.name} size="sm" />
-                  <div className={s.adminInfo}>
-                    <div className={s.adminName}>{u.name}</div>
-                    <div className={s.adminContact}><Mail size={11} /> {u.email}</div>
-                    <div className={s.adminContact}><Phone size={11} /> {u.phone}</div>
-                  </div>
-                  <Toggle checked={u.active} disabled onChange={() => {}} />
-                </div>
-              ))}
-            </div>
-          )}
-          <p className={s.hint}>
-            Admin accounts are managed by the partner from their own backoffice.
-          </p>
-        </section>
+        {/* Users — view + manage (edit, reset password) */}
+        <PartnerUsers partnerId={id} />
 
         {/* Marketplace listing (platform-curated) */}
         <section className={s.card}>
