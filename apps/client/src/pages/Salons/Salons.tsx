@@ -62,8 +62,9 @@ export function Salons() {
   // Mobile: the search lives in a focused full-screen sheet rather than three
   // cramped rows in the hero.
   const [sheetOpen, setSheetOpen] = useState(false)
-  // Sort of the displayed list (client-side, instant).
-  const [sort, setSort] = useState<SortKey>('rating')
+  // Sort of the displayed list (client-side, instant). Defaults to name —
+  // "Top rated" is only meaningful once real ratings exist.
+  const [sort, setSort] = useState<SortKey>('name')
   // "Near me" — geolocation-driven distance + nearest sort.
   const geo = useGeolocation()
   // Distinct categories captured from the FIRST unfiltered load, so the quick
@@ -147,7 +148,12 @@ export function Salons() {
   // away from nearest if location is cleared/denied.
   const located = geo.status === 'granted' && !!geo.coords
   useEffect(() => { if (located) setSort('nearest') }, [located])
-  useEffect(() => { if (!located && sort === 'nearest') setSort('rating') }, [located, sort])
+  useEffect(() => { if (!located && sort === 'nearest') setSort('name') }, [located, sort])
+
+  // Only offer "Top rated" once at least one salon has a real rating.
+  const hasRatings = useMemo(() => !!salons?.some((s) => s.rating > 0), [salons])
+  // If ratings vanish (data without ratings) but we're sorted by them, fall back.
+  useEffect(() => { if (!hasRatings && sort === 'rating') setSort('name') }, [hasRatings, sort])
 
   // Precompute each salon's distance (km) to the user's nearest branch.
   const distances = useMemo(() => {
@@ -404,7 +410,7 @@ export function Salons() {
                       panelMinWidth={180}
                       options={[
                         ...(located ? [{ value: 'nearest', label: t('salons.sort.nearest') }] : []),
-                        { value: 'rating', label: t('salons.sort.rating') },
+                        ...(hasRatings ? [{ value: 'rating', label: t('salons.sort.rating') }] : []),
                         { value: 'name', label: t('salons.sort.name') },
                         { value: 'services', label: t('salons.sort.services') },
                       ]}

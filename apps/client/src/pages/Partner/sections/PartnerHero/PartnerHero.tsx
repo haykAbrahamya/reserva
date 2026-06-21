@@ -84,11 +84,14 @@ export function PartnerHero({ partner, onBook }: Props) {
 
         <div className={s.typeRow}>
           <span className={s.type}>{partner.type}</span>
-          <span className={s.rating}>
-            <span className={s.stars}>★</span>
-            <strong>{p.rating.toFixed(1)}</strong>
-            <span className={s.reviewCount}>{t('partner.hero.reviews', { count: p.reviews })}</span>
-          </span>
+          {/* Only show a rating when there's real review data — no fake stars. */}
+          {p.rating > 0 && p.reviews > 0 && (
+            <span className={s.rating}>
+              <span className={s.stars}>★</span>
+              <strong>{p.rating.toFixed(1)}</strong>
+              <span className={s.reviewCount}>{t('partner.hero.reviews', { count: p.reviews })}</span>
+            </span>
+          )}
         </div>
 
         <h1 className={s.name}>{partner.name}</h1>

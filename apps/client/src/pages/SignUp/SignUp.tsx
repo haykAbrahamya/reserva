@@ -228,11 +228,6 @@ export function SignUp() {
                     {t('signup.continue')} <ArrowRight size={17} />
                   </button>
                 </div>
-
-                <p className={s.signInRow}>
-                  {t('signup.haveAccount')}{' '}
-                  <a className={s.signInLink} href="#">{t('signup.signIn')}</a>
-                </p>
               </>
             ) : (
               <>

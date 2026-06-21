@@ -54,8 +54,8 @@ export const PARTNERS: PublicPartner[] = [
       tagline: 'Modern aesthetic medicine in the heart of Yerevan',
       about:
         'Antheris is a clinical aesthetics studio where science meets care. From laser treatments to bespoke facials, our specialists craft results-driven plans tailored to your skin — in a calm, considered space designed to make you feel at home.',
-      rating: 4.9,
-      reviews: 214,
+      rating: 0,
+      reviews: 0,
       hours: 'Mon–Sat · 10:00–19:00',
       // Near-black ramp echoes the black wordmark: avatars/hero read as a matte
       // black card with crisp white initials, while pink stays the accent.
@@ -91,8 +91,8 @@ export const PARTNERS: PublicPartner[] = [
       tagline: 'Sharp cuts, classic vibes, no appointments-by-DM',
       about:
         'BarberBro is where craft meets attitude. Walk in for a precise fade, a clean beard line-up, or the full combo — and walk out feeling like the best version of yourself. Booked online in seconds, finished in style.',
-      rating: 4.8,
-      reviews: 158,
+      rating: 0,
+      reviews: 0,
       hours: 'Tue–Sun · 11:00–20:00',
       heroTints: ['#2F4A3A', '#1E3225'],
       gallery: [
@@ -127,8 +127,8 @@ export const PARTNERS: PublicPartner[] = [
       tagline: 'Soft glamour & flawless detail by the Cascade',
       about:
         'Lumé Studio is a haven for nails, lashes and brows — where every detail is finished to perfection. Our artists blend technique with a gentle touch, so you leave glowing and ready to be seen. Quietly luxurious, effortlessly you.',
-      rating: 5.0,
-      reviews: 96,
+      rating: 0,
+      reviews: 0,
       hours: 'Mon–Sat · 10:00–20:00',
       heroTints: ['#B07683', '#7A4A55'],
       gallery: [
@@ -170,8 +170,8 @@ export const PARTNERS: PublicPartner[] = [
       tagline: 'Restore, recharge, renew — naturally',
       about:
         'Avanta is a sanctuary for body and mind, where natural therapies meet expert hands. From deep-tissue massage to detoxifying body rituals, every treatment is designed to leave you lighter, calmer and renewed — green by name, restorative by nature.',
-      rating: 4.9,
-      reviews: 173,
+      rating: 0,
+      reviews: 0,
       hours: 'Mon–Sun · 09:00–21:00',
       // Vivid green → deep forest ramp, drawn from the apple logo.
       heroTints: ['#1FA84C', '#0E6B30'],

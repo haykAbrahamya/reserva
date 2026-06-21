@@ -52,34 +52,49 @@ export function SpecialistModal({ partner, specialist, onClose, onBook }: Props)
           <div className={s.bannerInfo}>
             <div className={s.spName}>{specialist.name}</div>
             <div className={s.spTitle}>{specialist.title}</div>
-            <span className={s.spRating}>
-              <Star size={13} className={s.star} fill="currentColor" />
-              <strong>{profile.rating.toFixed(1)}</strong>
-              <span className={s.count}>{t('specialistModal.reviewsCount', { count: profile.reviewCount })}</span>
-            </span>
+            {/* Rating only when there are real reviews — never fake stars. */}
+            {profile.rating > 0 && profile.reviewCount > 0 && (
+              <span className={s.spRating}>
+                <Star size={13} className={s.star} fill="currentColor" />
+                <strong>{profile.rating.toFixed(1)}</strong>
+                <span className={s.count}>{t('specialistModal.reviewsCount', { count: profile.reviewCount })}</span>
+              </span>
+            )}
           </div>
         </div>
 
         <div className={s.body}>
-          {/* Quick stats */}
-          <div className={s.statsRow}>
-            <div className={s.stat}>
-              <div className={s.statVal}>{profile.rating.toFixed(1)}</div>
-              <div className={s.statLabel}>{t('specialistModal.stats.rating')}</div>
+          {/* Quick stats — each only shown when there's real data behind it. */}
+          {(profile.reviewCount > 0 || profile.experience) && (
+            <div className={s.statsRow}>
+              {profile.rating > 0 && profile.reviewCount > 0 && (
+                <div className={s.stat}>
+                  <div className={s.statVal}>{profile.rating.toFixed(1)}</div>
+                  <div className={s.statLabel}>{t('specialistModal.stats.rating')}</div>
+                </div>
+              )}
+              {profile.reviewCount > 0 && (
+                <div className={s.stat}>
+                  <div className={s.statVal}>{profile.reviewCount}</div>
+                  <div className={s.statLabel}>{t('specialistModal.stats.reviews')}</div>
+                </div>
+              )}
+              {profile.experience && (
+                <div className={s.stat}>
+                  <div className={s.statVal}>{profile.experience}</div>
+                  <div className={s.statLabel}>{t('specialistModal.stats.experience')}</div>
+                </div>
+              )}
             </div>
-            <div className={s.stat}>
-              <div className={s.statVal}>{profile.reviewCount}</div>
-              <div className={s.statLabel}>{t('specialistModal.stats.reviews')}</div>
-            </div>
-            <div className={s.stat}>
-              <div className={s.statVal}>{profile.experience}</div>
-              <div className={s.statLabel}>{t('specialistModal.stats.experience')}</div>
-            </div>
-          </div>
+          )}
 
-          {/* Bio */}
-          <p className={s.sectionLabel}>{t('specialistModal.about')}</p>
-          <p className={s.bio}>{profile.bio}</p>
+          {/* Bio — only when present. */}
+          {profile.bio && (
+            <>
+              <p className={s.sectionLabel}>{t('specialistModal.about')}</p>
+              <p className={s.bio}>{profile.bio}</p>
+            </>
+          )}
 
           {/* Services */}
           {services.length > 0 && (
