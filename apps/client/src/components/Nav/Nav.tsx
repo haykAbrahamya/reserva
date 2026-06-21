@@ -56,7 +56,6 @@ export function Nav() {
           <ThemeToggle />
           <div className={s.desktopActions}>
             <LanguageSwitcher />
-            <a className={s.signIn} href="#">{t('nav.signIn')}</a>
             <button className={s.cta} onClick={() => navigate('/signup')}>
               {t('nav.getStarted')} <ArrowRight size={15} />
             </button>
@@ -86,7 +85,6 @@ export function Nav() {
             ))}
 
             <div className={s.mobileDivider} />
-            <button className={s.mobileLink} onClick={() => setMenuOpen(false)}>{t('nav.signIn')}</button>
 
             <div className={s.mobileLangRow}>
               <LanguageSwitcher />

@@ -10,7 +10,7 @@ import { Button, Card, CardHeader, CardTitle, BookingBadge, Avatar } from '@/com
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
 import { fmtAMD, fmtTime, isSameDay } from '@/utils/format'
 import { useScopedLocationId } from '@/store/auth.hooks'
-import { useI18n } from '@/i18n'
+import { useI18n, useDateLocale } from '@/i18n'
 import type { Booking } from '@/types'
 import s from './Dashboard.module.scss'
 
@@ -45,6 +45,7 @@ export function Dashboard() {
   const isMobile       = useIsMobile()
   const scopedLocationId = useScopedLocationId()
   const { t }          = useI18n()
+  const dateLocale     = useDateLocale()
   const now            = new Date()
   const firstName      = authUser?.name.split(' ')[0] ?? t('dashboard.fallbackName')
 
@@ -106,7 +107,7 @@ export function Dashboard() {
         <div>
           <h1 className={s.h1}>{greetBefore}<em>{firstName}</em>{greetAfter}</h1>
           <p className={s.sub}>
-            {partner.name} · {now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+            {partner.name} · {now.toLocaleDateString(dateLocale, { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
         </div>
         <div className={s.headActions}>

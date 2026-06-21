@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { X } from 'lucide-react'
 import { Button } from '../Button/Button'
+import { useDragDismiss } from '../../hooks/useDragDismiss'
 import s from './Modal.module.scss'
 
 const CLOSE_DURATION = 260 // ms — must match longest CSS animation
@@ -46,6 +47,8 @@ interface ModalProps {
 export function Modal({ open, onClose, title, subtitle, children, footer, size = 'md' }: ModalProps) {
   const isMobile = useIsMobile()
   const { closing, handleClose } = useAnimatedClose(open, onClose)
+  // Android-style drag-to-dismiss for the mobile sheet (no scroll conflict).
+  const drag = useDragDismiss({ onDismiss: handleClose, scrollSelector: `.${s.body}`, enabled: isMobile })
 
   useEffect(() => {
     if (!open) return
@@ -86,6 +89,8 @@ export function Modal({ open, onClose, title, subtitle, children, footer, size =
         <div
           className={[s.sheet, closing ? s.closing : ''].filter(Boolean).join(' ')}
           onClick={e => e.stopPropagation()}
+          {...drag.handlers}
+          style={drag.style}
         >
           {inner}
         </div>
@@ -104,6 +109,7 @@ export function Modal({ open, onClose, title, subtitle, children, footer, size =
 export function Drawer({ open, onClose, title, subtitle, children, footer }: Omit<ModalProps, 'size'>) {
   const isMobile = useIsMobile()
   const { closing, handleClose } = useAnimatedClose(open, onClose)
+  const drag = useDragDismiss({ onDismiss: handleClose, scrollSelector: `.${s.body}`, enabled: isMobile })
 
   useEffect(() => {
     if (!open) return
@@ -144,6 +150,8 @@ export function Drawer({ open, onClose, title, subtitle, children, footer }: Omi
         <div
           className={[s.sheet, closing ? s.closing : ''].filter(Boolean).join(' ')}
           onClick={e => e.stopPropagation()}
+          {...drag.handlers}
+          style={drag.style}
         >
           {inner}
         </div>

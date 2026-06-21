@@ -11,7 +11,18 @@ import {
 import {
   pushSupported, isSubscribed, enablePush, disablePush, resyncPush, notificationPermission, isIosSafari,
 } from '@/services/push.service'
+import { useDragDismiss } from '@/components/ui'
 import s from './NotificationsBell.module.scss'
+
+function useIsMobile() {
+  const [m, setM] = useState(() => window.innerWidth <= 768)
+  useEffect(() => {
+    const fn = () => setM(window.innerWidth <= 768)
+    window.addEventListener('resize', fn)
+    return () => window.removeEventListener('resize', fn)
+  }, [])
+  return m
+}
 
 /** Compact relative time: "just now", "5m", "3h", "2d", else a short date. */
 function fmtRelative(iso: string): string {
@@ -23,7 +34,7 @@ function fmtRelative(iso: string): string {
   if (hr < 24) return `${hr}h ago`
   const day = Math.floor(hr / 24)
   if (day < 7) return `${day}d ago`
-  return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+  return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
 }
 
 const ICONS: Record<NotificationType, typeof Bell> = {
@@ -42,6 +53,7 @@ const POLL_MS = 25_000
 export function NotificationsBell() {
   const navigate = useNavigate()
   const ref = useRef<HTMLDivElement>(null)
+  const isMobile = useIsMobile()
 
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState<AppNotification[]>([])
@@ -160,6 +172,86 @@ export function NotificationsBell() {
 
   const denied = notificationPermission() === 'denied'
 
+  // Mobile: render as a bottom sheet with Android-style drag-to-dismiss.
+  const drag = useDragDismiss({
+    onDismiss: () => setOpen(false),
+    scrollSelector: `.${s.list}`,
+    enabled: isMobile && open,
+  })
+
+  // Lock background scroll while the mobile sheet is open.
+  useEffect(() => {
+    if (!isMobile || !open) return
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [isMobile, open])
+
+  const panelBody = (
+    <>
+      {/* Mobile sheet gets a grab handle for the drag-to-dismiss affordance. */}
+      {isMobile && <div className={s.grab} />}
+      <div className={s.head}>
+        <span className={s.title}>Notifications</span>
+        {unread > 0 && (
+          <button className={s.markAll} onClick={markAll}>
+            <Check size={13} /> Mark all read
+          </button>
+        )}
+      </div>
+
+      {/* Push enable row */}
+      {pushSupported() && (
+        <button className={s.pushRow} onClick={togglePush} disabled={pushBusy || denied}>
+          {pushOn ? <BellRing size={15} /> : <BellOff size={15} />}
+          <span className={s.pushText}>
+            {denied
+              ? 'Notifications blocked in browser settings'
+              : pushOn
+                ? 'Push notifications on'
+                : 'Enable push on this device'}
+          </span>
+          {!denied && <span className={[s.pushPill, pushOn ? s.pushPillOn : ''].join(' ')}>{pushOn ? 'On' : 'Off'}</span>}
+        </button>
+      )}
+      {pushSupported() && isIosSafari() && !pushOn && (
+        <div className={s.iosHint}>On iPhone: Share → Add to Home Screen first, then enable.</div>
+      )}
+
+      <div className={s.list}>
+        {loading && items.length === 0 ? (
+          <div className={s.empty}>Loading…</div>
+        ) : items.length === 0 ? (
+          <div className={s.empty}>
+            <Bell size={22} strokeWidth={1.5} />
+            <span>You're all caught up</span>
+          </div>
+        ) : (
+          items.map((n) => {
+            const Icon = ICONS[n.type] ?? Bell
+            return (
+              <button
+                key={n.id}
+                className={[s.item, n.read ? '' : s.unread].filter(Boolean).join(' ')}
+                onClick={() => openNotification(n)}
+              >
+                <span className={s.itemIcon}><Icon size={16} /></span>
+                <span className={s.itemBody}>
+                  <span className={s.itemTitle}>{n.title}</span>
+                  <span className={s.itemText}>{n.body}</span>
+                  <span className={s.itemTime}>{fmtRelative(n.createdAt)}</span>
+                </span>
+                {!n.read && <span className={s.dot} />}
+                <span className={s.del} onClick={(e) => remove(e, n.id)} role="button" aria-label="Remove">
+                  <Trash2 size={13} />
+                </span>
+              </button>
+            )
+          })
+        )}
+      </div>
+    </>
+  )
+
   return (
     <div ref={ref} className={s.wrap}>
       <button
@@ -173,67 +265,25 @@ export function NotificationsBell() {
       </button>
 
       {open && (
-        <div className={s.panel} role="menu">
-          <div className={s.head}>
-            <span className={s.title}>Notifications</span>
-            {unread > 0 && (
-              <button className={s.markAll} onClick={markAll}>
-                <Check size={13} /> Mark all read
-              </button>
-            )}
+        isMobile ? (
+          // Mobile: full-width bottom sheet + scrim, drag down to dismiss.
+          <>
+            <div className={s.scrim} onClick={() => setOpen(false)} />
+            <div
+              className={s.sheet}
+              role="menu"
+              {...drag.handlers}
+              style={drag.style}
+            >
+              {panelBody}
+            </div>
+          </>
+        ) : (
+          // Desktop: anchored dropdown.
+          <div className={s.panel} role="menu">
+            {panelBody}
           </div>
-
-          {/* Push enable row */}
-          {pushSupported() && (
-            <button className={s.pushRow} onClick={togglePush} disabled={pushBusy || denied}>
-              {pushOn ? <BellRing size={15} /> : <BellOff size={15} />}
-              <span className={s.pushText}>
-                {denied
-                  ? 'Notifications blocked in browser settings'
-                  : pushOn
-                    ? 'Push notifications on'
-                    : 'Enable push on this device'}
-              </span>
-              {!denied && <span className={[s.pushPill, pushOn ? s.pushPillOn : ''].join(' ')}>{pushOn ? 'On' : 'Off'}</span>}
-            </button>
-          )}
-          {pushSupported() && isIosSafari() && !pushOn && (
-            <div className={s.iosHint}>On iPhone: Share → Add to Home Screen first, then enable.</div>
-          )}
-
-          <div className={s.list}>
-            {loading && items.length === 0 ? (
-              <div className={s.empty}>Loading…</div>
-            ) : items.length === 0 ? (
-              <div className={s.empty}>
-                <Bell size={22} strokeWidth={1.5} />
-                <span>You're all caught up</span>
-              </div>
-            ) : (
-              items.map((n) => {
-                const Icon = ICONS[n.type] ?? Bell
-                return (
-                  <button
-                    key={n.id}
-                    className={[s.item, n.read ? '' : s.unread].filter(Boolean).join(' ')}
-                    onClick={() => openNotification(n)}
-                  >
-                    <span className={s.itemIcon}><Icon size={16} /></span>
-                    <span className={s.itemBody}>
-                      <span className={s.itemTitle}>{n.title}</span>
-                      <span className={s.itemText}>{n.body}</span>
-                      <span className={s.itemTime}>{fmtRelative(n.createdAt)}</span>
-                    </span>
-                    {!n.read && <span className={s.dot} />}
-                    <span className={s.del} onClick={(e) => remove(e, n.id)} role="button" aria-label="Remove">
-                      <Trash2 size={13} />
-                    </span>
-                  </button>
-                )
-              })
-            )}
-          </div>
-        </div>
+        )
       )}
     </div>
   )

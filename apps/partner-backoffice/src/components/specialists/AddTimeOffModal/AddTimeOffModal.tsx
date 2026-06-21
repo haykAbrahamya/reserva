@@ -6,7 +6,7 @@ import { usePartner } from '@/store/app.store'
 import { partnersService } from '@/services/partners.service'
 import { fmtDateInput, fmtTime } from '@/utils/format'
 import { findConflictingBookings } from '@/utils/timeOff'
-import { useI18n } from '@/i18n'
+import { useI18n, useDateLocale } from '@/i18n'
 import type { Specialist, SpecialistTimeOff, Booking } from '@/types'
 import s from './AddTimeOffModal.module.scss'
 
@@ -58,6 +58,7 @@ export function AddTimeOffModal({ open, specialist, bookings, editing, initialDr
   const toast    = useToast()
   const navigate = useNavigate()
   const { t, tp } = useI18n()
+  const dateLocale = useDateLocale()
   const today    = fmtDateInput(new Date())
 
   const [type,      setType]      = useState<OffType>('partial')
@@ -223,7 +224,7 @@ export function AddTimeOffModal({ open, specialist, bookings, editing, initialDr
                   <span className={s.conflictTime}>
                     {fmtTime(b.startISO)}
                     <span className={s.conflictDate}>
-                      {new Date(b.startISO).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                      {new Date(b.startISO).toLocaleDateString(dateLocale, { day: 'numeric', month: 'short' })}
                     </span>
                   </span>
                   <span className={s.conflictMeta}>

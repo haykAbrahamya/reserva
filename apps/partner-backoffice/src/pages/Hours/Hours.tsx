@@ -10,7 +10,7 @@ import { useScopedLocationId } from '@/store/auth.hooks'
 import { AddTimeOffModal, type TimeOffDraft } from '@/components/specialists/AddTimeOffModal/AddTimeOffModal'
 import { findConflictingBookings } from '@/utils/timeOff'
 import { fmtTime, fmtDateInput } from '@/utils/format'
-import { useI18n } from '@/i18n'
+import { useI18n, useDateLocale } from '@/i18n'
 import type { WeekSchedule, WorkingDay, SpecialistTimeOff } from '@/types'
 import s from './Hours.module.scss'
 
@@ -42,6 +42,7 @@ export function Hours() {
   const toast = useToast()
   const navigate = useNavigate()
   const { t } = useI18n()
+  const dateLocale = useDateLocale()
 
   const [schedules, setSchedules] = useState<Record<string, WeekSchedule>>({})
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -272,6 +273,7 @@ export function Hours() {
                           onDelete={() => setDeleteTarget(entry)}
                           onReview={() => reviewTimeOffConflicts(entry)}
                           t={t}
+                          dateLocale={dateLocale}
                         />
                       ))}
                     </div>
@@ -312,13 +314,14 @@ export function Hours() {
 }
 
 /** One row in the time-off list — formats partial/full/range entries. */
-function TimeOffRow({ entry, conflicts, onEdit, onDelete, onReview, t }: {
+function TimeOffRow({ entry, conflicts, onEdit, onDelete, onReview, t, dateLocale }: {
   entry: SpecialistTimeOff
   conflicts: number
   onEdit: () => void
   onDelete: () => void
   onReview: () => void
   t: (key: string, vars?: Record<string, string | number>) => string
+  dateLocale: string
 }) {
   const start = new Date(entry.startISO)
   const end   = new Date(entry.endISO)
@@ -326,8 +329,8 @@ function TimeOffRow({ entry, conflicts, onEdit, onDelete, onReview, t }: {
   const dateOpts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' }
 
   const dateLabel = sameDay
-    ? start.toLocaleDateString('en-GB', { weekday: 'short', ...dateOpts })
-    : `${start.toLocaleDateString('en-GB', dateOpts)} – ${end.toLocaleDateString('en-GB', dateOpts)}`
+    ? start.toLocaleDateString(dateLocale, { weekday: 'short', ...dateOpts })
+    : `${start.toLocaleDateString(dateLocale, dateOpts)} – ${end.toLocaleDateString(dateLocale, dateOpts)}`
 
   const timeLabel = entry.allDay
     ? t('timeOff.allDay')

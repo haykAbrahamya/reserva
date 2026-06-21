@@ -8,7 +8,7 @@ import { bookingsService } from '@/services/bookings.service'
 import { partnersService } from '@/services/partners.service'
 import { slotBlockedByTimeOff } from '@/utils/timeOff'
 import { fmtDateInput } from '@/utils/format'
-import { useT } from '@/i18n'
+import { useT, useDateLocale } from '@/i18n'
 import type { SpecialistTimeOff } from '@/types'
 import s from './NewBookingModal.module.scss'
 
@@ -30,6 +30,7 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
   const toast         = useToast()
   const scopedLocationId = useScopedLocationId()
   const t             = useT()
+  const dateLocale    = useDateLocale()
   const today         = fmtDateInput(new Date())
 
   // All hooks must be declared before any conditional return
@@ -266,7 +267,7 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
             <Calendar size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
             <span>
               {t('newBooking.summary', {
-                date: new Date(date).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }),
+                date: new Date(date).toLocaleDateString(dateLocale, { weekday: 'long', day: 'numeric', month: 'long' }),
                 time,
                 service: selectedService.name,
                 duration: selectedService.duration,

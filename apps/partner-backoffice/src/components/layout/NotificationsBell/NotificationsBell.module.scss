@@ -183,7 +183,50 @@
 .item:hover .del { opacity: 1; }
 .del:hover { background: $danger-soft; color: $danger; }
 
+/* ── Mobile bottom sheet ── */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: var(--scrim, rgba(20, 17, 14, 0.4));
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  animation: notif-scrim-in 0.2s ease both;
+}
+
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 71;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(85vh - env(safe-area-inset-top, 0px));
+  background: $bg-1;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 40px rgba(20, 17, 14, 0.24);
+  overflow: hidden;
+  will-change: transform;
+  animation: notif-sheet-in 0.32s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  touch-action: pan-y; /* allow vertical gestures; we manage dismiss ourselves */
+}
+
+/* Grab handle */
+.grab {
+  width: 40px;
+  height: 4px;
+  margin: 10px auto 2px;
+  flex-shrink: 0;
+  border-radius: 2px;
+  background: $line-2;
+}
+
+@keyframes notif-scrim-in { from { opacity: 0 } to { opacity: 1 } }
+@keyframes notif-sheet-in { from { transform: translateY(100%) } to { transform: translateY(0) } }
+
 @media (max-width: 768px) {
   .del { opacity: 1; } /* no hover on touch — always show */
-  .panel { width: 340px; }
+  .list { max-height: none; flex: 1; } /* sheet itself bounds the height */
 }

@@ -10,7 +10,7 @@ import { partnersService } from '@/services/partners.service'
 import { useNewBooking } from '@/App'
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
 import { useScopedLocationId } from '@/store/auth.hooks'
-import { useI18n } from '@/i18n'
+import { useI18n, useDateLocale } from '@/i18n'
 import type { Booking } from '@/types'
 import s from './Bookings.module.scss'
 
@@ -34,6 +34,7 @@ export function Bookings() {
   const isMobile       = useIsMobile()
   const scopedLocationId = useScopedLocationId()
   const { t, tp }      = useI18n()
+  const dateLocale     = useDateLocale()
 
   const [statusFilter, setStatusFilter] = useState('all')
   const [selectedId,   setSelectedId]   = useState<string | null>(null)
@@ -207,7 +208,7 @@ export function Bookings() {
             Object.entries(grouped).map(([dateKey, bks]) => (
               <div key={dateKey} className={s.dateGroup}>
                 <div className={s.dateHeader}>
-                  {new Date(dateKey).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+                  {new Date(dateKey).toLocaleDateString(dateLocale, { weekday: 'long', day: 'numeric', month: 'long' })}
                 </div>
                 {bks.map((b, i) => (
                   <div

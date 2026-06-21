@@ -97,7 +97,7 @@
     "calcTitle": "Find your tariff",
     "calcDesc": "Enter how many specialists you have to see your monthly total.",
     "cta": "Start free trial",
-    "trialNote": "14-day free trial · no card required",
+    "trialNote": "1-month free trial · no card required",
     "everythingIncluded": "Everything included",
     "footnote": "Prices in Armenian Dram (AMD). Billed monthly per active specialist. Cancel anytime — no setup or hidden fees.",
     "feat": {
@@ -117,7 +117,7 @@
     "titlePre": "Ready to take bookings ",
     "titleEm": "online",
     "titlePost": "?",
-    "text": "Set up in days and start your free 14-day trial today.",
+    "text": "Set up in days and start your free 1-month trial today.",
     "startTrial": "Start free trial",
     "bookDemo": "Book a demo",
     "tagline": "The online reservation platform built for Armenian salons, barbershops and beauty studios.",
@@ -311,7 +311,7 @@
         "desc": "Live at reserva.am in minutes"
       },
       "trial": {
-        "title": "14-day free trial",
+        "title": "1-month free trial",
         "desc": "No card required, cancel anytime"
       }
     },

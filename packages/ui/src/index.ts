@@ -21,6 +21,7 @@ export { Toggle, Checkbox } from './components/Toggle/Toggle'
 export { Avatar } from './components/Avatar/Avatar'
 export { ToastProvider, useToast } from './components/Toast/Toast'
 export { Empty } from './components/Empty/Empty'
+export { useDragDismiss } from './hooks/useDragDismiss'
 
 // Re-export `initials` for convenience (originally lived alongside Avatar).
 export { initials } from '@reserva/shared'

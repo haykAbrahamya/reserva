@@ -11,7 +11,7 @@ import { offBandsForDay, isBookingInAnyTimeOff } from '@/utils/timeOff'
 import { useToast } from '@/components/ui'
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
 import { useScopedLocationId } from '@/store/auth.hooks'
-import { useT } from '@/i18n'
+import { useT, useDateLocale } from '@/i18n'
 import type { Booking, SpecialistTimeOff } from '@/types'
 import s from './CalendarPage.module.scss'
 
@@ -36,6 +36,7 @@ export function CalendarPage() {
   const toast          = useToast()
   const scopedLocationId = useScopedLocationId()
   const t              = useT()
+  const dateLocale     = useDateLocale()
 
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768)
   useEffect(() => {
@@ -197,8 +198,8 @@ export function CalendarPage() {
   const totalMin  = (HOUR_END - HOUR_START) * 60
   const colHeight = totalMin * PX_PER_MIN
   const dateLabel = view === 'week'
-    ? `${days[0].toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} – ${days[6].toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
-    : anchor.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+    ? `${days[0].toLocaleDateString(dateLocale, { day: 'numeric', month: 'short' })} – ${days[6].toLocaleDateString(dateLocale, { day: 'numeric', month: 'short', year: 'numeric' })}`
+    : anchor.toLocaleDateString(dateLocale, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 
   // ─────────────────────────────────────────────
   // MOBILE VIEW: week strip + day booking cards
@@ -215,7 +216,7 @@ export function CalendarPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <button className={`${s.navBtn} ${s.iconOnly}`} onClick={() => mobMove(-1)}><ChevronLeft size={13} /></button>
             <span className={s.mobDateLabel}>
-              {mobDay.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
+              {mobDay.toLocaleDateString(dateLocale, { month: 'long', year: 'numeric' })}
             </span>
             <button className={`${s.navBtn} ${s.iconOnly}`} onClick={() => mobMove(1)}><ChevronRight size={13} /></button>
           </div>
@@ -230,7 +231,7 @@ export function CalendarPage() {
             const cnt     = filteredBookings.filter(b => isSameDay(new Date(b.startISO), d) && b.status !== 'cancelled').length
             return (
               <button key={i} className={[s.stripDay, isSel ? s.stripSelected : ''].filter(Boolean).join(' ')} onClick={() => setMobDay(d)}>
-                <span className={s.stripDayName}>{d.toLocaleDateString('en-GB', { weekday: 'short' })}</span>
+                <span className={s.stripDayName}>{d.toLocaleDateString(dateLocale, { weekday: 'short' })}</span>
                 <span className={[s.stripDayNum, isToday && !isSel ? s.stripToday : ''].filter(Boolean).join(' ')}>{d.getDate()}</span>
                 <span className={[s.stripDot, cnt > 0 ? s.stripDotVisible : ''].filter(Boolean).join(' ')} style={isSel && cnt > 0 ? { background: 'white' } : {}} />
               </button>
@@ -245,7 +246,7 @@ export function CalendarPage() {
               <Calendar size={28} strokeWidth={1} style={{ color: 'var(--fg-3)', marginBottom: 8 }} />
               <div style={{ fontFamily: 'var(--font-serif)', fontSize: 18, color: 'var(--fg-1)' }}>{t('calendar.nothingBooked')}</div>
               <div style={{ fontSize: 13, color: 'var(--fg-2)', marginTop: 4 }}>
-                {mobDay.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+                {mobDay.toLocaleDateString(dateLocale, { weekday: 'long', day: 'numeric', month: 'long' })}
               </div>
             </div>
           ) : (
@@ -307,7 +308,7 @@ export function CalendarPage() {
           <div className={s.headerGutter} />
           {days.map((d, i) => (
             <div key={i} className={s.headerCell}>
-              <div className={s.dayName}>{d.toLocaleDateString('en-GB', { weekday: 'short' })}</div>
+              <div className={s.dayName}>{d.toLocaleDateString(dateLocale, { weekday: 'short' })}</div>
               <div className={[s.dayNum, isSameDay(d, now) ? s.today : ''].filter(Boolean).join(' ')}>{d.getDate()}</div>
             </div>
           ))}

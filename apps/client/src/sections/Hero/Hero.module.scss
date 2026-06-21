@@ -90,6 +90,17 @@
   /* Let the emphasized phrase wrap naturally — forcing it onto one line pushed
      the longer Armenian/Russian copy off the right edge. */
   .nowrap { white-space: normal; }
+
+  /* Armenian & Russian words run noticeably longer and the glyphs are taller,
+     so the same size ballooned the headline to many lines. Scale down + widen
+     the measure so it settles into a tight 3-4 line block. */
+  :global(html:lang(hy)) &,
+  :global(html:lang(ru)) & {
+    font-size: clamp(32px, 5vw, 58px);
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+    max-width: 1000px;
+  }
 }
 
 .subtitle {

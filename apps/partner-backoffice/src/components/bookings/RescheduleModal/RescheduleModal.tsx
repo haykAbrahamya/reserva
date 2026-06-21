@@ -5,7 +5,7 @@ import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import { bookingsService } from '@/services/bookings.service'
 import { fmtDateInput, fmtDateTime } from '@/utils/format'
-import { useT } from '@/i18n'
+import { useT, useDateLocale } from '@/i18n'
 import type { Booking } from '@/types'
 import s from './RescheduleModal.module.scss'
 
@@ -20,6 +20,7 @@ export function RescheduleModal({ booking, onClose, onDone }: Props) {
   const partner       = usePartner()
   const toast         = useToast()
   const t             = useT()
+  const dateLocale    = useDateLocale()
   const today         = fmtDateInput(new Date())
 
   const start = new Date(booking.startISO)
@@ -172,7 +173,7 @@ export function RescheduleModal({ booking, onClose, onDone }: Props) {
             <CalendarClock size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
             <span>
               {t('reschedule.preview', {
-                date: new Date(date).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }),
+                date: new Date(date).toLocaleDateString(dateLocale, { weekday: 'long', day: 'numeric', month: 'long' }),
                 time,
                 service: svc.name,
                 duration: svc.duration,

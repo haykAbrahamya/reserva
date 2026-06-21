@@ -294,16 +294,31 @@
   pointer-events: none;
 }
 .fieldError {
-  font-size: 12px;
+  font-size: 12.5px;
+  line-height: 1.4;
   color: $danger;
   display: flex;
-  align-items: center;
-  gap: 5px;
+  align-items: flex-start;   /* icon hugs the first line on wrapped text */
+  gap: 6px;
+  margin-top: 1px;
+  animation: field-err-in 0.18s ease both;
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 1px;          /* optically center against the cap height */
+  }
 }
 .fieldHint {
   font-size: 12px;
+  line-height: 1.4;
   color: $fg-3;
   font-family: $font-mono;
+  margin-top: 1px;
+}
+
+@keyframes field-err-in {
+  from { opacity: 0; transform: translateY(-2px); }
+  to   { opacity: 1; transform: none; }
 }
 
 /* ── Submit ── */

@@ -373,7 +373,7 @@ function Field({ label, optional, icon, value, onChange, placeholder, type = 'te
         {trailing}
         {valid && !trailing && <span className={s.validIcon}><Check size={16} /></span>}
       </div>
-      {error && <span className={s.fieldError}><AlertCircle size={12} /> {error}</span>}
+      {error && <span className={s.fieldError}><AlertCircle size={14} /> {error}</span>}
       {!error && hint && <span className={s.fieldHint}>{hint}</span>}
     </div>
   )

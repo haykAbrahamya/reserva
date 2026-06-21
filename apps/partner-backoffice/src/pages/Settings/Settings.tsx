@@ -7,6 +7,7 @@ import { partnersService, type PartnerProfileResponse } from '@/services/partner
 import { useResource } from '@/store/useResource'
 import { useInstallPrompt } from '@/hooks/useInstallPrompt'
 import { ApiError } from '@/services/http'
+import { useT } from '@/i18n'
 import s from './Settings.module.scss'
 
 const slugify = (v: string) =>
@@ -16,11 +17,12 @@ export function Settings() {
   const setPartner = useAppStore((st) => st.setPartner)
   const isAdmin = useIsAdmin()
   const toast = useToast()
+  const t = useT()
   const { platform, promptInstall } = useInstallPrompt()
 
   const handleInstall = async () => {
     const outcome = await promptInstall()
-    if (outcome === 'accepted') toast('App installed')
+    if (outcome === 'accepted') toast(t('settings.install.installedToast'))
   }
 
   // Fetch the profile fresh on mount — never depends on whether the global
@@ -45,8 +47,8 @@ export function Settings() {
     return (
       <div className={s.page}>
         <div className={s.head}>
-          <h1 className={s.h1}>Settings</h1>
-          <p className={s.sub}>Manage your public address and how bookings work.</p>
+          <h1 className={s.h1}>{t('settings.title')}</h1>
+          <p className={s.sub}>{t('settings.subtitle')}</p>
         </div>
         <div className={s.skeleton} />
         <div className={s.skeleton} />
@@ -78,9 +80,9 @@ export function Settings() {
     setSlugSaving(true)
     try {
       applyUpdate(await partnersService.updateProfile({ slug }))
-      toast('Public address updated')
+      toast(t('settings.address.updated'))
     } catch (err) {
-      toast(err instanceof ApiError ? err.message : 'Could not update address')
+      toast(err instanceof ApiError ? err.message : t('settings.address.updateError'))
     } finally {
       setSlugSaving(false)
     }
@@ -93,24 +95,24 @@ export function Settings() {
     setAutoConfirm(next)
     try {
       applyUpdate(await partnersService.updateProfile({ autoConfirmBookings: next }))
-      toast(next ? 'Online bookings will be auto-confirmed' : 'Online bookings now need manual confirmation')
+      toast(next ? t('settings.bookings.autoOnToast') : t('settings.bookings.autoOffToast'))
     } catch (err) {
       setAutoConfirm(!next)
-      toast(err instanceof ApiError ? err.message : 'Could not save setting')
+      toast(err instanceof ApiError ? err.message : t('settings.bookings.saveError'))
     } finally {
       setAutoSaving(false)
     }
   }
 
   const adminLock = !isAdmin && (
-    <span className={s.adminOnly}><Lock size={11} /> Admin only</span>
+    <span className={s.adminOnly}><Lock size={11} /> {t('settings.adminOnly')}</span>
   )
 
   return (
     <div className={s.page}>
       <div className={s.head}>
-        <h1 className={s.h1}>Settings</h1>
-        <p className={s.sub}>Manage your public address and how bookings work.</p>
+        <h1 className={s.h1}>{t('settings.title')}</h1>
+        <p className={s.sub}>{t('settings.subtitle')}</p>
       </div>
 
       {/* ── Public address ── */}
@@ -118,8 +120,8 @@ export function Settings() {
         <div className={s.cardHead}>
           <span className={s.cardIcon}><Globe size={18} /></span>
           <div className={s.cardHeadText}>
-            <h2 className={s.cardTitle}>Public address</h2>
-            <p className={s.cardDesc}>Your booking page handle — lowercase letters, numbers and hyphens.</p>
+            <h2 className={s.cardTitle}>{t('settings.address.title')}</h2>
+            <p className={s.cardDesc}>{t('settings.address.desc')}</p>
           </div>
           {adminLock}
         </div>
@@ -131,13 +133,13 @@ export function Settings() {
                 value={slug}
                 disabled={!isAdmin || slugSaving}
                 onChange={(e) => setSlug(slugify(e.target.value))}
-                placeholder="your-salon"
-                error={!slugValid ? 'Lowercase letters, numbers and hyphens only' : undefined}
+                placeholder={t('settings.address.placeholder')}
+                error={!slugValid ? t('settings.address.invalid') : undefined}
               />
               <span className={s.slugSuffix}>.reserva.am</span>
             </div>
             <Button variant="accent" disabled={!canSaveSlug} onClick={saveSlug}>
-              {slugSaving ? 'Saving…' : 'Save'}
+              {slugSaving ? t('settings.saving') : t('settings.save')}
             </Button>
           </div>
           <div className={s.statusLine}>
@@ -146,7 +148,7 @@ export function Settings() {
                 <ExternalLink size={13} /> {savedSlug}.reserva.am
               </a>
             ) : (
-              <span className={s.off}>No public address yet — your page is offline until you set one.</span>
+              <span className={s.off}>{t('settings.address.none')}</span>
             )}
           </div>
         </div>
@@ -157,8 +159,8 @@ export function Settings() {
         <div className={s.cardHead}>
           <span className={s.cardIcon}><CheckCircle2 size={18} /></span>
           <div className={s.cardHeadText}>
-            <h2 className={s.cardTitle}>Bookings</h2>
-            <p className={s.cardDesc}>How online bookings from your public page are handled.</p>
+            <h2 className={s.cardTitle}>{t('settings.bookings.title')}</h2>
+            <p className={s.cardDesc}>{t('settings.bookings.desc')}</p>
           </div>
           {adminLock}
         </div>
@@ -166,17 +168,19 @@ export function Settings() {
         <div className={s.cardBody}>
           <div className={s.toggleRow}>
             <div className={s.toggleText}>
-              <div className={s.toggleTitle}>Auto-confirm online bookings</div>
+              <div className={s.toggleTitle}>{t('settings.bookings.toggleTitle')}</div>
               <div className={s.toggleDesc}>
-                On → confirmed automatically. Off → arrive as <strong>pending</strong> for staff to confirm.
+                {t('settings.bookings.toggleDescOn')} → {t('settings.bookings.toggleDescConfirmed')}{' '}
+                {t('settings.bookings.toggleDescOff')} → {t('settings.bookings.toggleDescArrive')}{' '}
+                <strong>{t('settings.bookings.pending')}</strong> {t('settings.bookings.forStaff')}
               </div>
             </div>
             <Toggle checked={autoConfirm} disabled={!isAdmin || autoSaving} onChange={toggleAutoConfirm} />
           </div>
           <div className={s.statusLine}>
             {autoConfirm
-              ? <>New online bookings are <strong className={s.on}>auto-confirmed</strong>.</>
-              : <>New online bookings start as <strong className={s.off}>pending</strong> until confirmed.</>}
+              ? <>{t('settings.bookings.statusAutoPre')} <strong className={s.on}>{t('settings.bookings.statusAutoStrong')}</strong>{t('settings.bookings.statusAutoPost')}</>
+              : <>{t('settings.bookings.statusPendingPre')} <strong className={s.off}>{t('settings.bookings.statusPendingStrong')}</strong> {t('settings.bookings.statusPendingPost')}</>}
           </div>
         </div>
       </section>
@@ -186,10 +190,8 @@ export function Settings() {
         <div className={s.cardHead}>
           <span className={s.cardIcon}><Store size={18} /></span>
           <div className={s.cardHeadText}>
-            <h2 className={s.cardTitle}>Reserva marketplace</h2>
-            <p className={s.cardDesc}>
-              Featured salons appear on the public Reserva directory at reserva.am/salons.
-            </p>
+            <h2 className={s.cardTitle}>{t('settings.marketplace.title')}</h2>
+            <p className={s.cardDesc}>{t('settings.marketplace.desc')}</p>
           </div>
         </div>
         <div className={s.cardBody}>
@@ -197,13 +199,10 @@ export function Settings() {
             {profile.marketplaceListed ? (
               <>
                 <CheckCircle size={14} className={s.on} />{' '}
-                Your salon is <strong className={s.on}>featured</strong> in the marketplace.
+                {t('settings.marketplace.featuredPre')} <strong className={s.on}>{t('settings.marketplace.featuredStrong')}</strong> {t('settings.marketplace.featuredPost')}
               </>
             ) : (
-              <>
-                Not featured yet. Listing is curated by the Reserva team — reach out if you’d like
-                to be included.
-              </>
+              <>{t('settings.marketplace.notFeatured')}</>
             )}
           </div>
         </div>
@@ -215,36 +214,34 @@ export function Settings() {
           <div className={s.cardHead}>
             <span className={s.cardIcon}><Download size={18} /></span>
             <div className={s.cardHeadText}>
-              <h2 className={s.cardTitle}>Install app</h2>
-              <p className={s.cardDesc}>
-                Add Reserva to your device for a full-screen app — faster access, no browser bar.
-              </p>
+              <h2 className={s.cardTitle}>{t('settings.install.title')}</h2>
+              <p className={s.cardDesc}>{t('settings.install.desc')}</p>
             </div>
           </div>
 
           <div className={s.cardBody}>
             {platform === 'installed' && (
               <div className={s.statusLine}>
-                <CheckCircle size={14} className={s.on} /> <strong className={s.on}>Installed</strong> — you’re running the app.
+                <CheckCircle size={14} className={s.on} /> <strong className={s.on}>{t('settings.install.installedPre')}</strong> {t('settings.install.installedPost')}
               </div>
             )}
 
             {platform === 'installable' && (
               <div className={s.installRow}>
                 <Button variant="accent" onClick={handleInstall}>
-                  <Download size={15} /> Install Reserva
+                  <Download size={15} /> {t('settings.install.button')}
                 </Button>
-                <span className={s.installHint}>It’ll appear on your home screen / app list.</span>
+                <span className={s.installHint}>{t('settings.install.hint')}</span>
               </div>
             )}
 
             {platform === 'ios' && (
               <div className={s.iosSteps}>
-                <p className={s.iosLead}>On iPhone/iPad, install from Safari:</p>
+                <p className={s.iosLead}>{t('settings.install.iosLead')}</p>
                 <ol className={s.iosList}>
-                  <li>Tap the <Share size={13} className={s.iosIcon} /> <strong>Share</strong> button in Safari’s toolbar.</li>
-                  <li>Scroll and choose <strong>Add to Home Screen</strong>.</li>
-                  <li>Tap <strong>Add</strong> — Reserva appears as an app icon.</li>
+                  <li>{t('settings.install.iosStep1Pre')} <Share size={13} className={s.iosIcon} /> <strong>{t('settings.install.iosStep1Strong')}</strong> {t('settings.install.iosStep1Post')}</li>
+                  <li>{t('settings.install.iosStep2Pre')} <strong>{t('settings.install.iosStep2Strong')}</strong>{t('settings.install.iosStep2Post')}</li>
+                  <li>{t('settings.install.iosStep3Pre')} <strong>{t('settings.install.iosStep3Strong')}</strong> {t('settings.install.iosStep3Post')}</li>
                 </ol>
               </div>
             )}

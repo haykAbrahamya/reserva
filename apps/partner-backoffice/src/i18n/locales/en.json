@@ -503,5 +503,68 @@
   "language": {
     "label": "Language",
     "switcherAria": "Change language"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your public address and how bookings work.",
+    "adminOnly": "Admin only",
+    "save": "Save",
+    "saving": "Saving…",
+    "address": {
+      "title": "Public address",
+      "desc": "Your booking page handle — lowercase letters, numbers and hyphens.",
+      "placeholder": "your-salon",
+      "invalid": "Lowercase letters, numbers and hyphens only",
+      "none": "No public address yet — your page is offline until you set one.",
+      "updated": "Public address updated",
+      "updateError": "Could not update address"
+    },
+    "bookings": {
+      "title": "Bookings",
+      "desc": "How online bookings from your public page are handled.",
+      "toggleTitle": "Auto-confirm online bookings",
+      "toggleDescOn": "On",
+      "toggleDescConfirmed": "confirmed automatically.",
+      "toggleDescOff": "Off",
+      "toggleDescArrive": "arrive as",
+      "pending": "pending",
+      "forStaff": "for staff to confirm.",
+      "statusAutoPre": "New online bookings are",
+      "statusAutoStrong": "auto-confirmed",
+      "statusAutoPost": ".",
+      "statusPendingPre": "New online bookings start as",
+      "statusPendingStrong": "pending",
+      "statusPendingPost": "until confirmed.",
+      "autoOnToast": "Online bookings will be auto-confirmed",
+      "autoOffToast": "Online bookings now need manual confirmation",
+      "saveError": "Could not save setting"
+    },
+    "marketplace": {
+      "title": "Reserva marketplace",
+      "desc": "Featured salons appear on the public Reserva directory at reserva.am/salons.",
+      "featuredPre": "Your salon is",
+      "featuredStrong": "featured",
+      "featuredPost": "in the marketplace.",
+      "notFeatured": "Not featured yet. Listing is curated by the Reserva team — reach out if you’d like to be included."
+    },
+    "install": {
+      "title": "Install app",
+      "desc": "Add Reserva to your device for a full-screen app — faster access, no browser bar.",
+      "installedPre": "Installed",
+      "installedPost": "— you’re running the app.",
+      "button": "Install Reserva",
+      "hint": "It’ll appear on your home screen / app list.",
+      "installedToast": "App installed",
+      "iosLead": "On iPhone/iPad, install from Safari:",
+      "iosStep1Pre": "Tap the",
+      "iosStep1Strong": "Share",
+      "iosStep1Post": "button in Safari’s toolbar.",
+      "iosStep2Pre": "Scroll and choose",
+      "iosStep2Strong": "Add to Home Screen",
+      "iosStep2Post": ".",
+      "iosStep3Pre": "Tap",
+      "iosStep3Strong": "Add",
+      "iosStep3Post": "— Reserva appears as an app icon."
+    }
   }
 }
