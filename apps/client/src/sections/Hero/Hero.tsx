@@ -3,13 +3,6 @@ import { ArrowRight, PlayCircle, Sparkles } from 'lucide-react'
 import { useT } from '@/i18n'
 import s from './Hero.module.scss'
 
-const PROOF_AVATARS = [
-  { initials: 'AP', color: '#A8784B' },
-  { initials: 'MS', color: '#2F4A3A' },
-  { initials: 'LH', color: '#B07683' },
-  { initials: 'NA', color: '#4A6B8A' },
-]
-
 function scrollToId(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
@@ -52,18 +45,6 @@ export function Hero() {
           <button className={s.ctaGhost} onClick={() => scrollToId('how')}>
             <PlayCircle size={17} /> {t('hero.seeHow')}
           </button>
-        </div>
-
-        <div className={s.proof}>
-          <div className={s.avatars}>
-            {PROOF_AVATARS.map(a => (
-              <span key={a.initials} className={s.avatar} style={{ background: a.color }}>{a.initials}</span>
-            ))}
-          </div>
-          <div className={s.proofText}>
-            <div className={s.stars}>★★★★★</div>
-            <div>{t('hero.proofPre')}<strong>{t('hero.proofStrong')}</strong>{t('hero.proofPost')}</div>
-          </div>
         </div>
       </div>
 
