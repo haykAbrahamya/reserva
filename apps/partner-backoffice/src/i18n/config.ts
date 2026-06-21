@@ -10,7 +10,7 @@
 export const LOCALES = ['en', 'hy', 'ru'] as const
 export type Locale = (typeof LOCALES)[number]
 
-export const DEFAULT_LOCALE: Locale = 'en'
+export const DEFAULT_LOCALE: Locale = 'hy'
 
 /** A translation bundle is an arbitrarily-nested map of strings. */
 export type Messages = { [key: string]: string | Messages }
@@ -47,13 +47,14 @@ export function isLocale(v: unknown): v is Locale {
 }
 
 /**
- * Resolve the initial locale: saved choice → browser preference → default.
+ * Resolve the initial locale: an explicit saved choice wins; otherwise default
+ * to Armenian. We intentionally do NOT auto-switch to the browser language —
+ * this is an Armenian-market product, so the backoffice opens in Armenian until
+ * the user picks another language (their choice is then remembered).
  */
 export function detectInitialLocale(): Locale {
   if (typeof window === 'undefined') return DEFAULT_LOCALE
   const saved = window.localStorage.getItem(STORAGE_KEY)
   if (isLocale(saved)) return saved
-  const nav = window.navigator.language?.slice(0, 2).toLowerCase()
-  if (isLocale(nav)) return nav
   return DEFAULT_LOCALE
 }
