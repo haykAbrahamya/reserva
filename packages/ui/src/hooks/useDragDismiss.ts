@@ -2,35 +2,37 @@ import { useRef, useState, useCallback, type TouchEvent as ReactTouchEvent } fro
 
 /**
  * Android/iOS-style "drag the sheet down to dismiss" gesture for mobile bottom
- * sheets — without fighting inner scrolling.
+ * sheets — without fighting inner scrolling OR interactive controls.
  *
- * How the scroll conflict is avoided:
- *  - A downward drag only "grabs" the sheet when the scrollable content is
- *    already at the very top (scrollTop <= 0). If the user is scrolling a long
- *    body, the native scroll wins and we never start dragging.
- *  - A drag that begins on the grab handle / header (anything NOT inside the
- *    scroll region) always grabs immediately.
- *  - Only downward movement translates the sheet; upward is ignored.
- *  - Release past a distance/velocity threshold dismisses; otherwise it springs
- *    back to its resting position.
+ * A drag is only ever STARTED from one of two safe places:
+ *  1. The grab handle (matched by `handleSelector`) — the obvious affordance.
+ *  2. Inside the scrollable body (matched by `scrollSelector`) while it's
+ *     scrolled to the very top and the finger is clearly pulling DOWN.
+ *
+ * Crucially, a touch that lands on any other element (a dropdown trigger, a
+ * button, an input, a Select, etc.) NEVER becomes a drag — so tapping controls
+ * inside the sheet can't accidentally dismiss it. We also require a real
+ * downward movement past a small threshold before engaging, so a plain tap
+ * (with tiny finger jitter) is never treated as a drag.
  *
  * Usage:
- *   const drag = useDragDismiss({ onDismiss: handleClose, scrollSelector: `.${s.body}` })
+ *   const drag = useDragDismiss({ onDismiss, scrollSelector: `.${s.body}`, handleSelector: `.${s.grab}` })
  *   <div className={s.sheet} {...drag.handlers} style={drag.style}> … </div>
  */
 
 interface Options {
   /** Called when the user drags far/fast enough to dismiss. */
   onDismiss: () => void
-  /**
-   * CSS selector (within the sheet) for the scrollable region. A downward drag
-   * starting inside it only takes over when that region is scrolled to the top.
-   */
+  /** Selector (within the sheet) for the scrollable region. */
   scrollSelector?: string
-  /** Min px dragged to dismiss on release (default 110). */
+  /** Selector for the grab handle — a drag may always start here. */
+  handleSelector?: string
+  /** Min px dragged to dismiss on release (default 120). */
   threshold?: number
-  /** Min downward velocity (px/ms) to dismiss regardless of distance (default 0.5). */
+  /** Min downward velocity (px/ms) to dismiss regardless of distance (default 0.6). */
   velocity?: number
+  /** Px of downward movement before a drag engages — avoids tap jitter (default 10). */
+  engageAt?: number
   /** Disable the gesture entirely (e.g. on desktop). */
   enabled?: boolean
 }
@@ -38,8 +40,10 @@ interface Options {
 export function useDragDismiss({
   onDismiss,
   scrollSelector,
-  threshold = 110,
-  velocity = 0.5,
+  handleSelector,
+  threshold = 120,
+  velocity = 0.6,
+  engageAt = 10,
   enabled = true,
 }: Options) {
   const [offset, setOffset] = useState(0)
@@ -49,73 +53,83 @@ export function useDragDismiss({
   const startT = useRef(0)
   const lastY = useRef(0)
   const lastT = useRef(0)
-  // Whether this gesture is allowed to move the sheet (vs. let content scroll).
-  const active = useRef(false)
-  // Whether the touch began inside the scroll region.
-  const fromScroll = useRef(false)
+  // Has this gesture engaged into an actual sheet drag?
+  const engaged = useRef(false)
+  // Is this gesture even ELIGIBLE to become a drag? (handle, or top-of-scroll)
+  const eligible = useRef(false)
+  const onHandle = useRef(false)
   const scrollEl = useRef<HTMLElement | null>(null)
 
+  const reset = useCallback(() => {
+    engaged.current = false
+    eligible.current = false
+    onHandle.current = false
+    setDragging(false)
+  }, [])
+
   const onTouchStart = useCallback((e: ReactTouchEvent<HTMLElement>) => {
-    if (!enabled || e.touches.length !== 1) return
+    if (!enabled || e.touches.length !== 1) { eligible.current = false; return }
     const t = e.touches[0]
     startY.current = lastY.current = t.clientY
     startT.current = lastT.current = performance.now()
+    engaged.current = false
+    setOffset(0)
 
-    // Did the touch land inside the scrollable body?
     const sheet = e.currentTarget
-    scrollEl.current = scrollSelector ? sheet.querySelector<HTMLElement>(scrollSelector) : null
-    fromScroll.current = !!(scrollEl.current && e.target instanceof Node && scrollEl.current.contains(e.target))
+    const target = e.target instanceof Node ? e.target : null
 
-    // Outside the scroll region (grab handle / header) → eligible immediately.
-    active.current = !fromScroll.current
-  }, [enabled, scrollSelector])
+    // Did the touch start on the grab handle?
+    const handle = handleSelector ? sheet.querySelector<HTMLElement>(handleSelector) : null
+    onHandle.current = !!(handle && target && handle.contains(target))
+
+    // Or inside the scrollable body?
+    scrollEl.current = scrollSelector ? sheet.querySelector<HTMLElement>(scrollSelector) : null
+    const inScroll = !!(scrollEl.current && target && scrollEl.current.contains(target))
+
+    // Eligible to drag only from the handle, or from within the scroll region.
+    // Anywhere else (controls, dropdowns, footer buttons) → never a drag.
+    eligible.current = onHandle.current || inScroll
+  }, [enabled, scrollSelector, handleSelector])
 
   const onTouchMove = useCallback((e: ReactTouchEvent<HTMLElement>) => {
-    if (!enabled || e.touches.length !== 1) return
+    if (!enabled || !eligible.current || e.touches.length !== 1) return
     const t = e.touches[0]
     const dy = t.clientY - startY.current
     lastY.current = t.clientY
     lastT.current = performance.now()
 
-    // If the gesture started in the scroll region, only take over once the
-    // content is at the top AND the user is pulling DOWN — otherwise let it scroll.
-    if (!active.current) {
-      const atTop = (scrollEl.current?.scrollTop ?? 0) <= 0
-      if (fromScroll.current && atTop && dy > 6) {
-        active.current = true
-        startY.current = t.clientY // re-baseline so there's no jump
-        setDragging(true)
-      } else {
-        return
-      }
+    if (!engaged.current) {
+      // Need a clear downward pull past the engage threshold.
+      if (dy < engageAt) return
+      // From the scroll body, only take over when it's at the very top —
+      // otherwise it's a normal content scroll, leave it alone.
+      if (!onHandle.current && (scrollEl.current?.scrollTop ?? 0) > 0) return
+      engaged.current = true
+      startY.current = t.clientY // re-baseline so there's no visual jump
+      setDragging(true)
     }
 
     const move = t.clientY - startY.current
-    if (move <= 0) { setOffset(0); return } // ignore upward drag
-    // Prevent the page/content from scrolling while we're translating the sheet.
-    if (e.cancelable) e.preventDefault()
-    setDragging(true)
+    if (move <= 0) { setOffset(0); return } // ignore upward
+    if (e.cancelable) e.preventDefault() // stop content scroll while dragging
     setOffset(move)
-  }, [enabled])
+  }, [enabled, engageAt])
 
   const endDrag = useCallback(() => {
-    if (!enabled) return
+    if (!enabled || !engaged.current) { reset(); setOffset(0); return }
     const moved = offset
     const dt = Math.max(1, lastT.current - startT.current)
     const v = moved / dt
-    const shouldDismiss = moved > threshold || (moved > 24 && v > velocity)
+    const shouldDismiss = moved > threshold || (moved > 60 && v > velocity)
 
-    active.current = false
-    fromScroll.current = false
-    setDragging(false)
-
+    reset()
     if (shouldDismiss) {
       onDismiss()
-      // leave offset; the unmount/closing animation takes over
+      // keep the offset; the unmount/closing animation takes over
     } else {
       setOffset(0) // spring back
     }
-  }, [enabled, offset, threshold, velocity, onDismiss])
+  }, [enabled, offset, threshold, velocity, onDismiss, reset])
 
   return {
     /** Spread onto the sheet element. */

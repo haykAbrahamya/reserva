@@ -48,7 +48,7 @@ export function Modal({ open, onClose, title, subtitle, children, footer, size =
   const isMobile = useIsMobile()
   const { closing, handleClose } = useAnimatedClose(open, onClose)
   // Android-style drag-to-dismiss for the mobile sheet (no scroll conflict).
-  const drag = useDragDismiss({ onDismiss: handleClose, scrollSelector: `.${s.body}`, enabled: isMobile })
+  const drag = useDragDismiss({ onDismiss: handleClose, scrollSelector: `.${s.body}`, handleSelector: `.${s.grab}`, enabled: isMobile })
 
   useEffect(() => {
     if (!open) return
@@ -109,7 +109,7 @@ export function Modal({ open, onClose, title, subtitle, children, footer, size =
 export function Drawer({ open, onClose, title, subtitle, children, footer }: Omit<ModalProps, 'size'>) {
   const isMobile = useIsMobile()
   const { closing, handleClose } = useAnimatedClose(open, onClose)
-  const drag = useDragDismiss({ onDismiss: handleClose, scrollSelector: `.${s.body}`, enabled: isMobile })
+  const drag = useDragDismiss({ onDismiss: handleClose, scrollSelector: `.${s.body}`, handleSelector: `.${s.grab}`, enabled: isMobile })
 
   useEffect(() => {
     if (!open) return

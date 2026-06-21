@@ -176,6 +176,7 @@ export function NotificationsBell() {
   const drag = useDragDismiss({
     onDismiss: () => setOpen(false),
     scrollSelector: `.${s.list}`,
+    handleSelector: `.${s.grab}`,
     enabled: isMobile && open,
   })
 
