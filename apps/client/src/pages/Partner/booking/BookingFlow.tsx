@@ -13,7 +13,7 @@ import {
 import { getTelegramConnectLink } from '@/services/telegram.service'
 import { friendlyError } from '@/services/errors'
 import { useT, useI18n, LOCALE_META } from '@/i18n'
-import { buildIcs, downloadIcs } from '@/lib/ics'
+import { addToCalendar } from '@/lib/ics'
 import s from './BookingFlow.module.scss'
 
 type Step = 'location' | 'service' | 'specialist' | 'datetime' | 'details' | 'confirm' | 'success'
@@ -226,9 +226,9 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
       ? partner.specialists.find(sp => sp.id === specialistId) ?? null
       : null
 
-  // Build + download a calendar invite (.ics) for the booking, with a 1-hour
-  // VALARM so the customer's own phone reminds them — free, no opt-in needed.
-  const addToCalendar = () => {
+  // Add the booking to the user's calendar — opens Google Calendar (app on
+  // Android, web on desktop) or hands an .ics to Apple Calendar on iOS/macOS.
+  const handleAddToCalendar = () => {
     if (!service || !time) return
     const start = new Date(`${date}T00:00:00`)
     const [h, m] = time.split(':').map(Number)
@@ -244,14 +244,16 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
     })
     const place = chosenLocation?.address || chosenLocation?.name || partner.name
 
-    const ics = buildIcs({
-      uid: bookingId ?? `${partner.id}-${start.getTime()}`,
-      start, end, title, description,
-      location: place,
-      organizer: partner.name,
-      reminderMinutes: 60,
-    })
-    downloadIcs(`${partner.name}-booking`, ics)
+    addToCalendar(
+      {
+        uid: bookingId ?? `${partner.id}-${start.getTime()}`,
+        start, end, title, description,
+        location: place,
+        organizer: partner.name,
+        reminderMinutes: 60,
+      },
+      `${partner.name}-booking`,
+    )
   }
 
   const [t1, t2] = partner.presentation.heroTints
@@ -363,7 +365,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
               <div className={s.remindLabel}>{t('booking.remind.title')}</div>
               <div className={s.remindGrid}>
                 {/* Add to calendar — generates an .ics with a 1-hour alarm. */}
-                <button type="button" className={s.remindTile} onClick={addToCalendar}>
+                <button type="button" className={s.remindTile} onClick={handleAddToCalendar}>
                   <span className={[s.remindIcon, s.remindIconCal].join(' ')}><CalendarPlus size={18} /></span>
                   <span className={s.remindName}>{t('booking.remind.calendar')}</span>
                 </button>

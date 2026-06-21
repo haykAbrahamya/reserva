@@ -99,3 +99,50 @@ export function downloadIcs(filename: string, ics: string): void {
   // Revoke after a tick so the click/navigation has consumed the URL.
   setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
+
+/** Format a Date for a Google Calendar template URL: 20260628T143000Z */
+function toGCalDate(d: Date): string {
+  return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
+}
+
+/**
+ * Google Calendar "create event" URL with the event pre-filled. Opening this
+ * launches the Google Calendar APP on Android (it handles calendar.google.com
+ * links) and the web composer on desktop — one tap to save, no file download.
+ */
+export function googleCalendarUrl(ev: IcsEvent): string {
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: ev.title,
+    dates: `${toGCalDate(ev.start)}/${toGCalDate(ev.end)}`,
+  })
+  if (ev.description) params.set('details', ev.description)
+  if (ev.location) params.set('location', ev.location)
+  return `https://calendar.google.com/calendar/render?${params.toString()}`
+}
+
+/** Apple devices (iOS/iPadOS/macOS) open .ics natively in Apple Calendar. */
+function isApple(): boolean {
+  const ua = navigator.userAgent
+  const iOS = /iPad|iPhone|iPod/.test(ua) ||
+    // iPadOS 13+ reports as Mac; detect via touch.
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  const mac = /Macintosh/.test(ua)
+  return iOS || mac
+}
+
+/**
+ * Add the event to the user's calendar the way that actually works on their
+ * platform:
+ *  - Apple (iPhone/iPad/Mac): hand over the .ics → opens Apple Calendar.
+ *  - Everyone else (Android, Windows, Linux, ChromeOS): open the Google
+ *    Calendar template → launches the GCal app on Android / web composer on
+ *    desktop, event pre-filled. No silent file download.
+ */
+export function addToCalendar(ev: IcsEvent, filename: string): void {
+  if (isApple()) {
+    downloadIcs(filename, buildIcs(ev))
+    return
+  }
+  window.open(googleCalendarUrl(ev), '_blank', 'noopener,noreferrer')
+}
