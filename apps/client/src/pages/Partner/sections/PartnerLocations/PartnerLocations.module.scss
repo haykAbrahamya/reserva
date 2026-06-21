@@ -13,7 +13,7 @@
 .head { margin-bottom: 28px; }
 .eyebrow {
   font-size: 12px; font-weight: 600; text-transform: uppercase;
-  letter-spacing: 0.08em; color: $accent; margin-bottom: 10px;
+  letter-spacing: 0.08em; color: $accent-contrast; margin-bottom: 10px;
 }
 .title {
   font-family: $font-serif;
@@ -92,7 +92,7 @@
   font-size: 14px;
   color: $fg-1;
   margin-bottom: 8px;
-  svg { color: $accent; flex-shrink: 0; margin-top: 2px; }
+  svg { color: $accent-contrast; flex-shrink: 0; margin-top: 2px; }
 }
 
 /* Address is a link to Google Maps — subtle affordance, accent on hover. */
@@ -101,7 +101,7 @@
   cursor: pointer;
   border-radius: 6px;
   transition: color 0.15s;
-  &:hover { color: $accent; }
+  &:hover { color: $accent-contrast; }
   &:hover span { text-decoration: underline; }
 }
 
@@ -157,5 +157,5 @@
   &:hover { background: $bg-2; border-color: $line-strong; }
 }
 /* Directions stands out a touch with the accent icon. */
-.mapBtn svg { color: $accent; }
-.mapBtn:hover { color: $accent-strong; border-color: $accent; }
+.mapBtn svg { color: $accent-contrast; }
+.mapBtn:hover { color: $accent-contrast; border-color: $accent; }

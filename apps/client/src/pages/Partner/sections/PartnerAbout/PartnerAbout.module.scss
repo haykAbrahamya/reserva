@@ -29,7 +29,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: $accent;
+  color: $accent-contrast;
   margin-bottom: 14px;
 }
 
@@ -68,7 +68,7 @@
   height: 36px;
   border-radius: 10px;
   background: $accent-soft;
-  color: $accent;
+  color: $accent-contrast;
   display: flex;
   align-items: center;
   justify-content: center;

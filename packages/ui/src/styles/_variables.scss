@@ -21,6 +21,9 @@ $line-strong: var(--line-strong);
 $accent: var(--accent);
 $accent-soft: var(--accent-soft);
 $accent-strong: var(--accent-strong);
+/* Accent-family text on NEUTRAL backgrounds — stays legible in both themes.
+   Falls back to --accent-strong where no per-page value is set. */
+$accent-contrast: var(--accent-contrast, var(--accent-strong));
 
 $success: var(--success);
 $success-soft: var(--success-soft);

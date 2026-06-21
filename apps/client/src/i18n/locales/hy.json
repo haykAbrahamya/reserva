@@ -294,7 +294,19 @@
       "phone": "Հեռախոս",
       "total": "Ընդամենը"
     },
-    "spots": "{n} տեղ"
+    "spots": "{n} տեղ",
+    "remind": {
+      "title": "Ստացեք հիշեցումներ",
+      "calendar": "Ավելացնել օրացույցում",
+      "calendarSub": "Կհիշեցնենք 1 ժամ առաջ։",
+      "telegram": "Թարմացումներ Telegram-ով",
+      "telegramSub": "Անվճար հաստատումներ և հիշեցումներ։"
+    },
+    "ics": {
+      "title": "{service} · {salon}",
+      "description": "Ձեր այցը՝ {service} ծառայության համար {salon}-ում, {specialist}-ի մոտ։",
+      "anySpecialist": "թիմը"
+    }
   },
   "signup": {
     "panelTag": "Սրահների համար",

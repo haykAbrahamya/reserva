@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { ArrowLeft, X, Check, Users, Calendar, Clock, CheckCircle2, ArrowRight, Sparkles, MapPin, Send, AlertCircle } from 'lucide-react'
+import { ArrowLeft, X, Check, Users, Calendar, Clock, CheckCircle2, ArrowRight, Sparkles, MapPin, Send, AlertCircle, CalendarPlus } from 'lucide-react'
 import { fmtAMD, fmtDuration, fmtDateInput, initials } from '@reserva/shared'
 import { DatePicker } from '@reserva/ui'
 import type { Service, Specialist } from '@reserva/shared'
@@ -12,7 +12,8 @@ import {
 } from '@/services/booking.service'
 import { getTelegramConnectLink } from '@/services/telegram.service'
 import { friendlyError } from '@/services/errors'
-import { useT } from '@/i18n'
+import { useT, useI18n, LOCALE_META } from '@/i18n'
+import { buildIcs, downloadIcs } from '@/lib/ics'
 import s from './BookingFlow.module.scss'
 
 type Step = 'location' | 'service' | 'specialist' | 'datetime' | 'details' | 'confirm' | 'success'
@@ -29,6 +30,7 @@ const ANY_SPECIALIST = '__any__'
 
 export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, onClose }: Props) {
   const t = useT()
+  const { locale } = useI18n()
   const [closing, setClosing] = useState(false)
 
   // Only branches that can actually be booked (active + ≥1 active specialist).
@@ -56,6 +58,8 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   // Telegram connect deep link for the just-created booking (null = unavailable
   // / already connected / telegram disabled → button hidden).
   const [telegramLink, setTelegramLink] = useState<string | null>(null)
+  // Id of the just-created booking — used as the calendar event UID.
+  const [bookingId, setBookingId] = useState<string | null>(null)
 
   // slots
   const [slots, setSlots]           = useState<string[]>([])
@@ -194,10 +198,12 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
         clientName: name.trim(),
         clientPhone: phone.trim(),
         notes: notes.trim() || undefined,
+        locale,
       })
       // Reflect the real outcome: auto-confirm partners → 'confirmed', otherwise
       // the booking lands as 'pending' awaiting staff confirmation.
       setBookedStatus(booking.status === 'confirmed' ? 'confirmed' : 'pending')
+      setBookingId(booking.id)
       setStep('success')
       // Offer free Telegram updates for this booking (best-effort, non-blocking).
       getTelegramConnectLink(booking.id).then(setTelegramLink)
@@ -219,6 +225,34 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
     specialistId && specialistId !== ANY_SPECIALIST
       ? partner.specialists.find(sp => sp.id === specialistId) ?? null
       : null
+
+  // Build + download a calendar invite (.ics) for the booking, with a 1-hour
+  // VALARM so the customer's own phone reminds them — free, no opt-in needed.
+  const addToCalendar = () => {
+    if (!service || !time) return
+    const start = new Date(`${date}T00:00:00`)
+    const [h, m] = time.split(':').map(Number)
+    start.setHours(h, m, 0, 0)
+    const end = new Date(start.getTime() + service.duration * 60_000)
+
+    const spName = chosenSpecialist?.name
+    const title = t('booking.ics.title', { service: service.name, salon: partner.name })
+    const description = t('booking.ics.description', {
+      service: service.name,
+      salon: partner.name,
+      specialist: spName ?? t('booking.ics.anySpecialist'),
+    })
+    const place = chosenLocation?.address || chosenLocation?.name || partner.name
+
+    const ics = buildIcs({
+      uid: bookingId ?? `${partner.id}-${start.getTime()}`,
+      start, end, title, description,
+      location: place,
+      organizer: partner.name,
+      reminderMinutes: 60,
+    })
+    downloadIcs(`${partner.name}-booking`, ics)
+  }
 
   const [t1, t2] = partner.presentation.heroTints
 
@@ -292,45 +326,66 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
         {/* ── BODY ── */}
         {step === 'success' ? (
           <div className={s.success}>
-            <div className={[s.successIcon, bookedStatus === 'pending' ? s.successIconPending : ''].filter(Boolean).join(' ')}>
-              {bookedStatus === 'pending' ? <Clock size={38} /> : <CheckCircle2 size={38} />}
-            </div>
-            <h2 className={s.successTitle}>
-              {bookedStatus === 'pending' ? t('booking.pendingTitle') : t('booking.successTitle')}
-            </h2>
-            <p className={s.successText}>
-              {bookedStatus === 'pending' ? (
-                <>{t('booking.pendingTextPre')}<strong>{partner.name}</strong>{t('booking.pendingTextPost')}</>
-              ) : (
-                <>{t('booking.successTextPre')}<strong>{partner.name}</strong>{t('booking.successTextPost')}</>
-              )}
-            </p>
-            <div className={s.successCard}>
-              <SummaryRows
-                service={service}
-                specialist={chosenSpecialist}
-                anySpecialist={specialistId === ANY_SPECIALIST}
-                hideSpecialist={isFacility}
-                location={multiLocation ? chosenLocation?.name ?? null : null}
-                date={date}
-                time={time}
-                hidePrice
-              />
+            {/* Full-bleed accent banner — anchors the card, no floating icon. */}
+            <div className={[s.banner, bookedStatus === 'pending' ? s.bannerPending : ''].filter(Boolean).join(' ')}>
+              <button className={s.bannerClose} onClick={animatedClose} aria-label={t('booking.done')}><X size={18} /></button>
+              <div className={s.bannerIcon}>
+                {bookedStatus === 'pending' ? <Clock size={30} /> : <CheckCircle2 size={30} />}
+              </div>
+              <h2 className={s.bannerTitle}>
+                {bookedStatus === 'pending' ? t('booking.pendingTitle') : t('booking.successTitle')}
+              </h2>
+              <p className={s.bannerText}>
+                {bookedStatus === 'pending' ? (
+                  <>{t('booking.pendingTextPre')}<strong>{partner.name}</strong>{t('booking.pendingTextPost')}</>
+                ) : (
+                  <>{t('booking.successTextPre')}<strong>{partner.name}</strong>{t('booking.successTextPost')}</>
+                )}
+              </p>
             </div>
 
-            {/* Free customer notifications via Telegram — one tap to connect. */}
-            {telegramLink && (
-              <a
-                className={s.telegramBtn}
-                href={telegramLink}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Send size={17} /> {t('booking.telegramConnect')}
-              </a>
-            )}
+            <div className={s.successScroll}>
+              {/* Appointment details — full width, icon-chip rows. */}
+              <div className={s.successCard}>
+                <SummaryRows
+                  service={service}
+                  specialist={chosenSpecialist}
+                  anySpecialist={specialistId === ANY_SPECIALIST}
+                  hideSpecialist={isFacility}
+                  location={multiLocation ? chosenLocation?.name ?? null : null}
+                  date={date}
+                  time={time}
+                  hidePrice
+                />
+              </div>
 
-            <button className={s.doneBtn} onClick={animatedClose}>{t('booking.done')}</button>
+              {/* ── Get reminders — free, no-cost channels (grid on web) ── */}
+              <div className={s.remindLabel}>{t('booking.remind.title')}</div>
+              <div className={s.remindGrid}>
+                {/* Add to calendar — generates an .ics with a 1-hour alarm. */}
+                <button type="button" className={s.remindTile} onClick={addToCalendar}>
+                  <span className={[s.remindIcon, s.remindIconCal].join(' ')}><CalendarPlus size={18} /></span>
+                  <span className={s.remindName}>{t('booking.remind.calendar')}</span>
+                </button>
+
+                {/* Telegram — one tap to connect the bot for free live updates. */}
+                {telegramLink && (
+                  <a
+                    className={s.remindTile}
+                    href={telegramLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <span className={[s.remindIcon, s.remindIconTg].join(' ')}><Send size={16} /></span>
+                    <span className={s.remindName}>{t('booking.remind.telegram')}</span>
+                  </a>
+                )}
+              </div>
+            </div>
+
+            <div className={s.successFooter}>
+              <button className={s.doneBtn} onClick={animatedClose}>{t('booking.done')}</button>
+            </div>
           </div>
         ) : (
           <>
@@ -583,48 +638,38 @@ function SummaryRows({ service, specialist, anySpecialist, hideSpecialist, locat
   hidePrice?: boolean
 }) {
   const t = useT()
-  const dateLabel = new Date(`${date}T00:00:00`).toLocaleDateString('en-GB', {
+  const { locale } = useI18n()
+  const dateLabel = new Date(`${date}T00:00:00`).toLocaleDateString(LOCALE_META[locale].lang, {
     weekday: 'long', day: 'numeric', month: 'long',
   })
 
+  const Row = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) => (
+    <div className={s.sumRow}>
+      <span className={s.sumIcon}>{icon}</span>
+      <span className={s.sumLabel}>{label}</span>
+      <span className={s.sumValue}>{value}</span>
+    </div>
+  )
+
   return (
     <>
-      {location && (
-        <div className={s.sumRow}>
-          <span className={s.sumLabel}><MapPin size={13} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 6 }} />{t('booking.summary.branch')}</span>
-          <span className={s.sumValue}>{location}</span>
-        </div>
-      )}
-      <div className={s.sumRow}>
-        <span className={s.sumLabel}><Sparkles size={13} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 6 }} />{t('booking.summary.service')}</span>
-        <span className={s.sumValue}>{service?.name ?? '—'}</span>
-      </div>
+      {location && <Row icon={<MapPin size={15} />} label={t('booking.summary.branch')} value={location} />}
+      <Row icon={<Sparkles size={15} />} label={t('booking.summary.service')} value={service?.name ?? '—'} />
       {!hideSpecialist && (
-        <div className={s.sumRow}>
-          <span className={s.sumLabel}><Users size={13} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 6 }} />{t('booking.summary.specialist')}</span>
-          <span className={s.sumValue}>{anySpecialist ? t('booking.summary.anyAvailable') : specialist?.name ?? '—'}</span>
-        </div>
+        <Row
+          icon={<Users size={15} />}
+          label={t('booking.summary.specialist')}
+          value={anySpecialist ? t('booking.summary.anyAvailable') : specialist?.name ?? '—'}
+        />
       )}
-      <div className={s.sumRow}>
-        <span className={s.sumLabel}><Calendar size={13} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 6 }} />{t('booking.summary.date')}</span>
-        <span className={s.sumValue}>{dateLabel}</span>
-      </div>
-      <div className={s.sumRow}>
-        <span className={s.sumLabel}><Clock size={13} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 6 }} />{t('booking.summary.time')}</span>
-        <span className={s.sumValue}>{time ?? '—'}{service ? ` · ${fmtDuration(service.duration)}` : ''}</span>
-      </div>
-      {name && (
-        <div className={s.sumRow}>
-          <span className={s.sumLabel}>{t('booking.summary.name')}</span>
-          <span className={s.sumValue}>{name}</span>
-        </div>
-      )}
-      {phone && (
-        <div className={s.sumRow}>
-          <span className={s.sumLabel}>{t('booking.summary.phone')}</span>
-          <span className={s.sumValue}>{phone}</span>
-        </div>
-      )}
+      <Row icon={<Calendar size={15} />} label={t('booking.summary.date')} value={dateLabel} />
+      <Row
+        icon={<Clock size={15} />}
+        label={t('booking.summary.time')}
+        value={<>{time ?? '—'}{service ? ` · ${fmtDuration(service.duration)}` : ''}</>}
+      />
+      {name && <Row icon={<Users size={15} />} label={t('booking.summary.name')} value={name} />}
+      {phone && <Row icon={<MapPin size={15} />} label={t('booking.summary.phone')} value={phone} />}
       {!hidePrice && service && (
         <div className={[s.sumRow, s.sumTotal].join(' ')}>
           <span className={s.sumTotalLabel}>{t('booking.summary.total')}</span>

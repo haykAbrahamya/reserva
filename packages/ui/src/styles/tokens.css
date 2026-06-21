@@ -32,6 +32,8 @@
   --accent: #A8784B;
   --accent-soft: rgba(168, 120, 75, 0.12);
   --accent-strong: #6B4A2A;
+  /* Accent-family text on neutral backgrounds (deep enough to read on light). */
+  --accent-contrast: #6B4A2A;
 
   /* Semantic */
   --success: #4F7A4A;
@@ -114,6 +116,8 @@
   --accent: #C0915F;
   --accent-soft: rgba(192, 145, 95, 0.16);
   --accent-strong: #D6A972;
+  /* On dark neutral surfaces, accent text must be LIGHT to stay legible. */
+  --accent-contrast: #DCB489;
 
   /* Semantic — lifted for legibility on dark */
   --success: #74A86E;
@@ -143,14 +147,14 @@
 }
 
 /* Per-tenant accent in dark mode — brighten the brand hues */
-[data-theme="dark"][data-brand="antheris"]  { --accent:#C0915F; --accent-soft:rgba(192,145,95,.16);  --accent-strong:#D6A972; }
-[data-theme="dark"][data-brand="barberbro"] { --accent:#5C8A6E; --accent-soft:rgba(92,138,110,.16);   --accent-strong:#79A98C; }
-[data-theme="dark"][data-brand="lume"]      { --accent:#C99AA5; --accent-soft:rgba(201,154,165,.16); --accent-strong:#DBB4BD; }
+[data-theme="dark"][data-brand="antheris"]  { --accent:#C0915F; --accent-soft:rgba(192,145,95,.16);  --accent-strong:#D6A972; --accent-contrast:#DCB489; }
+[data-theme="dark"][data-brand="barberbro"] { --accent:#5C8A6E; --accent-soft:rgba(92,138,110,.16);   --accent-strong:#79A98C; --accent-contrast:#8FC0A2; }
+[data-theme="dark"][data-brand="lume"]      { --accent:#C99AA5; --accent-soft:rgba(201,154,165,.16); --accent-strong:#DBB4BD; --accent-contrast:#E3BFC7; }
 
 /* Tenant accent presets */
-[data-brand="antheris"]  { --accent:#A8784B; --accent-soft:rgba(168,120,75,.12);  --accent-strong:#6B4A2A; }
-[data-brand="barberbro"] { --accent:#2F4A3A; --accent-soft:rgba(47,74,58,.12);    --accent-strong:#1E3225; }
-[data-brand="lume"]      { --accent:#B07683; --accent-soft:rgba(176,118,131,.12); --accent-strong:#7A4A55; }
+[data-brand="antheris"]  { --accent:#A8784B; --accent-soft:rgba(168,120,75,.12);  --accent-strong:#6B4A2A; --accent-contrast:#6B4A2A; }
+[data-brand="barberbro"] { --accent:#2F4A3A; --accent-soft:rgba(47,74,58,.12);    --accent-strong:#1E3225; --accent-contrast:#2F4A3A; }
+[data-brand="lume"]      { --accent:#B07683; --accent-soft:rgba(176,118,131,.12); --accent-strong:#7A4A55; --accent-contrast:#7A4A55; }
 
 /* ---- Reset & base ---- */
 html, body, #root { height: 100%; margin: 0; }

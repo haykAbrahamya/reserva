@@ -100,7 +100,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: $accent-strong;
+  color: $accent-contrast;
   background: $accent-soft;
   border: 1px solid color-mix(in srgb, $accent 24%, transparent);
   padding: 5px 11px;
@@ -152,7 +152,7 @@
   gap: 8px;
   font-size: 14px;
   color: $fg-1;
-  svg { color: $accent; flex-shrink: 0; }
+  svg { color: $accent-contrast; flex-shrink: 0; }
 }
 
 /* clickable "N locations" meta — jumps to the locations section */
@@ -162,7 +162,7 @@
   gap: 8px;
   font-size: 14px;
   font-weight: 500;
-  color: $accent;
+  color: $accent-contrast;
   background: $accent-soft;
   border: 1px solid color-mix(in srgb, $accent 22%, transparent);
   padding: 7px 13px;
@@ -170,7 +170,7 @@
   cursor: pointer;
   font-family: $font-sans;
   transition: background 0.15s, transform 0.1s;
-  svg { color: $accent; flex-shrink: 0; }
+  svg { color: $accent-contrast; flex-shrink: 0; }
   &:hover { background: color-mix(in srgb, $accent 18%, transparent); }
   &:active { transform: scale(0.98); }
 }

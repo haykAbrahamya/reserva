@@ -293,7 +293,19 @@
       "phone": "Phone",
       "total": "Total"
     },
-    "spots": "{n} spots"
+    "spots": "{n} spots",
+    "remind": {
+      "title": "Get reminders",
+      "calendar": "Add to calendar",
+      "calendarSub": "We’ll remind you 1 hour before.",
+      "telegram": "Get updates on Telegram",
+      "telegramSub": "Free confirmations & reminders."
+    },
+    "ics": {
+      "title": "{service} · {salon}",
+      "description": "Your appointment for {service} at {salon} with {specialist}.",
+      "anySpecialist": "the team"
+    }
   },
   "signup": {
     "panelTag": "For salons",

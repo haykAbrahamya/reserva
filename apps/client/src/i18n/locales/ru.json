@@ -294,7 +294,19 @@
       "phone": "Телефон",
       "total": "Итого"
     },
-    "spots": "{n} мест"
+    "spots": "{n} мест",
+    "remind": {
+      "title": "Получать напоминания",
+      "calendar": "Добавить в календарь",
+      "calendarSub": "Напомним за 1 час до визита.",
+      "telegram": "Уведомления в Telegram",
+      "telegramSub": "Бесплатные подтверждения и напоминания."
+    },
+    "ics": {
+      "title": "{service} · {salon}",
+      "description": "Ваша запись на «{service}» в {salon}, специалист — {specialist}.",
+      "anySpecialist": "команда"
+    }
   },
   "signup": {
     "panelTag": "Для салонов",

@@ -169,6 +169,8 @@ export interface CreateBookingInput {
   clientName: string
   clientPhone: string
   notes?: string
+  /** UI language the booking was made in, for localized reminders. */
+  locale?: string
 }
 
 export async function createBooking(input: CreateBookingInput): Promise<Booking> {
@@ -181,6 +183,7 @@ export async function createBooking(input: CreateBookingInput): Promise<Booking>
     clientName: input.clientName,
     clientPhone: input.clientPhone,
     notes: input.notes,
+    locale: input.locale,
   }
   const b = await api<{
     id: string
