@@ -11,6 +11,7 @@ import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
 import { signupService } from '@/services/signup.service'
 import { friendlyError } from '@/services/errors'
 import { isValidPhone, normalizePhoneInput } from '@reserva/shared'
+import { useScrollToTop } from '@/hooks/useScrollToTop'
 import { useT } from '@/i18n'
 import s from './SignUp.module.scss'
 
@@ -20,6 +21,7 @@ type Step = 'company' | 'account' | 'success'
 const MIN_PW = 8
 
 export function SignUp() {
+  useScrollToTop()
   const t = useT()
   const navigate = useNavigate()
   const [params] = useSearchParams()
