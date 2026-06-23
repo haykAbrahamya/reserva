@@ -9,7 +9,7 @@ import {
   type PartnerUser,
   type UpdatePartnerUserInput,
 } from '@/services/partners.service'
-import { ApiError } from '@/services/http'
+import { errorMessage } from '@/services/errors'
 import s from './PartnerUsers.module.scss'
 
 /** Platform-staff panel: view + manage a partner's users (edit, reset password). */
@@ -99,7 +99,7 @@ function EditUserModal({
       await partnersService.updateUser(partnerId, user.id, form)
       onSaved()
     } catch (err) {
-      toast(err instanceof ApiError ? err.message : 'Could not save')
+      toast(errorMessage(err))
     } finally {
       setSaving(false)
     }
@@ -158,7 +158,7 @@ function ResetPasswordModal({
       setResult(res.password)
       onDone()
     } catch (err) {
-      toast(err instanceof ApiError ? err.message : 'Could not reset password')
+      toast(errorMessage(err))
     } finally {
       setWorking(false)
     }

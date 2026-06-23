@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Calendar } from 'lucide-react'
-import { Modal, Input, Select, Button, DatePicker, useToast } from '@/components/ui'
+import { Modal, Input, Select, Button, DatePicker, FieldError, useToast } from '@/components/ui'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import { useScopedLocationId } from '@/store/auth.hooks'
@@ -8,6 +8,7 @@ import { bookingsService } from '@/services/bookings.service'
 import { partnersService } from '@/services/partners.service'
 import { slotBlockedByTimeOff } from '@/utils/timeOff'
 import { fmtDateInput } from '@/utils/format'
+import { errorMessage } from '@/utils/errors'
 import { useT, useDateLocale } from '@/i18n'
 import type { SpecialistTimeOff } from '@/types'
 import s from './NewBookingModal.module.scss'
@@ -41,6 +42,10 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
   const [time,         setTime]         = useState(initialTime ?? '')
   const [clientName,   setClientName]   = useState('')
   const [clientPhone,  setClientPhone]  = useState('')
+  // Inline validation errors, keyed by field. Set on submit; cleared on edit.
+  const [errs, setErrs] = useState<Record<string, string>>({})
+  const [saving, setSaving] = useState(false)
+  const clearErr = (k: string) => setErrs(e => (e[k] ? (() => { const n = { ...e }; delete n[k]; return n })() : e))
 
   // Fresh bookings for the chosen day for slot availability (backend enforces overlaps).
   const { data: bookings } = useResource(
@@ -143,30 +148,56 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
   // The time grid is ready once we can resolve availability: a specialist for a
   // person service, or just the service itself for a facility/entry one.
   const slotsReady = isFacility ? !!serviceId : !!specialistId
-  const canSubmit =
-    locationId && serviceId && date && time && clientName && clientPhone &&
-    (isFacility || specialistId)
+
+  /** Local validation → inline errors. Returns true when the form is valid. */
+  const validate = (): boolean => {
+    const e: Record<string, string> = {}
+    if (!locationId) e.locationId = t('errors.required')
+    if (!serviceId) e.serviceId = t('errors.required')
+    if (!isFacility && !specialistId) e.specialistId = t('errors.required')
+    if (!time) e.time = t('errors.required')
+    if (!clientName.trim()) e.clientName = t('errors.required')
+    if (clientPhone.replace(/\D/g, '').length < 6) e.clientPhone = clientPhone.trim() ? t('errors.invalid') : t('errors.required')
+    setErrs(e)
+    return Object.keys(e).length === 0
+  }
 
   const handleSubmit = async () => {
-    if (!canSubmit || !selectedService) return
+    if (saving) return
+    if (!validate() || !selectedService) {
+      toast(t('errors.fixFields'))
+      return
+    }
     const [h, m] = time.split(':').map(Number)
     const start = new Date(`${date}T00:00:00`)
     start.setHours(h, m, 0, 0)
     const end = new Date(start.getTime() + selectedService.duration * 60_000)
 
-    await bookingsService.create({
-      partnerId: partner.id, locationId,
-      specialistId: isFacility ? null : specialistId,
-      serviceId,
-      clientName, clientPhone,
-      startISO: start.toISOString(), endISO: end.toISOString(),
-      status: 'confirmed',
-    })
-    onCreated?.()
-    toast(t('newBooking.confirmedToast', { name: clientName }))
-    onClose()
-    setLocationId(scopedLocationId ?? ''); setServiceId(''); setSpecialistId('')
-    setDate(today);   setTime('');   setClientName(''); setClientPhone('')
+    setSaving(true)
+    try {
+      await bookingsService.create({
+        partnerId: partner.id, locationId,
+        specialistId: isFacility ? null : specialistId,
+        serviceId,
+        clientName, clientPhone,
+        startISO: start.toISOString(), endISO: end.toISOString(),
+        status: 'confirmed',
+      })
+      onCreated?.()
+      toast(t('newBooking.confirmedToast', { name: clientName }))
+      onClose()
+      setErrs({})
+      setLocationId(scopedLocationId ?? ''); setServiceId(''); setSpecialistId('')
+      setDate(today);   setTime('');   setClientName(''); setClientPhone('')
+    } catch (err) {
+      // Surface the backend error as a friendly, localized toast (slot taken,
+      // overlap, etc.). A slot conflict also clears the time so they re-pick.
+      toast(errorMessage(err, t))
+      const code = (err as { code?: string } | null)?.code
+      if (code === 'BOOKING_OVERLAP') { setTime(''); setErrs(e => ({ ...e, time: t('errors.codes.BOOKING_OVERLAP') })) }
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -178,7 +209,7 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>{t('common.cancel')}</Button>
-          <Button variant="accent" disabled={!canSubmit} onClick={handleSubmit}>
+          <Button variant="accent" disabled={saving} onClick={handleSubmit}>
             {t('newBooking.confirm')}
           </Button>
         </>
@@ -189,11 +220,12 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
           <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('newBooking.locationLabel')}</label>
           <Select
             value={locationId}
-            onChange={v => { setLocationId(v); setSpecialistId('') }}
+            onChange={v => { setLocationId(v); setSpecialistId(''); clearErr('locationId') }}
             options={locations.map(l => ({ value: l.id, label: l.name, sub: l.address }))}
             placeholder={t('newBooking.locationPlaceholder')}
             disabled={!!scopedLocationId}
           />
+          <FieldError message={errs.locationId} />
         </div>
 
         <div className={s.full}>
@@ -203,6 +235,7 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
             onChange={v => {
               setServiceId(v)
               setTime('')
+              clearErr('serviceId')
               // Facility services have no specialist — clear any prior pick.
               if (svcCatalog.find(sv => sv.id === v)?.requiresSpecialist === false) setSpecialistId('')
             }}
@@ -215,6 +248,7 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
             }))}
             placeholder={t('newBooking.servicePlaceholder')}
           />
+          <FieldError message={errs.serviceId} />
         </div>
 
         {/* Specialist — hidden for facility/entry services (spa walk-ins). */}
@@ -223,11 +257,12 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
             <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('newBooking.specialistLabel')}</label>
             <Select
               value={specialistId}
-              onChange={v => { setSpecialistId(v); setTime('') }}
+              onChange={v => { setSpecialistId(v); setTime(''); clearErr('specialistId') }}
               options={specialists.map(sp => ({ value: sp.id, label: sp.name, sub: sp.title }))}
               placeholder={t('newBooking.specialistPlaceholder')}
               disabled={!locationId}
             />
+            <FieldError message={errs.specialistId} />
           </div>
         )}
 
@@ -244,7 +279,7 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
                   key={sl}
                   type="button"
                   disabled={busySlots.has(sl)}
-                  onClick={() => !busySlots.has(sl) && setTime(sl)}
+                  onClick={() => { if (!busySlots.has(sl)) { setTime(sl); clearErr('time') } }}
                   className={[s.slot, time === sl ? s.selected : '', busySlots.has(sl) ? s.busy : ''].filter(Boolean).join(' ')}
                 >
                   {sl}
@@ -257,10 +292,11 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
               <span>{t(isFacility ? 'newBooking.slotsHintFacility' : 'newBooking.slotsHint')}</span>
             </div>
           )}
+          <FieldError message={errs.time} />
         </div>
 
-        <Input label={t('newBooking.clientNameLabel')}  value={clientName}  onChange={e => setClientName(e.target.value)}  placeholder={t('newBooking.clientNamePlaceholder')} />
-        <Input label={t('newBooking.clientPhoneLabel')} value={clientPhone} onChange={e => setClientPhone(e.target.value)} placeholder={t('newBooking.clientPhonePlaceholder')} />
+        <Input label={t('newBooking.clientNameLabel')}  value={clientName}  onChange={e => { setClientName(e.target.value); clearErr('clientName') }}  placeholder={t('newBooking.clientNamePlaceholder')} error={errs.clientName} />
+        <Input label={t('newBooking.clientPhoneLabel')} value={clientPhone} onChange={e => { setClientPhone(e.target.value); clearErr('clientPhone') }} placeholder={t('newBooking.clientPhonePlaceholder')} error={errs.clientPhone} />
 
         {time && selectedService && (
           <div className={[s.full, s.infoBox].join(' ')}>

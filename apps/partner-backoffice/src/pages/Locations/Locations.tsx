@@ -4,6 +4,7 @@ import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import { Button, Modal, Input, Empty, TimePicker, Toggle, useToast } from '@/components/ui'
 import { partnersService } from '@/services/partners.service'
+import { errorMessage } from '@/utils/errors'
 import {
   DAY_KEYS, DEFAULT_LOCATION_HOURS, everyDaySchedule, exceptSundaySchedule,
   summarizeHours, dayOf, type DayKey,
@@ -43,14 +44,16 @@ export function Locations() {
   const [form,        setForm]        = useState(EMPTY_FORM)
   const [confirmDel,  setConfirmDel]  = useState<Location | null>(null)
   const [saving,      setSaving]      = useState(false)
+  const [errs,        setErrs]        = useState<Record<string, string>>({})
 
   if (!partner) return null
 
   const total = locations.length
 
-  const openNew = () => { setEditing(null); setForm(EMPTY_FORM); setModalOpen(true) }
+  const openNew = () => { setEditing(null); setForm(EMPTY_FORM); setErrs({}); setModalOpen(true) }
   const openEdit = (loc: Location) => {
     setEditing(loc)
+    setErrs({})
     setForm({
       name: loc.name, address: loc.address, phone: loc.phone,
       hours: loc.hours ?? DEFAULT_LOCATION_HOURS,
@@ -62,22 +65,36 @@ export function Locations() {
   const updateDay = (key: DayKey, patch: Partial<WorkingDay>) =>
     setForm(f => ({ ...f, hours: { ...f.hours, [key]: { ...dayOf(f.hours, key), ...patch } } }))
 
-  const canSave = form.name.trim() !== '' && form.address.trim() !== ''
-
   const handleSave = async () => {
-    if (!canSave) return
+    if (saving) return
+    const e: Record<string, string> = {}
+    if (!form.name.trim()) e.name = t('errors.required')
+    if (!form.address.trim()) e.address = t('errors.required')
+    setErrs(e)
+    if (Object.keys(e).length) { toast(t('errors.fixFields')); return }
     setSaving(true)
-    if (editing) await partnersService.updateLocation(editing.id, form)
-    else await partnersService.createLocation(form)
-    await reload()
-    toast(editing ? t('locations.toast.updated') : t('locations.toast.added'))
-    setSaving(false)
-    setModalOpen(false)
+    try {
+      if (editing) await partnersService.updateLocation(editing.id, form)
+      else await partnersService.createLocation(form)
+      await reload()
+      toast(editing ? t('locations.toast.updated') : t('locations.toast.added'))
+      setErrs({})
+      setModalOpen(false)
+    } catch (err) {
+      toast(errorMessage(err, t))
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleDelete = async () => {
     if (!confirmDel) return
-    await partnersService.deleteLocation(confirmDel.id)
+    try {
+      await partnersService.deleteLocation(confirmDel.id)
+    } catch (err) {
+      toast(errorMessage(err, t))
+      return
+    }
     await reload()
     toast(t('locations.toast.removed'))
     setConfirmDel(null)
@@ -153,7 +170,7 @@ export function Locations() {
         footer={
           <>
             <Button variant="ghost" onClick={() => setModalOpen(false)}>{t('common.cancel')}</Button>
-            <Button variant="accent" disabled={!canSave || saving} onClick={handleSave}>
+            <Button variant="accent" disabled={saving} onClick={handleSave}>
               {saving ? t('common.saving') : editing ? t('common.saveChanges') : t('locations.modal.addLocation')}
             </Button>
           </>
@@ -163,8 +180,9 @@ export function Locations() {
           <Input
             label={t('locations.modal.nameLabel')}
             value={form.name}
-            onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+            onChange={e => { setForm(f => ({ ...f, name: e.target.value })); setErrs(x => ({ ...x, name: '' })) }}
             placeholder={t('locations.modal.namePlaceholder')}
+            error={errs.name || undefined}
           />
           {/* Address. When Google Maps is configured, the MapPicker IS the address
               input (search → pin → auto-filled, editable line) — a single source,
@@ -193,8 +211,9 @@ export function Locations() {
             <Input
               label={t('locations.modal.addressLabel')}
               value={form.address}
-              onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
+              onChange={e => { setForm(f => ({ ...f, address: e.target.value })); setErrs(x => ({ ...x, address: '' })) }}
               placeholder={t('locations.modal.addressPlaceholder')}
+              error={errs.address || undefined}
             />
           )}
 

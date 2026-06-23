@@ -48,4 +48,15 @@
 }
 
 .help  { font-size: 12px; color: $fg-2; }
-.error-msg { font-size: 12px; color: $danger; }
+
+/* One consistent inline error look across all fields (matches FieldError). */
+.errorMsg {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: $danger;
+
+  svg { flex-shrink: 0; margin-top: 1px; }
+}

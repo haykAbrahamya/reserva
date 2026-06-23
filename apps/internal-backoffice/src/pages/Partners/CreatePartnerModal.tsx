@@ -4,6 +4,7 @@ import { Modal, Button, Input, useToast } from '@/components/ui'
 import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
 import { partnersService, type CreatePartnerResult } from '@/services/partners.service'
 import { ApiError } from '@/services/http'
+import { errorMessage } from '@/services/errors'
 import s from './CreatePartnerModal.module.scss'
 
 interface Props {
@@ -107,7 +108,7 @@ export function CreatePartnerModal({ open, onClose, onCreated }: Props) {
         setSlugStatus('taken')
         setError(`The slug "${effectiveSlug}" is already taken. Choose another.`)
       } else {
-        setError(err instanceof ApiError ? err.message : 'Could not create partner')
+        setError(errorMessage(err))
       }
     } finally {
       setSaving(false)

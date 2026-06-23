@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react'
 import { Plus, Sparkles, Pencil, Clock, RotateCcw, X, Users, Waves } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
-import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Empty, Pagination } from '@/components/ui'
+import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Empty, Pagination, useToast } from '@/components/ui'
 import { fmtAMD, fmtDuration } from '@/utils/format'
 import { partnersService } from '@/services/partners.service'
+import { errorMessage } from '@/utils/errors'
 import { useI18n } from '@/i18n'
 import type { Service } from '@/types'
 import s from './Services.module.scss'
@@ -53,6 +54,7 @@ export function Services() {
   const partner     = usePartner()
   const isMobile    = useIsMobile()
   const { t, tp }   = useI18n()
+  const toast       = useToast()
 
   const [page,     setPage]     = useState(1)
   const [pageSize, setPageSize] = useState(5)
@@ -66,6 +68,8 @@ export function Services() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editing,   setEditing]   = useState<Service | null>(null)
   const [form,      setForm]      = useState(EMPTY_FORM)
+  const [errs,      setErrs]      = useState<Record<string, string>>({})
+  const [saving,    setSaving]    = useState(false)
   // Repeat-period editor is collapsed behind a button until the user opens it
   // (or it auto-opens when editing a service that already has a period set).
   const [repeatOpen, setRepeatOpen] = useState(false)
@@ -79,9 +83,10 @@ export function Services() {
   const to        = Math.min(page * pageSize, total)
   const changePageSize = (n: number) => { setPageSize(n); setPage(1) }
 
-  const openNew = () => { setEditing(null); setForm(EMPTY_FORM); setRepeatOpen(false); setModalOpen(true) }
+  const openNew = () => { setEditing(null); setForm(EMPTY_FORM); setRepeatOpen(false); setErrs({}); setModalOpen(true) }
   const openEdit = (svc: Service) => {
     setEditing(svc)
+    setErrs({})
     setForm({
       name: svc.name, price: String(svc.price), duration: String(svc.duration),
       category: svc.category, active: svc.active,
@@ -99,8 +104,18 @@ export function Services() {
   }
 
   const handleSave = async () => {
+    if (saving) return
+    // Local validation → inline errors.
+    const e: Record<string, string> = {}
+    if (!form.name.trim()) e.name = t('errors.required')
+    if (form.price === '' || Number(form.price) < 0 || Number.isNaN(Number(form.price))) e.price = t('errors.invalid')
+    if (form.duration === '' || Number(form.duration) <= 0 || Number.isNaN(Number(form.duration))) e.duration = t('errors.invalid')
+    if (!form.requiresSpecialist && (Number(form.capacity) < 1 || Number.isNaN(Number(form.capacity)))) e.capacity = t('errors.invalid')
+    setErrs(e)
+    if (Object.keys(e).length) { toast(t('errors.fixFields')); return }
+
     const data = {
-      name: form.name,
+      name: form.name.trim(),
       price: Number(form.price),
       duration: Number(form.duration),
       category: form.category,
@@ -110,10 +125,18 @@ export function Services() {
       // Capacity only matters for facility services; force 1 otherwise.
       capacity: form.requiresSpecialist ? 1 : Math.max(1, Number(form.capacity) || 1),
     }
-    if (editing) await partnersService.updateService(editing.id, data)
-    else await partnersService.createService(data)
-    await reload()
-    setModalOpen(false)
+    setSaving(true)
+    try {
+      if (editing) await partnersService.updateService(editing.id, data)
+      else await partnersService.createService(data)
+      await reload()
+      setModalOpen(false)
+      setErrs({})
+    } catch (err) {
+      toast(errorMessage(err, t))
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleToggleActive = async (svc: Service) => {
@@ -249,16 +272,16 @@ export function Services() {
         footer={
           <>
             <Button variant="ghost" onClick={() => setModalOpen(false)}>{t('common.cancel')}</Button>
-            <Button variant="accent" onClick={handleSave}>{t('services.modal.save')}</Button>
+            <Button variant="accent" onClick={handleSave} disabled={saving}>{t('services.modal.save')}</Button>
           </>
         }
       >
         <div className={s.formGrid}>
           <div className={s.formFull}>
-            <Input label={t('services.modal.nameLabel')} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder={t('services.modal.namePlaceholder')} />
+            <Input label={t('services.modal.nameLabel')} value={form.name} onChange={e => { setForm(f => ({ ...f, name: e.target.value })); setErrs(x => ({ ...x, name: '' })) }} placeholder={t('services.modal.namePlaceholder')} error={errs.name || undefined} />
           </div>
-          <Input label={t('services.modal.priceLabel')} type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} placeholder={t('services.modal.pricePlaceholder')} />
-          <Input label={t('services.modal.durationLabel')} type="number" value={form.duration} onChange={e => setForm(f => ({ ...f, duration: e.target.value }))} placeholder={t('services.modal.durationPlaceholder')} />
+          <Input label={t('services.modal.priceLabel')} type="number" value={form.price} onChange={e => { setForm(f => ({ ...f, price: e.target.value })); setErrs(x => ({ ...x, price: '' })) }} placeholder={t('services.modal.pricePlaceholder')} error={errs.price || undefined} />
+          <Input label={t('services.modal.durationLabel')} type="number" value={form.duration} onChange={e => { setForm(f => ({ ...f, duration: e.target.value })); setErrs(x => ({ ...x, duration: '' })) }} placeholder={t('services.modal.durationPlaceholder')} error={errs.duration || undefined} />
           <div className={s.formFull}>
             <Input label={t('services.modal.categoryLabel')} value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} placeholder={t('services.modal.categoryPlaceholder')} />
           </div>
@@ -377,8 +400,9 @@ export function Services() {
                     min={1}
                     max={200}
                     value={form.capacity}
-                    onChange={e => setForm(f => ({ ...f, capacity: e.target.value }))}
+                    onChange={e => { setForm(f => ({ ...f, capacity: e.target.value })); setErrs(x => ({ ...x, capacity: '' })) }}
                     placeholder="10"
+                    error={errs.capacity || undefined}
                   />
                   <span className={s.capacityHint}>{t('services.modal.capacityHint')}</span>
                 </div>

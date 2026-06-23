@@ -2,3 +2,4 @@
 // imports keep working, plus app-specific domain wrappers.
 export * from '@reserva/ui'
 export { BookingBadge } from './BookingBadge'
+export { FieldError } from './FieldError'

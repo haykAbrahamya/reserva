@@ -3,7 +3,7 @@ import { Copy, Check } from 'lucide-react'
 import { Modal, Button, Input, Select, useToast } from '@/components/ui'
 import { staffService, type CreateStaffResult } from '@/services/staff.service'
 import type { PlatformRole } from '@/store/auth.store'
-import { ApiError } from '@/services/http'
+import { errorMessage } from '@/services/errors'
 import s from './CreateStaffModal.module.scss'
 
 interface Props {
@@ -40,7 +40,7 @@ export function CreateStaffModal({ open, onClose, onCreated }: Props) {
       if (res.otp) setResult(res)
       else { toast('Staff member created'); close() }
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not create staff member')
+      setError(errorMessage(err))
     } finally {
       setSaving(false)
     }

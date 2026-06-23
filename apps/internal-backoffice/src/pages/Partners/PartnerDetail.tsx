@@ -5,7 +5,7 @@ import { Avatar, Badge, Button, Input, Textarea, Toggle, Empty, useToast } from 
 import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
 import { useResource } from '@/store/useResource'
 import { partnersService, type UpdatePartnerInput } from '@/services/partners.service'
-import { ApiError } from '@/services/http'
+import { errorMessage } from '@/services/errors'
 import { PartnerUsers } from './PartnerUsers'
 import s from './PartnerDetail.module.scss'
 
@@ -54,7 +54,7 @@ export function PartnerDetailPage() {
       toast('Changes saved')
       await reload()
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not save')
+      setError(errorMessage(err))
     } finally {
       setSaving(false)
     }
@@ -66,7 +66,7 @@ export function PartnerDetailPage() {
       toast(partner.active ? 'Partner disabled' : 'Partner enabled')
       await reload()
     } catch (err) {
-      toast(err instanceof ApiError ? err.message : 'Could not update')
+      toast(errorMessage(err))
     }
   }
 
@@ -76,7 +76,7 @@ export function PartnerDetailPage() {
       toast(next ? 'Featured in marketplace' : 'Removed from marketplace')
       await reload()
     } catch (err) {
-      toast(err instanceof ApiError ? err.message : 'Could not update')
+      toast(errorMessage(err))
     }
   }
 

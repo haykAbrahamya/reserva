@@ -8,7 +8,7 @@ import { staffService, type StaffMember } from '@/services/staff.service'
 import { useAuthStore } from '@/store/auth.store'
 import type { PlatformRole } from '@/store/auth.store'
 import { CreateStaffModal } from './CreateStaffModal'
-import { ApiError } from '@/services/http'
+import { errorMessage } from '@/services/errors'
 import s from './Staff.module.scss'
 
 export function Staff() {
@@ -43,7 +43,7 @@ export function Staff() {
       await staffService.update(id, patch)
       await reload()
     } catch (err) {
-      toast(err instanceof ApiError ? err.message : 'Could not update')
+      toast(errorMessage(err))
     }
   }
 
@@ -55,7 +55,7 @@ export function Staff() {
       setToDelete(null)
       await reload()
     } catch (err) {
-      toast(err instanceof ApiError ? err.message : 'Could not remove')
+      toast(errorMessage(err))
       setToDelete(null)
     }
   }

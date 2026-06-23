@@ -566,5 +566,36 @@
       "iosStep3Strong": "Add",
       "iosStep3Post": "— Reserva appears as an app icon."
     }
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Can’t reach the server. Check your connection and try again.",
+    "required": "This field is required.",
+    "invalid": "Please enter a valid value.",
+    "fixFields": "Please fix the highlighted fields.",
+    "codes": {
+      "VALIDATION_FAILED": "Please check the form and try again.",
+      "NOT_FOUND": "That item could no longer be found.",
+      "INTERNAL": "Something went wrong on our side. Please try again.",
+      "RATE_LIMITED": "Too many attempts. Please wait a moment and try again.",
+      "UPLOAD_FAILED": "The file couldn’t be uploaded. Please try again.",
+      "UNAUTHENTICATED": "Your session expired. Please sign in again.",
+      "INVALID_CREDENTIALS": "Incorrect email or password.",
+      "TOKEN_EXPIRED": "Your session expired. Please sign in again.",
+      "TOKEN_INVALID": "Your session is invalid. Please sign in again.",
+      "FORBIDDEN": "You don’t have permission to do that.",
+      "WRONG_CURRENT_PASSWORD": "Your current password is incorrect.",
+      "SLUG_TAKEN": "That public address is already taken.",
+      "EMAIL_TAKEN": "That email is already in use.",
+      "PHONE_TAKEN": "That phone number is already in use.",
+      "LOCATION_HAS_SPECIALISTS": "Move or remove this branch’s specialists before deleting it.",
+      "BOOKING_OVERLAP": "That time is no longer available.",
+      "SPECIALIST_TIME_OFF": "The specialist is off at that time.",
+      "OUTSIDE_WORKING_HOURS": "That time is outside working hours.",
+      "SERVICE_NOT_OFFERED": "This service isn’t available for that selection.",
+      "TIME_OFF_HAS_CONFLICTS": "There are bookings during that time off.",
+      "INVALID_TIME_RANGE": "The end time must be after the start time.",
+      "PAST_DATE": "Please choose a time in the future."
+    }
   }
 }

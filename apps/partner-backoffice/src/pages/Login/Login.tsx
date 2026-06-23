@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Mail, Eye, EyeOff, AlertCircle, CalendarClock, Users, TrendingUp } from 'lucide-react'
 import { useAuthStore } from '@/store/auth.store'
 import { authService } from '@/services/auth.service'
+import { errorMessage } from '@/utils/errors'
 import { useT } from '@/i18n'
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher/LanguageSwitcher'
 import s from './Login.module.scss'
@@ -59,7 +60,7 @@ export function Login() {
       login(token, user)
       navigate('/', { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('login.loginFailed'))
+      setError(errorMessage(err, t))
     } finally {
       setLoading(false)
     }

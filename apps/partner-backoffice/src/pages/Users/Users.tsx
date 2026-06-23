@@ -2,10 +2,11 @@ import { useState, useEffect, useCallback } from 'react'
 import { UserPlus, Users as UsersIcon, MapPin, Phone, Mail, Trash2, Copy, Check, ShieldCheck, KeyRound } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
-import { Button, Modal, Input, Select, Empty, Avatar, useToast } from '@/components/ui'
+import { Button, Modal, Input, Select, Empty, Avatar, FieldError, useToast } from '@/components/ui'
 import { isValidPhone, normalizePhoneInput } from '@reserva/shared'
 import { usersService } from '@/services/users.service'
 import { partnersService } from '@/services/partners.service'
+import { errorMessage } from '@/utils/errors'
 import type { AuthUser } from '@/store/auth.store'
 import { useI18n } from '@/i18n'
 import s from './Users.module.scss'
@@ -22,6 +23,7 @@ export function Users() {
   const [loading,  setLoading]  = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
+  const [errs, setErrs] = useState<Record<string, string>>({})
   const [saving, setSaving] = useState(false)
   const [confirmDel, setConfirmDel] = useState<AuthUser | null>(null)
   // After creating: show the generated OTP + delivery channel.
@@ -42,35 +44,49 @@ export function Users() {
 
   const openNew = () => {
     setForm({ ...EMPTY_FORM, locationId: locations[0]?.id ?? '' })
+    setErrs({})
     setModalOpen(true)
   }
 
-  const canSave =
-    form.name.trim().length > 1 &&
-    isValidPhone(form.phone) &&
-    /\S+@\S+\.\S+/.test(form.email.trim()) &&
-    !!form.locationId
-
   const handleCreate = async () => {
-    if (!canSave) return
+    if (saving) return
+    const e: Record<string, string> = {}
+    if (form.name.trim().length < 2) e.name = form.name.trim() ? t('errors.invalid') : t('errors.required')
+    if (!isValidPhone(form.phone)) e.phone = form.phone.trim() ? t('errors.invalid') : t('errors.required')
+    if (!/\S+@\S+\.\S+/.test(form.email.trim())) e.email = form.email.trim() ? t('errors.invalid') : t('errors.required')
+    if (!form.locationId) e.locationId = t('errors.required')
+    setErrs(e)
+    if (Object.keys(e).length) { toast(t('errors.fixFields')); return }
+
     setSaving(true)
-    const res = await usersService.createManager({
-      partnerId: partner.id,
-      name: form.name,
-      phone: form.phone,
-      email: form.email,
-      locationId: form.locationId,
-      otpChannel: form.otpChannel,
-    })
-    setSaving(false)
-    setModalOpen(false)
-    setCreated({ user: res.user, otp: res.otp, channel: form.otpChannel })
-    refresh()
+    try {
+      const res = await usersService.createManager({
+        partnerId: partner.id,
+        name: form.name,
+        phone: form.phone,
+        email: form.email,
+        locationId: form.locationId,
+        otpChannel: form.otpChannel,
+      })
+      setModalOpen(false)
+      setErrs({})
+      setCreated({ user: res.user, otp: res.otp, channel: form.otpChannel })
+      refresh()
+    } catch (err) {
+      toast(errorMessage(err, t))
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleDelete = async () => {
     if (!confirmDel) return
-    await usersService.removeManager(confirmDel.id)
+    try {
+      await usersService.removeManager(confirmDel.id)
+    } catch (err) {
+      toast(errorMessage(err, t))
+      return
+    }
     toast(t('users.toast.removed'))
     setConfirmDel(null)
     refresh()
@@ -138,7 +154,7 @@ export function Users() {
         footer={
           <>
             <Button variant="ghost" onClick={() => setModalOpen(false)}>{t('common.cancel')}</Button>
-            <Button variant="accent" disabled={!canSave || saving} onClick={handleCreate}>
+            <Button variant="accent" disabled={saving} onClick={handleCreate}>
               {saving ? t('users.modal.creating') : t('users.modal.create')}
             </Button>
           </>
@@ -148,33 +164,36 @@ export function Users() {
           <Input
             label={t('users.modal.nameLabel')}
             value={form.name}
-            onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+            onChange={e => { setForm(f => ({ ...f, name: e.target.value })); setErrs(x => ({ ...x, name: '' })) }}
             placeholder={t('users.modal.namePlaceholder')}
+            error={errs.name || undefined}
           />
           <div className={s.formRow}>
             <Input
               label={t('users.modal.phoneLabel')}
               value={form.phone}
-              onChange={e => setForm(f => ({ ...f, phone: normalizePhoneInput(e.target.value) }))}
+              onChange={e => { setForm(f => ({ ...f, phone: normalizePhoneInput(e.target.value) })); setErrs(x => ({ ...x, phone: '' })) }}
               placeholder="+37491234567"
-              error={form.phone.length > 0 && !isValidPhone(form.phone) ? t('users.modal.phoneFormat') : undefined}
+              error={errs.phone || (form.phone.length > 0 && !isValidPhone(form.phone) ? t('users.modal.phoneFormat') : undefined)}
             />
             <Input
               label={t('users.modal.emailLabel')}
               type="email"
               value={form.email}
-              onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+              onChange={e => { setForm(f => ({ ...f, email: e.target.value })); setErrs(x => ({ ...x, email: '' })) }}
               placeholder="manager@salon.am"
+              error={errs.email || undefined}
             />
           </div>
           <div>
             <label className={s.fieldLabel}>{t('users.modal.locationLabel')}</label>
             <Select
               value={form.locationId}
-              onChange={v => setForm(f => ({ ...f, locationId: v }))}
+              onChange={v => { setForm(f => ({ ...f, locationId: v })); setErrs(x => ({ ...x, locationId: '' })) }}
               options={locations.map(l => ({ value: l.id, label: l.name, sub: l.address }))}
               placeholder={t('users.modal.locationPlaceholder')}
             />
+            <FieldError message={errs.locationId} />
           </div>
 
           {/* OTP delivery choice */}

@@ -4,7 +4,7 @@ import { ReservaMark } from '@/components/ReservaMark'
 import { Button, Input } from '@/components/ui'
 import { authService } from '@/services/auth.service'
 import { useAuthStore } from '@/store/auth.store'
-import { ApiError } from '@/services/http'
+import { errorMessage } from '@/services/errors'
 import s from './Login.module.scss'
 
 export function Login() {
@@ -14,18 +14,26 @@ export function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [fieldErr, setFieldErr] = useState<{ email?: string; password?: string }>({})
   const [loading, setLoading] = useState(false)
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
     setError('')
+    // Local validation — show inline messages instead of silently doing nothing.
+    const fe: { email?: string; password?: string } = {}
+    if (!email.trim()) fe.email = 'Email is required.'
+    if (!password) fe.password = 'Password is required.'
+    setFieldErr(fe)
+    if (Object.keys(fe).length) return
+
     setLoading(true)
     try {
       const user = await authService.login(email.trim(), password)
       setUser(user)
       navigate('/', { replace: true })
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Something went wrong. Try again.')
+      setError(errorMessage(err))
     } finally {
       setLoading(false)
     }
@@ -51,19 +59,21 @@ export function Login() {
           type="email"
           autoComplete="username"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => { setEmail(e.target.value); setFieldErr(f => ({ ...f, email: undefined })) }}
           placeholder="you@reserva.am"
+          error={fieldErr.email}
         />
         <Input
           label="Password"
           type="password"
           autoComplete="current-password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => { setPassword(e.target.value); setFieldErr(f => ({ ...f, password: undefined })) }}
           placeholder="••••••••"
+          error={fieldErr.password}
         />
 
-        <Button type="submit" variant="accent" disabled={loading || !email || !password} className={s.submit}>
+        <Button type="submit" variant="accent" disabled={loading} className={s.submit}>
           {loading ? 'Signing in…' : 'Sign in'}
         </Button>
       </form>

@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react'
 import { Plus, User, Pencil, MapPin } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
-import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Select, Avatar, Empty, Badge, Pagination } from '@/components/ui'
+import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Select, Avatar, Empty, Badge, Pagination, FieldError, useToast } from '@/components/ui'
 import { SpecialistDashboard } from '@/components/specialists/SpecialistDashboard/SpecialistDashboard'
 import { normalizePhoneInput } from '@reserva/shared'
 import { partnersService } from '@/services/partners.service'
+import { errorMessage } from '@/utils/errors'
 import { useScopedLocationId } from '@/store/auth.hooks'
 import { useI18n } from '@/i18n'
 import type { Specialist } from '@/types'
@@ -28,6 +29,7 @@ export function Specialists() {
   const isMobile    = useIsMobile()
   const scopedLocationId = useScopedLocationId()
   const { t }       = useI18n()
+  const toast       = useToast()
 
   const [page,     setPage]     = useState(1)
   const [pageSize, setPageSize] = useState(5)
@@ -50,6 +52,8 @@ export function Specialists() {
   const [modalOpen,   setModalOpen]   = useState(false)
   const [editing,     setEditing]     = useState<Specialist | null>(null)
   const [form,        setForm]        = useState(EMPTY_FORM)
+  const [errs,        setErrs]        = useState<Record<string, string>>({})
+  const [saving,      setSaving]      = useState(false)
   const [dashboardSp, setDashboardSp] = useState<Specialist | null>(null)
 
   if (!partner) return null
@@ -66,21 +70,37 @@ export function Specialists() {
 
   const openNew = () => {
     setEditing(null)
+    setErrs({})
     setForm({ ...EMPTY_FORM, locationId: lockedLocation ?? locations[0]?.id ?? '' })
     setModalOpen(true)
   }
 
   const openEdit = (sp: Specialist) => {
     setEditing(sp)
+    setErrs({})
     setForm({ name: sp.name, title: sp.title, locationId: sp.locationId, phone: sp.phone, active: sp.active, services: sp.services })
     setModalOpen(true)
   }
 
   const handleSave = async () => {
-    if (editing) await partnersService.updateSpecialist(editing.id, form)
-    else await partnersService.createSpecialist(form)
-    await reload()
-    setModalOpen(false)
+    if (saving) return
+    const e: Record<string, string> = {}
+    if (!form.name.trim()) e.name = t('errors.required')
+    if (!form.locationId) e.locationId = t('errors.required')
+    setErrs(e)
+    if (Object.keys(e).length) { toast(t('errors.fixFields')); return }
+    setSaving(true)
+    try {
+      if (editing) await partnersService.updateSpecialist(editing.id, form)
+      else await partnersService.createSpecialist(form)
+      await reload()
+      setModalOpen(false)
+      setErrs({})
+    } catch (err) {
+      toast(errorMessage(err, t))
+    } finally {
+      setSaving(false)
+    }
   }
 
   const toggleSvc = (id: string) =>
@@ -219,13 +239,13 @@ export function Specialists() {
         footer={
           <>
             <Button variant="ghost" onClick={() => setModalOpen(false)}>{t('common.cancel')}</Button>
-            <Button variant="accent" onClick={handleSave}>{t('common.save')}</Button>
+            <Button variant="accent" onClick={handleSave} disabled={saving}>{t('common.save')}</Button>
           </>
         }
       >
         <div className={s.formGrid}>
           <div className={s.formFull}>
-            <Input label={t('specialists.modal.nameLabel')} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder={t('specialists.modal.namePlaceholder')} />
+            <Input label={t('specialists.modal.nameLabel')} value={form.name} onChange={e => { setForm(f => ({ ...f, name: e.target.value })); setErrs(x => ({ ...x, name: '' })) }} placeholder={t('specialists.modal.namePlaceholder')} error={errs.name || undefined} />
           </div>
           <Input label={t('specialists.modal.titleLabel')} value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder={t('specialists.modal.titlePlaceholder')} />
           <Input label={t('specialists.modal.phoneLabel')} value={form.phone} onChange={e => setForm(f => ({ ...f, phone: normalizePhoneInput(e.target.value) }))} placeholder="+37491234567" />
@@ -233,10 +253,11 @@ export function Specialists() {
             <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('specialists.modal.locationLabel')}</label>
             <Select
               value={form.locationId}
-              onChange={v => setForm(f => ({ ...f, locationId: v }))}
+              onChange={v => { setForm(f => ({ ...f, locationId: v })); setErrs(x => ({ ...x, locationId: '' })) }}
               options={locations.map(l => ({ value: l.id, label: l.name }))}
               disabled={!!lockedLocation}
             />
+            <FieldError message={errs.locationId} />
           </div>
           <div className={s.formFull}>
             <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', marginBottom: 8 }}>{t('specialists.modal.servicesLabel')}</div>

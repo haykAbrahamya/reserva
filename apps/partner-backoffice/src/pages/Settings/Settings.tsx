@@ -6,7 +6,7 @@ import { useIsAdmin } from '@/store/auth.hooks'
 import { partnersService, type PartnerProfileResponse } from '@/services/partners.service'
 import { useResource } from '@/store/useResource'
 import { useInstallPrompt } from '@/hooks/useInstallPrompt'
-import { ApiError } from '@/services/http'
+import { errorMessage } from '@/utils/errors'
 import { useT } from '@/i18n'
 import s from './Settings.module.scss'
 
@@ -82,7 +82,7 @@ export function Settings() {
       applyUpdate(await partnersService.updateProfile({ slug }))
       toast(t('settings.address.updated'))
     } catch (err) {
-      toast(err instanceof ApiError ? err.message : t('settings.address.updateError'))
+      toast(errorMessage(err, t))
     } finally {
       setSlugSaving(false)
     }
@@ -98,7 +98,7 @@ export function Settings() {
       toast(next ? t('settings.bookings.autoOnToast') : t('settings.bookings.autoOffToast'))
     } catch (err) {
       setAutoConfirm(!next)
-      toast(err instanceof ApiError ? err.message : t('settings.bookings.saveError'))
+      toast(errorMessage(err, t))
     } finally {
       setAutoSaving(false)
     }

@@ -1,5 +1,16 @@
 import { forwardRef } from 'react'
+import { AlertCircle } from 'lucide-react'
 import s from './Input.module.scss'
+
+/** Shared inline field-error row — one consistent look (icon + red text)
+ *  everywhere. Matches the standalone FieldError component used for Selects. */
+function ErrorMsg({ message }: { message: string }) {
+  return (
+    <span className={s.errorMsg} role="alert">
+      <AlertCircle size={13} /> {message}
+    </span>
+  )
+}
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
@@ -16,7 +27,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         className={[s.field, error ? s.error : '', className].filter(Boolean).join(' ')}
         {...props}
       />
-      {error && <span className={s.errorMsg}>{error}</span>}
+      {error && <ErrorMsg message={error} />}
       {help && !error && <span className={s.help}>{help}</span>}
     </div>
   )
@@ -38,7 +49,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         className={[s.field, s.textarea, error ? s.error : '', className].filter(Boolean).join(' ')}
         {...props}
       />
-      {error && <span className={s.errorMsg}>{error}</span>}
+      {error && <ErrorMsg message={error} />}
       {help && !error && <span className={s.help}>{help}</span>}
     </div>
   )
