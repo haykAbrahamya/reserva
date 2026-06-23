@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { ArrowLeft, X, Check, Users, Calendar, Clock, CheckCircle2, ArrowRight, Sparkles, MapPin, Send, AlertCircle, CalendarPlus } from 'lucide-react'
+import { ArrowLeft, X, Check, Users, Calendar, Clock, CheckCircle2, ArrowRight, Sparkles, MapPin, Send, AlertCircle, CalendarPlus, Bell, BellRing } from 'lucide-react'
 import { fmtAMD, fmtDuration, fmtDateInput, initials } from '@reserva/shared'
 import { DatePicker } from '@reserva/ui'
 import type { Service, Specialist } from '@reserva/shared'
@@ -11,6 +11,7 @@ import {
   createBooking,
 } from '@/services/booking.service'
 import { getTelegramConnectLink } from '@/services/telegram.service'
+import { pushSupported, isIosSafari, notificationPermission, enableBookingPush } from '@/services/push.service'
 import { friendlyError } from '@/services/errors'
 import { useT, useI18n, LOCALE_META } from '@/i18n'
 import { addToCalendar } from '@/lib/ics'
@@ -60,6 +61,8 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   const [telegramLink, setTelegramLink] = useState<string | null>(null)
   // Id of the just-created booking — used as the calendar event UID.
   const [bookingId, setBookingId] = useState<string | null>(null)
+  // Web-push enrolment state for the just-created booking.
+  const [pushState, setPushState] = useState<'idle' | 'enabling' | 'on' | 'denied'>('idle')
 
   // slots
   const [slots, setSlots]           = useState<string[]>([])
@@ -256,6 +259,24 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
     )
   }
 
+  // Enable browser push for this booking — prompts permission, subscribes, and
+  // registers the subscription server-side (scoped to the booking id).
+  const handleEnablePush = async () => {
+    if (!bookingId || pushState === 'enabling' || pushState === 'on' || pushState === 'denied') return
+    setPushState('enabling')
+    try {
+      const ok = await enableBookingPush(bookingId)
+      setPushState(ok ? 'on' : (notificationPermission() === 'denied' ? 'denied' : 'idle'))
+    } catch {
+      setPushState('idle')
+    }
+  }
+
+  // Push is offered whenever the browser can do it (and isn't an iOS Safari tab
+  // that needs Add-to-Home-Screen first). We always render the tile when offered
+  // — a blocked/denied state shows as a disabled tile, never a missing button.
+  const canOfferPush = pushSupported() && !isIosSafari()
+
   const [t1, t2] = partner.presentation.heroTints
 
   // step label e.g. "Step 2 of 6"
@@ -369,6 +390,29 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
                   <span className={[s.remindIcon, s.remindIconCal].join(' ')}><CalendarPlus size={18} /></span>
                   <span className={s.remindName}>{t('booking.remind.calendar')}</span>
                 </button>
+
+                {/* Browser push — get notified about changes to this booking. */}
+                {(canOfferPush || pushState === 'on') && (
+                  <button
+                    type="button"
+                    className={[s.remindTile, pushState === 'on' ? s.remindTileOn : ''].filter(Boolean).join(' ')}
+                    onClick={handleEnablePush}
+                    disabled={pushState === 'enabling' || pushState === 'on' || pushState === 'denied'}
+                  >
+                    <span className={[s.remindIcon, s.remindIconPush].join(' ')}>
+                      {pushState === 'on' ? <BellRing size={17} /> : <Bell size={17} />}
+                    </span>
+                    <span className={s.remindName}>
+                      {pushState === 'on'
+                        ? t('booking.remind.pushOn')
+                        : pushState === 'enabling'
+                          ? t('booking.remind.pushEnabling')
+                          : pushState === 'denied'
+                            ? t('booking.remind.pushDenied')
+                            : t('booking.remind.push')}
+                    </span>
+                  </button>
+                )}
 
                 {/* Telegram — one tap to connect the bot for free live updates. */}
                 {telegramLink && (

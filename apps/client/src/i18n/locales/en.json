@@ -299,7 +299,11 @@
       "calendar": "Add to calendar",
       "calendarSub": "We’ll remind you 1 hour before.",
       "telegram": "Get updates on Telegram",
-      "telegramSub": "Free confirmations & reminders."
+      "telegramSub": "Free confirmations & reminders.",
+      "push": "Notify me of changes",
+      "pushEnabling": "Enabling…",
+      "pushOn": "Notifications on",
+      "pushDenied": "Notifications blocked"
     },
     "ics": {
       "title": "{service} · {salon}",
