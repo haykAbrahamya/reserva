@@ -12,6 +12,7 @@ import { Dashboard } from '@/pages/Dashboard/Dashboard'
 import { Partners } from '@/pages/Partners/Partners'
 import { PartnerDetailPage } from '@/pages/Partners/PartnerDetail'
 import { Staff } from '@/pages/Staff/Staff'
+import { DemoRequests } from '@/pages/DemoRequests/DemoRequests'
 
 /** Apply the platform brand theme once on mount. */
 function ThemeApplier() {
@@ -50,6 +51,7 @@ export default function App() {
             <Route index element={<Dashboard />} />
             <Route path="partners" element={<Partners />} />
             <Route path="partners/:id" element={<PartnerDetailPage />} />
+            <Route path="demo-requests" element={<DemoRequests />} />
             <Route path="staff" element={<RequireOwner><Staff /></RequireOwner>} />
           </Route>
 
