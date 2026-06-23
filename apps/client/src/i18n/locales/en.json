@@ -303,7 +303,8 @@
       "push": "Notify me of changes",
       "pushEnabling": "Enabling…",
       "pushOn": "Notifications on",
-      "pushDenied": "Notifications blocked"
+      "pushDenied": "Notifications blocked",
+      "iosHint": "On iPhone: tap Share, then “Add to Home Screen” to enable notifications."
     },
     "ics": {
       "title": "{service} · {salon}",

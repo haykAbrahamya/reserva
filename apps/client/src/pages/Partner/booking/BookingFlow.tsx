@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { ArrowLeft, X, Check, Users, Calendar, Clock, CheckCircle2, ArrowRight, Sparkles, MapPin, Send, AlertCircle, CalendarPlus, Bell, BellRing } from 'lucide-react'
+import { ArrowLeft, X, Check, Users, Calendar, Clock, CheckCircle2, ArrowRight, Sparkles, MapPin, Send, AlertCircle, CalendarPlus, Bell, BellRing, Share } from 'lucide-react'
 import { fmtAMD, fmtDuration, fmtDateInput, initials } from '@reserva/shared'
 import { DatePicker } from '@reserva/ui'
 import type { Service, Specialist } from '@reserva/shared'
@@ -427,6 +427,14 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
                   </a>
                 )}
               </div>
+
+              {/* iOS in a tab can't do web push — guide them to install the PWA. */}
+              {isIosSafari() && (
+                <p className={s.iosPushHint}>
+                  <Share size={13} />
+                  <span>{t('booking.remind.iosHint')}</span>
+                </p>
+              )}
             </div>
 
             <div className={s.successFooter}>

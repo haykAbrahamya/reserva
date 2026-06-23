@@ -13,12 +13,29 @@ export function pushSupported(): boolean {
   return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window
 }
 
-/** iOS only allows web push from an installed (Add to Home Screen) PWA. */
-export function isIosSafari(): boolean {
+/** True on any iPhone/iPad/iPod — including iPadOS, which masquerades as Mac. */
+export function isIos(): boolean {
   const ua = navigator.userAgent
-  const iOS = /iP(hone|ad|od)/.test(ua)
-  const standalone = (navigator as Navigator & { standalone?: boolean }).standalone === true
-  return iOS && !standalone
+  if (/iP(hone|ad|od)/.test(ua)) return true
+  // iPadOS 13+ reports a Mac UA; detect via touch support.
+  return navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1
+}
+
+/** Running as an installed PWA (Add to Home Screen) rather than a browser tab. */
+export function isStandalone(): boolean {
+  return (
+    (navigator as Navigator & { standalone?: boolean }).standalone === true ||
+    window.matchMedia('(display-mode: standalone)').matches
+  )
+}
+
+/**
+ * iOS in a browser TAB can't do web push — Apple requires the site be installed
+ * to the Home Screen first. True when we should show an "Add to Home Screen"
+ * hint instead of the enable button.
+ */
+export function isIosSafari(): boolean {
+  return isIos() && !isStandalone()
 }
 
 export function notificationPermission(): NotificationPermission {
