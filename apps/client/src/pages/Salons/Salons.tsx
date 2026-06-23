@@ -7,6 +7,7 @@ import { ThemeToggle } from '@/components/ThemeToggle/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher'
 import { listSalons, type SalonCard as Salon } from '@/services/salons.service'
 import { useGeolocation } from '@/hooks/useGeolocation'
+import { ModalShell } from '@/components/ModalShell/ModalShell'
 import { distanceKm, type LatLng } from '@/lib/geo'
 import { useT } from '@/i18n'
 import { SalonCard } from './SalonCard'
@@ -134,13 +135,6 @@ export function Salons() {
     syncUrl(EMPTY)
   }
 
-  // Lock background scroll while the mobile search sheet is open.
-  useEffect(() => {
-    if (!sheetOpen) return
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = prev }
-  }, [sheetOpen])
 
   const openSalon = useCallback((slug: string) => navigate(`/p/${slug}`), [navigate])
 
@@ -268,15 +262,16 @@ export function Salons() {
         </div>
       </section>
 
-      {/* ── Mobile search sheet ── */}
-      {sheetOpen && (
-        <div className={s.sheet} role="dialog" aria-modal="true">
-          <div className={s.sheetScrim} onClick={() => setSheetOpen(false)} />
+      {/* ── Mobile search sheet (portaled via ModalShell) ── */}
+      <ModalShell open={sheetOpen} onClose={() => setSheetOpen(false)}>
+        {({ closing, requestClose }) => (
+        <div className={[s.sheet, closing ? s.closing : ''].filter(Boolean).join(' ')} role="dialog" aria-modal="true">
+          <div className={s.sheetScrim} onClick={requestClose} />
           <div className={s.sheetPanel}>
             <div className={s.sheetHandle} />
             <div className={s.sheetHead}>
               <h2 className={s.sheetTitle}>{t('salons.search.sheetTitle')}</h2>
-              <button className={s.sheetClose} onClick={() => setSheetOpen(false)} aria-label={t('common.close')}>
+              <button className={s.sheetClose} onClick={requestClose} aria-label={t('common.close')}>
                 <X size={18} />
               </button>
             </div>
@@ -327,7 +322,7 @@ export function Salons() {
                   {t('salons.search.clear')}
                 </button>
               )}
-              <button className={s.sheetSubmit} onClick={() => setSheetOpen(false)}>
+              <button className={s.sheetSubmit} onClick={requestClose}>
                 <Search size={16} />
                 {searching
                   ? t('salons.results.searching')
@@ -336,7 +331,8 @@ export function Salons() {
             </div>
           </div>
         </div>
-      )}
+        )}
+      </ModalShell>
 
       {/* ── Category quick filters ── */}
       {!initialLoading && !error && allCategories.length > 0 && (

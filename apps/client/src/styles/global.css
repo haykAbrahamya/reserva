@@ -34,11 +34,19 @@
   --grid-line: rgba(31, 24, 14, 0.07);
 }
 
-/* Contain horizontal overflow WITHOUT creating a scroll container.
-   `overflow-x: clip` (unlike `hidden`) doesn't break position:fixed
-   navs or backdrop-filter blur on the landing header. */
+/* Contain horizontal overflow. `overflow-x: clip` (unlike `hidden`) on the
+   viewport root doesn't trap position:fixed navs/modals — it just clips the
+   horizontal axis. Kept on html/body (NOT on #root, where clip WOULD clip the
+   fixed mobile menu and modals). */
 html,
 body {
   overflow-x: clip;
   max-width: 100%;
+}
+
+/* Modal scroll lock — pure CSS. A modal adds `modal-open` to <html>; this
+   freezes background scroll. We pin overflow-y only (leaving overflow-x: clip
+   intact) so there's no clip/hidden axis conflict that would jump the page. */
+html.modal-open {
+  overflow-y: hidden;
 }

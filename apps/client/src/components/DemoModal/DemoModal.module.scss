@@ -1,0 +1,257 @@
+@use 'variables' as *;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--scrim, rgba(20, 17, 14, 0.55));
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  animation: dm-fade 0.22s ease both;
+  &.closing { animation: dm-fade-out 0.22s ease both; }
+
+  @media (max-width: 600px) { padding: 0; align-items: flex-end; }
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: $bg-1;
+  border-radius: 20px;
+  box-shadow: 0 30px 70px rgba(20, 17, 14, 0.32), 0 10px 24px rgba(20, 17, 14, 0.12);
+  animation: dm-pop 0.34s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+  &.closing { animation: dm-pop-out 0.22s ease both; }
+
+  @media (max-width: 600px) {
+    max-width: 100%;
+    max-height: 94vh;
+    border-radius: 22px 22px 0 0;
+    animation: dm-sheet 0.36s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+  }
+}
+
+.close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--fg-on-accent, #fff) 16%, transparent);
+  color: var(--fg-on-accent, #fff);
+  cursor: pointer;
+  transition: background 0.15s;
+  &:hover { background: color-mix(in srgb, var(--fg-on-accent, #fff) 28%, transparent); }
+}
+
+/* ── Accent header band ── */
+.head {
+  position: relative;
+  flex-shrink: 0;
+  padding: 26px 28px 22px;
+  overflow: hidden;
+  color: var(--fg-on-accent, #fff);
+  background:
+    radial-gradient(120% 130% at 100% -10%, color-mix(in srgb, var(--fg-on-accent, #fff) 16%, transparent), transparent 55%),
+    linear-gradient(155deg, var(--accent), var(--accent-strong));
+}
+.headGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--fg-on-accent, #fff) 8%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--fg-on-accent, #fff) 8%, transparent) 1px, transparent 1px);
+  background-size: 30px 30px;
+  mask-image: radial-gradient(ellipse 80% 70% at 70% 0%, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 70% 0%, #000 30%, transparent 75%);
+  pointer-events: none;
+}
+.eyebrow {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fg-on-accent, #fff) 16%, transparent);
+}
+.title {
+  position: relative;
+  font-family: $font-serif;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 12px 0 6px;
+}
+.subtitle {
+  position: relative;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--fg-on-accent, #fff) 85%, transparent);
+  margin: 0;
+  max-width: 380px;
+}
+
+/* ── Body / form ── */
+.body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: $r-2;
+  background: $danger-soft;
+  color: $danger;
+  font-size: 13px;
+  svg { flex-shrink: 0; }
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  @media (max-width: 440px) { grid-template-columns: 1fr; }
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.label { font-size: 12.5px; font-weight: 500; color: $fg-1; }
+.optional { color: $fg-3; font-weight: 400; }
+
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1.5px solid $line-2;
+  border-radius: $r-2;
+  background: $bg-1;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  &:focus-within { border-color: $accent; box-shadow: 0 0 0 3px $accent-soft; }
+  &.hasError { border-color: $danger; &:focus-within { box-shadow: 0 0 0 3px $danger-soft; } }
+}
+.inputWrapArea { align-items: flex-start; }
+.inputIcon {
+  display: flex;
+  align-items: center;
+  padding: 0 0 0 12px;
+  color: $fg-3;
+  flex-shrink: 0;
+}
+.inputWrapArea .inputIcon { padding-top: 12px; }
+
+.input {
+  flex: 1;
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: $fg-0;
+  font-family: $font-sans;
+  font-size: 14.5px;
+  padding: 11px 12px;
+  &::placeholder { color: $fg-3; }
+}
+.textarea { resize: vertical; min-height: 70px; line-height: 1.5; }
+
+.fieldError {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: $danger;
+  svg { flex-shrink: 0; margin-top: 1px; }
+}
+
+.submitBtn {
+  margin-top: 2px;
+  height: 48px;
+  min-height: 48px;
+  flex-shrink: 0;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: $r-2;
+  background: $accent;
+  color: var(--fg-on-accent, #fff);
+  font-family: $font-sans;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  &:hover:not(:disabled) { background: $accent-strong; transform: translateY(-1px); }
+  &:active:not(:disabled) { transform: translateY(0); }
+  &:disabled { opacity: 0.6; cursor: default; }
+}
+.privacy { font-size: 11.5px; color: $fg-3; text-align: center; margin: 2px 0 0; line-height: 1.4; }
+
+/* ── Success state ── */
+.success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 44px 28px 32px;
+  gap: 0;
+}
+.successIcon {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: $success-soft;
+  color: $success;
+  margin-bottom: 18px;
+  box-shadow: 0 0 0 8px color-mix(in srgb, var(--success) 8%, transparent);
+  animation: dm-pop 0.45s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+}
+.successTitle {
+  font-family: $font-serif;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+}
+.successText {
+  font-size: 14px;
+  color: $fg-2;
+  line-height: 1.55;
+  max-width: 320px;
+  margin: 0 0 24px;
+}
+
+:global {
+  @keyframes dm-fade     { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes dm-fade-out { from { opacity: 1 } to { opacity: 0 } }
+  @keyframes dm-pop      { from { opacity: 0; transform: scale(0.96) translateY(10px) } to { opacity: 1; transform: none } }
+  @keyframes dm-pop-out  { from { opacity: 1; transform: none } to { opacity: 0; transform: scale(0.97) translateY(8px) } }
+  @keyframes dm-sheet    { from { transform: translateY(100%) } to { transform: translateY(0) } }
+}

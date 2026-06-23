@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react'
 import { X, CalendarCheck, Star } from 'lucide-react'
 import { initials } from '@reserva/shared'
 import type { Specialist } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
 import { getSpecialistProfile } from '@/mock/specialists'
+import { ModalShell } from '@/components/ModalShell/ModalShell'
 import { useT } from '@/i18n'
 import s from './SpecialistModal.module.scss'
 
@@ -15,33 +15,19 @@ interface Props {
 }
 
 export function SpecialistModal({ partner, specialist, onClose, onBook }: Props) {
-  const [closing, setClosing] = useState(false)
   const profile = getSpecialistProfile(specialist.id)
   const [t1, t2] = partner.presentation.heroTints
   const t = useT()
-
-  const animatedClose = useCallback(() => {
-    setClosing(true)
-    setTimeout(onClose, 280)
-  }, [onClose])
-
-  useEffect(() => {
-    document.body.style.overflow = 'hidden'
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') animatedClose() }
-    document.addEventListener('keydown', onKey)
-    return () => {
-      document.body.style.overflow = ''
-      document.removeEventListener('keydown', onKey)
-    }
-  }, [animatedClose])
 
   // Services this specialist offers.
   const services = partner.services.filter(sv => sv.active && specialist.services.includes(sv.id))
 
   return (
-    <div className={[s.overlay, closing ? s.closing : ''].filter(Boolean).join(' ')} onClick={animatedClose}>
+    <ModalShell open onClose={onClose} closeDuration={280}>
+      {({ closing, requestClose }) => (
+    <div className={[s.overlay, closing ? s.closing : ''].filter(Boolean).join(' ')} onClick={requestClose}>
       <div className={[s.modal, closing ? s.closing : ''].filter(Boolean).join(' ')} onClick={e => e.stopPropagation()}>
-        <button className={s.closeBtn} onClick={animatedClose} aria-label={t('specialistModal.close')}><X size={16} /></button>
+        <button className={s.closeBtn} onClick={requestClose} aria-label={t('specialistModal.close')}><X size={16} /></button>
 
         {/* Branded banner */}
         <div className={s.banner} style={{ background: `linear-gradient(140deg, ${t1}, ${t2})` }}>
@@ -129,11 +115,13 @@ export function SpecialistModal({ partner, specialist, onClose, onBook }: Props)
         </div>
 
         <div className={s.footer}>
-          <button className={s.bookBtn} onClick={() => { onBook(); animatedClose() }}>
+          <button className={s.bookBtn} onClick={() => { onBook(); requestClose() }}>
             <CalendarCheck size={17} /> {t('specialistModal.bookWith', { name: specialist.name.split(' ')[0] })}
           </button>
         </div>
       </div>
     </div>
+      )}
+    </ModalShell>
   )
 }

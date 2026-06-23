@@ -479,5 +479,30 @@
       "PHONE_TAKEN": "This phone number is already registered.",
       "SLUG_TAKEN": "That address is already taken. Try another."
     }
+  },
+  "demo": {
+    "eyebrow": "Book a demo",
+    "title": "See Reserva in action",
+    "subtitle": "Leave your details and our team will reach out to walk you through Reserva — tailored to your salon.",
+    "name": "Full name",
+    "namePlaceholder": "Anna Karapetyan",
+    "company": "Salon / company",
+    "companyPlaceholder": "e.g. Lumé Studio",
+    "phone": "Phone",
+    "email": "Email",
+    "notes": "Anything we should know?",
+    "notesPlaceholder": "Your team size, what you’re looking for…",
+    "optional": "optional",
+    "submit": "Request a demo",
+    "submitting": "Sending…",
+    "privacy": "We’ll only use your details to contact you about Reserva.",
+    "close": "Close",
+    "done": "Done",
+    "successTitle": "Request received 🎉",
+    "successText": "Thanks! Our team will get in touch with you very soon to set up your demo.",
+    "errRequired": "Please enter your name.",
+    "errContact": "Add a phone or email so we can reach you.",
+    "errNetwork": "Can’t reach the server. Please check your connection and try again.",
+    "errGeneric": "Something went wrong. Please try again."
   }
 }

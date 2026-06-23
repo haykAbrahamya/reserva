@@ -4,6 +4,7 @@ import { Menu, X, ArrowRight } from 'lucide-react'
 import { Logo } from '@/components/Logo/Logo'
 import { ThemeToggle } from '@/components/ThemeToggle/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher'
+import { ModalShell } from '@/components/ModalShell/ModalShell'
 import { useT } from '@/i18n'
 import s from './Nav.module.scss'
 
@@ -30,12 +31,6 @@ export function Nav() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
-  }, [menuOpen])
-
-  const goto = (id: string) => { setMenuOpen(false); scrollToId(id) }
 
   return (
     <header className={[s.nav, scrolled ? s.scrolled : ''].filter(Boolean).join(' ')}>
@@ -66,38 +61,41 @@ export function Nav() {
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {menuOpen && (
-        <>
-          <div className={s.mobileScrim} onClick={() => setMenuOpen(false)} />
-          <div className={s.mobileMenu}>
-            <div className={s.mobileHead}>
-              <Logo size={30} />
-              <button className={s.mobileClose} onClick={() => setMenuOpen(false)} aria-label={t('nav.closeMenu')}>
-                <X size={18} />
-              </button>
+      {/* Mobile menu — portaled to <body> via ModalShell so it escapes the
+          landing's overflow-clip ancestors (which would clip the fixed panel). */}
+      <ModalShell open={menuOpen} onClose={() => setMenuOpen(false)}>
+        {({ closing, requestClose }) => (
+          <>
+            <div className={[s.mobileScrim, closing ? s.closing : ''].filter(Boolean).join(' ')} onClick={requestClose} />
+            <div className={[s.mobileMenu, closing ? s.closing : ''].filter(Boolean).join(' ')}>
+              <div className={s.mobileHead}>
+                <Logo size={30} />
+                <button className={s.mobileClose} onClick={requestClose} aria-label={t('nav.closeMenu')}>
+                  <X size={18} />
+                </button>
+              </div>
+
+              {LINKS.map(l => (
+                <button key={l.id} className={s.mobileLink} onClick={() => { requestClose(); scrollToId(l.id) }}>
+                  {t(l.labelKey)}
+                </button>
+              ))}
+
+              <div className={s.mobileDivider} />
+
+              <div className={s.mobileLangRow}>
+                <LanguageSwitcher />
+              </div>
+
+              <div className={s.mobileCta}>
+                <button className={s.cta} style={{ width: '100%', justifyContent: 'center', height: 46 }} onClick={() => { requestClose(); navigate('/signup') }}>
+                  {t('nav.getStarted')} <ArrowRight size={15} />
+                </button>
+              </div>
             </div>
-
-            {LINKS.map(l => (
-              <button key={l.id} className={s.mobileLink} onClick={() => goto(l.id)}>
-                {t(l.labelKey)}
-              </button>
-            ))}
-
-            <div className={s.mobileDivider} />
-
-            <div className={s.mobileLangRow}>
-              <LanguageSwitcher />
-            </div>
-
-            <div className={s.mobileCta}>
-              <button className={s.cta} style={{ width: '100%', justifyContent: 'center', height: 46 }} onClick={() => { setMenuOpen(false); navigate('/signup') }}>
-                {t('nav.getStarted')} <ArrowRight size={15} />
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </ModalShell>
     </header>
   )
 }

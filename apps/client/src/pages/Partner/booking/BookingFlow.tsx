@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { ArrowLeft, X, Check, Users, Calendar, Clock, CheckCircle2, ArrowRight, Sparkles, MapPin, Send, AlertCircle, CalendarPlus, Bell, BellRing, Share } from 'lucide-react'
 import { fmtAMD, fmtDuration, fmtDateInput, initials } from '@reserva/shared'
 import { DatePicker } from '@reserva/ui'
@@ -13,6 +13,7 @@ import {
 import { getTelegramConnectLink } from '@/services/telegram.service'
 import { pushSupported, isIosSafari, notificationPermission, enableBookingPush } from '@/services/push.service'
 import { friendlyError } from '@/services/errors'
+import { ModalShell } from '@/components/ModalShell/ModalShell'
 import { useT, useI18n, LOCALE_META } from '@/i18n'
 import { addToCalendar } from '@/lib/ics'
 import s from './BookingFlow.module.scss'
@@ -32,7 +33,6 @@ const ANY_SPECIALIST = '__any__'
 export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, onClose }: Props) {
   const t = useT()
   const { locale } = useI18n()
-  const [closing, setClosing] = useState(false)
 
   // Only branches that can actually be booked (active + ≥1 active specialist).
   const locations = useMemo(() => bookableLocations(partner), [partner])
@@ -93,21 +93,6 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
     [locations, locationId]
   )
 
-  const animatedClose = useCallback(() => {
-    setClosing(true)
-    setTimeout(onClose, 260)
-  }, [onClose])
-
-  // Lock scroll + esc to close
-  useEffect(() => {
-    document.body.style.overflow = 'hidden'
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') animatedClose() }
-    document.addEventListener('keydown', onKey)
-    return () => {
-      document.body.style.overflow = ''
-      document.removeEventListener('keydown', onKey)
-    }
-  }, [animatedClose])
 
   // Load slots when entering the datetime step (or changing date/specialist).
   useEffect(() => {
@@ -324,6 +309,8 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   }
 
   return (
+    <ModalShell open onClose={onClose} closeDuration={260}>
+      {({ closing, requestClose: animatedClose }) => (
     <div className={[s.overlay, closing ? s.closing : ''].filter(Boolean).join(' ')} onClick={animatedClose}>
       <div className={[s.modal, closing ? s.closing : ''].filter(Boolean).join(' ')} onClick={e => e.stopPropagation()}>
 
@@ -632,6 +619,8 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
         )}
       </div>
     </div>
+      )}
+    </ModalShell>
   )
 }
 

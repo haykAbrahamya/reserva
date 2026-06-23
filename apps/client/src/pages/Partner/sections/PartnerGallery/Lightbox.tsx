@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ModalShell } from '@/components/ModalShell/ModalShell'
 import { useT } from '@/i18n'
 import s from './Lightbox.module.scss'
 
@@ -19,7 +20,6 @@ const SWIPE_THRESHOLD = 50 // px to count as a swipe
 
 export function Lightbox({ images, index, onClose, onIndex }: Props) {
   const t = useT()
-  const [closing, setClosing] = useState(false)
   // Nav direction: 0 = first open (no slide, just a soft fade-in), 1 = next
   // (slide from right), -1 = prev (slide from left).
   const [dir, setDir] = useState<0 | 1 | -1>(0)
@@ -29,29 +29,16 @@ export function Lightbox({ images, index, onClose, onIndex }: Props) {
   const current = images[index]
   const go = (d: 1 | -1) => { setDir(d); onIndex((index + d + count) % count) }
 
-  const animatedClose = () => {
-    setClosing(true)
-    setTimeout(onClose, 180)
-  }
-
-  // Keyboard: Esc closes, arrows navigate.
+  // Arrow-key navigation (Esc + scroll-lock + portal are handled by ModalShell).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') animatedClose()
-      else if (e.key === 'ArrowRight') go(1)
+      if (e.key === 'ArrowRight') go(1)
       else if (e.key === 'ArrowLeft') go(-1)
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, count])
-
-  // Lock background scroll while open.
-  useEffect(() => {
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = prev }
-  }, [])
 
   if (!current) return null
 
@@ -64,16 +51,18 @@ export function Lightbox({ images, index, onClose, onIndex }: Props) {
   }
 
   return (
+    <ModalShell open onClose={onClose} closeDuration={180}>
+      {({ closing, requestClose }) => (
     <div
       className={[s.overlay, closing ? s.closing : ''].filter(Boolean).join(' ')}
-      onClick={animatedClose}
+      onClick={requestClose}
       role="dialog"
       aria-modal="true"
     >
       {/* Top bar: counter + close */}
       <div className={s.topBar} onClick={(e) => e.stopPropagation()}>
         {count > 1 && <span className={s.counter}>{t('partner.gallery.counter', { current: index + 1, total: count })}</span>}
-        <button className={s.close} onClick={animatedClose} aria-label={t('common.close')}>
+        <button className={s.close} onClick={requestClose} aria-label={t('common.close')}>
           <X size={22} />
         </button>
       </div>
@@ -119,5 +108,7 @@ export function Lightbox({ images, index, onClose, onIndex }: Props) {
         </button>
       )}
     </div>
+      )}
+    </ModalShell>
   )
 }

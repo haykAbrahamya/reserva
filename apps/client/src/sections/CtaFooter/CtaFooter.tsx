@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowRight, Instagram, Send, Mail } from 'lucide-react'
 import { Logo } from '@/components/Logo/Logo'
 import { Reveal } from '@/components/Reveal/Reveal'
+import { DemoModal } from '@/components/DemoModal/DemoModal'
 import { useT } from '@/i18n'
 import s from './CtaFooter.module.scss'
 
@@ -14,6 +16,7 @@ const FOOTER_COLS = [
 export function CtaFooter() {
   const t = useT()
   const navigate = useNavigate()
+  const [demoOpen, setDemoOpen] = useState(false)
   return (
     <>
       {/* Final CTA */}
@@ -33,7 +36,7 @@ export function CtaFooter() {
                 <button className={s.btnPrimary} onClick={() => navigate('/signup')}>
                   {t('ctaFooter.startTrial')} <ArrowRight size={17} />
                 </button>
-                <button className={s.btnGhost}>
+                <button className={s.btnGhost} onClick={() => setDemoOpen(true)}>
                   <Mail size={16} /> {t('ctaFooter.bookDemo')}
                 </button>
               </div>
@@ -71,6 +74,8 @@ export function CtaFooter() {
           </div>
         </div>
       </footer>
+
+      <DemoModal open={demoOpen} onClose={() => setDemoOpen(false)} />
     </>
   )
 }
