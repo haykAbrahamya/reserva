@@ -34,6 +34,7 @@
   @media (max-width: 600px) {
     max-width: 100%;
     max-height: 92vh;
+    max-height: calc(100dvh - 24px); /* always leave a gap from the top; body scrolls if taller */
     border-radius: 22px 22px 0 0;
     border-bottom: none;
     animation: sm-sheet 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;

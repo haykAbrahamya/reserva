@@ -53,12 +53,15 @@
 
 .panelTitle {
   font-family: $font-serif;
-  font-size: clamp(28px, 4.5vw, 44px);
-  line-height: 1.1;
+  font-size: clamp(26px, 4.5vw, 44px);
+  line-height: 1.15;
   letter-spacing: -0.025em;
   color: $fg-0;
   margin: 0 0 16px;
+  text-wrap: balance;
   em { font-style: italic; color: $accent; }
+
+  @media (max-width: 480px) { font-size: 24px; line-height: 1.2; }
 }
 
 .panelText {
@@ -67,6 +70,7 @@
   color: $fg-2;
   max-width: 480px;
   margin: 0 auto 32px;
+  text-wrap: pretty;
 }
 
 .panelActions {
@@ -74,20 +78,29 @@
   gap: 12px;
   justify-content: center;
   flex-wrap: wrap;
+
+  /* Stack full-width on phones so long Armenian/Russian labels never wrap
+     awkwardly inside a fixed-width pill. */
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 .btnPrimary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  height: 50px;
-  padding: 0 26px;
+  min-height: 50px;
+  padding: 12px 26px;
   border-radius: $r-2;
   background: $accent;
   color: #fff;
   font-family: $font-sans;
   font-size: 16px;
   font-weight: 600;
+  line-height: 1.25;
   border: none;
   cursor: pointer;
   box-shadow: 0 8px 24px rgba(192,145,95,.4);
@@ -99,15 +112,17 @@
 .btnGhost {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  height: 50px;
-  padding: 0 24px;
+  min-height: 50px;
+  padding: 12px 24px;
   border-radius: $r-2;
   background: $bg-1;
   color: $fg-0;
   font-family: $font-sans;
   font-size: 16px;
   font-weight: 600;
+  line-height: 1.25;
   border: 1px solid $line-2;
   box-shadow: $shadow-1;
   cursor: pointer;
