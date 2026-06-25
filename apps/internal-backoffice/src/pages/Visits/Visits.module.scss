@@ -1,0 +1,65 @@
+@use 'variables' as *;
+
+.page { padding: 28px; animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both; }
+@media (max-width: 860px) { .page { padding: 20px 16px; } }
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.h1 { font-family: $font-serif; font-size: 30px; letter-spacing: -0.022em; margin: 0 0 4px; }
+.sub { font-size: 13px; color: $fg-2; margin: 0; }
+
+.tableWrap {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  overflow: hidden;
+}
+
+.mono { font-family: $font-mono; font-size: 13px; color: $fg-2; }
+.when { white-space: nowrap; }
+.device { display: inline-flex; align-items: center; gap: 6px; text-transform: capitalize; }
+
+.referrer {
+  display: inline-block;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+  color: $fg-2;
+}
+
+// ── Visit detail modal ──
+.detailList { display: flex; flex-direction: column; }
+.detailRow {
+  display: grid;
+  grid-template-columns: 22px 120px 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 2px;
+  border-bottom: 1px solid $line-1;
+  &:last-of-type { border-bottom: none; }
+}
+.detailIcon { color: $fg-3; display: inline-flex; }
+.detailLabel { font-size: 13px; color: $fg-2; }
+.detailValue { font-size: 14px; color: $fg-0; word-break: break-word; text-transform: capitalize; }
+.detailValue.mono { font-family: $font-mono; font-size: 13px; text-transform: none; }
+
+.uaBlock { display: flex; flex-direction: column; gap: 6px; padding: 14px 2px 2px; }
+.ua {
+  font-family: $font-mono;
+  font-size: 12px;
+  line-height: 1.5;
+  color: $fg-2;
+  background: $bg-2;
+  border: 1px solid $line-1;
+  border-radius: $r-1;
+  padding: 10px 12px;
+  word-break: break-all;
+}

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, Instagram, Send, Mail } from 'lucide-react'
+import { ArrowRight, Instagram, Mail } from 'lucide-react'
 import { Logo } from '@/components/Logo/Logo'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { DemoModal } from '@/components/DemoModal/DemoModal'
@@ -68,9 +68,15 @@ export function CtaFooter() {
         <div className={s.bottom}>
           <span className={s.copy}>{t('ctaFooter.copyright', { year: new Date().getFullYear() })}</span>
           <div className={s.social}>
-            <button className={s.socialBtn} aria-label="Instagram"><Instagram size={16} /></button>
-            <button className={s.socialBtn} aria-label="Telegram"><Send size={16} /></button>
-            <button className={s.socialBtn} aria-label="Email"><Mail size={16} /></button>
+            <a
+              className={s.socialBtn}
+              href="http://instagram.com/reserva.platform"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+            >
+              <Instagram size={16} />
+            </a>
           </div>
         </div>
       </footer>

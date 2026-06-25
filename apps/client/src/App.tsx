@@ -1,14 +1,24 @@
 import { useEffect } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { store } from '@/store'
 import { useAppSelector } from '@/store/hooks'
+import { trackPageView } from '@/services/analytics.service'
 import { Home } from '@/pages/Home/Home'
 import { PartnerPage } from '@/pages/Partner/PartnerPage'
 import { SignUp } from '@/pages/SignUp/SignUp'
 import { NotFound } from '@/pages/NotFound/NotFound'
 import { Salons } from '@/pages/Salons/Salons'
 import { slugFromHost } from '@/hooks/useTenantSlug'
+
+/** Fires a visitor analytics page-view on initial load and every navigation. */
+function PageViewTracker() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    trackPageView()
+  }, [pathname])
+  return null
+}
 
 /** Reflects the persisted theme onto <html data-theme="…">. */
 function ThemeApplier() {
@@ -30,6 +40,7 @@ export default function App() {
     <Provider store={store}>
       <BrowserRouter>
         <ThemeApplier />
+        <PageViewTracker />
         <Routes>
           <Route path="/" element={isTenant ? <PartnerPage /> : <Home />} />
           {/* Sign up / start free trial */}
