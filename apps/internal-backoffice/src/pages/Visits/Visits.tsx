@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { BarChart3, Smartphone, Tablet, Monitor } from 'lucide-react'
-import { Table, Th, Td, Tr, Empty, Pagination } from '@/components/ui'
+import { BarChart3, Smartphone, Tablet, Monitor, RefreshCw } from 'lucide-react'
+import { Button, Table, Th, Td, Tr, Empty, Pagination } from '@/components/ui'
 import { useResource } from '@/store/useResource'
 import { visitsService, type Visit } from '@/services/visits.service'
 import { fmtWhen, fmtIp, fmtGeo, fmtBrowser, fmtOs } from './format'
@@ -18,7 +18,7 @@ export function Visits() {
   const [pageSize, setPageSize] = useState(20)
   const [selected, setSelected] = useState<Visit | null>(null)
 
-  const { data: result } = useResource(
+  const { data: result, loading, reload } = useResource(
     () => visitsService.list({ page, pageSize }),
     [page, pageSize],
   )
@@ -37,6 +37,9 @@ export function Visits() {
           <h1 className={s.h1}>Visits</h1>
           <p className={s.sub}>{total.toLocaleString()} {total === 1 ? 'page view' : 'page views'} on reserva.am</p>
         </div>
+        <Button variant="ghost" onClick={() => void reload()} disabled={loading}>
+          <RefreshCw size={14} className={loading ? s.spin : undefined} /> Refresh
+        </Button>
       </div>
 
       {total === 0 ? (
