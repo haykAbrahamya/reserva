@@ -159,6 +159,16 @@
       "/settings": "Settings"
     }
   },
+  "publicLink": {
+    "yourPage": "Your booking page:",
+    "copy": "Copy",
+    "copied": "Copied",
+    "open": "Open",
+    "setupTitle": "Your booking page isn't live yet",
+    "setupDesc": "Choose a web address so clients can book online.",
+    "setupBtn": "Set up your link",
+    "adminHint": "Ask an admin to set up your booking page."
+  },
   "dashboard": {
     "greeting": {
       "morning": "Good morning, {name}",

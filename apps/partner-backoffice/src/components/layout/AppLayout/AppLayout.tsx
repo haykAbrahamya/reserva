@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { Sidebar } from '../Sidebar/Sidebar'
 import { Topbar } from '../Topbar/Topbar'
+import { PublicLinkBar } from '../PublicLinkBar/PublicLinkBar'
 import { MobileTabBar } from '../MobileTabBar/MobileTabBar'
 import s from './AppLayout.module.scss'
 
@@ -20,6 +21,7 @@ export function AppLayout() {
       <Sidebar />
       <div className={s.main}>
         <Topbar />
+        <PublicLinkBar />
         <main className={s.content} ref={contentRef}>
           <Outlet />
         </main>

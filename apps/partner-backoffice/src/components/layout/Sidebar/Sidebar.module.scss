@@ -63,7 +63,10 @@
 
 /* ── Partner info strip ── */
 .partnerStrip {
-  padding: 10px 12px;
+  /* Match the PublicLinkBar's height so their bottom borders line up across
+     the sidebar / content seam. */
+  min-height: 44px;
+  padding: 8px 12px;
   border-bottom: 1px solid $line-1;
   flex-shrink: 0;
   display: flex;

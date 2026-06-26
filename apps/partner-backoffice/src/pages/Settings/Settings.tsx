@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { CheckCircle2, Lock, Globe, ExternalLink, Download, Share, CheckCircle, Store } from 'lucide-react'
 import { Toggle, Button, Input, useToast } from '@/components/ui'
 import { useAppStore } from '@/store/app.store'
@@ -42,6 +43,24 @@ export function Settings() {
 
   const [slugSaving, setSlugSaving] = useState(false)
   const [autoSaving, setAutoSaving] = useState(false)
+
+  // Deep-link from the PublicLinkBar's "set up your link" CTA: scroll the public
+  // address card into view and pulse it so the new partner knows what to do.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const addressRef = useRef<HTMLElement>(null)
+  const [highlightAddress, setHighlightAddress] = useState(false)
+  useEffect(() => {
+    if (searchParams.get('highlight') !== 'address' || !profile) return
+    addressRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    setHighlightAddress(true)
+    const t = window.setTimeout(() => setHighlightAddress(false), 4200)
+    // Clear the query param so a refresh/re-navigation doesn't re-trigger it.
+    searchParams.delete('highlight')
+    setSearchParams(searchParams, { replace: true })
+    return () => window.clearTimeout(t)
+    // Run once, after the profile is available.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile])
 
   if (!profile) {
     return (
@@ -116,7 +135,10 @@ export function Settings() {
       </div>
 
       {/* ── Public address ── */}
-      <section className={s.card}>
+      <section
+        ref={addressRef}
+        className={`${s.card} ${highlightAddress ? s.highlight : ''}`}
+      >
         <div className={s.cardHead}>
           <span className={s.cardIcon}><Globe size={18} /></span>
           <div className={s.cardHeadText}>

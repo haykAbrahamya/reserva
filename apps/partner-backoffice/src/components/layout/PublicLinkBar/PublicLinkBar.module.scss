@@ -1,0 +1,127 @@
+@use 'variables' as *;
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0px 20px;
+  background: $bg-1;
+  border-bottom: 1px solid $line-1;
+  border-top: 1px solid $line-1;
+  flex-shrink: 0;
+  font-size: 13px;
+  height: 45px;
+  margin-top: -1px;
+}
+
+/* Setup variant — warm, attention-drawing but not alarming. */
+.setup {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--accent) 12%, $bg-1),
+    $bg-1 70%
+  );
+  // border-top-color: $line-1;
+  // border-bottom-color: color-mix(in srgb, var(--accent) 35%, $line-1);
+}
+
+.iconWrap {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: $r-1;
+  background: $accent-soft;
+  color: $accent-strong;
+}
+
+.text {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+.title {
+  font-weight: 600;
+  color: $fg-0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex-shrink: 1;
+}
+.desc { color: $fg-2; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 999; }
+
+.label { color: $fg-2; white-space: nowrap; }
+.link {
+  font-family: $font-mono;
+  font-weight: 600;
+  color: $accent;
+  text-decoration: none;
+  white-space: nowrap;
+  &:hover { text-decoration: underline; }
+}
+
+.spacer { flex: 1; }
+
+.cta {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border: none;
+  border-radius: $r-1;
+  background: $accent;
+  color: var(--fg-on-accent, #fff);
+  font-family: $font-sans;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  &:hover { background: $accent-strong; transform: translateY(-1px); }
+  &:active { transform: translateY(0); }
+}
+
+.adminHint { margin-left: auto; color: $fg-2; font-size: 12px; flex-shrink: 0; }
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 6px 11px;
+  border: 1px solid $line-2;
+  border-radius: $r-1;
+  background: $bg-0;
+  color: $fg-1;
+  font-family: $font-sans;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+  &:hover { background: $bg-2; border-color: $line-strong; }
+}
+.ok { color: $success; }
+
+/* ── Mobile: keep it compact, drop secondary text/labels ── */
+@media (max-width: 768px) {
+  .bar { padding: 7px 14px; gap: 8px; min-height: 44px; }
+  .label { display: none; }
+  .desc { display: none; }
+  .actionLabel { display: none; }
+  .action { padding: 6px 9px; }
+
+  .iconWrap { width: 24px; height: 24px; }
+  .cta { padding: 7px 12px; font-size: 12.5px; gap: 5px; }
+
+  /* Setup state on mobile: show only the path to settings — hide the icon and
+     message text, leaving just the full-width "Set up your link" CTA. */
+  .setup .iconWrap,
+  .setup .text { display: none; }
+  .setup .cta { width: 100%; justify-content: center; }
+}

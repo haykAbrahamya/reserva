@@ -28,6 +28,7 @@ export function CreatePartnerModal({ open, onClose, onCreated }: Props) {
   const [form, setForm] = useState(EMPTY)
   const [slugTouched, setSlugTouched] = useState(false)
   const [error, setError] = useState('')
+  const [submitted, setSubmitted] = useState(false)
   const [saving, setSaving] = useState(false)
   const [result, setResult] = useState<CreatePartnerResult | null>(null)
   const [copied, setCopied] = useState(false)
@@ -60,26 +61,38 @@ export function CreatePartnerModal({ open, onClose, onCreated }: Props) {
     return () => clearTimeout(id)
   }, [effectiveSlug, open])
 
-  const valid = useMemo(
-    () =>
-      !!form.name.trim() &&
-      effectiveSlug.length >= 2 &&
-      slugStatus !== 'taken' &&
-      slugStatus !== 'checking' &&
-      !!form.type.trim() &&
-      !!form.adminName.trim() &&
-      /.+@.+\..+/.test(form.adminEmail) &&
-      form.adminPhone.trim().length >= 4,
-    [form, effectiveSlug, slugStatus],
-  )
+  // Per-field validation messages. Surfaced only after a submit attempt so we
+  // don't nag the operator while they're still filling the form.
+  const fieldErrors = useMemo(() => {
+    const e: Partial<Record<'name' | 'slug' | 'type' | 'adminName' | 'adminEmail' | 'adminPhone', string>> = {}
+    if (!form.name.trim()) e.name = 'Name is required'
+    if (effectiveSlug.length < 2) e.slug = 'Slug must be at least 2 characters'
+    else if (slugStatus === 'taken') e.slug = 'This slug is already taken'
+    if (!form.type.trim()) e.type = 'Type is required'
+    if (!form.adminName.trim()) e.adminName = 'Admin name is required'
+    if (!/.+@.+\..+/.test(form.adminEmail)) e.adminEmail = 'Enter a valid email'
+    if (form.adminPhone.trim().length < 4) e.adminPhone = 'Enter a valid phone'
+    return e
+  }, [form, effectiveSlug, slugStatus])
+
+  const valid = Object.keys(fieldErrors).length === 0 && slugStatus !== 'checking'
 
   const reset = () => {
     setForm(EMPTY); setSlugTouched(false); setError(''); setResult(null); setCopied(false)
-    setSlugStatus('idle')
+    setSlugStatus('idle'); setSubmitted(false)
   }
   const close = () => { reset(); onClose() }
 
   const save = async () => {
+    // Always give feedback on click: if something's missing, reveal the inline
+    // errors instead of a silently-dead button.
+    if (!valid) {
+      setSubmitted(true)
+      setError(slugStatus === 'checking'
+        ? 'Please wait — checking slug availability…'
+        : 'Please fill in all required fields.')
+      return
+    }
     setError('')
     setSaving(true)
     try {
@@ -161,7 +174,7 @@ export function CreatePartnerModal({ open, onClose, onCreated }: Props) {
       footer={
         <>
           <Button variant="ghost" onClick={close}>Cancel</Button>
-          <Button variant="accent" disabled={!valid || saving} onClick={save}>
+          <Button variant="accent" disabled={saving} onClick={save}>
             {saving ? 'Creating…' : 'Create partner'}
           </Button>
         </>
@@ -171,7 +184,7 @@ export function CreatePartnerModal({ open, onClose, onCreated }: Props) {
         {error && <div className={s.error}>{error}</div>}
 
         <div className={s.groupLabel}>Salon</div>
-        <Input label="Name" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Antheris" />
+        <Input label="Name" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Antheris" error={submitted ? fieldErrors.name : undefined} />
         <div className={s.row}>
           <div className={s.slugField}>
             <Input
@@ -179,6 +192,7 @@ export function CreatePartnerModal({ open, onClose, onCreated }: Props) {
               value={effectiveSlug}
               onChange={(e) => { setSlugTouched(true); set('slug', slugify(e.target.value)) }}
               placeholder="antheris"
+              error={submitted && effectiveSlug.length < 2 ? fieldErrors.slug : undefined}
             />
             <div className={s.slugStatus}>
               {effectiveSlug.length >= 2 && slugStatus === 'checking' && (
@@ -195,16 +209,16 @@ export function CreatePartnerModal({ open, onClose, onCreated }: Props) {
               )}
             </div>
           </div>
-          <Input label="Type" value={form.type} onChange={(e) => set('type', e.target.value)} placeholder="Aesthetic clinic" />
+          <Input label="Type" value={form.type} onChange={(e) => set('type', e.target.value)} placeholder="Aesthetic clinic" error={submitted ? fieldErrors.type : undefined} />
         </div>
 
         <AccentPicker value={form.accent} onChange={(c) => set('accent', c)} />
 
         <div className={s.groupLabel}>First admin</div>
-        <Input label="Full name" value={form.adminName} onChange={(e) => set('adminName', e.target.value)} placeholder="Jane Doe" />
+        <Input label="Full name" value={form.adminName} onChange={(e) => set('adminName', e.target.value)} placeholder="Jane Doe" error={submitted ? fieldErrors.adminName : undefined} />
         <div className={s.row}>
-          <Input label="Email" type="email" value={form.adminEmail} onChange={(e) => set('adminEmail', e.target.value)} placeholder="admin@antheris.am" />
-          <Input label="Phone" value={form.adminPhone} onChange={(e) => set('adminPhone', e.target.value)} placeholder="+374 …" />
+          <Input label="Email" type="email" value={form.adminEmail} onChange={(e) => set('adminEmail', e.target.value)} placeholder="admin@antheris.am" error={submitted ? fieldErrors.adminEmail : undefined} />
+          <Input label="Phone" value={form.adminPhone} onChange={(e) => set('adminPhone', e.target.value)} placeholder="+374 …" error={submitted ? fieldErrors.adminPhone : undefined} />
         </div>
       </div>
     </Modal>

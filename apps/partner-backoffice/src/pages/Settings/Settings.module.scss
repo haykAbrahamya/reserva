@@ -32,6 +32,13 @@
   padding: 22px;
 }
 
+/* Pulse the card when deep-linked from the "set up your link" CTA. A slow,
+   two-beat glow so the operator clearly notices where to act. */
+.highlight {
+  animation: settings-pulse 1.4s ease-in-out 0s 3;
+  border-color: var(--accent);
+}
+
 .cardHead {
   display: flex;
   align-items: flex-start;
@@ -179,4 +186,9 @@
 :global {
   @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
   @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  @keyframes settings-pulse {
+    0%   { box-shadow: 0 0 0 0 transparent; }
+    50%  { box-shadow: 0 0 0 5px var(--accent-soft); }
+    100% { box-shadow: 0 0 0 0 transparent; }
+  }
 }
