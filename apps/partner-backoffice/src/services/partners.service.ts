@@ -79,6 +79,7 @@ export interface PartnerPresentationFields {
   tagline?: string
   instagram?: string
   facebook?: string
+  logoUrl?: string
   /** Hero gradient tints [from, to]. */
   heroTints?: string[]
   gallery?: GalleryItem[]
