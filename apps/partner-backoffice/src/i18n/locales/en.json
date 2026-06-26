@@ -528,6 +528,16 @@
     "adminOnly": "Admin only",
     "save": "Save",
     "saving": "Saving…",
+    "logo": {
+      "title": "Brand logo",
+      "desc": "Shown across your dashboard. If none is set, your salon's initial is used.",
+      "upload": "Upload logo",
+      "replace": "Replace logo",
+      "remove": "Remove",
+      "updated": "Logo updated",
+      "removed": "Logo removed",
+      "fallbackNote": "No logo yet — your salon's initial is shown instead."
+    },
     "address": {
       "title": "Public address",
       "desc": "Your booking page handle — lowercase letters, numbers and hyphens.",

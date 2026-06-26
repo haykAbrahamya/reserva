@@ -8,6 +8,7 @@ export interface PartnerPresentation {
   tagline: string
   about: string
   rating: number
+  logoUrl?: string;
   reviews: number
   /** Gallery tiles. New tiles carry an uploaded image `url`; legacy/seed tiles
    *  carry only a color `tone` + label (rendered as a colored placeholder). */

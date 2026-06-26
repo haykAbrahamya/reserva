@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 import { MapPin, ChevronLeft, ChevronRight, ShieldCheck } from 'lucide-react'
 import { useAppStore, usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
-import { partnersService } from '@/services/partners.service'
+import { partnersService, galleryImageUrl } from '@/services/partners.service'
 import { useIsAdmin, useScopedLocationId } from '@/store/auth.hooks'
 import { useI18n } from '@/i18n'
 import { NAV } from '../nav.config'
@@ -41,7 +41,11 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       <aside className={[s.sidebar, collapsed ? s.collapsed : '', mobileOpen ? s.mobileOpen : ''].filter(Boolean).join(' ')}>
         {/* Logo — the partner's own initial + name. */}
         <div className={s.logo}>
-          <div className={s.logoIcon}>{(partner?.name?.trim()?.[0] ?? 'R').toUpperCase()}</div>
+          <div className={s.logoIcon}>
+            {partner?.presentation?.logoUrl
+              ? <img src={galleryImageUrl(partner.presentation.logoUrl)} alt="" className={s.logoImg} />
+              : (partner?.name?.trim()?.[0] ?? 'R').toUpperCase()}
+          </div>
           {!collapsed && (
             <div className={s.logoText}>
               <div className={s.name}>{partner?.name ?? 'Reserva'}</div>

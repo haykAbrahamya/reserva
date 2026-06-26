@@ -61,6 +61,7 @@ export function PartnerHero({ partner, onBook }: Props) {
               transparent 65%)`,
           }}
         />
+
         <div
           className={s.washTint}
           style={{
@@ -75,13 +76,16 @@ export function PartnerHero({ partner, onBook }: Props) {
 
       <div className={s.inner}>
         {/* Letter logo */}
-        <div
-          className={s.logo}
-          style={{ background: `linear-gradient(140deg, ${t1}, ${t2})` }}
-        >
-          {partner.name.charAt(0)}
-        </div>
-
+        {
+          partner.presentation.logoUrl 
+            ? <img src={partner.presentation.logoUrl} className={s.logo}/>
+            : <div
+                className={s.logo}
+                style={{ background: `linear-gradient(140deg, ${t1}, ${t2})` }}
+              >
+                {partner.name.charAt(0)}
+              </div>
+        }
         <div className={s.typeRow}>
           <span className={s.type}>{partner.type}</span>
           {/* Only show a rating when there's real review data — no fake stars. */}

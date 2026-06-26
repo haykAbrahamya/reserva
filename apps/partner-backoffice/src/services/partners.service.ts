@@ -144,6 +144,22 @@ export const partnersService = {
     const res = await http.delete('/partner/gallery', { data: { url } })
     return (res.data?.data ?? res.data) as GalleryItem[]
   },
+  // ── Brand logo (admin) ──
+  /** Upload the brand logo; returns the new logo URL. */
+  async uploadLogo(file: File): Promise<{ logoUrl: string }> {
+    const form = new FormData()
+    form.append('file', file)
+    const res = await http.post('/partner/logo', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    return (res.data?.data ?? res.data) as { logoUrl: string }
+  },
+  /** Remove the brand logo; returns the (now empty) logo URL. */
+  async removeLogo(): Promise<{ logoUrl: string }> {
+    const res = await http.delete('/partner/logo')
+    return (res.data?.data ?? res.data) as { logoUrl: string }
+  },
+
   /** Persist a new tile order; returns the updated gallery list. */
   async reorderGallery(urls: string[]): Promise<GalleryItem[]> {
     return apiPatch<GalleryItem[]>('/partner/gallery/order', { urls })

@@ -81,6 +81,7 @@
   box-shadow: $shadow-3;
   border: 1.5px solid rgba(255,255,255,0.22);
   margin-bottom: 22px;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 30%, transparent), 0 10px 26px color-mix(in srgb, var(--accent) 26%, transparent);
   animation: ph-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 
   @media (max-width: 600px) { width: 66px; height: 66px; border-radius: 18px; font-size: 34px; }

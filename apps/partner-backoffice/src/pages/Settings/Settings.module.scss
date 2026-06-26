@@ -94,6 +94,32 @@
   &:hover { text-decoration: underline; }
 }
 
+/* ── Brand logo ── */
+.logoRow { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.logoPreview {
+  width: 64px;
+  height: 64px;
+  border-radius: $r-2;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid $line-1;
+  background: $bg-2;
+  img { width: 100%; height: 100%; object-fit: cover; }
+}
+.logoFallback {
+  font-family: $font-serif;
+  font-size: 28px;
+  color: $accent;
+  background: $accent-soft;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+.logoActions { display: flex; gap: 8px; flex-wrap: wrap; }
+
 /* ── Slug editor ── */
 .slugRow {
   display: flex;

@@ -60,6 +60,7 @@ interface ApiPartner {
   presentation: {
     tagline: string
     about: string
+    logoUrl?: string;
     hours: string
     instagram?: string
     facebook?: string
@@ -76,6 +77,7 @@ function toPublicPartner(p: ApiPartner): PublicPartner {
     about: p.presentation?.about ?? '',
     rating: Number(p.presentation?.rating ?? 0),
     reviews: p.presentation?.reviews ?? 0,
+    logoUrl: resolveImageUrl(p.presentation?.logoUrl),
     hours: p.presentation?.hours ?? '',
     instagram: p.presentation?.instagram || undefined,
     facebook: p.presentation?.facebook || undefined,

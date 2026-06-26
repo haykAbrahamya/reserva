@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { CheckCircle2, Lock, Globe, ExternalLink, Download, Share, CheckCircle, Store } from 'lucide-react'
+import { CheckCircle2, Lock, Globe, ExternalLink, Download, Share, CheckCircle, Store, Image, Trash2, Upload } from 'lucide-react'
 import { Toggle, Button, Input, useToast } from '@/components/ui'
 import { useAppStore } from '@/store/app.store'
 import { useIsAdmin } from '@/store/auth.hooks'
-import { partnersService, type PartnerProfileResponse } from '@/services/partners.service'
+import { partnersService, galleryImageUrl, type PartnerProfileResponse } from '@/services/partners.service'
 import { useResource } from '@/store/useResource'
 import { useInstallPrompt } from '@/hooks/useInstallPrompt'
 import { errorMessage } from '@/utils/errors'
@@ -43,6 +43,36 @@ export function Settings() {
 
   const [slugSaving, setSlugSaving] = useState(false)
   const [autoSaving, setAutoSaving] = useState(false)
+
+  // ── Brand logo ──
+  const logoInputRef = useRef<HTMLInputElement>(null)
+  const [logoBusy, setLogoBusy] = useState(false)
+  const logoUrl = profile?.presentation?.logoUrl ?? ''
+
+  const syncLogo = (url: string) => {
+    const cur = useAppStore.getState().partner
+    if (cur) setPartner({ ...cur, presentation: { ...(cur.presentation ?? {}), logoUrl: url } })
+    reload()
+  }
+  const onPickLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setLogoBusy(true)
+    try {
+      const { logoUrl } = await partnersService.uploadLogo(file)
+      syncLogo(logoUrl)
+      toast(t('settings.logo.updated'))
+    } catch (err) { toast(errorMessage(err, t)) } finally { setLogoBusy(false) }
+  }
+  const onRemoveLogo = async () => {
+    setLogoBusy(true)
+    try {
+      await partnersService.removeLogo()
+      syncLogo('')
+      toast(t('settings.logo.removed'))
+    } catch (err) { toast(errorMessage(err, t)) } finally { setLogoBusy(false) }
+  }
 
   // Deep-link from the PublicLinkBar's "set up your link" CTA: scroll the public
   // address card into view and pulse it so the new partner knows what to do.
@@ -133,6 +163,39 @@ export function Settings() {
         <h1 className={s.h1}>{t('settings.title')}</h1>
         <p className={s.sub}>{t('settings.subtitle')}</p>
       </div>
+
+      {/* ── Brand logo ── */}
+      <section className={s.card}>
+        <div className={s.cardHead}>
+          <span className={s.cardIcon}><Image size={18} /></span>
+          <div className={s.cardHeadText}>
+            <h2 className={s.cardTitle}>{t('settings.logo.title')}</h2>
+            <p className={s.cardDesc}>{t('settings.logo.desc')}</p>
+          </div>
+          {adminLock}
+        </div>
+        <div className={s.cardBody}>
+          <div className={s.logoRow}>
+            <div className={s.logoPreview}>
+              {logoUrl
+                ? <img src={galleryImageUrl(logoUrl)} alt="" />
+                : <span className={s.logoFallback}>{(profile.name?.trim()?.[0] ?? 'R').toUpperCase()}</span>}
+            </div>
+            <div className={s.logoActions}>
+              <input ref={logoInputRef} type="file" accept="image/*" hidden onChange={onPickLogo} />
+              <Button variant="accent" disabled={!isAdmin || logoBusy} onClick={() => logoInputRef.current?.click()}>
+                <Upload size={15} /> {logoUrl ? t('settings.logo.replace') : t('settings.logo.upload')}
+              </Button>
+              {logoUrl && (
+                <Button variant="ghost" disabled={!isAdmin || logoBusy} onClick={onRemoveLogo}>
+                  <Trash2 size={15} /> {t('settings.logo.remove')}
+                </Button>
+              )}
+            </div>
+          </div>
+          {!logoUrl && <div className={s.statusLine}>{t('settings.logo.fallbackNote')}</div>}
+        </div>
+      </section>
 
       {/* ── Public address ── */}
       <section
