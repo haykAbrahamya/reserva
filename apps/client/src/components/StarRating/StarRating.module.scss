@@ -1,0 +1,57 @@
+@use 'variables' as *;
+
+/* ── Read-only display with partial fill ── */
+.display {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.starTrack {
+  position: relative;
+  display: inline-flex;
+  line-height: 0;
+}
+.baseStar { color: color-mix(in srgb, var(--accent) 22%, $line-2); }
+.starFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  display: inline-flex;
+  white-space: nowrap;
+  line-height: 0;
+}
+.litStar { color: #F5B544; }
+.num { font-size: 13px; font-weight: 700; color: $fg-0; }
+.count { font-size: 12px; color: $fg-3; }
+
+/* ── Compact (chip) ── */
+.compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12.5px;
+  color: $fg-0;
+  .litStar { color: #F5B544; }
+  strong { font-weight: 700; }
+  .count { color: $fg-3; }
+}
+
+/* ── Interactive picker ── */
+.input {
+  display: inline-flex;
+  gap: 4px;
+}
+.inputStar {
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  line-height: 0;
+  border-radius: 6px;
+  transition: transform 0.1s;
+  &:hover { transform: scale(1.12); }
+  &:active { transform: scale(0.95); }
+  &:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+}
+.dimStar { color: color-mix(in srgb, var(--accent) 28%, $line-strong); transition: color 0.12s; }
