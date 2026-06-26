@@ -9,6 +9,7 @@ import { listSalons, type SalonCard as Salon } from '@/services/salons.service'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { ModalShell } from '@/components/ModalShell/ModalShell'
 import { distanceKm, type LatLng } from '@/lib/geo'
+import { useSeo } from '@/hooks/useSeo'
 import { useT } from '@/i18n'
 import { SalonCard } from './SalonCard'
 import s from './Salons.module.scss'
@@ -48,6 +49,7 @@ function paramsFromFilters(f: Filters): URLSearchParams {
 
 export function Salons() {
   const t = useT()
+  useSeo({ title: t('seo.salons.title'), description: t('seo.salons.description'), path: '/salons' })
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
 

@@ -4,8 +4,13 @@ import { Features } from '@/sections/Features/Features'
 import { HowItWorks } from '@/sections/HowItWorks/HowItWorks'
 import { Pricing } from '@/sections/Pricing/Pricing'
 import { CtaFooter } from '@/sections/CtaFooter/CtaFooter'
+import { useSeo } from '@/hooks/useSeo'
+import { useT } from '@/i18n'
 
 export function Home() {
+  const t = useT()
+  useSeo({ title: t('seo.home.title'), description: t('seo.home.description'), path: '/' })
+
   return (
     <>
       <Nav />

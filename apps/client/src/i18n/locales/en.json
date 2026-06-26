@@ -3,6 +3,24 @@
     "dash": "—",
     "close": "Close"
   },
+  "seo": {
+    "home": {
+      "title": "Reserva — Online Booking Platform for Armenia",
+      "description": "Online booking & reservation platform for Armenian salons, barbershops and beauty studios. Take appointments online, 24/7, without phone calls."
+    },
+    "salons": {
+      "title": "Salons & Studios — Book Online | Reserva",
+      "description": "Discover the best salons, barbershops and beauty studios in Armenia and book an appointment online in seconds."
+    },
+    "signup": {
+      "title": "Start Free — Your Salon's Booking Page | Reserva",
+      "description": "Create your salon's online booking page with Reserva. 1 month free trial, no card required."
+    },
+    "partner": {
+      "title": "{name} — Book Online | Reserva",
+      "description": "Book an appointment at {name} online in seconds. See services, prices and specialists."
+    }
+  },
   "nav": {
     "features": "Features",
     "howItWorks": "How it works",

@@ -147,6 +147,7 @@ vite.config.ts.timestamp-*
 
 # ── Monorepo / build outputs ──
 **/dist
+**/dist-ssr
 **/node_modules
 **/.turbo
 **/*.tsbuildinfo

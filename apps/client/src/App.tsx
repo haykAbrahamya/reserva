@@ -29,7 +29,9 @@ function ThemeApplier() {
   return null
 }
 
-export default function App() {
+/** The route table + global side-effect components, router-agnostic so it can be
+ *  wrapped by BrowserRouter (client) or StaticRouter (prerender). */
+export function AppRoutes() {
   // On a tenant subdomain (e.g. antheris.reserva.am) the root path is that
   // partner's booking page — same view as reserva.am/p/antheris. On the apex
   // (reserva.am) the root is the marketing home. PartnerPage reads the slug
@@ -38,21 +40,27 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <BrowserRouter>
-        <ThemeApplier />
-        <PageViewTracker />
-        <Routes>
-          <Route path="/" element={isTenant ? <PartnerPage /> : <Home />} />
-          {/* Sign up / start free trial */}
-          <Route path="/signup" element={<SignUp />} />
-          {/* Public salon marketplace directory */}
-          <Route path="/salons" element={<Salons />} />
-          {/* Partner booking page — reserva.am/p/:slug (kept for dev + direct links) */}
-          <Route path="/p/:slug" element={<PartnerPage />} />
-          {/* Creative 404 for any unknown route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <ThemeApplier />
+      <PageViewTracker />
+      <Routes>
+        <Route path="/" element={isTenant ? <PartnerPage /> : <Home />} />
+        {/* Sign up / start free trial */}
+        <Route path="/signup" element={<SignUp />} />
+        {/* Public salon marketplace directory */}
+        <Route path="/salons" element={<Salons />} />
+        {/* Partner booking page — reserva.am/p/:slug (kept for dev + direct links) */}
+        <Route path="/p/:slug" element={<PartnerPage />} />
+        {/* Creative 404 for any unknown route */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </Provider>
+  )
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   )
 }

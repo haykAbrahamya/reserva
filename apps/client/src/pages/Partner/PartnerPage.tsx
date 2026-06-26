@@ -15,6 +15,7 @@ import { PartnerTeam } from './sections/PartnerTeam/PartnerTeam'
 import { PartnerFooter } from './sections/PartnerFooter/PartnerFooter'
 import { BookingFlow } from './booking/BookingFlow'
 import { SpecialistModal } from './components/SpecialistModal/SpecialistModal'
+import { useSeo } from '@/hooks/useSeo'
 import { useT } from '@/i18n'
 import type { Specialist } from '@reserva/shared'
 import s from './PartnerPage.module.scss'
@@ -45,6 +46,46 @@ export function PartnerPage() {
     })
     return () => { active = false }
   }, [slug])
+
+  // Per-salon SEO: each partner page is a unique indexable URL. We give it the
+  // salon's own title/description + a LocalBusiness structured-data record so it
+  // can surface for "<salon name>" and local "book <service>" searches. Called
+  // unconditionally (rules of hooks) with safe fallbacks until the data loads.
+  const seoName = partner?.name ?? 'Reserva'
+  useSeo({
+    title: partner ? t('seo.partner.title', { name: seoName }) : t('seo.home.title'),
+    description: partner
+      ? (partner.presentation?.about?.slice(0, 160) || t('seo.partner.description', { name: seoName }))
+      : t('seo.home.description'),
+    path: slug ? `/p/${slug}` : '/',
+    noindex: !partner,
+    jsonLd: partner
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'LocalBusiness',
+          name: partner.name,
+          description: partner.presentation?.about?.slice(0, 300),
+          url: slug ? `https://${slug}.reserva.am` : 'https://reserva.am',
+          address: partner.locations?.map((l) => ({
+            '@type': 'PostalAddress',
+            streetAddress: l.address,
+            addressLocality: 'Yerevan',
+            addressCountry: 'AM',
+          })),
+          telephone: partner.locations?.[0]?.phone,
+          areaServed: { '@type': 'Country', name: 'Armenia' },
+          makesOffer: partner.services
+            ?.filter((sv) => sv.active)
+            .slice(0, 20)
+            .map((sv) => ({
+              '@type': 'Offer',
+              itemOffered: { '@type': 'Service', name: sv.name },
+              price: sv.price,
+              priceCurrency: 'AMD',
+            })),
+        }
+      : undefined,
+  })
 
   const openBooking = useCallback((serviceId?: string) => {
     setSeedServiceId(serviceId ?? null)

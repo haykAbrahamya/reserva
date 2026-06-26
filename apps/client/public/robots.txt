@@ -1,0 +1,8 @@
+# Reserva — https://reserva.am
+User-agent: *
+Allow: /
+
+# Keep the app shell / service worker out of the index
+Disallow: /sw.js
+
+Sitemap: https://reserva.am/sitemap.xml

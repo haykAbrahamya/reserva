@@ -8,7 +8,11 @@ const RESERVED_SUBDOMAINS = new Set(['www', 'backoffice', 'api', 'admin', 'inter
  * subdomain like `antheris.reserva.am`. Returns null for the apex (`reserva.am`),
  * reserved subdomains, and local/IP hosts (where there's no real subdomain).
  */
-export function slugFromHost(hostname = window.location.hostname): string | null {
+export function slugFromHost(
+  hostname = typeof window === 'undefined' ? '' : window.location.hostname,
+): string | null {
+  // During prerender/SSR there is no host → treat as the apex (not a tenant).
+  if (!hostname) return null
   // No subdomain concept on localhost / bare IPs → fall back to the path.
   if (hostname === 'localhost' || /^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)) return null
 

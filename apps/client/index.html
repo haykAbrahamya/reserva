@@ -3,14 +3,99 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Reserva" />
     <meta name="theme-color" content="#FAFAF7" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Reserva — Book beauty & wellness online</title>
-    <meta name="description" content="Reserva — the easiest way to book appointments at your favourite salons and studios." />
+
+    <!-- ─────────────────────────  Primary SEO  ───────────────────────── -->
+    <title>Reserva — Առցանց ամրագրման հարթակ Հայաստանում</title>
+    <meta
+      name="description"
+      content="Reserva — առցանց ամրագրման հարթակ հայկական սրահների, վարսավիրանոցների և գեղեցկության ստուդիաների համար։ Ընդունեք ամրագրումներ առցանց՝ շուրջօրյա, առանց զանգերի։ Online booking & reservation system for Armenia."
+    />
+    <meta
+      name="keywords"
+      content="ամրագրման հարթակ, առցանց ամրագրում, ամրագրումներ Հայաստան, գրանցում սրահ, online booking armenia, reservation system armenia, booking system, appointment booking, салон онлайн запись, бронирование Армения, reserva, reserva.am"
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+    <meta name="author" content="Reserva" />
+    <link rel="canonical" href="https://reserva.am/" />
+
+    <!-- Language alternates (hreflang) — same SPA serves all locales -->
+    <link rel="alternate" hreflang="hy" href="https://reserva.am/" />
+    <link rel="alternate" hreflang="en" href="https://reserva.am/" />
+    <link rel="alternate" hreflang="ru" href="https://reserva.am/" />
+    <link rel="alternate" hreflang="x-default" href="https://reserva.am/" />
+
+    <!-- ─────────────────────────  Open Graph  ───────────────────────── -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Reserva" />
+    <meta property="og:locale" content="hy_AM" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale:alternate" content="ru_RU" />
+    <meta property="og:title" content="Reserva — Առցանց ամրագրման հարթակ Հայաստանում" />
+    <meta
+      property="og:description"
+      content="Առցանց ամրագրման հարթակ հայկական սրահների և գեղեցկության ստուդիաների համար։ Ընդունեք ամրագրումներ շուրջօրյա, առանց զանգերի։"
+    />
+    <meta property="og:url" content="https://reserva.am/" />
+    <meta property="og:image" content="https://reserva.am/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Reserva — առցանց ամրագրման հարթակ" />
+
+    <!-- ─────────────────────────  Twitter  ───────────────────────── -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Reserva — Առցանց ամրագրման հարթակ Հայաստանում" />
+    <meta
+      name="twitter:description"
+      content="Առցանց ամրագրման հարթակ հայկական սրահների և գեղեցկության ստուդիաների համար։"
+    />
+    <meta name="twitter:image" content="https://reserva.am/og-image.png" />
+
+    <!-- ─────────────────────────  Structured data (JSON-LD)  ───────────────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Reserva",
+      "url": "https://reserva.am/",
+      "logo": "https://reserva.am/icon-512.png",
+      "description": "Առցանց ամրագրման հարթակ հայկական սրահների, վարսավիրանոցների և գեղեցկության ստուդիաների համար։",
+      "areaServed": { "@type": "Country", "name": "Armenia" },
+      "sameAs": []
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Reserva",
+      "alternateName": "Reserva — Ամրագրման հարթակ",
+      "url": "https://reserva.am/",
+      "inLanguage": ["hy", "en", "ru"],
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://reserva.am/salons?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Reserva",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "description": "Online booking & reservation platform for salons and beauty studios in Armenia.",
+      "url": "https://reserva.am/",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "AMD" }
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

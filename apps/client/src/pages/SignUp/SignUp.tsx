@@ -12,6 +12,7 @@ import { signupService } from '@/services/signup.service'
 import { friendlyError } from '@/services/errors'
 import { isValidPhone, normalizePhoneInput } from '@reserva/shared'
 import { useScrollToTop } from '@/hooks/useScrollToTop'
+import { useSeo } from '@/hooks/useSeo'
 import { useT } from '@/i18n'
 import s from './SignUp.module.scss'
 
@@ -23,6 +24,7 @@ const MIN_PW = 8
 export function SignUp() {
   useScrollToTop()
   const t = useT()
+  useSeo({ title: t('seo.signup.title'), description: t('seo.signup.description'), path: '/signup' })
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const plan = params.get('plan') // 'starter' | 'pro' | 'business' | null
