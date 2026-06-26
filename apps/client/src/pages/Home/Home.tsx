@@ -3,6 +3,7 @@ import { Hero } from '@/sections/Hero/Hero'
 import { Features } from '@/sections/Features/Features'
 import { HowItWorks } from '@/sections/HowItWorks/HowItWorks'
 import { Pricing } from '@/sections/Pricing/Pricing'
+import { Faq } from '@/sections/Faq/Faq'
 import { CtaFooter } from '@/sections/CtaFooter/CtaFooter'
 import { useSeo } from '@/hooks/useSeo'
 import { useT } from '@/i18n'
@@ -19,6 +20,7 @@ export function Home() {
         <Features />
         <HowItWorks />
         <Pricing />
+        <Faq />
         <CtaFooter />
       </main>
     </>

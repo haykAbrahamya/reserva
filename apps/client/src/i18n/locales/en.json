@@ -25,6 +25,7 @@
     "features": "Features",
     "howItWorks": "How it works",
     "pricing": "Pricing",
+    "faq": "FAQ",
     "signIn": "Sign in",
     "getStarted": "Get started",
     "openMenu": "Open menu",
@@ -129,6 +130,49 @@
       "insights": "Revenue & occupancy insights",
       "roles": "Team roles & permissions",
       "prioritySupport": "Priority support"
+    }
+  },
+  "faq": {
+    "eyebrow": "Frequently asked questions",
+    "titlePre": "Got ",
+    "titleEm": "questions",
+    "titlePost": "?",
+    "subtitle": "Everything you need to know to get started with Reserva.",
+    "stillQuestions": "Didn't find your answer?",
+    "contactUs": "Get in touch",
+    "items": {
+      "what": {
+        "q": "What is Reserva?",
+        "a": "Reserva is an online booking platform for salons, barbershops and beauty studios. You get a branded booking page for your clients and a powerful dashboard to manage bookings, your team and services."
+      },
+      "setup": {
+        "q": "How long does it take to get started?",
+        "a": "Just a few days. You tell us about your salon and we set up your booking page with your services, specialists and working hours. No technical skills required."
+      },
+      "cost": {
+        "q": "How much does Reserva cost?",
+        "a": "You pay per active specialist — the more specialists, the lower the per-specialist rate. All features are included, and your first month is free, no card required."
+      },
+      "clientApp": {
+        "q": "Do my clients need to download an app?",
+        "a": "No. Your clients book straight from the browser via your personal link, 24/7. No app, no sign-up — just a few taps."
+      },
+      "notifications": {
+        "q": "How will I know about new bookings?",
+        "a": "Every new booking appears instantly on your dashboard, and you and your team get free Telegram notifications in real time."
+      },
+      "multiLocation": {
+        "q": "Can I manage multiple branches?",
+        "a": "Yes. Manage all your branches from one account, each with its own specialists, services and working hours."
+      },
+      "cancel": {
+        "q": "Can I cancel anytime?",
+        "a": "Yes. The subscription is flexible — no long-term commitment and no hidden fees. Cancel anytime."
+      },
+      "data": {
+        "q": "Is my data safe?",
+        "a": "Absolutely. Your data and your clients' data are stored securely and never shared with third parties. Your data belongs to you."
+      }
     }
   },
   "ctaFooter": {

@@ -12,6 +12,7 @@ const LINKS = [
   { labelKey: 'nav.features', id: 'features' },
   { labelKey: 'nav.howItWorks', id: 'how' },
   { labelKey: 'nav.pricing', id: 'pricing' },
+  { labelKey: 'nav.faq', id: 'faq' },
 ]
 
 function scrollToId(id: string) {

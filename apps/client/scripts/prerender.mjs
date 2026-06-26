@@ -22,6 +22,28 @@ const root = resolve(__dirname, '..')
 const distDir = resolve(root, 'dist')
 const ssrEntry = resolve(root, 'dist-ssr/entry-server.js')
 
+// Build a FAQPage JSON-LD from the Armenian bundle so the rich-result schema is
+// in the static HTML (not just injected later by JS) for the home route.
+function faqJsonLd() {
+  try {
+    const hy = JSON.parse(readFileSync(resolve(root, 'src/i18n/locales/hy.json'), 'utf-8'))
+    const items = hy.faq?.items
+    if (!items) return ''
+    const data = {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: Object.values(items).map((it) => ({
+        '@type': 'Question',
+        name: it.q,
+        acceptedAnswer: { '@type': 'Answer', text: it.a },
+      })),
+    }
+    return `\n    <script type="application/ld+json">${JSON.stringify(data)}</script>\n  `
+  } catch {
+    return ''
+  }
+}
+
 // Armenian-default head per route (matches src/i18n/locales/hy.json → seo.*).
 // Visitors still get localized titles live via useSeo; this is the crawl-time
 // baseline Google reads before JS runs.
@@ -81,6 +103,11 @@ async function main() {
       }
 
       let html = injectHead(template, url, meta)
+      // Bake the FAQPage schema into the home page's static HTML.
+      if (url === '/') {
+        const ld = faqJsonLd()
+        if (ld) html = html.replace('</head>', `${ld}</head>`)
+      }
       if (bodyHtml) {
         html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`)
       }
