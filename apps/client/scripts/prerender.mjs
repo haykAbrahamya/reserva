@@ -48,7 +48,9 @@ const esc = (s) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g
 
 /** Replace the title + key meta/canonical/OG tags in the HTML template. */
 function injectHead(html, url, meta) {
-  const canonical = `${SITE}${url === '/' ? '/' : url}`
+  // Use the trailing-slash form for sub-routes so the page's self-declared
+  // canonical matches the URL nginx actually serves (/salons → 301 /salons/).
+  const canonical = `${SITE}${url === '/' ? '/' : `${url}/`}`
   // Tolerant of whitespace/newlines between attributes (the template formats
   // some <meta> tags across multiple lines).
   let out = html
