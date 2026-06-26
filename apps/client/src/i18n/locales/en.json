@@ -282,6 +282,21 @@
       "reviews": "Reviews",
       "experience": "Experience"
     },
+    "review": {
+      "write": "Write a review",
+      "yourRating": "Your rating",
+      "namePlaceholder": "Your name (optional)",
+      "textPlaceholder": "Share your experience (optional)",
+      "submit": "Submit review",
+      "cancel": "Cancel",
+      "pickStars": "Please pick a star rating",
+      "failed": "Couldn't submit your review. Please try again.",
+      "thanks": "Thanks for your review!",
+      "anonymous": "Anonymous",
+      "emptyTitle": "No reviews yet",
+      "emptyText": "Be the first to share your experience with {name}.",
+      "beFirst": "Write the first review"
+    },
     "bookWith": "Book with {name}",
     "close": "Close"
   },

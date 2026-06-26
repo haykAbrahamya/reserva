@@ -2,6 +2,7 @@ import { initials } from '@reserva/shared'
 import type { Specialist } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
+import { StarRatingDisplay } from '@/components/StarRating/StarRating'
 import { useI18n } from '@/i18n'
 import s from './PartnerTeam.module.scss'
 
@@ -42,6 +43,15 @@ export function PartnerTeam({ partner, onSelect }: Props) {
                 </div>
                 <div className={s.spName}>{sp.name}</div>
                 <div className={s.spTitle}>{sp.title}</div>
+                {/* Real rating only — never fabricated. */}
+                {(sp.rating ?? 0) > 0 && (sp.reviewCount ?? 0) > 0 && (
+                  <StarRatingDisplay
+                    className={s.spRating}
+                    value={sp.rating!}
+                    count={sp.reviewCount!}
+                    compact
+                  />
+                )}
                 <div className={s.spServices}>
                   {tp('partner.team.serviceCount', sp.services.length)}
                 </div>

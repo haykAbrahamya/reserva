@@ -48,6 +48,10 @@ export interface Specialist {
   services: string[]
   /** Recurring weekly schedule. Present when loaded from the API. */
   schedule?: WeekSchedule
+  /** Computed average rating (0 when no reviews). Present on public payloads. */
+  rating?: number
+  /** Number of public reviews (0 when none). Present on public payloads. */
+  reviewCount?: number
 }
 
 export interface Service {

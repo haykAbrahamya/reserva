@@ -338,7 +338,15 @@
     "avgPerBooking": "Avg per booking",
     "servicesOffered": "Services offered",
     "recentBookings": "Recent bookings",
-    "noBookings": "No bookings yet"
+    "noBookings": "No bookings yet",
+    "reviews": {
+      "title": "Client reviews",
+      "empty": "No reviews yet",
+      "anonymous": "Anonymous",
+      "delete": "Delete review",
+      "confirmDelete": "Delete this review? This can't be undone.",
+      "deleted": "Review deleted"
+    }
   },
   "clients": {
     "title": "Clients",

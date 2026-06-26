@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { ArrowLeft, X, Check, Users, Calendar, Clock, CheckCircle2, ArrowRight, Sparkles, MapPin, Send, AlertCircle, CalendarPlus, Bell, BellRing, Share } from 'lucide-react'
 import { fmtAMD, fmtDuration, fmtDateInput, initials } from '@reserva/shared'
+import { StarRatingDisplay } from '@/components/StarRating/StarRating'
 import { DatePicker } from '@reserva/ui'
 import type { Service, Specialist } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
@@ -501,7 +502,12 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
                       </span>
                       <div className={s.optBody}>
                         <div className={s.optName}>{sp.name}</div>
-                        <div className={s.optMeta}>{sp.title}</div>
+                        <div className={s.optMeta}>
+                          <span>{sp.title}</span>
+                          {(sp.rating ?? 0) > 0 && (sp.reviewCount ?? 0) > 0 && (
+                            <StarRatingDisplay value={sp.rating!} count={sp.reviewCount!} size={12} compact />
+                          )}
+                        </div>
                       </div>
                       {specialistId === sp.id && <Check size={18} className={s.check} />}
                     </button>

@@ -338,7 +338,15 @@
     "avgPerBooking": "Средний чек",
     "servicesOffered": "Оказываемые услуги",
     "recentBookings": "Последние записи",
-    "noBookings": "Записей пока нет"
+    "noBookings": "Записей пока нет",
+    "reviews": {
+      "title": "Отзывы клиентов",
+      "empty": "Отзывов пока нет",
+      "anonymous": "Аноним",
+      "delete": "Удалить отзыв",
+      "confirmDelete": "Удалить этот отзыв? Это действие необратимо.",
+      "deleted": "Отзыв удалён"
+    }
   },
   "clients": {
     "title": "Клиенты",

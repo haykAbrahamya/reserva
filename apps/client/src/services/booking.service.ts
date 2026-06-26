@@ -216,4 +216,42 @@ export async function createBooking(input: CreateBookingInput): Promise<Booking>
   }
 }
 
+// ── Specialist reviews (public) ──
+
+export interface SpecialistReview {
+  id: string
+  author: string
+  rating: number
+  text: string
+  createdAt: string
+}
+
+/** Fetch a specialist's public reviews (newest first). */
+export function getSpecialistReviews(slug: string, specialistId: string): Promise<SpecialistReview[]> {
+  return api<SpecialistReview[]>(
+    `/public/partners/${encodeURIComponent(slug)}/specialists/${encodeURIComponent(specialistId)}/reviews`,
+  )
+}
+
+export interface CreateReviewInput {
+  /** Reviewer name; blank → shown as "Anonymous". */
+  author?: string
+  /** 1–5 stars (required). */
+  rating: number
+  /** Optional free-text comment. */
+  text?: string
+}
+
+/** Submit a public review for a specialist. */
+export function createSpecialistReview(
+  slug: string,
+  specialistId: string,
+  input: CreateReviewInput,
+): Promise<SpecialistReview> {
+  return api<SpecialistReview>(
+    `/public/partners/${encodeURIComponent(slug)}/specialists/${encodeURIComponent(specialistId)}/reviews`,
+    { method: 'POST', body: JSON.stringify(input) },
+  )
+}
+
 export { BookingApiError }

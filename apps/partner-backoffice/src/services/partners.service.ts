@@ -58,6 +58,15 @@ export interface ListSpecialistsOpts {
   locationId?: string
 }
 
+/** A public review left for a specialist on the booking page. */
+export interface SpecialistReview {
+  id: string
+  author: string
+  rating: number
+  text: string
+  createdAt: string
+}
+
 /** A storefront gallery tile. New tiles carry an uploaded image `url`. */
 export interface GalleryItem {
   url?: string
@@ -216,6 +225,14 @@ export const partnersService = {
   },
   async deleteSpecialist(specialistId: string): Promise<void> {
     await apiDelete(`/specialists/${specialistId}`)
+  },
+
+  // ── Specialist reviews ──
+  async listSpecialistReviews(specialistId: string): Promise<SpecialistReview[]> {
+    return apiGet<SpecialistReview[]>(`/specialists/${specialistId}/reviews`)
+  },
+  async deleteSpecialistReview(specialistId: string, reviewId: string): Promise<void> {
+    await apiDelete(`/specialists/${specialistId}/reviews/${reviewId}`)
   },
 
   // ── Locations ──
