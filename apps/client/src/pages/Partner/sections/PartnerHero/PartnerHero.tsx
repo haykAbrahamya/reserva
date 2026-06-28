@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { CalendarCheck, MapPin, Phone, ChevronDown, Instagram, Facebook } from 'lucide-react'
 import { useT } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
-import { bookableLocations } from '@/services/booking.service'
+import { bookableLocations, canBook } from '@/services/booking.service'
 import s from './PartnerHero.module.scss'
 
 interface Props {
@@ -118,9 +118,11 @@ export function PartnerHero({ partner, onBook }: Props) {
         </div>
 
         <div className={s.actions}>
-          <button className={s.bookCta} onClick={onBook}>
-            <CalendarCheck size={18} /> {t('partner.hero.bookAppointment')}
-          </button>
+          {canBook(partner) && (
+            <button className={s.bookCta} onClick={onBook}>
+              <CalendarCheck size={18} /> {t('partner.hero.bookAppointment')}
+            </button>
+          )}
           {primaryLocation && (
             <a className={s.callBtn} href={`tel:${primaryLocation.phone.replace(/\s/g, '')}`}>
               <Phone size={17} /> {t('partner.hero.call')}

@@ -538,6 +538,20 @@
       "removed": "Logo removed",
       "fallbackNote": "No logo yet — your salon's initial is shown instead."
     },
+    "online": {
+      "title": "Online booking",
+      "desc": "Whether clients can book online from your public page.",
+      "toggleTitle": "Accept online bookings",
+      "toggleDesc": "When off, your page becomes contact-only — booking buttons are hidden and replaced with call/contact actions.",
+      "statusOnPre": "Online booking is ",
+      "statusOnStrong": "on",
+      "statusOnPost": " — clients can book from your page.",
+      "statusOffPre": "Online booking is ",
+      "statusOffStrong": "off",
+      "statusOffPost": " — your page shows contact actions instead.",
+      "onToast": "Online booking enabled",
+      "offToast": "Online booking disabled — page is now contact-only"
+    },
     "address": {
       "title": "Public address",
       "desc": "Your booking page handle — lowercase letters, numbers and hyphens.",

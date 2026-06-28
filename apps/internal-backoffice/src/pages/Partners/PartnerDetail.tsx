@@ -80,6 +80,16 @@ export function PartnerDetailPage() {
     }
   }
 
+  const toggleBookings = async (next: boolean) => {
+    try {
+      await partnersService.setBookings(id, next)
+      toast(next ? 'Online booking enabled' : 'Online booking disabled (contact-only)')
+      await reload()
+    } catch (err) {
+      toast(errorMessage(err))
+    }
+  }
+
   const counts = [
     { label: 'Branches', value: partner.counts.locations, icon: MapPin },
     { label: 'Services', value: partner.counts.services, icon: CalendarDays },
@@ -175,6 +185,24 @@ export function PartnerDetailPage() {
             <a className={s.marketLink} href={`/p/${partner.slug}`} target="_blank" rel="noopener noreferrer">
               <ExternalLink size={13} /> View public page
             </a>
+          )}
+        </section>
+
+        {/* Online booking on/off (contact-only mode) */}
+        <section className={s.card}>
+          <h2 className={s.cardTitle}><CalendarDays size={15} className={s.cardTitleIcon} /> Online booking</h2>
+          <div className={s.marketRow}>
+            <div className={s.marketText}>
+              <div className={s.marketLabel}>Accept online bookings</div>
+              <div className={s.marketDesc}>
+                When off, the public page becomes <strong>contact-only</strong> — booking buttons are
+                hidden and replaced with call/contact actions.
+              </div>
+            </div>
+            <Toggle checked={partner.bookingsEnabled} onChange={toggleBookings} />
+          </div>
+          {!partner.bookingsEnabled && (
+            <p className={s.hint}>This salon is contact-only — clients can’t book online.</p>
           )}
         </section>
       </div>

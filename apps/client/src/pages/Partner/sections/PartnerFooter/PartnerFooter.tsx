@@ -1,9 +1,9 @@
-import { CalendarCheck } from 'lucide-react'
+import { CalendarCheck, Phone } from 'lucide-react'
 import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { LogoMark } from '@/components/Logo/Logo'
 import { marketingSiteUrl } from '@/hooks/useTenantSlug'
-import { bookableLocations } from '@/services/booking.service'
+import { bookableLocations, canBook, partnerTelHref } from '@/services/booking.service'
 import { useT } from '@/i18n'
 import s from './PartnerFooter.module.scss'
 
@@ -16,6 +16,7 @@ export function PartnerFooter({ partner, onBook }: Props) {
   const [t1, t2] = partner.presentation.heroTints
   const loc = bookableLocations(partner)[0] ?? partner.locations[0]
   const t = useT()
+  const telHref = partnerTelHref(partner)
 
   return (
     <>
@@ -30,9 +31,15 @@ export function PartnerFooter({ partner, onBook }: Props) {
               <p className={s.panelText}>
                 {t('partner.footer.text', { name: partner.name })}
               </p>
-              <button className={s.bookBtn} onClick={onBook}>
-                <CalendarCheck size={18} /> {t('partner.footer.bookNow')}
-              </button>
+              {canBook(partner) ? (
+                <button className={s.bookBtn} onClick={onBook}>
+                  <CalendarCheck size={18} /> {t('partner.footer.bookNow')}
+                </button>
+              ) : telHref && (
+                <a className={s.bookBtn} href={telHref}>
+                  <Phone size={18} /> {t('partner.callNow')}
+                </a>
+              )}
             </div>
           </div>
         </Reveal>

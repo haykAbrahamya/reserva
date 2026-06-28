@@ -54,6 +54,7 @@ interface ApiPartner {
   slug: string
   type: string
   accent: string
+  bookingsEnabled?: boolean
   locations: PublicPartner['locations']
   services: Service[]
   specialists: ApiSpecialist[]
@@ -95,6 +96,8 @@ function toPublicPartner(p: ApiPartner): PublicPartner {
     slug: p.slug,
     type: p.type,
     accent: p.accent,
+    // Default to true when the API omits it (older payloads / safety).
+    bookingsEnabled: p.bookingsEnabled !== false,
     locations: p.locations,
     services: p.services,
     specialists: p.specialists.map(({ serviceIds, ...rest }) => ({ ...rest, services: serviceIds })),
@@ -142,6 +145,23 @@ export function bookableLocations(partner: PublicPartner): PublicPartner['locati
 
 export function servicesForSpecialist(partner: PublicPartner, specialist: Specialist): Service[] {
   return partner.services.filter((sv) => sv.active && specialist.services.includes(sv.id))
+}
+
+/** True when the salon accepts online bookings; false = contact-only page. */
+export function canBook(partner: Pick<PublicPartner, 'bookingsEnabled'>): boolean {
+  return partner.bookingsEnabled !== false
+}
+
+/** The partner's primary public phone (first bookable branch, else first branch). */
+export function partnerPhone(partner: PublicPartner): string | null {
+  const loc = bookableLocations(partner)[0] ?? partner.locations[0]
+  return loc?.phone || null
+}
+
+/** `tel:` href for the primary phone, or null when no phone is known. */
+export function partnerTelHref(partner: PublicPartner): string | null {
+  const phone = partnerPhone(partner)
+  return phone ? `tel:${phone.replace(/\s/g, '')}` : null
 }
 
 // ── Availability + booking ──

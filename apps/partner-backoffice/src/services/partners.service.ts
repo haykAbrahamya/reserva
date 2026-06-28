@@ -90,6 +90,7 @@ export type PartnerProfileResponse = Omit<Partner, 'slug'> & {
   slug: string | null
   locationCount?: number
   autoConfirmBookings?: boolean
+  bookingsEnabled?: boolean
   /** Featured in the public marketplace (/salons). Read-only here — curated by
    *  Reserva platform staff from the internal console. */
   marketplaceListed?: boolean
@@ -99,6 +100,7 @@ export type PartnerProfileResponse = Omit<Partner, 'slug'> & {
 /** Admin-editable partner settings (PATCH /partner). */
 export interface PartnerSettingsPatch {
   autoConfirmBookings?: boolean
+  bookingsEnabled?: boolean
   name?: string
   type?: string
   accent?: string

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { CheckCircle2, Lock, Globe, ExternalLink, Download, Share, CheckCircle, Store, Image, Trash2, Upload } from 'lucide-react'
+import { CheckCircle2, Lock, Globe, ExternalLink, Download, Share, CheckCircle, Store, Image, Trash2, Upload, CalendarCheck } from 'lucide-react'
 import { Toggle, Button, Input, useToast } from '@/components/ui'
 import { useAppStore } from '@/store/app.store'
 import { useIsAdmin } from '@/store/auth.hooks'
@@ -34,15 +34,19 @@ export function Settings() {
   // + after a successful save) — fills on open and stays in sync after saving.
   const [slug, setSlug] = useState('')
   const [autoConfirm, setAutoConfirm] = useState(false)
+  const [bookingsOn, setBookingsOn] = useState(true)
 
   const savedSlug = profile?.slug ?? ''
   const savedAuto = profile?.autoConfirmBookings ?? false
+  const savedBookingsOn = profile?.bookingsEnabled ?? true
 
   useEffect(() => { setSlug(savedSlug) }, [savedSlug])
   useEffect(() => { setAutoConfirm(savedAuto) }, [savedAuto])
+  useEffect(() => { setBookingsOn(savedBookingsOn) }, [savedBookingsOn])
 
   const [slugSaving, setSlugSaving] = useState(false)
   const [autoSaving, setAutoSaving] = useState(false)
+  const [bookingsSaving, setBookingsSaving] = useState(false)
 
   // ── Brand logo ──
   const logoInputRef = useRef<HTMLInputElement>(null)
@@ -114,6 +118,7 @@ export function Settings() {
         ...current,
         slug: updated.slug,
         autoConfirmBookings: updated.autoConfirmBookings,
+        bookingsEnabled: updated.bookingsEnabled,
       })
     }
     reload()
@@ -150,6 +155,22 @@ export function Settings() {
       toast(errorMessage(err, t))
     } finally {
       setAutoSaving(false)
+    }
+  }
+
+  // ── Online booking on/off (optimistic toggle) ──
+  const toggleBookings = async (next: boolean) => {
+    if (!isAdmin || bookingsSaving) return
+    setBookingsSaving(true)
+    setBookingsOn(next)
+    try {
+      applyUpdate(await partnersService.updateProfile({ bookingsEnabled: next }))
+      toast(next ? t('settings.online.onToast') : t('settings.online.offToast'))
+    } catch (err) {
+      setBookingsOn(!next)
+      toast(errorMessage(err, t))
+    } finally {
+      setBookingsSaving(false)
     }
   }
 
@@ -239,7 +260,34 @@ export function Settings() {
         </div>
       </section>
 
+      {/* ── Online booking on/off ── */}
+      <section className={s.card}>
+        <div className={s.cardHead}>
+          <span className={s.cardIcon}><CalendarCheck size={18} /></span>
+          <div className={s.cardHeadText}>
+            <h2 className={s.cardTitle}>{t('settings.online.title')}</h2>
+            <p className={s.cardDesc}>{t('settings.online.desc')}</p>
+          </div>
+          {adminLock}
+        </div>
+        <div className={s.cardBody}>
+          <div className={s.toggleRow}>
+            <div className={s.toggleText}>
+              <div className={s.toggleTitle}>{t('settings.online.toggleTitle')}</div>
+              <div className={s.toggleDesc}>{t('settings.online.toggleDesc')}</div>
+            </div>
+            <Toggle checked={bookingsOn} disabled={!isAdmin || bookingsSaving} onChange={toggleBookings} />
+          </div>
+          <div className={s.statusLine}>
+            {bookingsOn
+              ? <>{t('settings.online.statusOnPre')} <strong className={s.on}>{t('settings.online.statusOnStrong')}</strong>{t('settings.online.statusOnPost')}</>
+              : <>{t('settings.online.statusOffPre')} <strong className={s.off}>{t('settings.online.statusOffStrong')}</strong>{t('settings.online.statusOffPost')}</>}
+          </div>
+        </div>
+      </section>
+
       {/* ── Bookings ── */}
+      {bookingsOn && (
       <section className={s.card}>
         <div className={s.cardHead}>
           <span className={s.cardIcon}><CheckCircle2 size={18} /></span>
@@ -269,6 +317,7 @@ export function Settings() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── Marketplace listing (read-only — curated by Reserva) ── */}
       <section className={s.card}>

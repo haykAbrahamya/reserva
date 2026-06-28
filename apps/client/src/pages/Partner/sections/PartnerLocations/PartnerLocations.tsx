@@ -2,7 +2,7 @@ import { MapPin, Phone, CalendarCheck, Clock, Users, Navigation } from 'lucide-r
 import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { useI18n } from '@/i18n'
-import { bookableLocations } from '@/services/booking.service'
+import { bookableLocations, canBook } from '@/services/booking.service'
 import { summarizeHours } from './summarizeHours'
 import s from './PartnerLocations.module.scss'
 
@@ -84,9 +84,11 @@ export function PartnerLocations({ partner, onBook }: Props) {
                   </div>
 
                   <div className={s.actions}>
-                    <button className={s.bookBtn} onClick={onBook}>
-                      <CalendarCheck size={15} /> {t('partner.locations.bookHere')}
-                    </button>
+                    {canBook(partner) && (
+                      <button className={s.bookBtn} onClick={onBook}>
+                        <CalendarCheck size={15} /> {t('partner.locations.bookHere')}
+                      </button>
+                    )}
                     <a className={s.callBtn} href={`tel:${loc.phone.replace(/\s/g, '')}`}>
                       <Phone size={15} /> {t('partner.locations.call')}
                     </a>

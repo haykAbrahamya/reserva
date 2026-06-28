@@ -8,6 +8,7 @@ import { StarRatingDisplay, StarRatingInput } from '@/components/StarRating/Star
 import {
   getSpecialistReviews,
   createSpecialistReview,
+  canBook,
   type SpecialistReview,
 } from '@/services/booking.service'
 import { useI18n } from '@/i18n'
@@ -195,11 +196,13 @@ export function SpecialistModal({ partner, specialist, onClose, onBook }: Props)
           )}
         </div>
 
-        <div className={s.footer}>
-          <button className={s.bookBtn} onClick={() => { onBook(); requestClose() }}>
-            <CalendarCheck size={17} /> {t('specialistModal.bookWith', { name: specialist.name.split(' ')[0] })}
-          </button>
-        </div>
+        {canBook(partner) && (
+          <div className={s.footer}>
+            <button className={s.bookBtn} onClick={() => { onBook(); requestClose() }}>
+              <CalendarCheck size={17} /> {t('specialistModal.bookWith', { name: specialist.name.split(' ')[0] })}
+            </button>
+          </div>
+        )}
       </div>
     </div>
       )}

@@ -212,6 +212,7 @@
     "backToReserva": "Back to Reserva",
     "poweredBy": "Powered by Reserva",
     "bookNow": "Book now",
+    "callNow": "Call now",
     "hero": {
       "reviews": "({count} reviews)",
       "locationsInYerevan": "{count} locations in Yerevan",

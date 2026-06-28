@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react'
 import { fmtAMD, fmtDuration } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
+import { canBook } from '@/services/booking.service'
 import { useT } from '@/i18n'
 import s from './PartnerServices.module.scss'
 
@@ -15,6 +16,7 @@ const ALL = 'All'
 
 export function PartnerServices({ partner, onBook }: Props) {
   const t = useT()
+  const bookable = canBook(partner)
   const services = useMemo(
     () => partner.services.filter(sv => sv.active),
     [partner]
@@ -64,9 +66,11 @@ export function PartnerServices({ partner, onBook }: Props) {
               </div>
               <div className={s.right}>
                 <span className={s.price}>{fmtAMD(sv.price)}</span>
-                <button className={s.bookBtn} onClick={() => onBook(sv.id)}>
-                  <Plus size={14} /> {t('partner.services.book')}
-                </button>
+                {bookable && (
+                  <button className={s.bookBtn} onClick={() => onBook(sv.id)}>
+                    <Plus size={14} /> {t('partner.services.book')}
+                  </button>
+                )}
               </div>
             </Reveal>
           ))}

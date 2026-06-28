@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { CalendarCheck } from 'lucide-react'
+import { CalendarCheck, Phone } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher'
 import { LogoMark } from '@/components/Logo/Logo'
 import { marketingSiteUrl } from '@/hooks/useTenantSlug'
+import { canBook, partnerTelHref } from '@/services/booking.service'
 import { useT } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
 import s from './PartnerNav.module.scss'
@@ -17,6 +18,7 @@ export function PartnerNav({ partner, onBook }: Props) {
   const [scrolled, setScrolled] = useState(false)
   const [t1, t2] = partner.presentation.heroTints
   const t = useT()
+  const telHref = partnerTelHref(partner)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 300)
@@ -48,10 +50,16 @@ export function PartnerNav({ partner, onBook }: Props) {
         <div className={s.actions}>
           <LanguageSwitcher />
           <ThemeToggle />
-          {/* Always available — booking is the primary action on this page */}
-          <button className={s.bookBtn} onClick={onBook} aria-label={t('partner.bookNow')}>
-            <CalendarCheck size={15} /> <span className={s.bookLabel}>{t('partner.bookNow')}</span>
-          </button>
+          {/* Booking is the primary action; contact-only salons get "Call now". */}
+          {canBook(partner) ? (
+            <button className={s.bookBtn} onClick={onBook} aria-label={t('partner.bookNow')}>
+              <CalendarCheck size={15} /> <span className={s.bookLabel}>{t('partner.bookNow')}</span>
+            </button>
+          ) : telHref && (
+            <a className={s.bookBtn} href={telHref} aria-label={t('partner.callNow')}>
+              <Phone size={15} /> <span className={s.bookLabel}>{t('partner.callNow')}</span>
+            </a>
+          )}
         </div>
       </div>
     </header>

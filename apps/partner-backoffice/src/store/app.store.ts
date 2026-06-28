@@ -16,6 +16,8 @@ export type PartnerProfile = Omit<Partner, 'locations' | 'services' | 'specialis
   locationCount?: number
   /** When true, public bookings are auto-confirmed; else they land as pending. */
   autoConfirmBookings?: boolean
+  /** When false, the public page is contact-only (booking CTAs hidden/replaced). */
+  bookingsEnabled?: boolean
   /** Public marketing fields edited in the Storefront section. */
   presentation?: {
     about?: string

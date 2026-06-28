@@ -18,6 +18,8 @@ export interface PartnerListItem {
   active: boolean
   /** Featured in the public marketplace (/salons). Curated here by platform staff. */
   marketplaceListed: boolean
+  /** Whether the public page accepts online bookings (off = contact-only). */
+  bookingsEnabled: boolean
   createdAt: string
   counts: PartnerCounts
 }
@@ -118,6 +120,11 @@ export const partnersService = {
   /** Feature/unfeature a salon in the public marketplace (/salons). */
   setMarketplace(id: string, listed: boolean): Promise<PartnerDetail> {
     return apiPatch<PartnerDetail>(`/platform/partners/${id}/marketplace`, { listed })
+  },
+
+  /** Enable/disable the public booking flow (off = contact-only page). */
+  setBookings(id: string, enabled: boolean): Promise<PartnerDetail> {
+    return apiPatch<PartnerDetail>(`/platform/partners/${id}/bookings`, { enabled })
   },
 
   // ── Partner users (platform support) ──

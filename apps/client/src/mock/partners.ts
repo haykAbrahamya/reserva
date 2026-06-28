@@ -21,7 +21,12 @@ export interface PartnerPresentation {
   facebook?: string
 }
 
-export type PublicPartner = Partner & { presentation: PartnerPresentation }
+export type PublicPartner = Partner & {
+  presentation: PartnerPresentation
+  /** When false, the page is contact-only — booking CTAs are hidden/replaced.
+   *  Optional in mock data; the API always provides it (defaults to true). */
+  bookingsEnabled?: boolean
+}
 
 export const PARTNERS: PublicPartner[] = [
   {
