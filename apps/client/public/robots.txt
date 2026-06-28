@@ -6,3 +6,4 @@ Allow: /
 Disallow: /sw.js
 
 Sitemap: https://reserva.am/sitemap.xml
+Sitemap: https://api.reserva.am/api/v1/public/salons/sitemap.xml
