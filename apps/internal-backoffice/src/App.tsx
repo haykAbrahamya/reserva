@@ -13,6 +13,7 @@ import { Partners } from '@/pages/Partners/Partners'
 import { PartnerDetailPage } from '@/pages/Partners/PartnerDetail'
 import { Staff } from '@/pages/Staff/Staff'
 import { DemoRequests } from '@/pages/DemoRequests/DemoRequests'
+import { PendingRegistrations } from '@/pages/PendingRegistrations/PendingRegistrations'
 import { Visits } from '@/pages/Visits/Visits'
 
 /** Apply the platform brand theme once on mount. */
@@ -53,6 +54,7 @@ export default function App() {
             <Route path="partners" element={<Partners />} />
             <Route path="partners/:id" element={<PartnerDetailPage />} />
             <Route path="demo-requests" element={<DemoRequests />} />
+            <Route path="pending-registrations" element={<PendingRegistrations />} />
             <Route path="visits" element={<Visits />} />
             <Route path="staff" element={<RequireOwner><Staff /></RequireOwner>} />
           </Route>
