@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { AlertTriangle } from 'lucide-react'
 import { Modal } from '../Modal/Modal'
 import { Button } from '../Button/Button'
@@ -16,13 +17,15 @@ interface ConfirmDialogProps {
   loading?: boolean
   onConfirm: () => void
   onClose: () => void
+  /** Optional extra content below the message (e.g. a type-to-confirm input). */
+  children?: ReactNode
 }
 
 /** A themed replacement for window.confirm() — used for destructive/important
  * confirmations so they match the app instead of the OS dialog. */
 export function ConfirmDialog({
   open, title, message, confirmLabel, cancelLabel,
-  variant = 'default', loading, onConfirm, onClose,
+  variant = 'default', loading, onConfirm, onClose, children,
 }: ConfirmDialogProps) {
   return (
     <Modal
@@ -45,6 +48,7 @@ export function ConfirmDialog({
         <div className={s.text}>
           <div className={s.title}>{title}</div>
           <p className={s.message}>{message}</p>
+          {children && <div className={s.extra}>{children}</div>}
         </div>
       </div>
     </Modal>

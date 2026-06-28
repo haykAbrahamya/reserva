@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { UserPlus, Phone, Mail, Send, Trash2, Clock, Building2 } from 'lucide-react'
-import { Badge, Button, Empty, Pagination, Select, ConfirmDialog, useToast } from '@/components/ui'
+import { UserPlus, Phone, Mail, Send, Trash2, Clock } from 'lucide-react'
+import { Badge, Button, Empty, Pagination, SegmentedFilter, ConfirmDialog, useToast } from '@/components/ui'
 import { useResource } from '@/store/useResource'
 import {
   pendingRegistrationsService,
@@ -25,6 +25,10 @@ function fmtWhen(iso: string): string {
   const day = Math.floor(hr / 24)
   if (day < 7) return wrap(`${day}d`)
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+function initials(name: string): string {
+  return name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? '').join('')
 }
 
 export function PendingRegistrations() {
@@ -87,10 +91,10 @@ export function PendingRegistrations() {
             {total > 0 && <span className={s.newPill}>{total}</span>}
           </p>
         </div>
-        <Select
-          size="sm"
+        <SegmentedFilter<PendingStatus>
+          ariaLabel="Filter pending registrations"
           value={status}
-          onChange={(v) => changeStatus(v as PendingStatus)}
+          onChange={changeStatus}
           options={[
             { value: 'pending', label: 'Awaiting activation' },
             { value: 'expired', label: 'Expired links' },
@@ -113,19 +117,20 @@ export function PendingRegistrations() {
           <div className={s.list}>
             {items.map((r) => (
               <div key={r.id} className={[s.card, !r.expired ? s.cardNew : ''].filter(Boolean).join(' ')}>
+                <div className={s.avatar} aria-hidden="true">{initials(r.companyName)}</div>
+
                 <div className={s.cardMain}>
                   <div className={s.cardTop}>
                     <span className={s.name}>{r.companyName}</span>
-                    <span className={s.company}>{r.companyType}</span>
+                    <span className={s.company}>· {r.companyType}</span>
                     <Badge
                       variant={r.expired ? 'completed' : 'pending'}
                       label={r.expired ? 'Expired' : 'Awaiting'}
                     />
-                    <span className={s.when}>signed up {fmtWhen(r.createdAt)}</span>
                   </div>
 
                   <div className={s.contacts}>
-                    <span className={s.contact}><Building2 size={13} /> {r.adminName}</span>
+                    <span className={s.contact}><UserPlus size={13} /> {r.adminName}</span>
                     <a className={s.contact} href={`mailto:${r.adminEmail}`}><Mail size={13} /> {r.adminEmail}</a>
                     {r.adminPhone && (
                       <a className={s.contact} href={`tel:${r.adminPhone}`}><Phone size={13} /> {r.adminPhone}</a>
@@ -136,9 +141,10 @@ export function PendingRegistrations() {
                   <div className={s.notes}>
                     <Clock size={13} className={s.notesIcon} />
                     <span>
+                      signed up {fmtWhen(r.createdAt)} ·{' '}
                       {r.expired
-                        ? `Link expired ${fmtWhen(r.expiresAt)}`
-                        : `Link expires ${fmtWhen(r.expiresAt)}`}
+                        ? `link expired ${fmtWhen(r.expiresAt)}`
+                        : `link expires ${fmtWhen(r.expiresAt)}`}
                     </span>
                   </div>
                 </div>
@@ -147,9 +153,9 @@ export function PendingRegistrations() {
                   <Button variant="accent" size="sm" disabled={resendingId === r.id} onClick={() => resend(r)}>
                     <Send size={14} /> {r.expired ? 'Resend link' : 'Resend email'}
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setConfirmDel(r)}>
-                    <Trash2 size={14} /> Delete
-                  </Button>
+                  <button className={s.iconDelete} title="Delete" aria-label="Delete" onClick={() => setConfirmDel(r)}>
+                    <Trash2 size={15} />
+                  </button>
                 </div>
               </div>
             ))}

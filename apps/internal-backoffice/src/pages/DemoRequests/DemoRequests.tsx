@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Inbox, Phone, Mail, Check, RotateCcw, MessageSquare } from 'lucide-react'
-import { Badge, Button, Empty, Pagination, Select, useToast } from '@/components/ui'
+import { Inbox, Phone, Mail, Check, RotateCcw, MessageSquare, Trash2 } from 'lucide-react'
+import { Badge, Button, Empty, Pagination, SegmentedFilter, ConfirmDialog, useToast } from '@/components/ui'
 import { useResource } from '@/store/useResource'
 import {
   demoRequestsService,
@@ -25,11 +25,17 @@ function fmtWhen(iso: string): string {
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
+function initials(name: string): string {
+  return name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? '').join('')
+}
+
 export function DemoRequests() {
   const toast = useToast()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [filter, setFilter] = useState<Filter>('all')
+  const [confirmDel, setConfirmDel] = useState<DemoRequest | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   const { data: result, reload } = useResource(
     () => demoRequestsService.list({ page, pageSize, status: filter === 'all' ? undefined : filter }),
@@ -55,22 +61,35 @@ export function DemoRequests() {
     }
   }
 
+  const confirmDelete = async () => {
+    if (!confirmDel) return
+    setDeleting(true)
+    try {
+      await demoRequestsService.remove(confirmDel.id)
+      toast('Demo request deleted')
+      setConfirmDel(null)
+      await reload()
+    } catch (err) {
+      toast(errorMessage(err))
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   return (
     <div className={s.page}>
       <div className={s.head}>
         <div>
           <h1 className={s.h1}>Demo requests</h1>
-          <p className={s.sub}>
-            {total} total{newCount > 0 && <span className={s.newPill}>{newCount} new</span>}
-          </p>
+          <p className={s.sub}>Leads from the landing page “Book a demo” form.</p>
         </div>
-        <Select
-          size="sm"
+        <SegmentedFilter<Filter>
+          ariaLabel="Filter demo requests"
           value={filter}
-          onChange={(v) => changeFilter(v as Filter)}
+          onChange={changeFilter}
           options={[
-            { value: 'all', label: 'All requests' },
-            { value: 'new', label: 'New' },
+            { value: 'all', label: 'All', count: total },
+            { value: 'new', label: 'New', count: newCount },
             { value: 'done', label: 'Done' },
           ]}
         />
@@ -87,15 +106,16 @@ export function DemoRequests() {
           <div className={s.list}>
             {items.map((r) => (
               <div key={r.id} className={[s.card, r.status === 'new' ? s.cardNew : ''].filter(Boolean).join(' ')}>
+                <div className={s.avatar} aria-hidden="true">{initials(r.name)}</div>
+
                 <div className={s.cardMain}>
                   <div className={s.cardTop}>
                     <span className={s.name}>{r.name}</span>
-                    {r.company && <span className={s.company}>{r.company}</span>}
+                    {r.company && <span className={s.company}>· {r.company}</span>}
                     <Badge
                       variant={r.status === 'new' ? 'pending' : 'completed'}
                       label={r.status === 'new' ? 'New' : 'Done'}
                     />
-                    <span className={s.when}>{fmtWhen(r.createdAt)}</span>
                   </div>
 
                   <div className={s.contacts}>
@@ -105,6 +125,7 @@ export function DemoRequests() {
                     {r.email && (
                       <a className={s.contact} href={`mailto:${r.email}`}><Mail size={13} /> {r.email}</a>
                     )}
+                    <span className={s.when}>{fmtWhen(r.createdAt)}</span>
                   </div>
 
                   {r.notes && (
@@ -125,6 +146,9 @@ export function DemoRequests() {
                       <RotateCcw size={14} /> Reopen
                     </Button>
                   )}
+                  <button className={s.iconDelete} title="Delete" aria-label="Delete" onClick={() => setConfirmDel(r)}>
+                    <Trash2 size={15} />
+                  </button>
                 </div>
               </div>
             ))}
@@ -141,6 +165,18 @@ export function DemoRequests() {
           />
         </>
       )}
+
+      <ConfirmDialog
+        open={!!confirmDel}
+        variant="danger"
+        title="Delete demo request"
+        message={`Delete the demo request from "${confirmDel?.name}"? This can't be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onClose={() => { if (!deleting) setConfirmDel(null) }}
+      />
     </div>
   )
 }

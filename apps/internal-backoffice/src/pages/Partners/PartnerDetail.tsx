@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Save, MapPin, Users, CalendarDays, Store, ExternalLink } from 'lucide-react'
-import { Avatar, Badge, Button, Input, Textarea, Toggle, Empty, useToast } from '@/components/ui'
+import { ArrowLeft, Save, MapPin, Users, CalendarDays, Store, ExternalLink, Trash2, AlertTriangle, SlidersHorizontal } from 'lucide-react'
+import { Avatar, Badge, Button, Input, Textarea, Toggle, Empty, ConfirmDialog, useToast } from '@/components/ui'
 import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
 import { useResource } from '@/store/useResource'
 import { partnersService, type UpdatePartnerInput } from '@/services/partners.service'
@@ -18,6 +18,9 @@ export function PartnerDetailPage() {
   const [form, setForm] = useState<UpdatePartnerInput>({})
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleteText, setDeleteText] = useState('')
+  const [deleting, setDeleting] = useState(false)
 
   // Seed the editable form once the partner loads.
   useEffect(() => {
@@ -90,6 +93,18 @@ export function PartnerDetailPage() {
     }
   }
 
+  const doHardDelete = async () => {
+    setDeleting(true)
+    try {
+      await partnersService.hardDelete(id)
+      toast('Partner permanently deleted')
+      navigate('/partners')
+    } catch (err) {
+      toast(errorMessage(err))
+      setDeleting(false)
+    }
+  }
+
   const counts = [
     { label: 'Branches', value: partner.counts.locations, icon: MapPin },
     { label: 'Services', value: partner.counts.services, icon: CalendarDays },
@@ -158,54 +173,78 @@ export function PartnerDetailPage() {
         {/* Users — view + manage (edit, reset password) */}
         <PartnerUsers partnerId={id} />
 
-        {/* Marketplace listing (platform-curated) */}
+        {/* Visibility & booking — grouped toggles */}
         <section className={s.card}>
-          <h2 className={s.cardTitle}><Store size={15} className={s.cardTitleIcon} /> Marketplace</h2>
-          <div className={s.marketRow}>
-            <div className={s.marketText}>
-              <div className={s.marketLabel}>Feature in public marketplace</div>
-              <div className={s.marketDesc}>
-                When on, this salon appears on the public <strong>/salons</strong> directory and is
-                discoverable in search.
+          <h2 className={s.cardTitle}><SlidersHorizontal size={15} className={s.cardTitleIcon} /> Visibility &amp; booking</h2>
+
+          <div className={s.toggleList}>
+            <div className={s.toggleRow}>
+              <div className={s.toggleText}>
+                <div className={s.toggleLabel}><Store size={13} /> Marketplace listing</div>
+                <div className={s.toggleDesc}>Show on the public /salons directory.</div>
               </div>
+              <Toggle
+                checked={partner.marketplaceListed}
+                onChange={toggleMarketplace}
+                disabled={!partner.active || !partner.slug}
+              />
             </div>
-            <Toggle
-              checked={partner.marketplaceListed}
-              onChange={toggleMarketplace}
-              disabled={!partner.active || !partner.slug}
-            />
+
+            <div className={s.toggleRow}>
+              <div className={s.toggleText}>
+                <div className={s.toggleLabel}><CalendarDays size={13} /> Online booking</div>
+                <div className={s.toggleDesc}>Off = contact-only page (call/contact CTAs).</div>
+              </div>
+              <Toggle checked={partner.bookingsEnabled} onChange={toggleBookings} />
+            </div>
           </div>
-          {!partner.active && (
-            <p className={s.hint}>Enable the partner first — inactive salons can’t be listed.</p>
+
+          {(!partner.active || !partner.slug) && (
+            <p className={s.hint}>
+              {!partner.active ? 'Enable the partner to allow marketplace listing. ' : ''}
+              {!partner.slug ? 'No public slug yet — set one before listing.' : ''}
+            </p>
           )}
-          {!partner.slug && (
-            <p className={s.hint}>This partner has no public slug yet, so it can’t be listed.</p>
-          )}
-          {partner.marketplaceListed && partner.slug && (
+          {partner.slug && (
             <a className={s.marketLink} href={`/p/${partner.slug}`} target="_blank" rel="noopener noreferrer">
               <ExternalLink size={13} /> View public page
             </a>
           )}
         </section>
 
-        {/* Online booking on/off (contact-only mode) */}
-        <section className={s.card}>
-          <h2 className={s.cardTitle}><CalendarDays size={15} className={s.cardTitleIcon} /> Online booking</h2>
-          <div className={s.marketRow}>
-            <div className={s.marketText}>
-              <div className={s.marketLabel}>Accept online bookings</div>
-              <div className={s.marketDesc}>
-                When off, the public page becomes <strong>contact-only</strong> — booking buttons are
-                hidden and replaced with call/contact actions.
-              </div>
-            </div>
-            <Toggle checked={partner.bookingsEnabled} onChange={toggleBookings} />
-          </div>
-          {!partner.bookingsEnabled && (
-            <p className={s.hint}>This salon is contact-only — clients can’t book online.</p>
-          )}
-        </section>
       </div>
+
+      {/* Danger zone — full-width row below the grid */}
+      <section className={`${s.card} ${s.danger} ${s.dangerCard}`}>
+        <div className={s.dangerRow}>
+          <div className={s.toggleText}>
+            <div className={s.toggleLabel}><AlertTriangle size={14} className={s.dangerIcon} /> Delete partner</div>
+            <div className={s.toggleDesc}>Permanently removes the salon and all its connected data. This cannot be undone.</div>
+          </div>
+          <Button variant="danger" size="sm" onClick={() => { setDeleteText(''); setConfirmDelete(true) }}>
+            <Trash2 size={14} /> Delete partner
+          </Button>
+        </div>
+      </section>
+
+      <ConfirmDialog
+        open={confirmDelete}
+        variant="danger"
+        title="Delete this partner permanently?"
+        message={`This deletes "${partner.name}" and ALL connected data — bookings, services, specialists, locations, clients, users, reviews and uploaded images. This cannot be undone. Type the salon name to confirm.`}
+        confirmLabel={deleting ? 'Deleting…' : 'Delete forever'}
+        cancelLabel="Cancel"
+        loading={deleting || deleteText.trim() !== partner.name.trim()}
+        onConfirm={doHardDelete}
+        onClose={() => { if (!deleting) setConfirmDelete(false) }}
+      >
+        <Input
+          autoFocus
+          placeholder={partner.name}
+          value={deleteText}
+          onChange={(e) => setDeleteText(e.target.value)}
+        />
+      </ConfirmDialog>
     </div>
   )
 }

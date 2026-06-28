@@ -1,5 +1,5 @@
 import type { Paginated, PageParams } from '@/types'
-import { apiGet, apiPatch } from './http'
+import { apiGet, apiPatch, apiDelete } from './http'
 
 export type DemoRequestStatus = 'new' | 'done'
 
@@ -38,5 +38,9 @@ export const demoRequestsService = {
 
   setStatus(id: string, status: DemoRequestStatus): Promise<DemoRequest> {
     return apiPatch<DemoRequest>(`/platform/demo-requests/${id}/status`, { status })
+  },
+
+  remove(id: string): Promise<void> {
+    return apiDelete(`/platform/demo-requests/${id}`)
   },
 }

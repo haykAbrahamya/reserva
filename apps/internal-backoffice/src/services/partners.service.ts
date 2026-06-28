@@ -1,5 +1,5 @@
 import type { Paginated, PageParams } from '@/types'
-import { apiGet, apiPost, apiPatch } from './http'
+import { apiGet, apiPost, apiPatch, apiDelete } from './http'
 
 export interface PartnerCounts {
   locations: number
@@ -125,6 +125,11 @@ export const partnersService = {
   /** Enable/disable the public booking flow (off = contact-only page). */
   setBookings(id: string, enabled: boolean): Promise<PartnerDetail> {
     return apiPatch<PartnerDetail>(`/platform/partners/${id}/bookings`, { enabled })
+  },
+
+  /** PERMANENTLY delete a partner and all connected data (owner-only). */
+  hardDelete(id: string): Promise<void> {
+    return apiDelete(`/platform/partners/${id}`)
   },
 
   // ── Partner users (platform support) ──

@@ -1,0 +1,64 @@
+@use 'variables' as *;
+
+.group {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: $bg-2;
+  border: 1px solid $line-1;
+}
+
+.segment {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  color: $fg-2;
+  font-family: $font-sans;
+  font-weight: 600;
+  border-radius: 999px;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+
+  &:hover { color: $fg-0; }
+
+  &.active {
+    background: $bg-0;
+    color: $fg-0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* per-segment count pill */
+.count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  background: $bg-2;
+  color: $fg-2;
+}
+.active .count {
+  background: $accent-soft;
+  color: $accent-strong;
+}
+
+/* sizes */
+.md .segment { font-size: 13px; padding: 7px 14px; }
+.md .segment.active { }
+.sm .segment { font-size: 12.5px; padding: 6px 12px; }
+
+@media (max-width: 560px) {
+  .group { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .segment { flex: 1 0 auto; justify-content: center; }
+}
