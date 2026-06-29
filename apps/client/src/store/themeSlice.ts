@@ -7,7 +7,7 @@ const STORAGE_KEY = 'reserva-client-theme'
 function loadTheme(): Theme {
   if (typeof window === 'undefined') return 'light'
   const saved = window.localStorage.getItem(STORAGE_KEY)
-  return saved === 'dark' || saved === 'light' ? saved : 'light'
+  return saved === 'dark' || saved === 'light' ? saved : 'dark'
 }
 
 interface ThemeState {
