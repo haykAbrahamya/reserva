@@ -2,16 +2,22 @@ import { useState } from 'react'
 import { ImageIcon } from 'lucide-react'
 import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
+import { BeforeAfter } from '@/components/BeforeAfter/BeforeAfter'
 import { useT } from '@/i18n'
 import { Lightbox, type LightboxImage } from './Lightbox'
 import s from './PartnerGallery.module.scss'
 
 interface Props {
   partner: PublicPartner
+  /** Which list to render: 'gallery' (Inside) or 'works'. Defaults to gallery. */
+  variant?: 'gallery' | 'works'
+  tone?: 'cream' | 'plain'
 }
 
-export function PartnerGallery({ partner }: Props) {
-  const tiles = partner.presentation.gallery
+export function PartnerGallery({ partner, variant = 'gallery', tone = 'cream' }: Props) {
+  const tiles = variant === 'works'
+    ? (partner.presentation.works ?? [])
+    : partner.presentation.gallery
   const t = useT()
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
@@ -25,18 +31,44 @@ export function PartnerGallery({ partner }: Props) {
   // salon's color — kept light (not bold) so the photos still read clearly.
   const tint = partner.presentation.heroTints?.[0] ?? partner.accent
 
-  // Nothing to show → hide the whole section (no empty "Inside …" band).
+  // Nothing to show → hide the whole section (no empty band).
   if (tiles.length === 0) return null
 
+  const title = variant === 'works'
+    ? t('partner.works.title')
+    : partner.kind === 'single'
+      ? t('partner.gallery.titleSingle')
+      : t('partner.gallery.title', { name: partner.name })
+
   return (
-    <section className={s.section}>
+    <section className={[s.section, tone === 'plain' ? s.plain : ''].filter(Boolean).join(' ')}>
       <div className={s.inner}>
         <div className={s.head}>
-          <h2 className={s.title}>{t('partner.gallery.title', { name: partner.name })}</h2>
+          <h2 className={s.title}>{title}</h2>
         </div>
 
         <div className={s.grid}>
           {tiles.map((tile, i) => {
+            // Before/after tile → render the draggable comparison slider inline.
+            if (tile.type === 'beforeAfter' && tile.beforeUrl && tile.afterUrl) {
+              return (
+                <Reveal
+                  key={`ba-${tile.beforeUrl}-${i}`}
+                  as="div"
+                  delay={(i % 4) * 50}
+                  className={[s.tile, s.tileBA].filter(Boolean).join(' ')}
+                >
+                  <BeforeAfter
+                    beforeUrl={tile.beforeUrl}
+                    afterUrl={tile.afterUrl}
+                    beforeLabel={t('partner.gallery.before')}
+                    afterLabel={t('partner.gallery.after')}
+                    alt={tile.label || partner.name}
+                  />
+                  {tile.label && <span className={s.baLabel}>{tile.label}</span>}
+                </Reveal>
+              )
+            }
             // Map this tile to its position in the (photo-only) lightbox list.
             const photoIndex = tile.url ? photos.findIndex((p) => p.url === tile.url) : -1
             const clickable = photoIndex !== -1

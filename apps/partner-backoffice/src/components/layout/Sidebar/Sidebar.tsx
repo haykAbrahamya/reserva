@@ -75,7 +75,9 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         {/* Nav */}
         <nav className={s.nav}>
           {NAV.map(group => {
-            const items = group.items.filter(item => isAdmin || !item.adminOnly)
+            const items = group.items.filter(item =>
+              (isAdmin || !item.adminOnly) && !(partner?.kind === 'single' && item.singleHidden)
+            )
             if (items.length === 0) return null
             return (
             <div key={group.section}>

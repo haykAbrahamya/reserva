@@ -15,6 +15,8 @@ import { getTelegramConnectLink } from '@/services/telegram.service'
 import { pushSupported, isIosSafari, notificationPermission, enableBookingPush } from '@/services/push.service'
 import { friendlyError } from '@/services/errors'
 import { ModalShell } from '@/components/ModalShell/ModalShell'
+import { partnerBrandVars } from '../partnerBrand'
+import { useAppSelector } from '@/store/hooks'
 import { useT, useI18n, LOCALE_META } from '@/i18n'
 import { addToCalendar } from '@/lib/ics'
 import s from './BookingFlow.module.scss'
@@ -34,6 +36,10 @@ const ANY_SPECIALIST = '__any__'
 export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, onClose }: Props) {
   const t = useT()
   const { locale } = useI18n()
+  // The modal portals to <body>, escaping the page's brand-scoped vars — so
+  // re-apply the partner's accent here for on-brand coloring.
+  const theme = useAppSelector((st) => st.theme.theme)
+  const brandVars = useMemo(() => partnerBrandVars(partner, theme === 'dark'), [partner, theme])
 
   // Only branches that can actually be booked (active + ≥1 active specialist).
   const locations = useMemo(() => bookableLocations(partner), [partner])
@@ -44,7 +50,10 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
     multiLocation ? null : locations[0]?.id ?? null
   )
   const [serviceId, setServiceId]       = useState<string | null>(seedServiceId)
-  const [specialistId, setSpecialistId] = useState<string | null>(null) // null = not chosen, ANY_SPECIALIST = any
+  // null = not chosen, ANY_SPECIALIST = any. Solo partners always auto-assign.
+  const [specialistId, setSpecialistId] = useState<string | null>(
+    partner.kind === 'single' ? ANY_SPECIALIST : null,
+  )
   const [date, setDate]                 = useState(fmtDateInput(new Date()))
   const [time, setTime]                 = useState<string | null>(null)
   const [name, setName]                 = useState('')
@@ -69,9 +78,16 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   const [slots, setSlots]           = useState<string[]>([])
   const [slotsLoading, setSlotsLoading] = useState(false)
 
-  // First step: location (multi-branch) → service → … or jump to specialist if seeded.
+  // First step: location (multi-branch) → service → … or jump to specialist if
+  // seeded. Solo partners never have a specialist step, so a seeded service
+  // jumps to date/time instead.
+  const soloMode = partner.kind === 'single'
   const [step, setStep] = useState<Step>(
-    multiLocation ? 'location' : (seedServiceId ? 'specialist' : 'service')
+    multiLocation
+      ? 'location'
+      : seedServiceId
+        ? (soloMode ? 'datetime' : 'specialist')
+        : 'service'
   )
 
   const service = useMemo(
@@ -118,12 +134,15 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   // ── Step navigation ──
   //  - location step only for multi-branch salons
   //  - specialist step is dropped for facility/entry services (no specialist)
+  // Solo professional: there's only one specialist, so never show the picker —
+  // the backend auto-assigns when specialistId is ANY_SPECIALIST.
+  const isSingle = partner.kind === 'single'
   const STEP_ORDER: Step[] = useMemo(() => {
     const steps: Step[] = ['service', 'datetime', 'details', 'confirm']
-    if (!isFacility) steps.splice(1, 0, 'specialist')
+    if (!isFacility && !isSingle) steps.splice(1, 0, 'specialist')
     if (multiLocation) steps.unshift('location')
     return steps
-  }, [multiLocation, isFacility])
+  }, [multiLocation, isFacility, isSingle])
   const stepIndex = STEP_ORDER.indexOf(step)
   const totalSteps = STEP_ORDER.length
 
@@ -134,7 +153,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
 
   const selectLocation = (id: string) => {
     setLocationId(id)
-    setSpecialistId(null)
+    setSpecialistId(isSingle ? ANY_SPECIALIST : null)
     setTime(null)
     setStep('service')
   }
@@ -142,9 +161,15 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   const selectService = (id: string) => {
     setServiceId(id)
     setTime(null)
-    setSpecialistId(null)
+    setSpecialistId(isSingle ? ANY_SPECIALIST : null)
     // Facility/entry service (spa): no specialist → jump straight to date/time.
     if (partner.services.find(sv => sv.id === id)?.requiresSpecialist === false) {
+      setStep('datetime')
+      return
+    }
+    // Solo professional: auto-assign the one specialist, skip the picker.
+    if (isSingle) {
+      setSpecialistId(ANY_SPECIALIST)
       setStep('datetime')
       return
     }
@@ -312,7 +337,11 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   return (
     <ModalShell open onClose={onClose} closeDuration={260}>
       {({ closing, requestClose: animatedClose }) => (
-    <div className={[s.overlay, closing ? s.closing : ''].filter(Boolean).join(' ')} onClick={animatedClose}>
+    <div
+      className={[s.overlay, closing ? s.closing : ''].filter(Boolean).join(' ')}
+      onClick={animatedClose}
+      style={brandVars}
+    >
       <div className={[s.modal, closing ? s.closing : ''].filter(Boolean).join(' ')} onClick={e => e.stopPropagation()}>
 
         {step !== 'success' && (
@@ -362,7 +391,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
                   service={service}
                   specialist={chosenSpecialist}
                   anySpecialist={specialistId === ANY_SPECIALIST}
-                  hideSpecialist={isFacility}
+                  hideSpecialist={isFacility || isSingle}
                   location={multiLocation ? chosenLocation?.name ?? null : null}
                   date={date}
                   time={time}
@@ -588,7 +617,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
                     service={service}
                     specialist={chosenSpecialist}
                     anySpecialist={specialistId === ANY_SPECIALIST}
-                    hideSpecialist={isFacility}
+                    hideSpecialist={isFacility || isSingle}
                     location={multiLocation ? chosenLocation?.name ?? null : null}
                     date={date}
                     time={time}

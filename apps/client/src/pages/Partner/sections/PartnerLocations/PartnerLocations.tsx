@@ -9,6 +9,7 @@ import s from './PartnerLocations.module.scss'
 interface Props {
   partner: PublicPartner
   onBook: () => void
+  tone?: 'cream' | 'plain'
 }
 
 /** Google Maps URL for a location — exact pin when coordinates exist, else the
@@ -21,7 +22,7 @@ function mapsUrl(loc: { address: string; name: string; lat?: number | null; lng?
   return base + encodeURIComponent(`${loc.name} ${loc.address}`.trim())
 }
 
-export function PartnerLocations({ partner, onBook }: Props) {
+export function PartnerLocations({ partner, onBook, tone = 'cream' }: Props) {
   const { t, tp } = useI18n()
 
   // Only functional branches (active + ≥1 active specialist). Shared helper so
@@ -34,7 +35,7 @@ export function PartnerLocations({ partner, onBook }: Props) {
   const [t1, t2] = partner.presentation.heroTints
 
   return (
-    <section className={s.section} id="locations">
+    <section className={[s.section, tone === 'plain' ? s.plain : ''].filter(Boolean).join(' ')} id="locations">
       <div className={s.inner}>
         <div className={s.head}>
           <div className={s.eyebrow}>{t('partner.locations.eyebrow')}</div>

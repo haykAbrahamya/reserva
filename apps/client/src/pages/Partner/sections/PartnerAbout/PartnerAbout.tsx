@@ -7,9 +7,10 @@ import s from './PartnerAbout.module.scss'
 
 interface Props {
   partner: PublicPartner
+  tone?: 'cream' | 'plain'
 }
 
-export function PartnerAbout({ partner }: Props) {
+export function PartnerAbout({ partner, tone = 'plain' }: Props) {
   const { presentation: p } = partner
   // Count only functional branches (active + ≥1 active specialist).
   const locations = bookableLocations(partner)
@@ -33,7 +34,7 @@ export function PartnerAbout({ partner }: Props) {
   ]
 
   return (
-    <section className={s.section}>
+    <section className={[s.section, tone === 'plain' ? s.plain : ''].filter(Boolean).join(' ')}>
       <div className={s.inner}>
         <Reveal className={s.about}>
           <div className={s.eyebrow}>{t('partner.about.eyebrow', { name: partner.name })}</div>

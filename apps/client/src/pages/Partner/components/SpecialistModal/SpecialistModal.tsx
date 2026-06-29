@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { X, CalendarCheck, Star, MessageSquarePlus, Loader2, MessagesSquare } from 'lucide-react'
 import { initials } from '@reserva/shared'
 import type { Specialist } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
+import { partnerBrandVars } from '../../partnerBrand'
+import { useAppSelector } from '@/store/hooks'
 import { ModalShell } from '@/components/ModalShell/ModalShell'
 import { StarRatingDisplay, StarRatingInput } from '@/components/StarRating/StarRating'
 import {
@@ -24,6 +26,8 @@ interface Props {
 export function SpecialistModal({ partner, specialist, onClose, onBook }: Props) {
   const [t1, t2] = partner.presentation.heroTints
   const { t, locale } = useI18n()
+  const theme = useAppSelector((st) => st.theme.theme)
+  const brandVars = useMemo(() => partnerBrandVars(partner, theme === 'dark'), [partner, theme])
 
   // Services this specialist offers.
   const services = partner.services.filter(sv => sv.active && specialist.services.includes(sv.id))
@@ -82,7 +86,7 @@ export function SpecialistModal({ partner, specialist, onClose, onBook }: Props)
   return (
     <ModalShell open onClose={onClose} closeDuration={280}>
       {({ closing, requestClose }) => (
-    <div className={[s.overlay, closing ? s.closing : ''].filter(Boolean).join(' ')} onClick={requestClose}>
+    <div className={[s.overlay, closing ? s.closing : ''].filter(Boolean).join(' ')} onClick={requestClose} style={brandVars}>
       <div className={[s.modal, closing ? s.closing : ''].filter(Boolean).join(' ')} onClick={e => e.stopPropagation()}>
         <button className={s.closeBtn} onClick={requestClose} aria-label={t('specialistModal.close')}><X size={16} /></button>
 

@@ -34,6 +34,7 @@ export function SignUp() {
   const [showPw, setShowPw] = useState(false)
 
   // Company
+  const [kind, setKind] = useState<'salon' | 'single'>('salon')
   const [company, setCompany] = useState('')
   const [companyType, setCompanyType] = useState('')
   const [slug, setSlug] = useState('')
@@ -73,6 +74,7 @@ export function SignUp() {
       await signupService.start({
         companyName: company.trim(),
         companyType: companyType.trim(),
+        kind,
         accent,
         slug: slug.trim() || undefined,
         adminName: name.trim(),
@@ -191,8 +193,33 @@ export function SignUp() {
                 </div>
 
                 <div className={s.form}>
+                  {/* Salon (team) vs single (solo) — drives the whole product shape */}
+                  <div className={s.kindField}>
+                    <label className={s.kindLabel}>{t('signup.kindLabel')}</label>
+                    <div className={s.kindRow}>
+                      <button
+                        type="button"
+                        className={[s.kindOption, kind === 'salon' ? s.kindActive : ''].filter(Boolean).join(' ')}
+                        onClick={() => setKind('salon')}
+                      >
+                        <Building2 size={18} />
+                        <span className={s.kindName}>{t('signup.kindSalon')}</span>
+                        <span className={s.kindHint}>{t('signup.kindSalonHint')}</span>
+                      </button>
+                      <button
+                        type="button"
+                        className={[s.kindOption, kind === 'single' ? s.kindActive : ''].filter(Boolean).join(' ')}
+                        onClick={() => setKind('single')}
+                      >
+                        <User size={18} />
+                        <span className={s.kindName}>{t('signup.kindSingle')}</span>
+                        <span className={s.kindHint}>{t('signup.kindSingleHint')}</span>
+                      </button>
+                    </div>
+                  </div>
+
                   <Field
-                    label={t('signup.companyName')}
+                    label={kind === 'single' ? t('signup.companyNameSingle') : t('signup.companyName')}
                     icon={<Building2 size={16} />}
                     value={company}
                     onChange={setCompany}

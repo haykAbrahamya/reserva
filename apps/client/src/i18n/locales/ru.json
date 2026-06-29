@@ -259,9 +259,15 @@
       "viewProfile": "Профиль",
       "viewProfileAria": "Открыть профиль {name}"
     },
+    "works": {
+      "title": "Наши работы"
+    },
     "gallery": {
       "title": "Внутри {name}",
+      "titleSingle": "Пространство",
       "hint": "Фотографии скоро появятся",
+      "before": "До",
+      "after": "После",
       "openImage": "Открыть фото",
       "counter": "{current} / {total}",
       "prev": "Предыдущее фото",
@@ -416,7 +422,13 @@
     "planChip": "Выбран тариф {plan}",
     "companyTitle": "Расскажите о своём салоне",
     "companySubtitle": "Это станет вашей страницей записи и панелью управления.",
+    "kindLabel": "Как вы работаете?",
+    "kindSalon": "Салон",
+    "kindSalonHint": "Команда из нескольких специалистов",
+    "kindSingle": "Один",
+    "kindSingleHint": "Только я — частный специалист",
     "companyName": "Название компании",
+    "companyNameSingle": "Ваше имя / бренд",
     "companyNamePlaceholder": "напр. Antheris",
     "companyType": "Тип бизнеса",
     "companyTypePlaceholder": "напр. Красота и эстетика",

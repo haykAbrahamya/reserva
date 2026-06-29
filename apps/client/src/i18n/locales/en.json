@@ -259,8 +259,14 @@
       "viewProfile": "View profile",
       "viewProfileAria": "View {name}'s profile"
     },
+    "works": {
+      "title": "Our work"
+    },
     "gallery": {
       "title": "Inside {name}",
+      "titleSingle": "The space",
+      "before": "Before",
+      "after": "After",
       "openImage": "View photo",
       "counter": "{current} / {total}",
       "prev": "Previous photo",
@@ -415,7 +421,13 @@
     "planChip": "{plan} plan selected",
     "companyTitle": "Tell us about your salon",
     "companySubtitle": "This becomes your booking page and backoffice.",
+    "kindLabel": "How do you work?",
+    "kindSalon": "Salon",
+    "kindSalonHint": "A team with several specialists",
+    "kindSingle": "Solo",
+    "kindSingleHint": "Just me — a solo professional",
     "companyName": "Company name",
+    "companyNameSingle": "Your name / brand",
     "companyNamePlaceholder": "e.g. Antheris",
     "companyType": "Business type",
     "companyTypePlaceholder": "e.g. Beauty & aesthetics",

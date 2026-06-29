@@ -19,6 +19,8 @@ export interface NavItem {
   end?: boolean
   adminOnly?: boolean
   primary?: boolean
+  /** Hidden for `single` (solo) partners — e.g. the Specialists/team section. */
+  singleHidden?: boolean
 }
 
 export interface NavSection {
@@ -35,7 +37,7 @@ export const NAV: NavSection[] = [
   ]},
   { section: 'catalog', items: [
     { to: '/services',    labelKey: 'nav.services',    icon: Sparkles, primary: true },
-    { to: '/specialists', labelKey: 'nav.specialists', icon: User },
+    { to: '/specialists', labelKey: 'nav.specialists', icon: User, singleHidden: true },
     { to: '/hours',       labelKey: 'nav.hours',       icon: Clock },
     { to: '/locations',   labelKey: 'nav.locations',   icon: MapPin, adminOnly: true },
   ]},

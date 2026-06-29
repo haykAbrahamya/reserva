@@ -105,6 +105,42 @@
 }
 
 /* ── Drop zone ── */
+/* ── Before/After tile + upload ── */
+.baSplit { position: absolute; inset: 0; display: flex; }
+.baSplit img { width: 50%; height: 100%; object-fit: cover; }
+.baBadge {
+  position: absolute; top: 8px; left: 8px; z-index: 2;
+  padding: 3px 8px; border-radius: 999px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  color: #fff; background: rgba(20, 17, 14, 0.6);
+}
+.baAddBtn {
+  display: inline-flex; align-items: center; gap: 7px;
+  margin-top: 12px; padding: 9px 14px;
+  border: 1px solid $line-2; border-radius: $r-1;
+  background: $bg-1; color: $fg-1;
+  font-family: $font-sans; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: background 0.15s, border-color 0.15s;
+  &:hover { background: $bg-2; border-color: $line-strong; }
+}
+.baPickers { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.baPicker {
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  padding: 0; border: none; background: none; cursor: pointer;
+}
+.baPicker .baPreview,
+.baPickerEmpty {
+  /* Keep compact (4:3) so the modal fits without scrolling. */
+  width: 100%; aspect-ratio: 4 / 3; border-radius: $r-2;
+  object-fit: cover; border: 1.5px dashed $line-strong; background: $bg-2;
+}
+.baPreview { border-style: solid; border-color: $line-2; }
+.baPickerEmpty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; color: $fg-3; font-size: 12px; font-weight: 600;
+}
+.baPickerLabel { font-size: 12.5px; font-weight: 600; color: $fg-1; }
+
 .dropZone {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 8px; text-align: center;

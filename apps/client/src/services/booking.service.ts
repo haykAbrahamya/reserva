@@ -25,6 +25,11 @@ function resolveImageUrl(url?: string): string | undefined {
   return `${API_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`
 }
 
+/** Resolve all image urls on a gallery/works tile (simple + before/after). */
+function resolveTile<T extends { url?: string; beforeUrl?: string; afterUrl?: string }>(g: T): T {
+  return { ...g, url: resolveImageUrl(g.url), beforeUrl: resolveImageUrl(g.beforeUrl), afterUrl: resolveImageUrl(g.afterUrl) }
+}
+
 class BookingApiError extends Error {
   constructor(readonly code: string, message: string) {
     super(message)
@@ -55,6 +60,7 @@ interface ApiPartner {
   type: string
   accent: string
   bookingsEnabled?: boolean
+  kind?: 'salon' | 'single'
   locations: PublicPartner['locations']
   services: Service[]
   specialists: ApiSpecialist[]
@@ -68,9 +74,11 @@ interface ApiPartner {
     rating: number | string
     reviews: number
     heroTints: string[]
-    gallery: { url?: string; label?: string; tone?: string }[]
+    gallery: ApiGalleryTile[]
+    works?: ApiGalleryTile[]
   } | null
 }
+type ApiGalleryTile = { type?: 'simple' | 'beforeAfter'; url?: string; beforeUrl?: string; afterUrl?: string; label?: string; tone?: string }
 
 function toPublicPartner(p: ApiPartner): PublicPartner {
   const presentation: PartnerPresentation = {
@@ -85,10 +93,8 @@ function toPublicPartner(p: ApiPartner): PublicPartner {
     heroTints: (p.presentation?.heroTints?.length
       ? (p.presentation.heroTints.slice(0, 2) as [string, string])
       : [p.accent, p.accent]) as [string, string],
-    gallery: (p.presentation?.gallery ?? []).map((g) => ({
-      ...g,
-      url: resolveImageUrl(g.url),
-    })),
+    gallery: (p.presentation?.gallery ?? []).map(resolveTile),
+    works: (p.presentation?.works ?? []).map(resolveTile),
   }
   return {
     id: p.id,
@@ -98,6 +104,7 @@ function toPublicPartner(p: ApiPartner): PublicPartner {
     accent: p.accent,
     // Default to true when the API omits it (older payloads / safety).
     bookingsEnabled: p.bookingsEnabled !== false,
+    kind: p.kind === 'single' ? 'single' : 'salon',
     locations: p.locations,
     services: p.services,
     specialists: p.specialists.map(({ serviceIds, ...rest }) => ({ ...rest, services: serviceIds })),

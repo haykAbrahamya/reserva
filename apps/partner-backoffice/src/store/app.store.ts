@@ -18,6 +18,8 @@ export type PartnerProfile = Omit<Partner, 'locations' | 'services' | 'specialis
   autoConfirmBookings?: boolean
   /** When false, the public page is contact-only (booking CTAs hidden/replaced). */
   bookingsEnabled?: boolean
+  /** 'salon' (team) or 'single' (solo). Drives nav/labels (hide team etc.). */
+  kind?: 'salon' | 'single'
   /** Public marketing fields edited in the Storefront section. */
   presentation?: {
     about?: string

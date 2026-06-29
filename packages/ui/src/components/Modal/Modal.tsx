@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { Button } from '../Button/Button'
 import { useDragDismiss } from '../../hooks/useDragDismiss'
@@ -80,7 +81,9 @@ export function Modal({ open, onClose, title, subtitle, children, footer, size =
     </>
   )
 
-  return (
+  // Portal to <body> so a transformed/overflow-clipped ancestor can never trap
+  // the position:fixed overlay (which would dock it mid-page instead of centered).
+  return createPortal(
     <div
       className={[s.overlay, closing ? s.closing : ''].filter(Boolean).join(' ')}
       onClick={handleClose}
@@ -102,7 +105,8 @@ export function Modal({ open, onClose, title, subtitle, children, footer, size =
           {inner}
         </div>
       )}
-    </div>
+    </div>,
+    document.body,
   )
 }
 
@@ -141,7 +145,7 @@ export function Drawer({ open, onClose, title, subtitle, children, footer }: Omi
     </>
   )
 
-  return (
+  return createPortal(
     <div
       className={[s.overlay, closing ? s.closing : ''].filter(Boolean).join(' ')}
       onClick={handleClose}
@@ -163,6 +167,7 @@ export function Drawer({ open, onClose, title, subtitle, children, footer }: Omi
           {inner}
         </div>
       )}
-    </div>
+    </div>,
+    document.body,
   )
 }

@@ -1,5 +1,16 @@
 import type { Partner } from '@reserva/shared'
 
+/** A gallery / works tile: a simple photo, a before/after pair, or a legacy
+ *  color-tone placeholder. */
+export interface GalleryTile {
+  type?: 'simple' | 'beforeAfter'
+  url?: string
+  beforeUrl?: string
+  afterUrl?: string
+  label?: string
+  tone?: string
+}
+
 /**
  * Extra public-facing presentation fields layered on top of the core
  * Partner domain model. These power the salon's branded booking page.
@@ -10,9 +21,13 @@ export interface PartnerPresentation {
   rating: number
   logoUrl?: string;
   reviews: number
-  /** Gallery tiles. New tiles carry an uploaded image `url`; legacy/seed tiles
-   *  carry only a color `tone` + label (rendered as a colored placeholder). */
-  gallery: { url?: string; label?: string; tone?: string }[]
+  /** Gallery / works tiles. Shapes:
+   *  - simple photo: `{ url }` (legacy items have no `type` → simple)
+   *  - before/after: `{ type: 'beforeAfter', beforeUrl, afterUrl }`
+   *  - legacy seed tile: color `tone` + label, no url. */
+  gallery: GalleryTile[]
+  /** "Works" — photos of work done; tiles may be simple or before/after. */
+  works?: GalleryTile[]
   hours: string
   /** Soft brand tints for the hero gradient. */
   heroTints: [string, string]
@@ -26,6 +41,8 @@ export type PublicPartner = Partner & {
   /** When false, the page is contact-only — booking CTAs are hidden/replaced.
    *  Optional in mock data; the API always provides it (defaults to true). */
   bookingsEnabled?: boolean
+  /** 'salon' (team) or 'single' (solo). Optional in mock; API provides it. */
+  kind?: 'salon' | 'single'
 }
 
 export const PARTNERS: PublicPartner[] = [

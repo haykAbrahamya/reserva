@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { MoreHorizontal, Plus, LogOut, KeyRound } from 'lucide-react'
 import { useAuthStore } from '@/store/auth.store'
+import { usePartner } from '@/store/app.store'
 import { useIsAdmin } from '@/store/auth.hooks'
 import { authService } from '@/services/auth.service'
 import { ChangePasswordModal } from '@/components/account/ChangePasswordModal/ChangePasswordModal'
@@ -23,6 +24,7 @@ export function MobileTabBar() {
   const user   = useAuthStore(st => st.user)
   const logout = useAuthStore(st => st.logout)
   const isAdmin = useIsAdmin()
+  const partner = usePartner()
   const navigate = useNavigate()
   const t = useT()
 
@@ -93,7 +95,9 @@ export function MobileTabBar() {
 
             <div className={s.sheetItems}>
               {MORE_SECTIONS.map(group => {
-                const items = group.items.filter(item => isAdmin || !item.adminOnly)
+                const items = group.items.filter(item =>
+                  (isAdmin || !item.adminOnly) && !(partner?.kind === 'single' && item.singleHidden)
+                )
                 if (items.length === 0) return null
                 return (
                   <div key={group.section} className={s.sheetGroup}>

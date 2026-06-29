@@ -522,6 +522,74 @@
     "label": "Language",
     "switcherAria": "Change language"
   },
+  "storefront": {
+    "title": "Storefront",
+    "subtitle": "Everything visitors see on your public booking page.",
+    "gallery": {
+      "title": "Photo gallery",
+      "desc": "Shown in the “Inside …” section of your page. Drag to reorder — the first photo is featured large."
+    },
+    "works": {
+      "title": "Works",
+      "desc": "Show off your work. Add a normal photo or a before / after pair (a draggable comparison slider on your page)."
+    },
+    "photo": {
+      "dragFull": "Drag photos here\nor click to browse",
+      "dragShort": "Add photo",
+      "uploading": "Uploading…",
+      "addBeforeAfter": "Add before / after",
+      "beforeAfter": "Before / After",
+      "featured": "Featured",
+      "remove": "Remove",
+      "reorder": "Drag to reorder",
+      "added": "Photo added",
+      "removed": "Photo removed",
+      "baAdded": "Before / after added",
+      "orderError": "Could not save the new order",
+      "uploadFailed": "Upload failed",
+      "removeFailed": "Could not remove photo",
+      "maxImages": "You can upload up to {n} images"
+    },
+    "ba": {
+      "title": "Add before / after",
+      "subtitle": "Two photos shown as a draggable comparison slider on your page.",
+      "before": "Before",
+      "after": "After",
+      "cancel": "Cancel",
+      "add": "Add",
+      "adding": "Uploading…"
+    },
+    "about": {
+      "title": "About",
+      "desc": "The short story shown in the “About” section of your public page.",
+      "placeholder": "Tell visitors what makes your salon special — your story, your team, what to expect…",
+      "save": "Save about",
+      "saving": "Saving…",
+      "saved": "About text updated",
+      "error": "Could not save about text"
+    },
+    "brand": {
+      "title": "Brand color",
+      "desc": "Your accent color — used for buttons, highlights and the hero gradient.",
+      "pick": "Click to pick a color",
+      "invalid": "Use a #RRGGBB hex color",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Brand color updated",
+      "error": "Could not save brand color",
+      "preview": "Hero gradient preview"
+    },
+    "social": {
+      "title": "Social links",
+      "desc": "Shown as icons on your public page. Paste a full URL, or leave blank to hide.",
+      "urlError": "Enter a full URL (https://…)",
+      "open": "Open",
+      "save": "Save links",
+      "saving": "Saving…",
+      "saved": "Social links updated",
+      "error": "Could not save social links"
+    }
+  },
   "settings": {
     "title": "Settings",
     "subtitle": "Manage your public address and how bookings work.",

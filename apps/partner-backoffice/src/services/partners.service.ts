@@ -67,12 +67,18 @@ export interface SpecialistReview {
   createdAt: string
 }
 
-/** A storefront gallery tile. New tiles carry an uploaded image `url`. */
+/** A storefront gallery / works tile: a simple photo or a before/after pair. */
 export interface GalleryItem {
+  type?: 'simple' | 'beforeAfter'
   url?: string
+  beforeUrl?: string
+  afterUrl?: string
   label?: string
   tone?: string
 }
+
+/** The two independent photo lists: 'gallery' (Inside) and 'works'. */
+export type PhotoList = 'gallery' | 'works'
 
 export interface PartnerPresentationFields {
   about?: string
@@ -83,6 +89,7 @@ export interface PartnerPresentationFields {
   /** Hero gradient tints [from, to]. */
   heroTints?: string[]
   gallery?: GalleryItem[]
+  works?: GalleryItem[]
 }
 
 export type PartnerProfileResponse = Omit<Partner, 'slug'> & {
@@ -91,6 +98,7 @@ export type PartnerProfileResponse = Omit<Partner, 'slug'> & {
   locationCount?: number
   autoConfirmBookings?: boolean
   bookingsEnabled?: boolean
+  kind?: 'salon' | 'single'
   /** Featured in the public marketplace (/salons). Read-only here — curated by
    *  Reserva platform staff from the internal console. */
   marketplaceListed?: boolean
@@ -131,20 +139,33 @@ export const partnersService = {
     return apiPatch<PartnerProfileResponse>('/partner', patch)
   },
 
-  // ── Storefront gallery (admin) ──
-  /** Upload one image; returns the updated gallery list. */
-  async uploadGalleryImage(file: File, label = ''): Promise<GalleryItem[]> {
+  // ── Storefront photo lists (admin): 'gallery' (Inside) or 'works' ──
+  /** Upload one simple photo to a list; returns the updated list. */
+  async uploadGalleryImage(file: File, label = '', list: PhotoList = 'gallery'): Promise<GalleryItem[]> {
     const form = new FormData()
     form.append('file', file)
+    form.append('list', list)
     if (label) form.append('label', label)
     const res = await http.post('/partner/gallery', form, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
     return (res.data?.data ?? res.data) as GalleryItem[]
   },
-  /** Remove an image by its url; returns the updated gallery list. */
-  async removeGalleryImage(url: string): Promise<GalleryItem[]> {
-    const res = await http.delete('/partner/gallery', { data: { url } })
+  /** Upload a before/after tile (two images) to a list; returns updated list. */
+  async uploadBeforeAfter(before: File, after: File, label = '', list: PhotoList = 'works'): Promise<GalleryItem[]> {
+    const form = new FormData()
+    form.append('before', before)
+    form.append('after', after)
+    form.append('list', list)
+    if (label) form.append('label', label)
+    const res = await http.post('/partner/gallery/before-after', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    return (res.data?.data ?? res.data) as GalleryItem[]
+  },
+  /** Remove an image by any of its urls from a list; returns the updated list. */
+  async removeGalleryImage(url: string, list: PhotoList = 'gallery'): Promise<GalleryItem[]> {
+    const res = await http.delete('/partner/gallery', { data: { url, list } })
     return (res.data?.data ?? res.data) as GalleryItem[]
   },
   // ── Brand logo (admin) ──
@@ -163,9 +184,9 @@ export const partnersService = {
     return (res.data?.data ?? res.data) as { logoUrl: string }
   },
 
-  /** Persist a new tile order; returns the updated gallery list. */
-  async reorderGallery(urls: string[]): Promise<GalleryItem[]> {
-    return apiPatch<GalleryItem[]>('/partner/gallery/order', { urls })
+  /** Persist a new tile order for a list; returns the updated list. */
+  async reorderGallery(urls: string[], list: PhotoList = 'gallery'): Promise<GalleryItem[]> {
+    return apiPatch<GalleryItem[]>('/partner/gallery/order', { urls, list })
   },
 
   // ── Services ──

@@ -27,6 +27,8 @@ async function api<T>(path: string, init?: RequestInit): Promise<T> {
 export interface SignupInput {
   companyName: string
   companyType: string
+  /** 'salon' (team) or 'single' (solo professional). */
+  kind?: 'salon' | 'single'
   accent: string
   /** Optional public handle; omitted → partner created without one. */
   slug?: string

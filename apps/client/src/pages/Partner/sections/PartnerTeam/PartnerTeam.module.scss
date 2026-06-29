@@ -104,3 +104,5 @@
   /* On touch devices there's no hover — keep it gently visible. */
   @media (hover: none) { opacity: 0.85; transform: none; }
 }
+
+.plain { background: var(--bg-1); }

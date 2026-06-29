@@ -259,9 +259,15 @@
       "viewProfile": "Դիտել պրոֆիլը",
       "viewProfileAria": "Դիտել {name}-ի պրոֆիլը"
     },
+    "works": {
+      "title": "Մեր աշխատանքները"
+    },
     "gallery": {
       "title": "{name}-ի ներսում",
+      "titleSingle": "Տարածքը",
       "hint": "Լուսանկարները շուտով",
+      "before": "Մինչ",
+      "after": "Հետո",
       "openImage": "Դիտել լուսանկարը",
       "counter": "{current} / {total}",
       "prev": "Նախորդ լուսանկարը",
@@ -416,7 +422,13 @@
     "planChip": "Ընտրված է {plan} փաթեթը",
     "companyTitle": "Պատմեք ձեր սրահի մասին",
     "companySubtitle": "Սա կդառնա ձեր ամրագրման էջն ու կառավարման վահանակը։",
+    "kindLabel": "Ինչպե՞ս եք աշխատում",
+    "kindSalon": "Սալոն",
+    "kindSalonHint": "Թիմ՝ մի քանի մասնագետով",
+    "kindSingle": "Անհատ",
+    "kindSingleHint": "Միայն ես՝ անհատ մասնագետ",
     "companyName": "Ընկերության անվանում",
+    "companyNameSingle": "Ձեր անունը / բրենդը",
     "companyNamePlaceholder": "օր․՝ Antheris",
     "companyType": "Բիզնեսի տեսակ",
     "companyTypePlaceholder": "օր․՝ Գեղեցկություն և էսթետիկա",

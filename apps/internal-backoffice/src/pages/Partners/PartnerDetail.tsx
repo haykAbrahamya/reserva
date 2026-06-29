@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Save, MapPin, Users, CalendarDays, Store, ExternalLink, Trash2, AlertTriangle, SlidersHorizontal } from 'lucide-react'
-import { Avatar, Badge, Button, Input, Textarea, Toggle, Empty, ConfirmDialog, useToast } from '@/components/ui'
+import { ArrowLeft, Save, MapPin, Users, User, CalendarDays, Store, ExternalLink, Trash2, AlertTriangle, SlidersHorizontal } from 'lucide-react'
+import { Avatar, Badge, Button, Input, Textarea, Toggle, Empty, ConfirmDialog, SegmentedFilter, useToast } from '@/components/ui'
 import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
 import { useResource } from '@/store/useResource'
 import { partnersService, type UpdatePartnerInput } from '@/services/partners.service'
@@ -93,6 +93,17 @@ export function PartnerDetailPage() {
     }
   }
 
+  const changeKind = async (kind: 'salon' | 'single') => {
+    if (kind === partner.kind) return
+    try {
+      await partnersService.setKind(id, kind)
+      toast(kind === 'single' ? 'Switched to solo mode' : 'Switched to salon mode')
+      await reload()
+    } catch (err) {
+      toast(errorMessage(err))
+    }
+  }
+
   const doHardDelete = async () => {
     setDeleting(true)
     try {
@@ -178,6 +189,23 @@ export function PartnerDetailPage() {
           <h2 className={s.cardTitle}><SlidersHorizontal size={15} className={s.cardTitleIcon} /> Visibility &amp; booking</h2>
 
           <div className={s.toggleList}>
+            <div className={s.toggleRow}>
+              <div className={s.toggleText}>
+                <div className={s.toggleLabel}><User size={13} /> Partner type</div>
+                <div className={s.toggleDesc}>Solo hides the team/specialists and skips the picker.</div>
+              </div>
+              <SegmentedFilter<'salon' | 'single'>
+                size="sm"
+                ariaLabel="Partner type"
+                value={partner.kind}
+                onChange={changeKind}
+                options={[
+                  { value: 'salon', label: 'Salon' },
+                  { value: 'single', label: 'Solo' },
+                ]}
+              />
+            </div>
+
             <div className={s.toggleRow}>
               <div className={s.toggleText}>
                 <div className={s.toggleLabel}><Store size={13} /> Marketplace listing</div>

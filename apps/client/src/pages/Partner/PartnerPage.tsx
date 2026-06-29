@@ -125,13 +125,29 @@ export function PartnerPage() {
 
       <main>
         {/* Flow: hook → what they came for (services) → trust (about) →
-            where + who → vibe (gallery) → final CTA */}
+            where + who → vibe (gallery) → final CTA.
+            Backgrounds alternate over the VISIBLE sections (computed below), so a
+            hidden section (e.g. no team for a single, empty works) never leaves
+            two same-tone bands adjacent. */}
         <PartnerHero partner={partner} onBook={() => openBooking()} />
-        <PartnerServices partner={partner} onBook={openBooking} />
-        <PartnerAbout partner={partner} />
-        <PartnerLocations partner={partner} onBook={() => openBooking()} />
-        <PartnerTeam partner={partner} onSelect={setActiveSpecialist} />
-        <PartnerGallery partner={partner} />
+        {(() => {
+          const showTeam = partner.kind !== 'single' && partner.specialists.some((sp) => sp.active)
+          const showGallery = (partner.presentation.gallery?.length ?? 0) > 0
+          const showWorks = (partner.presentation.works?.length ?? 0) > 0
+          // Ordered list of visible content sections; assign alternating tones.
+          let i = 0
+          const tone = () => (i++ % 2 === 0 ? 'cream' : 'plain') as 'cream' | 'plain'
+          return (
+            <>
+              <PartnerServices partner={partner} onBook={openBooking} tone={tone()} />
+              <PartnerAbout partner={partner} tone={tone()} />
+              <PartnerLocations partner={partner} onBook={() => openBooking()} tone={tone()} />
+              {showTeam && <PartnerTeam partner={partner} onSelect={setActiveSpecialist} tone={tone()} />}
+              {showGallery && <PartnerGallery partner={partner} variant="gallery" tone={tone()} />}
+              {showWorks && <PartnerGallery partner={partner} variant="works" tone={tone()} />}
+            </>
+          )
+        })()}
         <PartnerFooter partner={partner} onBook={() => openBooking()} />
       </main>
 

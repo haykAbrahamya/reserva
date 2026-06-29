@@ -10,11 +10,12 @@ import s from './PartnerServices.module.scss'
 interface Props {
   partner: PublicPartner
   onBook: (serviceId: string) => void
+  tone?: 'cream' | 'plain'
 }
 
 const ALL = 'All'
 
-export function PartnerServices({ partner, onBook }: Props) {
+export function PartnerServices({ partner, onBook, tone = 'cream' }: Props) {
   const t = useT()
   const bookable = canBook(partner)
   const services = useMemo(
@@ -32,7 +33,7 @@ export function PartnerServices({ partner, onBook }: Props) {
   const filtered = cat === ALL ? services : services.filter(sv => sv.category === cat)
 
   return (
-    <section className={s.section} id="services">
+    <section className={[s.section, tone === 'plain' ? s.plain : ''].filter(Boolean).join(' ')} id="services">
       <div className={s.inner}>
         <div className={s.head}>
           <div className={s.eyebrow}>{t('partner.services.eyebrow')}</div>

@@ -20,6 +20,8 @@ export interface PartnerListItem {
   marketplaceListed: boolean
   /** Whether the public page accepts online bookings (off = contact-only). */
   bookingsEnabled: boolean
+  /** 'salon' (team) or 'single' (solo professional). */
+  kind: 'salon' | 'single'
   createdAt: string
   counts: PartnerCounts
 }
@@ -125,6 +127,11 @@ export const partnersService = {
   /** Enable/disable the public booking flow (off = contact-only page). */
   setBookings(id: string, enabled: boolean): Promise<PartnerDetail> {
     return apiPatch<PartnerDetail>(`/platform/partners/${id}/bookings`, { enabled })
+  },
+
+  /** Switch between salon (team) and single (solo) mode. */
+  setKind(id: string, kind: 'salon' | 'single'): Promise<PartnerDetail> {
+    return apiPatch<PartnerDetail>(`/platform/partners/${id}/kind`, { kind })
   },
 
   /** PERMANENTLY delete a partner and all connected data (owner-only). */

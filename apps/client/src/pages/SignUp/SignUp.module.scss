@@ -222,6 +222,35 @@
 /* ── Form ── */
 .form { display: flex; flex-direction: column; gap: 15px; }
 .accentField { margin-top: 2px; }
+
+/* ── Salon / Single chooser ── */
+.kindField { display: flex; flex-direction: column; gap: 8px; }
+.kindLabel { font-size: 13px; font-weight: 500; color: $fg-1; }
+.kindRow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.kindOption {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 13px 14px;
+  border-radius: $r-2;
+  border: 1.5px solid $line-2;
+  background: $bg-1;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  color: $fg-2;
+  svg { color: $fg-3; transition: color 0.15s; }
+  &:hover { border-color: $line-strong; }
+}
+.kindActive {
+  border-color: $accent;
+  background: $accent-soft;
+  box-shadow: 0 0 0 3px $accent-soft;
+  svg { color: $accent; }
+}
+.kindName { font-size: 14px; font-weight: 600; color: $fg-0; }
+.kindHint { font-size: 12px; color: $fg-3; line-height: 1.35; }
 .submitError {
   display: flex;
   align-items: center;

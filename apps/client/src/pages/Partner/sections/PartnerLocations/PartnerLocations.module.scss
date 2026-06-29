@@ -159,3 +159,5 @@
 /* Directions stands out a touch with the accent icon. */
 .mapBtn svg { color: $accent-contrast; }
 .mapBtn:hover { color: $accent-contrast; border-color: $accent; }
+
+.plain { background: var(--bg-1); }

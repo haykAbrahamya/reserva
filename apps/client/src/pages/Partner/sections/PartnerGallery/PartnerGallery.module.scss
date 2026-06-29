@@ -56,6 +56,10 @@
   &.clickable { cursor: pointer; }
   &.clickable:hover .image { transform: scale(1.08); }
 
+  /* Before/after tile hosts the interactive slider — no padding/zoom hover. */
+  &.tileBA { padding: 0; cursor: default; }
+  &.tileBA:hover { transform: none; }
+
   /* first tile spans 2x2 */
   &:first-child {
     grid-column: span 2;
@@ -86,6 +90,22 @@
   transition: transform 0.4s cubic-bezier(0.22, 0.86, 0.23, 1);
 }
 .tile:hover .image { transform: scale(1.05); }
+
+.baLabel {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 4;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(20, 17, 14, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  pointer-events: none;
+}
 
 /* Brand-tinted wash over photos (color set inline). Normal blend so the hue is
    dependably visible (blend modes can vanish on mid-tone photos). The gradient
@@ -131,3 +151,5 @@
     linear-gradient(0deg, rgba(0,0,0,0.28), transparent 55%);
   pointer-events: none;
 }
+
+.plain { background: var(--bg-1); }

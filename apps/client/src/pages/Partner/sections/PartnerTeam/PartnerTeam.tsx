@@ -9,9 +9,10 @@ import s from './PartnerTeam.module.scss'
 interface Props {
   partner: PublicPartner
   onSelect: (specialist: Specialist) => void
+  tone?: 'cream' | 'plain'
 }
 
-export function PartnerTeam({ partner, onSelect }: Props) {
+export function PartnerTeam({ partner, onSelect, tone = 'plain' }: Props) {
   const { t, tp } = useI18n()
   const team = partner.specialists.filter(sp => sp.active)
   const [t1, t2] = partner.presentation.heroTints
@@ -19,7 +20,7 @@ export function PartnerTeam({ partner, onSelect }: Props) {
   if (team.length === 0) return null
 
   return (
-    <section className={s.section} id="team">
+    <section className={[s.section, tone === 'plain' ? s.plain : ''].filter(Boolean).join(' ')} id="team">
       <div className={s.inner}>
         <div className={s.head}>
           <div className={s.eyebrow}>{t('partner.team.eyebrow')}</div>
