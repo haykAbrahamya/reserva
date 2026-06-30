@@ -14,6 +14,8 @@
 .h1 { font-family: $font-serif; font-size: 30px; letter-spacing: -0.022em; margin: 0 0 4px; }
 .sub { font-size: 13px; color: $fg-2; margin: 0; }
 
+.headActions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
 .spin { animation: bo-spin 0.7s linear infinite; }
 
 .tableWrap {

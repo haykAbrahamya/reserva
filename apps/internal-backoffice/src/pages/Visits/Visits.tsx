@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { BarChart3, Smartphone, Tablet, Monitor, RefreshCw } from 'lucide-react'
-import { Button, Table, Th, Td, Tr, Empty, Pagination } from '@/components/ui'
+import { BarChart3, Smartphone, Tablet, Monitor, RefreshCw, Trash2 } from 'lucide-react'
+import { Button, Table, Th, Td, Tr, Empty, Pagination, ConfirmDialog, useToast } from '@/components/ui'
 import { useResource } from '@/store/useResource'
 import { visitsService, type Visit } from '@/services/visits.service'
 import { fmtWhen, fmtIp, fmtGeo, fmtBrowser, fmtOs } from './format'
@@ -14,9 +14,12 @@ function DeviceIcon({ type }: { type: string | null }) {
 }
 
 export function Visits() {
+  const toast = useToast()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(20)
   const [selected, setSelected] = useState<Visit | null>(null)
+  const [confirmClear, setConfirmClear] = useState(false)
+  const [clearing, setClearing] = useState(false)
 
   const { data: result, loading, reload } = useResource(
     () => visitsService.list({ page, pageSize }),
@@ -30,6 +33,21 @@ export function Visits() {
   const to = Math.min(page * pageSize, total)
   const changePageSize = (n: number) => { setPageSize(n); setPage(1) }
 
+  const clearHistory = async () => {
+    setClearing(true)
+    try {
+      await visitsService.clearAll()
+      toast('Visit history cleared')
+      setConfirmClear(false)
+      setPage(1)
+      await reload()
+    } catch {
+      toast('Couldn’t clear history. Please try again.')
+    } finally {
+      setClearing(false)
+    }
+  }
+
   return (
     <div className={s.page}>
       <div className={s.head}>
@@ -37,9 +55,16 @@ export function Visits() {
           <h1 className={s.h1}>Visits</h1>
           <p className={s.sub}>{total.toLocaleString()} {total === 1 ? 'page view' : 'page views'} on reserva.am</p>
         </div>
-        <Button variant="ghost" onClick={() => void reload()} disabled={loading}>
-          <RefreshCw size={14} className={loading ? s.spin : undefined} /> Refresh
-        </Button>
+        <div className={s.headActions}>
+          <Button variant="ghost" onClick={() => void reload()} disabled={loading}>
+            <RefreshCw size={14} className={loading ? s.spin : undefined} /> Refresh
+          </Button>
+          {total > 0 && (
+            <Button variant="danger" onClick={() => setConfirmClear(true)} disabled={clearing}>
+              <Trash2 size={14} /> Clear history
+            </Button>
+          )}
+        </div>
       </div>
 
       {total === 0 ? (
@@ -94,6 +119,18 @@ export function Visits() {
       )}
 
       <VisitDetail visit={selected} onClose={() => setSelected(null)} />
+
+      <ConfirmDialog
+        open={confirmClear}
+        variant="danger"
+        title="Clear visit history?"
+        message={`This permanently deletes all ${total.toLocaleString()} recorded page views. This can’t be undone.`}
+        confirmLabel="Clear history"
+        cancelLabel="Cancel"
+        loading={clearing}
+        onConfirm={clearHistory}
+        onClose={() => { if (!clearing) setConfirmClear(false) }}
+      />
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import type { Paginated, PageParams } from '@/types'
-import { apiGet } from './http'
+import { apiGet, apiDelete } from './http'
 
 /** A single page view recorded by the public client app. */
 export interface Visit {
@@ -37,5 +37,10 @@ export const visitsService = {
         ...(params.country ? { country: params.country } : {}),
       },
     })
+  },
+
+  /** Permanently delete the entire visit history. */
+  clearAll(): Promise<void> {
+    return apiDelete('/platform/visits')
   },
 }
