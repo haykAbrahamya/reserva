@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Mail, Eye, EyeOff, AlertCircle, CalendarClock, Users, TrendingUp } from 'lucide-react'
+import { AtSign, Eye, EyeOff, AlertCircle, CalendarClock, Users, TrendingUp } from 'lucide-react'
 import { useAuthStore } from '@/store/auth.store'
 import { authService } from '@/services/auth.service'
 import { errorMessage } from '@/utils/errors'
@@ -46,7 +46,7 @@ export function Login() {
   const validate = () => {
     let ok = true
     setEmailErr(null); setPassErr(null); setError(null)
-    if (!email.trim())  { setEmailErr(t('login.emailRequired'));    ok = false }
+    if (!email.trim())  { setEmailErr(t('login.identifierRequired'));    ok = false }
     if (!password)      { setPassErr(t('login.passwordRequired'));  ok = false }
     return ok
   }
@@ -135,21 +135,21 @@ export function Login() {
               </div>
             )}
 
-            {/* Email */}
+            {/* Email or phone — login accepts either (see auth.findByLogin). */}
             <div className={s.field}>
-              <label className={s.label} htmlFor="email">{t('login.emailLabel')}</label>
+              <label className={s.label} htmlFor="login">{t('login.identifierLabel')}</label>
               <div className={s.inputWrap}>
                 <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="admin@antheris.am"
+                  id="login"
+                  type="text"
+                  autoComplete="username"
+                  placeholder={t('login.identifierPlaceholder')}
                   value={email}
                   onChange={e => { setEmail(e.target.value); setEmailErr(null); setError(null) }}
                   onKeyDown={e => e.key === 'Enter' && passRef.current?.focus()}
                   className={[s.input, emailErr ? s.hasError : ''].filter(Boolean).join(' ')}
                 />
-                <span className={s.inputIcon}><Mail size={16} /></span>
+                <span className={s.inputIcon}><AtSign size={16} /></span>
               </div>
               {emailErr && (
                 <span className={s.fieldError}><AlertCircle size={12} />{emailErr}</span>
