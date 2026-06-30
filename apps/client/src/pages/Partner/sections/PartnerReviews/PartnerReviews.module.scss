@@ -1,0 +1,59 @@
+@use 'variables' as *;
+
+.section {
+  padding: 56px 24px;
+  @media (max-width: 600px) { padding: 44px 18px; }
+}
+
+.inner { max-width: 720px; margin: 0 auto; }
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.headText { min-width: 0; }
+.eyebrow {
+  font-size: 12px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: $accent-contrast; margin-bottom: 10px;
+}
+.title {
+  font-family: $font-serif;
+  font-size: clamp(26px, 4vw, 38px);
+  letter-spacing: -0.025em;
+  color: $fg-0;
+  margin: 0;
+}
+
+/* Rating summary chip — mirrors the specialist banner's badge styling. */
+.ratingBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: $accent-soft;
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+  font-size: 14px;
+  color: $fg-0;
+
+  .star { color: #F5A623; }
+  strong { font-size: 16px; letter-spacing: -0.01em; }
+  .count { color: $fg-3; font-size: 12.5px; }
+}
+
+/* Card that hosts the shared ReviewsPanel so the form/list sit on a clean
+   surface, consistent with the rest of the page's carded blocks. */
+.panel {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  box-shadow: $shadow-1;
+  padding: 22px 24px;
+  @media (max-width: 600px) { padding: 18px 16px; }
+}
+
+.plain { background: var(--bg-1); }

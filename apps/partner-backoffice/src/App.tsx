@@ -8,6 +8,7 @@ import { Dashboard } from '@/pages/Dashboard/Dashboard'
 import { Bookings } from '@/pages/Bookings/Bookings'
 import { Services } from '@/pages/Services/Services'
 import { Specialists } from '@/pages/Specialists/Specialists'
+import { Reviews } from '@/pages/Reviews/Reviews'
 import { Hours } from '@/pages/Hours/Hours'
 import { Locations } from '@/pages/Locations/Locations'
 import { Users } from '@/pages/Users/Users'
@@ -108,6 +109,7 @@ export default function App() {
             <Route path="clients"  element={<Clients />} />
             <Route path="services"    element={<Services />} />
             <Route path="specialists" element={<Specialists />} />
+            <Route path="reviews"     element={<Reviews />} />
             <Route path="hours"       element={<Hours />} />
             {/* Admin-only: branches + team management */}
             <Route path="locations"   element={<RequireAdmin><Locations /></RequireAdmin>} />

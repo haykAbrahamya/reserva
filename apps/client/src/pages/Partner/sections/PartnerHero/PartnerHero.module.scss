@@ -108,15 +108,24 @@
   border-radius: 999px;
 }
 
+/* Premium rating pill: the shared StarRatingDisplay (partial-fill stars + bold
+   score) on a soft branded surface so it reads as a trust signal at the top of
+   the page. Reusing the component keeps star rendering in one place. */
 .rating {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 13px;
   color: $fg-1;
-  .stars { color: $warn; letter-spacing: 0.5px; }
-  .reviewCount { color: $fg-3; }
+  padding: 5px 13px 5px 11px;
+  border-radius: 999px;
+  background: color-mix(in srgb, $bg-1 78%, transparent);
+  border: 1px solid $line-1;
+  box-shadow: $shadow-1;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
+.reviewCount { color: $fg-3; }
 
 .name {
   font-family: $font-serif;

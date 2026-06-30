@@ -5,7 +5,7 @@ import { useResource } from '@/store/useResource'
 import { partnersService, galleryImageUrl } from '@/services/partners.service'
 import { useIsAdmin, useScopedLocationId } from '@/store/auth.hooks'
 import { useI18n } from '@/i18n'
-import { NAV } from '../nav.config'
+import { NAV, isNavItemVisible } from '../nav.config'
 import s from './Sidebar.module.scss'
 
 interface SidebarProps {
@@ -76,7 +76,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         <nav className={s.nav}>
           {NAV.map(group => {
             const items = group.items.filter(item =>
-              (isAdmin || !item.adminOnly) && !(partner?.kind === 'single' && item.singleHidden)
+              isNavItemVisible(item, { isAdmin, isSingle: partner?.kind === 'single' })
             )
             if (items.length === 0) return null
             return (

@@ -215,6 +215,7 @@
     "callNow": "Զանգահարել",
     "hero": {
       "reviews": "({count} կարծիք)",
+      "ratingAria": "Գնահատված է {rating}՝ 5-ից, {count} կարծիքի հիման վրա",
       "locationsInYerevan": "{count} մասնաճյուղ Երևանում",
       "bookAppointment": "Ամրագրել ժամ",
       "call": "Զանգահարել",
@@ -258,6 +259,10 @@
       "serviceCount_plural": "{count} ծառայություն",
       "viewProfile": "Դիտել պրոֆիլը",
       "viewProfileAria": "Դիտել {name}-ի պրոֆիլը"
+    },
+    "reviews": {
+      "eyebrow": "Կարծիքներ",
+      "title": "Ի՞նչ են ասում հաճախորդները"
     },
     "works": {
       "title": "Մեր աշխատանքները"

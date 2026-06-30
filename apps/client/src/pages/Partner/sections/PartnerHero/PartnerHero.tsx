@@ -3,6 +3,7 @@ import { CalendarCheck, MapPin, Phone, ChevronDown, Instagram, Facebook } from '
 import { useT } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
 import { bookableLocations, canBook } from '@/services/booking.service'
+import { StarRatingDisplay } from '@/components/StarRating/StarRating'
 import s from './PartnerHero.module.scss'
 
 interface Props {
@@ -88,11 +89,15 @@ export function PartnerHero({ partner, onBook }: Props) {
         }
         <div className={s.typeRow}>
           <span className={s.type}>{partner.type}</span>
-          {/* Only show a rating when there's real review data — no fake stars. */}
+          {/* Only show a rating when there's real review data — no fake stars. The
+              partner-wide score is computed server-side from every specialist's
+              reviews (works for solo pros and salons alike). */}
           {p.rating > 0 && p.reviews > 0 && (
-            <span className={s.rating}>
-              <span className={s.stars}>★</span>
-              <strong>{p.rating.toFixed(1)}</strong>
+            <span
+              className={s.rating}
+              title={t('partner.hero.ratingAria', { rating: p.rating.toFixed(1), count: p.reviews })}
+            >
+              <StarRatingDisplay value={p.rating} size={15} />
               <span className={s.reviewCount}>{t('partner.hero.reviews', { count: p.reviews })}</span>
             </span>
           )}

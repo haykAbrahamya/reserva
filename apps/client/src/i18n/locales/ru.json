@@ -215,6 +215,7 @@
     "callNow": "Позвонить",
     "hero": {
       "reviews": "({count} отзывов)",
+      "ratingAria": "Оценка {rating} из 5 на основе {count} отзывов",
       "locationsInYerevan": "{count} филиала в Ереване",
       "bookAppointment": "Записаться на приём",
       "call": "Позвонить",
@@ -258,6 +259,10 @@
       "serviceCount_plural": "{count} услуг",
       "viewProfile": "Профиль",
       "viewProfileAria": "Открыть профиль {name}"
+    },
+    "reviews": {
+      "eyebrow": "Отзывы",
+      "title": "Что говорят клиенты"
     },
     "works": {
       "title": "Наши работы"

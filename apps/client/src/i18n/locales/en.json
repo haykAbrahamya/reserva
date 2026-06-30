@@ -215,6 +215,7 @@
     "callNow": "Call now",
     "hero": {
       "reviews": "({count} reviews)",
+      "ratingAria": "Rated {rating} out of 5 from {count} reviews",
       "locationsInYerevan": "{count} locations in Yerevan",
       "bookAppointment": "Book an appointment",
       "call": "Call",
@@ -258,6 +259,10 @@
       "serviceCount_plural": "{count} services",
       "viewProfile": "View profile",
       "viewProfileAria": "View {name}'s profile"
+    },
+    "reviews": {
+      "eyebrow": "Reviews",
+      "title": "What clients say"
     },
     "works": {
       "title": "Our work"

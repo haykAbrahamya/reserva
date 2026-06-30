@@ -31,14 +31,22 @@ export function StarRatingDisplay({ value, size = 14, count, compact, className 
   const pct = Math.max(0, Math.min(1, value / 5)) * 100
   return (
     <span className={[s.display, className].filter(Boolean).join(' ')} aria-label={`${value.toFixed(1)} / 5`}>
-      <span className={s.starTrack} style={{ ['--size' as string]: `${size}px` }}>
-        {[0, 1, 2, 3, 4].map((i) => (
-          <Star key={i} size={size} className={s.baseStar} />
-        ))}
-        <span className={s.starFill} style={{ width: `${pct}%` }}>
+      <span className={s.starTrack}>
+        {/* Base (dim) row. */}
+        <span className={s.starRow}>
           {[0, 1, 2, 3, 4].map((i) => (
-            <Star key={i} size={size} className={s.litStar} fill="currentColor" />
+            <Star key={i} size={size} className={s.baseStar} fill="currentColor" />
           ))}
+        </span>
+        {/* Lit row — an identical row clipped from the left to the score width.
+            Both rows are the SAME flex box (.starRow), so the stars sit pixel-
+            for-pixel on top of each other with no dim stars peeking through. */}
+        <span className={s.starFill} style={{ width: `${pct}%` }}>
+          <span className={s.starRow}>
+            {[0, 1, 2, 3, 4].map((i) => (
+              <Star key={i} size={size} className={s.litStar} fill="currentColor" />
+            ))}
+          </span>
         </span>
       </span>
       <strong className={s.num}>{value.toFixed(1)}</strong>

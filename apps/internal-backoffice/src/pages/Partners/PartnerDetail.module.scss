@@ -120,12 +120,22 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px 14px;
   padding: 12px 14px;
   background: $bg-2;
   border-radius: $r-1;
+  /* In the narrow detail column the control + descriptive text don't always fit
+     side by side. Wrap the ROW instead of squeezing the text to one word per
+     line; the control then drops neatly to its own line below. */
+  flex-wrap: wrap;
 }
-.toggleText { flex: 1; min-width: 0; }
+/* Floor the text width so the row wraps (control moves below) before the text
+   itself collapses into a thin one-word-per-line column. */
+.toggleText { flex: 1 1 220px; min-width: 0; }
+/* The control keeps its intrinsic width and never shrinks. When it can't sit
+   beside the text it wraps onto its own line below, staying right-aligned —
+   toggles keep their pill size; only the wider segmented control needs room. */
+.toggleRow > :not(.toggleText) { flex: 0 0 auto; margin-left: auto; }
 .toggleLabel {
   display: inline-flex;
   align-items: center;

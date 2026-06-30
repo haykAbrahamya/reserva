@@ -9,7 +9,7 @@ import { ChangePasswordModal } from '@/components/account/ChangePasswordModal/Ch
 import { Avatar } from '@/components/ui'
 import { useNewBooking } from '@/App'
 import { useT } from '@/i18n'
-import { PRIMARY_TABS, MORE_SECTIONS } from '../nav.config'
+import { PRIMARY_TABS, MORE_SECTIONS, isNavItemVisible } from '../nav.config'
 import s from './MobileTabBar.module.scss'
 
 // Bottom bar = the shared "primary" nav items. The dashboard tab shows the
@@ -96,7 +96,7 @@ export function MobileTabBar() {
             <div className={s.sheetItems}>
               {MORE_SECTIONS.map(group => {
                 const items = group.items.filter(item =>
-                  (isAdmin || !item.adminOnly) && !(partner?.kind === 'single' && item.singleHidden)
+                  isNavItemVisible(item, { isAdmin, isSingle: partner?.kind === 'single' })
                 )
                 if (items.length === 0) return null
                 return (

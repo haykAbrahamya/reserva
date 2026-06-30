@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Calendar, List, Users, Sparkles, User,
-  Clock, MapPin, Settings, UserCog, Store,
+  Clock, MapPin, Settings, UserCog, Store, MessageSquare,
 } from 'lucide-react'
 
 /**
@@ -21,6 +21,9 @@ export interface NavItem {
   primary?: boolean
   /** Hidden for `single` (solo) partners — e.g. the Specialists/team section. */
   singleHidden?: boolean
+  /** Shown ONLY for `single` (solo) partners — e.g. the solo Reviews page that
+   * replaces the per-specialist reviews living in the Specialists dashboard. */
+  singleOnly?: boolean
 }
 
 export interface NavSection {
@@ -38,6 +41,7 @@ export const NAV: NavSection[] = [
   { section: 'catalog', items: [
     { to: '/services',    labelKey: 'nav.services',    icon: Sparkles, primary: true },
     { to: '/specialists', labelKey: 'nav.specialists', icon: User, singleHidden: true },
+    { to: '/reviews',     labelKey: 'nav.reviews',     icon: MessageSquare, singleOnly: true },
     { to: '/hours',       labelKey: 'nav.hours',       icon: Clock },
     { to: '/locations',   labelKey: 'nav.locations',   icon: MapPin, adminOnly: true },
   ]},
@@ -47,6 +51,21 @@ export const NAV: NavSection[] = [
     { to: '/settings',   labelKey: 'nav.settings',   icon: Settings },
   ]},
 ]
+
+/**
+ * Single source of truth for nav visibility, shared by the desktop Sidebar and
+ * the mobile tab bar so the two can never disagree on what a given
+ * role/partner-kind should see.
+ */
+export function isNavItemVisible(
+  item: NavItem,
+  ctx: { isAdmin: boolean; isSingle: boolean },
+): boolean {
+  if (item.adminOnly && !ctx.isAdmin) return false
+  if (item.singleHidden && ctx.isSingle) return false
+  if (item.singleOnly && !ctx.isSingle) return false
+  return true
+}
 
 /** Flat list of the mobile bottom-bar items (in order). */
 export const PRIMARY_TABS: NavItem[] = NAV.flatMap(g => g.items).filter(i => i.primary)

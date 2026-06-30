@@ -30,6 +30,7 @@
     "clients": "Clients",
     "services": "Services",
     "specialists": "Specialists",
+    "reviews": "Reviews",
     "hours": "Working hours",
     "locations": "Locations",
     "users": "Users",
@@ -284,6 +285,14 @@
       "capacityHint": "How many people can use it at the same time."
     },
     "capacityShort": "{n} spots"
+  },
+  "reviews": {
+    "title": "Reviews",
+    "subtitle": "What your clients are saying — and your average rating.",
+    "count": "{count} review",
+    "count_plural": "{count} reviews",
+    "emptyTitle": "No reviews yet",
+    "emptyDesc": "Reviews left by your clients will appear here."
   },
   "specialists": {
     "title": "Specialists",

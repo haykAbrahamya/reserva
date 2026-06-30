@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { X, ChevronLeft, MapPin, Phone, CheckCircle2, XCircle, Clock, TrendingUp, Star, Trash2 } from 'lucide-react'
+import { X, ChevronLeft, MapPin, Phone, CheckCircle2, XCircle, Clock, TrendingUp, Star } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import { bookingsService } from '@/services/bookings.service'
-import { partnersService, type SpecialistReview } from '@/services/partners.service'
-import { BookingBadge, ConfirmDialog, useToast } from '@/components/ui'
-import { errorMessage } from '@/utils/errors'
+import { partnersService } from '@/services/partners.service'
+import { BookingBadge } from '@/components/ui'
+import { SpecialistReviews } from '@/components/specialists/SpecialistReviews/SpecialistReviews'
 import { fmtAMD, fmtTime, fmtDateShort, initials } from '@/utils/format'
 import { useT } from '@/i18n'
 import type { Specialist } from '@/types'
@@ -39,36 +39,16 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
   )
   const isMobile  = useIsMobile()
   const t         = useT()
-  const toast     = useToast()
 
-  // This specialist's public reviews (newest first).
-  const { data: reviewsData, reload: reloadReviews } = useResource(
-    () => partnersService.listSpecialistReviews(sp.id),
-    [sp.id],
+  // Review summary (avg + count) bubbled up from the shared SpecialistReviews
+  // component, used for the hero + section header badges.
+  const [reviewSummary, setReviewSummary] = useState({ avg: 0, count: 0 })
+  const onReviewSummary = useCallback(
+    (sum: { avg: number; count: number }) => setReviewSummary(sum),
     [],
   )
-  // Review pending deletion (drives the themed confirmation dialog).
-  const [confirmReview, setConfirmReview] = useState<SpecialistReview | null>(null)
-  const [deleting, setDeleting] = useState(false)
-
-  const avgRating = reviewsData.length
-    ? Math.round((reviewsData.reduce((sum, r) => sum + r.rating, 0) / reviewsData.length) * 10) / 10
-    : 0
-
-  const confirmDeleteReview = async () => {
-    if (!confirmReview) return
-    setDeleting(true)
-    try {
-      await partnersService.deleteSpecialistReview(sp.id, confirmReview.id)
-      reloadReviews()
-      toast(t('specialistDashboard.reviews.deleted'))
-      setConfirmReview(null)
-    } catch (err) {
-      toast(errorMessage(err, t))
-    } finally {
-      setDeleting(false)
-    }
-  }
+  const avgRating = reviewSummary.avg
+  const reviewCount = reviewSummary.count
 
   const [closing, setClosing] = useState(false)
 
@@ -182,7 +162,7 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
               )}
               {avgRating > 0 && (
                 <span className={s.heroBadge}>
-                  <Star size={10} fill="currentColor" style={{ color: '#F5B544' }} /> {avgRating.toFixed(1)} ({reviewsData.length})
+                  <Star size={10} fill="currentColor" style={{ color: '#F5B544' }} /> {avgRating.toFixed(1)} ({reviewCount})
                 </span>
               )}
             </div>
@@ -295,43 +275,16 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
           </div>
         </div>
 
-        {/* Reviews */}
+        {/* Reviews — shared list + moderation (delete). */}
         <div className={s.section}>
           <div className={s.sectionHead}>
             <span className={s.sectionTitle}>{t('specialistDashboard.reviews.title')}</span>
             <span className={s.sectionBadge} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               {avgRating > 0 && (<><Star size={11} fill="currentColor" style={{ color: '#F5B544' }} /> {avgRating.toFixed(1)} · </>)}
-              {reviewsData.length}
+              {reviewCount}
             </span>
           </div>
-          {reviewsData.length === 0 ? (
-            <div className={s.emptySection}>{t('specialistDashboard.reviews.empty')}</div>
-          ) : (
-            <div className={s.reviewList}>
-              {reviewsData.map((r) => (
-                <div key={r.id} className={s.reviewItem}>
-                  <div className={s.reviewTop}>
-                    <span className={s.reviewAuthor}>{r.author || t('specialistDashboard.reviews.anonymous')}</span>
-                    <span className={s.reviewStars}>
-                      {[1, 2, 3, 4, 5].map((n) => (
-                        <Star key={n} size={12} fill={n <= r.rating ? 'currentColor' : 'none'} className={n <= r.rating ? s.starLit : s.starDim} />
-                      ))}
-                    </span>
-                    <button
-                      className={s.reviewDelete}
-                      onClick={() => setConfirmReview(r)}
-                      title={t('specialistDashboard.reviews.delete')}
-                      aria-label={t('specialistDashboard.reviews.delete')}
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
-                  {r.text && <p className={s.reviewBody}>{r.text}</p>}
-                  <div className={s.reviewDate}>{fmtDateShort(r.createdAt)}</div>
-                </div>
-              ))}
-            </div>
-          )}
+          <SpecialistReviews specialistId={sp.id} onSummary={onReviewSummary} />
         </div>
 
         {/* Recent bookings */}
@@ -359,21 +312,6 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
     </div>
   )
 
-  // Themed delete-confirmation (matches the rest of the app, not window.confirm).
-  const confirmDialog = (
-    <ConfirmDialog
-      open={!!confirmReview}
-      variant="danger"
-      title={t('specialistDashboard.reviews.delete')}
-      message={t('specialistDashboard.reviews.confirmDelete')}
-      confirmLabel={t('common.remove')}
-      cancelLabel={t('common.cancel')}
-      loading={deleting}
-      onConfirm={confirmDeleteReview}
-      onClose={() => { if (!deleting) setConfirmReview(null) }}
-    />
-  )
-
   // ── Mobile: full-screen page ──────────────────────────────
   if (isMobile) {
     return (
@@ -384,7 +322,6 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
           </button>
         </div>
         {content}
-        {confirmDialog}
       </div>
     )
   }
@@ -396,7 +333,6 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
       <div className={[s.drawer, closing ? s.closing : ''].filter(Boolean).join(' ')}>
         {content}
       </div>
-      {confirmDialog}
     </>
   )
 }

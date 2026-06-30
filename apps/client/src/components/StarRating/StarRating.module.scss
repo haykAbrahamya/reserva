@@ -11,15 +11,24 @@
   display: inline-flex;
   line-height: 0;
 }
-.baseStar { color: color-mix(in srgb, var(--accent) 22%, $line-2); }
+/* The dim and lit rows are the SAME flex box, so they overlay pixel-perfectly. */
+.starRow {
+  display: inline-flex;
+  line-height: 0;
+}
+.starRow svg {
+  display: block;
+  flex: 0 0 auto;
+}
+/* Solid dim stars (not hollow outlines) so a partially-clipped lit star is
+   completed by the dim star behind it — no gaps, no peeking edges. */
+.baseStar { color: color-mix(in srgb, var(--accent) 30%, $line-strong); }
 .starFill {
   position: absolute;
   top: 0;
   left: 0;
   overflow: hidden;
-  display: inline-flex;
   white-space: nowrap;
-  line-height: 0;
 }
 .litStar { color: #F5B544; }
 .num { font-size: 13px; font-weight: 700; color: $fg-0; }
