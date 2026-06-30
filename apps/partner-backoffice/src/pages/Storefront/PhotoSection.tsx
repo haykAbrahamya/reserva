@@ -164,8 +164,14 @@ export function PhotoSection({
               {tile.type === 'beforeAfter' && tile.beforeUrl && tile.afterUrl ? (
                 <>
                   <div className={s.baSplit}>
-                    <img className={s.tileImg} src={galleryImageUrl(tile.beforeUrl)} alt="before" />
-                    <img className={s.tileImg} src={galleryImageUrl(tile.afterUrl)} alt="after" />
+                    <div className={s.baHalf}>
+                      <img className={s.baHalfImg} src={galleryImageUrl(tile.beforeUrl)} alt="before" />
+                      <span className={s.baHalfTag}>{t('storefront.ba.before')}</span>
+                    </div>
+                    <div className={s.baHalf}>
+                      <img className={s.baHalfImg} src={galleryImageUrl(tile.afterUrl)} alt="after" />
+                      <span className={s.baHalfTag}>{t('storefront.ba.after')}</span>
+                    </div>
                   </div>
                   <span className={s.baBadge}>{t('storefront.photo.beforeAfter')}</span>
                 </>

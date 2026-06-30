@@ -106,8 +106,35 @@
 
 /* ── Drop zone ── */
 /* ── Before/After tile + upload ── */
+/* Before | After preview: two equal halves, before on the LEFT, after on the
+   RIGHT — matching the client slider's convention. A thin divider + small tags
+   make the order unmistakable. */
 .baSplit { position: absolute; inset: 0; display: flex; }
-.baSplit img { width: 50%; height: 100%; object-fit: cover; }
+.baHalf {
+  position: relative;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  & + & { border-left: 1px solid rgba(255, 255, 255, 0.7); }
+}
+.baHalfImg { width: 100%; height: 100%; object-fit: cover; display: block; }
+.baHalfTag {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(20, 17, 14, 0.62);
+  white-space: nowrap;
+  pointer-events: none;
+}
 .baBadge {
   position: absolute; top: 8px; left: 8px; z-index: 2;
   padding: 3px 8px; border-radius: 999px;

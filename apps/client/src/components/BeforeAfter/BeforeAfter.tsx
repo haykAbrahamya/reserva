@@ -11,9 +11,11 @@ interface Props {
 }
 
 /**
- * Draggable before/after comparison slider. The "after" image sits on top and is
- * clipped to the handle position; dragging the divider left reveals more of it,
- * right reveals the "before". Works with mouse, touch, and keyboard (← →).
+ * Draggable before/after comparison slider. Convention: BEFORE on the left,
+ * AFTER on the right. The "after" image is the full base layer; the "before"
+ * image sits on top, clipped to the left of the handle. Dragging the divider
+ * right reveals more "before", left reveals more "after". Works with mouse,
+ * touch, and keyboard (← →).
  */
 export function BeforeAfter({ beforeUrl, afterUrl, beforeLabel, afterLabel, alt }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null)
@@ -53,21 +55,22 @@ export function BeforeAfter({ beforeUrl, afterUrl, beforeLabel, afterLabel, alt 
       onPointerUp={onPointerUp}
       onPointerLeave={onPointerUp}
     >
-      {/* Before — full size underneath */}
-      <img className={s.img} src={beforeUrl} alt={alt} draggable={false} loading="lazy" />
-      {beforeLabel && <span className={`${s.tag} ${s.tagLeft}`}>{beforeLabel}</span>}
+      {/* After — full size underneath, fills the RIGHT of the divider. */}
+      <img className={s.img} src={afterUrl} alt={alt} draggable={false} loading="lazy" />
+      {afterLabel && <span className={`${s.tag} ${s.tagRight}`}>{afterLabel}</span>}
 
-      {/* After — same full size, clipped from the right to the handle position
-          (clip-path keeps it un-squished at any size, no width JS needed). */}
+      {/* Before — same full size on top, clipped from the right to the handle
+          position so it occupies the LEFT side (clip-path keeps it un-squished
+          at any size, no width JS needed). */}
       <img
         className={`${s.img} ${s.after}`}
-        src={afterUrl}
+        src={beforeUrl}
         alt={alt}
         draggable={false}
         loading="lazy"
         style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}
       />
-      {afterLabel && pos > 12 && <span className={`${s.tag} ${s.tagRight}`}>{afterLabel}</span>}
+      {beforeLabel && pos > 12 && <span className={`${s.tag} ${s.tagLeft}`}>{beforeLabel}</span>}
 
       {/* Divider + handle */}
       <div
