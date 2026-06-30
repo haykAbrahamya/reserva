@@ -23,6 +23,7 @@ export { Toggle, Checkbox } from './components/Toggle/Toggle'
 export { Avatar } from './components/Avatar/Avatar'
 export { ToastProvider, useToast } from './components/Toast/Toast'
 export { Empty } from './components/Empty/Empty'
+export { WhatsappIcon } from './components/icons/WhatsappIcon'
 export { useDragDismiss } from './hooks/useDragDismiss'
 
 // Re-export `initials` for convenience (originally lived alongside Avatar).

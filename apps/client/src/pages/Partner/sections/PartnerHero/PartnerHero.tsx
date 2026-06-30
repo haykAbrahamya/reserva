@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { CalendarCheck, MapPin, Phone, ChevronDown, Instagram, Facebook } from 'lucide-react'
+import { WhatsappIcon } from '@reserva/ui'
 import { useT } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
 import { bookableLocations, canBook } from '@/services/booking.service'
@@ -133,7 +134,7 @@ export function PartnerHero({ partner, onBook }: Props) {
               <Phone size={17} /> {t('partner.hero.call')}
             </a>
           )}
-          {(p.instagram || p.facebook) && (
+          {(p.instagram || p.facebook || p.whatsapp) && (
             <div className={s.socials}>
               {p.instagram && (
                 <a className={s.social} href={p.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
@@ -143,6 +144,11 @@ export function PartnerHero({ partner, onBook }: Props) {
               {p.facebook && (
                 <a className={s.social} href={p.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
                   <Facebook size={18} />
+                </a>
+              )}
+              {p.whatsapp && (
+                <a className={s.social} href={`https://wa.me/${p.whatsapp}`} target="_blank" rel="noopener noreferrer" aria-label={t('partner.hero.whatsapp')}>
+                  <WhatsappIcon size={18} />
                 </a>
               )}
             </div>

@@ -85,6 +85,8 @@ export interface PartnerPresentationFields {
   tagline?: string
   instagram?: string
   facebook?: string
+  /** WhatsApp number in international digits (e.g. "37491234567"). */
+  whatsapp?: string
   logoUrl?: string
   /** Hero gradient tints [from, to]. */
   heroTints?: string[]

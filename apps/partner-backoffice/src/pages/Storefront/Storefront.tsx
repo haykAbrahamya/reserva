@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import {
   Store, Instagram, Facebook, Palette, ExternalLink, FileText, Pencil,
 } from 'lucide-react'
-import { Button, Input, Textarea, useToast } from '@/components/ui'
+import { Button, Input, Textarea, useToast, WhatsappIcon } from '@/components/ui'
 import { useAppStore } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import {
@@ -62,14 +62,17 @@ function StorefrontInner({ profile, reload, setPartner, toast }: InnerProps) {
   const [accent, setAccent] = useState(profile.accent ?? '#A8784B')
   const [instagram, setInstagram] = useState(profile.presentation?.instagram ?? '')
   const [facebook, setFacebook] = useState(profile.presentation?.facebook ?? '')
+  const [whatsapp, setWhatsapp] = useState(profile.presentation?.whatsapp ?? '')
   const savedAbout = profile.presentation?.about ?? ''
   const savedAccent = profile.accent ?? '#A8784B'
   const savedIg = profile.presentation?.instagram ?? ''
   const savedFb = profile.presentation?.facebook ?? ''
+  const savedWa = profile.presentation?.whatsapp ?? ''
   useEffect(() => { setAbout(savedAbout) }, [savedAbout])
   useEffect(() => { setAccent(savedAccent) }, [savedAccent])
   useEffect(() => { setInstagram(savedIg) }, [savedIg])
   useEffect(() => { setFacebook(savedFb) }, [savedFb])
+  useEffect(() => { setWhatsapp(savedWa) }, [savedWa])
 
   const [aboutSaving, setAboutSaving] = useState(false)
   const [brandSaving, setBrandSaving] = useState(false)
@@ -86,6 +89,7 @@ function StorefrontInner({ profile, reload, setPartner, toast }: InnerProps) {
           about: updated.presentation?.about ?? '',
           instagram: updated.presentation?.instagram ?? '',
           facebook: updated.presentation?.facebook ?? '',
+          whatsapp: updated.presentation?.whatsapp ?? '',
           heroTints: updated.presentation?.heroTints,
           gallery: updated.presentation?.gallery,
         },
@@ -121,14 +125,18 @@ function StorefrontInner({ profile, reload, setPartner, toast }: InnerProps) {
     } finally { setBrandSaving(false) }
   }
 
-  const socialChanged = instagram.trim() !== savedIg || facebook.trim() !== savedFb
-  const socialValid = isUrl(instagram) && isUrl(facebook)
+  // WhatsApp is digits only (we strip formatting); 7–15 per E.164, or empty.
+  const waDigits = whatsapp.replace(/\D/g, '')
+  const waValid = waDigits === '' || (waDigits.length >= 7 && waDigits.length <= 15)
+  const socialChanged =
+    instagram.trim() !== savedIg || facebook.trim() !== savedFb || waDigits !== savedWa
+  const socialValid = isUrl(instagram) && isUrl(facebook) && waValid
   const saveSocials = async () => {
     if (!socialChanged || !socialValid || socialSaving) return
     setSocialSaving(true)
     try {
       const updated = await partnersService.updateProfile({
-        presentation: { instagram: instagram.trim(), facebook: facebook.trim() },
+        presentation: { instagram: instagram.trim(), facebook: facebook.trim(), whatsapp: waDigits },
       })
       syncStore(updated); await reload()
       toast(t('storefront.social.saved'))
@@ -250,6 +258,13 @@ function StorefrontInner({ profile, reload, setPartner, toast }: InnerProps) {
               placeholder="https://facebook.com/yoursalon"
               error={!isUrl(facebook) ? t('storefront.social.urlError') : undefined} />
             {savedFb && <a className={s.openLink} href={savedFb} target="_blank" rel="noopener noreferrer" title={t('storefront.social.open')}><ExternalLink size={15} /></a>}
+          </div>
+          <div className={s.socialField}>
+            <span className={s.socialIcon}><WhatsappIcon size={16} /></span>
+            <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)}
+              placeholder="+374 91 234567"
+              error={!waValid ? t('storefront.social.whatsappError') : undefined} />
+            {savedWa && <a className={s.openLink} href={`https://wa.me/${savedWa}`} target="_blank" rel="noopener noreferrer" title={t('storefront.social.open')}><ExternalLink size={15} /></a>}
           </div>
           <div className={s.actionsRow}>
             <Button variant="accent" disabled={!socialChanged || !socialValid || socialSaving} onClick={saveSocials}>

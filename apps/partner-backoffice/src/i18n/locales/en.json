@@ -592,9 +592,10 @@
       "preview": "Hero gradient preview"
     },
     "social": {
-      "title": "Social links",
-      "desc": "Shown as icons on your public page. Paste a full URL, or leave blank to hide.",
+      "title": "Social & contact",
+      "desc": "Shown as icons on your public page. Paste a full URL (or WhatsApp number), or leave blank to hide.",
       "urlError": "Enter a full URL (https://…)",
+      "whatsappError": "Enter a valid number, e.g. +374 91 234567",
       "open": "Open",
       "save": "Save links",
       "saving": "Saving…",

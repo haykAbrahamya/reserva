@@ -25,6 +25,7 @@ export type PartnerProfile = Omit<Partner, 'locations' | 'services' | 'specialis
     about?: string
     instagram?: string
     facebook?: string
+    whatsapp?: string
     /** Brand logo URL; empty/absent → fall back to the name initial. */
     logoUrl?: string
     heroTints?: string[]

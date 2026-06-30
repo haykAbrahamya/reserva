@@ -34,6 +34,8 @@ export interface PartnerPresentation {
   /** Public social links (full URLs). Empty = not shown. */
   instagram?: string
   facebook?: string
+  /** WhatsApp number in international digits (e.g. "37491234567") → wa.me link. */
+  whatsapp?: string
 }
 
 export type PublicPartner = Partner & {
