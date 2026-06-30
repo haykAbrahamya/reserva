@@ -87,7 +87,16 @@
   &:hover:not(:disabled) { background: $bg-3; }
   &:disabled { cursor: default; opacity: 0.8; }
 }
-.pushText { flex: 1; font-size: 13px; }
+/* Non-clickable informational variant (iOS install hint): not a button, so no
+   pointer cursor/hover, and top-aligned for its multi-line copy. */
+.pushNote {
+  cursor: default;
+  align-items: flex-start;
+  &:hover { background: $bg-2; }
+  svg { margin-top: 2px; flex-shrink: 0; }
+  strong { color: $fg-0; font-weight: 600; }
+}
+.pushText { flex: 1; font-size: 13px; line-height: 1.45; }
 .pushPill {
   font-size: 11px;
   font-weight: 600;

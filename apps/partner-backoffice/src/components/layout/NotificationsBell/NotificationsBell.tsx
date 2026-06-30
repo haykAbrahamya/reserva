@@ -200,7 +200,7 @@ export function NotificationsBell() {
         )}
       </div>
 
-      {/* Push enable row */}
+      {/* Push enable row (when the browser supports web push). */}
       {pushSupported() && (
         <button className={s.pushRow} onClick={togglePush} disabled={pushBusy || denied}>
           {pushOn ? <BellRing size={15} /> : <BellOff size={15} />}
@@ -214,8 +214,19 @@ export function NotificationsBell() {
           {!denied && <span className={[s.pushPill, pushOn ? s.pushPillOn : ''].join(' ')}>{pushOn ? 'On' : 'Off'}</span>}
         </button>
       )}
-      {pushSupported() && isIosSafari() && !pushOn && (
-        <div className={s.iosHint}>On iPhone: Share → Add to Home Screen first, then enable.</div>
+
+      {/* iOS Safari (non-installed tab) can't do web push at all — `pushSupported()`
+          is false there, so the enable row above never shows. Without this the
+          user just sees an empty panel with no explanation. Tell them how to turn
+          notifications on: install the PWA first, then enable from inside it. */}
+      {!pushSupported() && isIosSafari() && (
+        <div className={[s.pushRow, s.pushNote].join(' ')} role="note">
+          <BellOff size={15} />
+          <span className={s.pushText}>
+            To get notifications on iPhone: tap <strong>Share</strong> → <strong>Add to Home Screen</strong>,
+            then open Reserva from your home screen and enable here.
+          </span>
+        </div>
       )}
 
       <div className={s.list}>
