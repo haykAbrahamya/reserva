@@ -209,6 +209,26 @@
 }
 .iosIcon { vertical-align: -2px; color: $accent; }
 
+/* Copy-link affordance for the in-app-browser case. */
+.copyLinkBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 12px;
+  padding: 8px 14px;
+  border: 1px solid $line-2;
+  border-radius: $r-1;
+  background: $bg-1;
+  color: $fg-1;
+  font-family: $font-sans;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  &:hover { background: $bg-3; border-color: color-mix(in srgb, var(--accent) 40%, $line-2); }
+  svg { color: $accent; }
+}
+
 :global {
   @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
   @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { CheckCircle2, Lock, Globe, ExternalLink, Download, Share, CheckCircle, Store, Image, Trash2, Upload, CalendarCheck } from 'lucide-react'
+import { CheckCircle2, Lock, Globe, ExternalLink, Download, Share, CheckCircle, Store, Image, Trash2, Upload, CalendarCheck, Copy } from 'lucide-react'
 import { Toggle, Button, Input, useToast } from '@/components/ui'
 import { useAppStore } from '@/store/app.store'
 import { useIsAdmin } from '@/store/auth.hooks'
@@ -24,6 +24,17 @@ export function Settings() {
   const handleInstall = async () => {
     const outcome = await promptInstall()
     if (outcome === 'accepted') toast(t('settings.install.installedToast'))
+  }
+
+  // In-app browsers can't open Safari directly; copying the URL lets the user
+  // paste it into Safari, where Add-to-Home-Screen (and push) become available.
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.origin)
+      toast(t('settings.install.linkCopied'))
+    } catch {
+      toast(t('settings.install.copyFailed'))
+    }
   }
 
   // Fetch the profile fresh on mount — never depends on whether the global
@@ -377,6 +388,21 @@ export function Settings() {
                   <li>{t('settings.install.iosStep2Pre')} <strong>{t('settings.install.iosStep2Strong')}</strong>{t('settings.install.iosStep2Post')}</li>
                   <li>{t('settings.install.iosStep3Pre')} <strong>{t('settings.install.iosStep3Strong')}</strong> {t('settings.install.iosStep3Post')}</li>
                 </ol>
+              </div>
+            )}
+
+            {/* iOS in-app browser (opened from Telegram/Instagram/etc.): there's no
+                Share→Add-to-Home-Screen here, so guide them to real Safari first. */}
+            {platform === 'ios-inapp' && (
+              <div className={s.iosSteps}>
+                <p className={s.iosLead}>{t('settings.install.inAppLead')}</p>
+                <ol className={s.iosList}>
+                  <li>{t('settings.install.inAppStep1')}</li>
+                  <li>{t('settings.install.inAppStep2Pre')} <Share size={13} className={s.iosIcon} /> <strong>{t('settings.install.iosStep1Strong')}</strong> {t('settings.install.iosStep1Post')}</li>
+                </ol>
+                <button className={s.copyLinkBtn} onClick={handleCopyLink}>
+                  <Copy size={14} /> {t('settings.install.copyLink')}
+                </button>
               </div>
             )}
           </div>

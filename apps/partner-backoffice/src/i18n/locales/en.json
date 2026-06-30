@@ -686,7 +686,13 @@
       "iosStep2Post": ".",
       "iosStep3Pre": "Tap",
       "iosStep3Strong": "Add",
-      "iosStep3Post": "— Reserva appears as an app icon."
+      "iosStep3Post": "— Reserva appears as an app icon.",
+      "inAppLead": "You opened this inside another app (e.g. Telegram). To install it and get notifications, open it in Safari first:",
+      "inAppStep1": "Open this page in Safari (e.g. tap the ••• menu → “Open in Safari”, or paste the copied link into Safari).",
+      "inAppStep2Pre": "In Safari, tap the",
+      "copyLink": "Copy link",
+      "linkCopied": "Link copied — now paste it in Safari",
+      "copyFailed": "Couldn’t copy the link"
     }
   },
   "errors": {
