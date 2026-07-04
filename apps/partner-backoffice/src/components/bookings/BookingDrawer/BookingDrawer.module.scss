@@ -119,6 +119,30 @@
   padding: 0 18px calc(40px + env(safe-area-inset-bottom, 0px));
 }
 
+/* Final-price section */
+.finalPriceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.finalPriceValue { font-size: 15px; font-weight: 600; color: $fg-0; }
+.finalPriceEmpty { font-size: 14px; color: $fg-2; font-style: italic; }
+
+/* Final-price modal */
+.modalHint {
+  font-size: 13px;
+  color: $fg-2;
+  margin-bottom: 14px;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .clientName { font-family: $font-serif; font-size: 22px; letter-spacing: -0.01em; }
 .clientPhone { font-size: 13px; color: $fg-2; margin-top: 2px; }
 .datetime { font-size: 13px; color: $fg-2; margin-top: 4px; }

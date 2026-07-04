@@ -384,6 +384,7 @@
       "total": "Total"
     },
     "spots": "{n} spots",
+    "priceRangeNote": "Final price confirmed after your visit",
     "remind": {
       "title": "Get reminders",
       "calendar": "Add to calendar",

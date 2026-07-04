@@ -108,7 +108,7 @@ function toPublicPartner(p: ApiPartner): PublicPartner {
     bookingsEnabled: p.bookingsEnabled !== false,
     kind: p.kind === 'single' ? 'single' : 'salon',
     locations: p.locations,
-    services: p.services,
+    services: p.services.map((sv) => ({ ...sv, priceType: sv.priceType, priceMax: sv.priceMax })),
     specialists: p.specialists.map(({ serviceIds, ...rest }) => ({ ...rest, services: serviceIds })),
     presentation,
   }

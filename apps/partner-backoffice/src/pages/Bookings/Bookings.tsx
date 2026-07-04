@@ -4,7 +4,7 @@ import { Plus, Calendar, X, Search } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import { Button, Table, Th, Td, Tr, BookingBadge, Avatar, Empty, Select, DatePicker, Pagination } from '@/components/ui'
-import { fmtAMD, fmtDateTime, fmtDuration, fmtTime, fmtDateInput } from '@/utils/format'
+import { fmtAMD, fmtServicePrice, fmtDateTime, fmtDuration, fmtTime, fmtDateInput } from '@/utils/format'
 import { bookingsService } from '@/services/bookings.service'
 import { partnersService } from '@/services/partners.service'
 import { useNewBooking } from '@/App'
@@ -25,6 +25,13 @@ function useIsMobile() {
 }
 
 const STATUS_FILTERS = ['all', 'confirmed', 'pending', 'completed', 'cancelled', 'noshow'] as const
+
+/** Effective price for a booking row: the exact final price once set, otherwise
+ *  the service's price (a range for range-priced services). */
+function effectivePrice(b: Booking): string {
+  if (b.finalPrice != null) return fmtAMD(b.finalPrice)
+  return b.service ? fmtServicePrice(b.service) : '—'
+}
 
 export function Bookings() {
   const partner        = usePartner()
@@ -230,7 +237,7 @@ export function Bookings() {
                         <div className={s.cardSvc}>{b.service?.name ?? '—'}</div>
                         <div className={s.cardSpec}>{b.specialist?.name ?? '—'}{b.service ? ` · ${fmtDuration(b.service.duration)}` : ''}</div>
                       </div>
-                      {b.service && <div className={s.cardPrice}>{fmtAMD(b.service.price)}</div>}
+                      {b.service && <div className={s.cardPrice}>{effectivePrice(b)}</div>}
                     </div>
                   </div>
                 ))}
@@ -282,7 +289,7 @@ export function Bookings() {
                     </Td>
                     <Td><span className={s.specialistName}>{b.specialist?.name ?? '—'}</span></Td>
                     <Td style={{ whiteSpace: 'nowrap' }}>{fmtDateTime(b.startISO)}</Td>
-                    <Td><span className={s.price}>{b.service ? fmtAMD(b.service.price) : '—'}</span></Td>
+                    <Td><span className={s.price}>{effectivePrice(b)}</span></Td>
                     <Td><BookingBadge status={b.status} /></Td>
                   </Tr>
               ))}

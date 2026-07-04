@@ -82,7 +82,7 @@ export function Dashboard() {
   const weekAgo    = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7)
   const last7      = bookings.filter(b => b.partnerId === partner.id && new Date(b.startISO) >= weekAgo && new Date(b.startISO) <= now)
   const completed7 = last7.filter(b => b.status === 'completed')
-  const revenue7   = completed7.reduce((sum, b) => sum + (b.service?.price ?? 0), 0)
+  const revenue7   = completed7.reduce((sum, b) => sum + (b.finalPrice ?? b.priceAtBooking ?? b.service?.price ?? 0), 0)
 
   const upcoming30 = (() => {
     const t30 = new Date(now); t30.setDate(t30.getDate() + 30)

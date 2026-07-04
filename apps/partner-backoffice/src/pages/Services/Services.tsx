@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { Plus, Sparkles, Pencil, Clock, RotateCcw, X, Users, Waves } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
-import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Empty, Pagination, useToast } from '@/components/ui'
-import { fmtAMD, fmtDuration } from '@/utils/format'
+import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Empty, Pagination, SegmentedFilter, useToast } from '@/components/ui'
+import { fmtDuration, fmtServicePrice } from '@/utils/format'
 import { partnersService } from '@/services/partners.service'
 import { errorMessage } from '@/utils/errors'
 import { useI18n } from '@/i18n'
@@ -23,6 +23,8 @@ function useIsMobile() {
 const EMPTY_FORM = {
   name: '', price: '', duration: '', category: '', active: true,
   repeatMonths: '', repeatDays: '',
+  // Pricing: 'fixed' → single price; 'range' → price..priceMax bounds.
+  priceType: 'fixed' as 'fixed' | 'range', priceMax: '',
   // Facility/entry service (spa): no specialist, N concurrent spots per slot.
   requiresSpecialist: true, capacity: '1',
 }
@@ -90,6 +92,8 @@ export function Services() {
     setForm({
       name: svc.name, price: String(svc.price), duration: String(svc.duration),
       category: svc.category, active: svc.active,
+      priceType: svc.priceType ?? 'fixed',
+      priceMax: svc.priceMax != null ? String(svc.priceMax) : '',
       requiresSpecialist: svc.requiresSpecialist ?? true,
       capacity: String(svc.capacity ?? 1),
       ...fromTotalDays(svc.repeatEveryDays),
@@ -109,6 +113,10 @@ export function Services() {
     const e: Record<string, string> = {}
     if (!form.name.trim()) e.name = t('errors.required')
     if (form.price === '' || Number(form.price) < 0 || Number.isNaN(Number(form.price))) e.price = t('errors.invalid')
+    if (form.priceType === 'range') {
+      if (form.priceMax === '' || Number(form.priceMax) < 0 || Number.isNaN(Number(form.priceMax))) e.priceMax = t('errors.invalid')
+      else if (!e.price && Number(form.priceMax) <= Number(form.price)) e.priceMax = t('services.modal.priceRangeError')
+    }
     if (form.duration === '' || Number(form.duration) <= 0 || Number.isNaN(Number(form.duration))) e.duration = t('errors.invalid')
     if (!form.requiresSpecialist && (Number(form.capacity) < 1 || Number.isNaN(Number(form.capacity)))) e.capacity = t('errors.invalid')
     setErrs(e)
@@ -116,7 +124,9 @@ export function Services() {
 
     const data = {
       name: form.name.trim(),
+      priceType: form.priceType,
       price: Number(form.price),
+      priceMax: form.priceType === 'range' ? Number(form.priceMax) : null,
       duration: Number(form.duration),
       category: form.category,
       active: form.active,
@@ -191,7 +201,7 @@ export function Services() {
                       </div>
                     </div>
                     <div className={s.svcCardRight}>
-                      <span className={s.svcCardPrice}>{fmtAMD(svc.price)}</span>
+                      <span className={s.svcCardPrice}>{fmtServicePrice(svc)}</span>
                       <Toggle
                         checked={svc.active}
                         onChange={e => { e; handleToggleActive(svc) }}
@@ -242,7 +252,7 @@ export function Services() {
                   <Td><span className={s.category}>{svc.category}</span></Td>
                   <Td><span className={s.duration}>{fmtDuration(svc.duration)}</span></Td>
                   <Td><span className={s.repeat}>{repeatLabel(svc.repeatEveryDays)}</span></Td>
-                  <Td><span className={s.price}>{fmtAMD(svc.price)}</span></Td>
+                  <Td><span className={s.price}>{fmtServicePrice(svc)}</span></Td>
                   <Td><Toggle checked={svc.active} onChange={() => handleToggleActive(svc)} /></Td>
                   <Td>
                     <Button variant="ghost" size="sm" icon onClick={e => { e.stopPropagation(); openEdit(svc) }}>
@@ -280,7 +290,29 @@ export function Services() {
           <div className={s.formFull}>
             <Input label={t('services.modal.nameLabel')} value={form.name} onChange={e => { setForm(f => ({ ...f, name: e.target.value })); setErrs(x => ({ ...x, name: '' })) }} placeholder={t('services.modal.namePlaceholder')} error={errs.name || undefined} />
           </div>
-          <Input label={t('services.modal.priceLabel')} type="number" value={form.price} onChange={e => { setForm(f => ({ ...f, price: e.target.value })); setErrs(x => ({ ...x, price: '' })) }} placeholder={t('services.modal.pricePlaceholder')} error={errs.price || undefined} />
+          {/* Pricing — a fixed amount, or a "from – to" range (e.g. a service
+              whose price depends on hair length). The toggle picks the mode;
+              only the relevant input(s) are shown. */}
+          <div className={s.formFull}>
+            <label className={s.priceTypeLabel}>{t('services.modal.priceTypeLabel')}</label>
+            <SegmentedFilter
+              value={form.priceType}
+              onChange={v => { setForm(f => ({ ...f, priceType: v })); setErrs(x => ({ ...x, price: '', priceMax: '' })) }}
+              ariaLabel={t('services.modal.priceTypeLabel')}
+              options={[
+                { value: 'fixed', label: t('services.modal.priceTypeFixed') },
+                { value: 'range', label: t('services.modal.priceTypeRange') },
+              ]}
+            />
+          </div>
+          {form.priceType === 'fixed' ? (
+            <Input label={t('services.modal.priceLabel')} type="number" value={form.price} onChange={e => { setForm(f => ({ ...f, price: e.target.value })); setErrs(x => ({ ...x, price: '' })) }} placeholder={t('services.modal.pricePlaceholder')} error={errs.price || undefined} />
+          ) : (
+            <>
+              <Input label={t('services.modal.priceFromLabel')} type="number" value={form.price} onChange={e => { setForm(f => ({ ...f, price: e.target.value })); setErrs(x => ({ ...x, price: '', priceMax: '' })) }} placeholder={t('services.modal.pricePlaceholder')} error={errs.price || undefined} />
+              <Input label={t('services.modal.priceToLabel')} type="number" value={form.priceMax} onChange={e => { setForm(f => ({ ...f, priceMax: e.target.value })); setErrs(x => ({ ...x, priceMax: '' })) }} placeholder={t('services.modal.pricePlaceholder')} error={errs.priceMax || undefined} />
+            </>
+          )}
           <Input label={t('services.modal.durationLabel')} type="number" value={form.duration} onChange={e => { setForm(f => ({ ...f, duration: e.target.value })); setErrs(x => ({ ...x, duration: '' })) }} placeholder={t('services.modal.durationPlaceholder')} error={errs.duration || undefined} />
           <div className={s.formFull}>
             <Input label={t('services.modal.categoryLabel')} value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} placeholder={t('services.modal.categoryPlaceholder')} />

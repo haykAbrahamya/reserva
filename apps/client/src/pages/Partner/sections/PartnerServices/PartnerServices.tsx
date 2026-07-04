@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Plus } from 'lucide-react'
-import { fmtAMD, fmtDuration } from '@reserva/shared'
+import { fmtServicePrice, fmtDuration } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { canBook } from '@/services/booking.service'
@@ -66,7 +66,7 @@ export function PartnerServices({ partner, onBook, tone = 'cream' }: Props) {
                 </div>
               </div>
               <div className={s.right}>
-                <span className={s.price}>{fmtAMD(sv.price)}</span>
+                <span className={s.price}>{fmtServicePrice(sv)}</span>
                 {bookable && (
                   <button className={s.bookBtn} onClick={() => onBook(sv.id)}>
                     <Plus size={14} /> {t('partner.services.book')}

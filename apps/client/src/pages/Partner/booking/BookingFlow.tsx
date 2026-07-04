@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { ArrowLeft, X, Check, Users, Calendar, Clock, CheckCircle2, ArrowRight, Sparkles, MapPin, Send, AlertCircle, CalendarPlus, Bell, BellRing, Share } from 'lucide-react'
-import { fmtAMD, fmtDuration, fmtDateInput, initials } from '@reserva/shared'
+import { fmtServicePrice, fmtDuration, fmtDateInput, initials } from '@reserva/shared'
 import { StarRatingDisplay } from '@/components/StarRating/StarRating'
 import { DatePicker } from '@reserva/ui'
 import type { Service, Specialist } from '@reserva/shared'
@@ -693,7 +693,7 @@ function ServiceStep({ partner, selectedId, onSelect }: {
                   )}
                 </div>
               </div>
-              <span className={s.optPrice}>{fmtAMD(sv.price)}</span>
+              <span className={s.optPrice}>{fmtServicePrice(sv)}</span>
             </button>
           ))}
         </div>
@@ -751,8 +751,11 @@ function SummaryRows({ service, specialist, anySpecialist, hideSpecialist, locat
       {!hidePrice && service && (
         <div className={[s.sumRow, s.sumTotal].join(' ')}>
           <span className={s.sumTotalLabel}>{t('booking.summary.total')}</span>
-          <span className={s.sumTotalValue}>{fmtAMD(service.price)}</span>
+          <span className={s.sumTotalValue}>{fmtServicePrice(service)}</span>
         </div>
+      )}
+      {!hidePrice && service?.priceType === 'range' && (
+        <div className={s.sumNote}>{t('booking.priceRangeNote')}</div>
       )}
     </>
   )

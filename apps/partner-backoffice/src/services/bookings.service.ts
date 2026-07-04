@@ -16,8 +16,22 @@ export interface ApiBooking {
   endAt: string
   status: BookingStatus
   notes?: string | null
+  /** Lower bound / booked price snapshot (drams). */
+  priceAtBooking?: number
+  /** Upper bound snapshot for a range-priced booking; null for fixed. */
+  priceMaxAtBooking?: number | null
+  /** Exact amount charged, captured on completion of a range booking. */
+  finalPrice?: number | null
   // Joined display data (see backend BOOKING_INCLUDE).
-  service?: { id: string; name: string; price: number; duration: number; capacity?: number } | null
+  service?: {
+    id: string
+    name: string
+    price: number
+    priceType?: 'fixed' | 'range'
+    priceMax?: number | null
+    duration: number
+    capacity?: number
+  } | null
   specialist?: { id: string; name: string; title: string } | null
   location?: { id: string; name: string; address: string } | null
 }
@@ -44,6 +58,9 @@ export function mapApiBooking(b: ApiBooking): Booking {
     endISO: b.endAt,
     status: b.status,
     notes: b.notes ?? undefined,
+    priceAtBooking: b.priceAtBooking,
+    priceMaxAtBooking: b.priceMaxAtBooking,
+    finalPrice: b.finalPrice,
     service: b.service ?? null,
     specialist: b.specialist ?? null,
     location: b.location ?? null,
@@ -111,8 +128,17 @@ export const bookingsService = {
     return mapApiBooking(b)
   },
 
-  async updateStatus(id: string, status: BookingStatus): Promise<Booking> {
-    const b = await apiPatch<ApiBooking>(`/bookings/${id}/status`, { status })
+  async updateStatus(id: string, status: BookingStatus, finalPrice?: number): Promise<Booking> {
+    const b = await apiPatch<ApiBooking>(`/bookings/${id}/status`, {
+      status,
+      ...(finalPrice != null && { finalPrice }),
+    })
+    return mapApiBooking(b)
+  },
+
+  /** Edit/correct the final price of a range booking at any time. */
+  async setFinalPrice(id: string, finalPrice: number): Promise<Booking> {
+    const b = await apiPatch<ApiBooking>(`/bookings/${id}/final-price`, { finalPrice })
     return mapApiBooking(b)
   },
 

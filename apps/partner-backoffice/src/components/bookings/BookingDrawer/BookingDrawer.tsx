@@ -2,10 +2,10 @@ import { useEffect, useState, useCallback } from 'react'
 import { X, CalendarClock } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
-import { Button, Avatar, BookingBadge } from '@/components/ui'
+import { Button, Avatar, BookingBadge, Modal, Input } from '@/components/ui'
 import { useToast } from '@/components/ui'
 import { bookingsService } from '@/services/bookings.service'
-import { fmtAMD, fmtDateTime, fmtDuration } from '@/utils/format'
+import { fmtAMD, fmtServicePrice, fmtDateTime, fmtDuration } from '@/utils/format'
 import { useT } from '@/i18n'
 import type { BookingStatus } from '@/types'
 import { RescheduleModal } from '../RescheduleModal/RescheduleModal'
@@ -19,6 +19,70 @@ const STATUS_ACTIONS: { status: BookingStatus; labelKey: string }[] = [
   { status: 'cancelled', labelKey: 'bookingDrawer.actions.cancel' },
   { status: 'noshow',    labelKey: 'bookingDrawer.actions.noshow' },
 ]
+
+/**
+ * Small dialog to capture the exact charged amount for a range-priced booking.
+ * Reused both when completing a booking and when editing an already-set price.
+ */
+function FinalPriceModal({
+  rangeHint,
+  initial,
+  saveLabelKey,
+  onCancel,
+  onSubmit,
+}: {
+  rangeHint: string
+  initial: number
+  saveLabelKey: string
+  onCancel: () => void
+  onSubmit: (amount: number) => void | Promise<void>
+}) {
+  const t = useT()
+  const [value, setValue] = useState(String(initial))
+  const [saving, setSaving] = useState(false)
+
+  const amount = Number(value)
+  const valid = value.trim() !== '' && Number.isFinite(amount) && amount >= 0
+
+  const submit = async () => {
+    if (!valid || saving) return
+    setSaving(true)
+    try {
+      await onSubmit(Math.round(amount))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <Modal
+      open
+      onClose={onCancel}
+      title={t('bookingDrawer.finalPriceModalTitle')}
+      subtitle={t('bookingDrawer.finalPriceModalDesc')}
+      size="sm"
+      footer={
+        <div className={s.modalActions}>
+          <Button variant="default" size="sm" onClick={onCancel}>{t('common.cancel')}</Button>
+          <Button variant="accent" size="sm" disabled={!valid || saving} onClick={submit}>
+            {t(saveLabelKey)}
+          </Button>
+        </div>
+      }
+    >
+      <div className={s.modalHint}>{t('bookingDrawer.bookedRange', { range: rangeHint })}</div>
+      <Input
+        type="number"
+        min={0}
+        label={t('bookingDrawer.amountLabel')}
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        onKeyDown={e => { if (e.key === 'Enter') void submit() }}
+        autoFocus
+      />
+    </Modal>
+  )
+}
 
 interface Props {
   bookingId: string
@@ -36,6 +100,9 @@ export function BookingDrawer({ bookingId, onClose, sheet, onChanged }: Props) {
   const t             = useT()
   const [closing, setClosing] = useState(false)
   const [rescheduling, setRescheduling] = useState(false)
+  // Final-price dialog: 'complete' captures the price then completes the booking;
+  // 'edit' just corrects an already-recorded final price.
+  const [priceModal, setPriceModal] = useState<null | 'complete' | 'edit'>(null)
 
   // Play the exit animation, then actually unmount via the parent's onClose.
   const handleClose = useCallback(() => {
@@ -55,11 +122,39 @@ export function BookingDrawer({ bookingId, onClose, sheet, onChanged }: Props) {
   const sp  = booking.specialist
   const loc = booking.location
 
+  const isRange = svc?.priceType === 'range'
+
+  const statusToast = (status: BookingStatus) =>
+    toast(t('bookingDrawer.statusToast', { status: t(`status.${status}`).toLowerCase() }))
+
   const handleStatus = async (status: BookingStatus) => {
+    // Completing a range-priced booking requires the exact final amount first.
+    if (status === 'completed' && isRange && booking.finalPrice == null) {
+      setPriceModal('complete')
+      return
+    }
     await bookingsService.updateStatus(booking.id, status)
     await reload()
     onChanged?.()
-    toast(t('bookingDrawer.statusToast', { status: t(`status.${status}`).toLowerCase() }))
+    statusToast(status)
+  }
+
+  // Complete + record the final price for a range booking.
+  const completeWithPrice = async (amount: number) => {
+    await bookingsService.updateStatus(booking.id, 'completed', amount)
+    setPriceModal(null)
+    await reload()
+    onChanged?.()
+    statusToast('completed')
+  }
+
+  // Edit/correct an existing final price.
+  const editFinalPrice = async (amount: number) => {
+    await bookingsService.setFinalPrice(booking.id, amount)
+    setPriceModal(null)
+    await reload()
+    onChanged?.()
+    toast(t('bookingDrawer.statusToast', { status: t('bookingDrawer.finalPrice').toLowerCase() }))
   }
 
   const canReschedule = booking.status === 'pending' || booking.status === 'confirmed'
@@ -111,7 +206,33 @@ export function BookingDrawer({ bookingId, onClose, sheet, onChanged }: Props) {
         <div className={s.section}>
           <div className={s.label}>{t('bookingDrawer.service')}</div>
           <div className={s.value}>{svc.name}</div>
-          <div className={s.sub}>{fmtDuration(svc.duration)} · {fmtAMD(svc.price)}</div>
+          <div className={s.sub}>{fmtDuration(svc.duration)} · {fmtServicePrice(svc)}</div>
+        </div>
+      )}
+
+      {/* Final price — only for range-priced services */}
+      {svc && isRange && (
+        <div className={s.section}>
+          <div className={s.label}>{t('bookingDrawer.finalPrice')}</div>
+          <div className={s.finalPriceRow}>
+            {booking.finalPrice != null ? (
+              <>
+                <div className={s.finalPriceValue}>{fmtAMD(booking.finalPrice)}</div>
+                <Button size="sm" variant="default" onClick={() => setPriceModal('edit')}>
+                  {t('bookingDrawer.editPrice')}
+                </Button>
+              </>
+            ) : booking.status === 'completed' ? (
+              <>
+                <div className={s.finalPriceEmpty}>{t('bookingDrawer.finalPriceNotSet')}</div>
+                <Button size="sm" variant="accent" onClick={() => setPriceModal('edit')}>
+                  {t('bookingDrawer.setPrice')}
+                </Button>
+              </>
+            ) : (
+              <div className={s.finalPriceEmpty}>{t('bookingDrawer.finalPriceNotSet')}</div>
+            )}
+          </div>
         </div>
       )}
 
@@ -148,6 +269,16 @@ export function BookingDrawer({ bookingId, onClose, sheet, onChanged }: Props) {
     />
   )
 
+  const finalPriceModal = priceModal && svc && (
+    <FinalPriceModal
+      rangeHint={fmtServicePrice(svc)}
+      initial={booking.finalPrice ?? booking.priceAtBooking ?? svc.price}
+      saveLabelKey={priceModal === 'complete' ? 'bookingDrawer.completeAndSave' : 'bookingDrawer.saveFinalPrice'}
+      onCancel={() => setPriceModal(null)}
+      onSubmit={priceModal === 'complete' ? completeWithPrice : editFinalPrice}
+    />
+  )
+
   if (sheet) {
     return (
       <>
@@ -173,6 +304,7 @@ export function BookingDrawer({ bookingId, onClose, sheet, onChanged }: Props) {
           <div className={s.sheetBody}>{inner}</div>
         </div>
         {rescheduleModal}
+        {finalPriceModal}
       </>
     )
   }
@@ -198,6 +330,7 @@ export function BookingDrawer({ bookingId, onClose, sheet, onChanged }: Props) {
         <div style={{ flex: 1, overflowY: 'auto', padding: '0 22px 32px' }}>{inner}</div>
       </div>
       {rescheduleModal}
+      {finalPriceModal}
     </>
   )
 }

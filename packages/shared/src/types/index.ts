@@ -54,10 +54,19 @@ export interface Specialist {
   reviewCount?: number
 }
 
+/** Fixed exact price, or a min–max range whose exact charge is captured per
+ *  booking on completion. */
+export type ServicePriceType = 'fixed' | 'range'
+
 export interface Service {
   id: string
   name: string
+  /** 'fixed' → `price` is exact. 'range' → `price`..`priceMax`. Absent = fixed. */
+  priceType?: ServicePriceType
+  /** Fixed price, or the LOWER bound for a range service. */
   price: number
+  /** Upper bound for a range service; null/absent for fixed. */
+  priceMax?: number | null
   duration: number
   active: boolean
   category: string
@@ -87,11 +96,25 @@ export interface Booking {
   endISO: string
   status: BookingStatus
   notes?: string
+  /** Lower bound / booked price snapshot (drams). */
+  priceAtBooking?: number
+  /** Upper bound snapshot for a range-priced booking; null for fixed. */
+  priceMaxAtBooking?: number | null
+  /** Exact amount charged, captured on completion of a range booking. */
+  finalPrice?: number | null
   /**
    * Embedded display data joined from the API so a booking row is
    * self-contained (no catalog lookup needed to render names/price).
    */
-  service?: { id: string; name: string; price: number; duration: number; capacity?: number } | null
+  service?: {
+    id: string
+    name: string
+    price: number
+    priceType?: ServicePriceType
+    priceMax?: number | null
+    duration: number
+    capacity?: number
+  } | null
   specialist?: { id: string; name: string; title: string } | null
   location?: { id: string; name: string; address: string } | null
 }

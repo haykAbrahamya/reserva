@@ -78,7 +78,7 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
   const totalRevenue = useMemo(() =>
     spBookings
       .filter(b => b.status === 'completed')
-      .reduce((sum, b) => sum + (b.service?.price ?? 0), 0),
+      .reduce((sum, b) => sum + (b.finalPrice ?? b.priceAtBooking ?? b.service?.price ?? 0), 0),
     [spBookings]
   )
 
@@ -108,7 +108,7 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
       const daysAgo = (now - new Date(b.startISO).getTime()) / 86_400_000
       const weekIdx = Math.floor(daysAgo / 7)
       if (weekIdx < 7) {
-        weeks[6 - weekIdx] += b.service?.price ?? 0
+        weeks[6 - weekIdx] += b.finalPrice ?? b.priceAtBooking ?? b.service?.price ?? 0
       }
     })
     return weeks

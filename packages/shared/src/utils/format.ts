@@ -11,6 +11,25 @@ export function fmtAMD(amount: number): string {
   }).format(amount)
 }
 
+/**
+ * Format a service's price for display: a single amount for fixed pricing, or a
+ * "min – max" range (en-dash) when the service is range-priced. Shared by the
+ * client page, booking flow and backoffice so pricing reads identically.
+ */
+export function fmtServicePrice(svc: {
+  price: number
+  priceType?: 'fixed' | 'range'
+  priceMax?: number | null
+}): string {
+  if (svc.priceType === 'range' && svc.priceMax != null) {
+    // Currency once, at the end: "1,000 – 6,000 ֏". Compact and unambiguous —
+    // avoids the awkward "AMD 1,000 – AMD 6,000" that overflowed tight cards.
+    const nf = new Intl.NumberFormat('hy-AM', { maximumFractionDigits: 0 })
+    return `${nf.format(svc.price)} – ${nf.format(svc.priceMax)} ֏`
+  }
+  return fmtAMD(svc.price)
+}
+
 export function fmtTime(iso: string): string {
   return new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
 }

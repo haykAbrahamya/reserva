@@ -102,6 +102,9 @@
 
 .repeat { font-size: 13px; color: $fg-2; font-family: $font-mono; }
 
+/* Pricing type toggle (fixed vs range) */
+.priceTypeLabel { display: block; font-size: 13px; color: $fg-1; margin-bottom: 8px; }
+
 /* Repeat-period field */
 .repeatLabel { display: block; font-size: 13px; color: $fg-1; margin-bottom: 8px; }
 .repeatPresets { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
