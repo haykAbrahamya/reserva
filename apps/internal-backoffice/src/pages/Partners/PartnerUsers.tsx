@@ -89,7 +89,7 @@ function EditUserModal({
 }: { partnerId: string; user: PartnerUser; onClose: () => void; onSaved: () => void }) {
   const toast = useToast()
   const [form, setForm] = useState<UpdatePartnerUserInput>({
-    name: user.name, phone: user.phone, active: user.active,
+    name: user.name, email: user.email, phone: user.phone, active: user.active,
   })
   const [saving, setSaving] = useState(false)
 
@@ -122,6 +122,7 @@ function EditUserModal({
     >
       <div className={s.fields}>
         <Input label="Name" value={form.name ?? ''} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+        <Input label="Email" type="email" value={form.email ?? ''} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder="admin@salon.am" />
         <Input label="Phone" value={form.phone ?? ''} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} placeholder="+374 …" />
         <div className={s.toggleRow}>
           <div>

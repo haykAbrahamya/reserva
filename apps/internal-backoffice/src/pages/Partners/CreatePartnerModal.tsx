@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Copy, Check, Loader2 } from 'lucide-react'
-import { Modal, Button, Input, useToast } from '@/components/ui'
+import { Modal, Button, Input, SegmentedFilter, useToast } from '@/components/ui'
 import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
 import { partnersService, type CreatePartnerResult } from '@/services/partners.service'
 import { ApiError } from '@/services/http'
@@ -20,6 +20,7 @@ const slugify = (v: string) =>
 
 const EMPTY = {
   name: '', slug: '', type: '', accent: DEFAULT_ACCENT,
+  kind: 'salon' as 'salon' | 'single',
   adminName: '', adminEmail: '', adminPhone: '',
 }
 
@@ -101,6 +102,7 @@ export function CreatePartnerModal({ open, onClose, onCreated }: Props) {
         slug: effectiveSlug,
         type: form.type.trim(),
         accent: form.accent,
+        kind: form.kind,
         admin: {
           name: form.adminName.trim(),
           email: form.adminEmail.trim(),
@@ -213,6 +215,24 @@ export function CreatePartnerModal({ open, onClose, onCreated }: Props) {
         </div>
 
         <AccentPicker value={form.accent} onChange={(c) => set('accent', c)} />
+
+        <div>
+          <span className={s.fieldLabel}>Partner type</span>
+          <SegmentedFilter<'salon' | 'single'>
+            ariaLabel="Partner type"
+            value={form.kind}
+            onChange={(v) => set('kind', v)}
+            options={[
+              { value: 'salon', label: 'Salon' },
+              { value: 'single', label: 'Solo' },
+            ]}
+          />
+          <span className={s.slugHint}>
+            {form.kind === 'single'
+              ? 'Solo pro — auto-creates one location + specialist; hides team UI.'
+              : 'Salon — full team, specialists and multiple locations.'}
+          </span>
+        </div>
 
         <div className={s.groupLabel}>First admin</div>
         <Input label="Full name" value={form.adminName} onChange={(e) => set('adminName', e.target.value)} placeholder="Jane Doe" error={submitted ? fieldErrors.adminName : undefined} />

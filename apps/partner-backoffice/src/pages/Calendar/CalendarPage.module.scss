@@ -405,7 +405,10 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: $fg-2;
-  .stripSelected & { color: rgba(255,255,255,0.7); }
+  /* Selected pill uses a light ($fg-0) background in BOTH themes, so the label
+     must be dark-on-light — matching the day number ($bg-1) — not white, which
+     was invisible in dark mode. */
+  .stripSelected & { color: color-mix(in srgb, $bg-1 65%, transparent); }
 }
 
 .stripDayNum {

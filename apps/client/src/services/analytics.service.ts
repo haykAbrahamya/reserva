@@ -4,21 +4,35 @@
 // only send browser-available page context. Must never throw or block render.
 // ─────────────────────────────────────────────────────────────
 
+import { slugFromHost } from '@/hooks/useTenantSlug'
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1'
 
 interface PageViewPayload {
   path: string
   host: string
+  /** Partner slug when on a tenant page (subdomain or /p/:slug) — else omitted. */
+  partnerSlug?: string
   referrer: string
   language: string
   screenW: number
   screenH: number
 }
 
+/** Resolve the partner slug for the current page: subdomain first, else /p/:slug. */
+function currentPartnerSlug(): string | undefined {
+  const fromHost = slugFromHost()
+  if (fromHost) return fromHost
+  const m = /^\/p\/([a-z0-9-]+)/i.exec(window.location.pathname)
+  return m ? m[1].toLowerCase() : undefined
+}
+
 function collect(): PageViewPayload {
+  const partnerSlug = currentPartnerSlug()
   return {
     path: window.location.pathname,
     host: window.location.host,
+    ...(partnerSlug ? { partnerSlug } : {}),
     referrer: document.referrer,
     language: navigator.language,
     screenW: window.screen.width,

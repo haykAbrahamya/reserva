@@ -51,6 +51,7 @@ export interface PartnerUser {
 
 export interface UpdatePartnerUserInput {
   name?: string
+  email?: string
   phone?: string
   active?: boolean
 }
@@ -71,6 +72,8 @@ export interface CreatePartnerInput {
   slug: string
   type: string
   accent: string
+  /** Salon (team) or solo (single pro). Defaults to salon on the backend. */
+  kind?: 'salon' | 'single'
   admin: { name: string; email: string; phone: string; password?: string }
 }
 

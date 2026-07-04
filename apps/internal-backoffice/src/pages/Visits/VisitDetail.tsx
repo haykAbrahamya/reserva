@@ -1,6 +1,6 @@
 import {
   Clock, MapPin, Globe, Smartphone, Tablet, Monitor, Chrome, AppWindow,
-  Link2, Languages, Ruler, FileCode,
+  Link2, Languages, Ruler, FileCode, Store,
 } from 'lucide-react'
 import { Modal } from '@/components/ui'
 import { type Visit } from '@/services/visits.service'
@@ -32,6 +32,7 @@ export function VisitDetail({ visit, onClose }: { visit: Visit | null; onClose: 
         { icon: <DeviceIcon type={v.deviceType} />, label: 'Device', value: v.deviceType ?? '—' },
         { icon: <Chrome size={15} />, label: 'Browser', value: fmtBrowser(v) },
         { icon: <AppWindow size={15} />, label: 'OS', value: fmtOs(v) },
+        { icon: <Store size={15} />, label: 'Partner', value: v.partnerSlug ?? '—', mono: true },
         { icon: <FileCode size={15} />, label: 'Page', value: v.host ? `${v.host}${v.path ?? ''}` : (v.path ?? '—'), mono: true },
         { icon: <Link2 size={15} />, label: 'Referrer', value: v.referrer || '— (direct)' },
         { icon: <Languages size={15} />, label: 'Language', value: v.language ?? '—' },

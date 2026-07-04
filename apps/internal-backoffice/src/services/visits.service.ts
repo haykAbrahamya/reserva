@@ -13,6 +13,7 @@ export interface Visit {
   osVer: string | null
   path: string | null
   host: string | null
+  partnerSlug: string | null
   referrer: string | null
   language: string | null
   screenW: number | null
@@ -22,9 +23,13 @@ export interface Visit {
   createdAt: string
 }
 
+export type VisitPageType = 'signup' | 'home' | 'marketplace' | 'partner'
+
 interface ListParams extends PageParams {
   deviceType?: string
   country?: string
+  partnerSlug?: string
+  pageType?: VisitPageType
 }
 
 export const visitsService = {
@@ -35,6 +40,8 @@ export const visitsService = {
         pageSize: params.pageSize ?? 20,
         ...(params.deviceType ? { deviceType: params.deviceType } : {}),
         ...(params.country ? { country: params.country } : {}),
+        ...(params.partnerSlug ? { partnerSlug: params.partnerSlug } : {}),
+        ...(params.pageType ? { pageType: params.pageType } : {}),
       },
     })
   },

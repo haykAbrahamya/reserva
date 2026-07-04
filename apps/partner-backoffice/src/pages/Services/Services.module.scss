@@ -21,7 +21,7 @@
   padding: 2px 8px; border-radius: 999px;
   background: $bg-2; color: $fg-1;
 }
-.price    { font-family: $font-mono; font-size: 13px; font-weight: 500; }
+.price    { font-family: $font-mono; font-size: 13px; font-weight: 500; white-space: nowrap; }
 .duration { font-size: 13px; color: $fg-2; }
 
 /* ── Mobile: category group + cards ── */
@@ -78,7 +78,14 @@
   min-width: 0;
 }
 
-.svcCardName  { font-size: 14px; font-weight: 500; color: $fg-0; }
+.svcCardName  {
+  font-size: 14px;
+  font-weight: 500;
+  color: $fg-0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;   /* truncate long names instead of overrunning the price */
+}
 .svcCardMeta  { font-size: 12px; color: $fg-2; margin-top: 2px; }
 
 .svcCardRight {
@@ -87,13 +94,16 @@
   align-items: flex-end;
   gap: 6px;
   flex-shrink: 0;
+  max-width: 45%;   /* cap so a long range can't crowd the name off the card */
 }
 
 .svcCardPrice {
   font-family: $font-mono;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: $fg-0;
+  text-align: right;
+  white-space: nowrap;   /* keep the range on one line */
 }
 
 /* ── Form ── */
