@@ -13,7 +13,10 @@ export function getSupportSocket(): Socket {
   if (socket) return socket
   socket = io(`${API_ORIGIN}/support`, {
     auth: (cb) => cb({ token: tokenStore.access ?? '' }),
-    transports: ['websocket'],
+    // Allow polling fallback + WS upgrade — see partner-backoffice for why WS-only
+    // silently fails behind a proxy that doesn't forward the Upgrade headers.
+    transports: ['websocket', 'polling'],
+    withCredentials: true,
     autoConnect: true,
     reconnection: true,
     reconnectionDelay: 1000,

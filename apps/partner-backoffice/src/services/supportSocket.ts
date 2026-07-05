@@ -15,7 +15,12 @@ export function getSupportSocket(): Socket {
   socket = io(`${API_ORIGIN}/support`, {
     // Send the current access token on every (re)connect attempt.
     auth: (cb) => cb({ token: tokenStore.access ?? '' }),
-    transports: ['websocket'],
+    // Allow HTTP long-polling as a fallback and let socket.io upgrade to a real
+    // WebSocket when the network/proxy permits. WS-only would silently fail
+    // behind a proxy that doesn't forward the Upgrade headers (prod), leaving no
+    // live updates at all — polling keeps the chat working regardless.
+    transports: ['websocket', 'polling'],
+    withCredentials: true,
     autoConnect: true,
     reconnection: true,
     reconnectionDelay: 1000,
