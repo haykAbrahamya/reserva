@@ -74,14 +74,9 @@ export function DayStrip({ days, selected, onSelect }: Props) {
       {days.map((d) => {
         const isSelected = d.date === selected
         const dayNum = parseLocalDay(d.date).getDate()
-        // Human-readable state for screen readers.
-        const stateLabel = d.closed
-          ? t('booking.strip.closed')
-          : d.openDots === 0
-            ? t('booking.strip.full')
-            : d.openDots != null
-              ? t('booking.strip.someOpen')
-              : ''
+        // Screen-reader state: only "closed" is a firm, actionable signal. Slot
+        // density is decorative (dots), so we don't announce it as words.
+        const stateLabel = d.closed ? ` — ${t('booking.strip.closed')}` : ''
         return (
           <button
             key={d.date}
@@ -91,21 +86,19 @@ export function DayStrip({ days, selected, onSelect }: Props) {
               s.chip,
               isSelected ? s.selected : '',
               d.closed ? s.closed : '',
-              !d.closed && d.openDots === 0 ? s.full : '',
             ].filter(Boolean).join(' ')}
             disabled={d.closed}
             aria-pressed={isSelected}
-            aria-label={`${weekdayLabel(d.date)} ${dayNum} — ${stateLabel}`}
+            aria-label={`${weekdayLabel(d.date)} ${dayNum}${stateLabel}`}
             onClick={() => onSelect(d.date)}
           >
             <span className={s.dow}>{weekdayLabel(d.date)}</span>
             <span className={s.num}>{dayNum}</span>
             <span className={s.signal} aria-hidden="true">
-              {d.closed ? (
-                <span className={s.stateText}>{t('booking.strip.closed')}</span>
-              ) : d.openDots === 0 ? (
-                <span className={s.stateText}>{t('booking.strip.full')}</span>
-              ) : d.openDots != null ? (
+              {d.openDots != null && !d.closed ? (
+                // Dots only — density of open slots. No text labels (a "Full"
+                // label can also disagree with the live slots on tap), so 0 just
+                // reads as all-dim dots and the day stays tappable.
                 <span className={s.dots}>
                   {[0, 1, 2].map((i) => (
                     <span
@@ -115,8 +108,8 @@ export function DayStrip({ days, selected, onSelect }: Props) {
                   ))}
                 </span>
               ) : (
-                // Unknown availability (no backend signal yet) — keep the row's
-                // height stable with an empty placeholder so chips don't jump.
+                // Closed day, or availability not known yet — no dots. Keeps the
+                // signal row's height stable so chips don't jump.
                 <span className={s.dotsPlaceholder} />
               )}
             </span>

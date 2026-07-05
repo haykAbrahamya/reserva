@@ -56,12 +56,7 @@
     .dow { color: color-mix(in srgb, #fff 82%, transparent); }
     .dot { background: color-mix(in srgb, #fff 40%, transparent); }
     .dotOn { background: #fff; }
-    .stateText { color: color-mix(in srgb, #fff 82%, transparent); }
   }
-
-  // Fully booked: still tappable (peek at the empty grid / read the message),
-  // just visually recessed.
-  &.full:not(.selected) { opacity: 0.62; }
 
   // Closed weekday: disabled, clearly inert.
   &.closed {
@@ -108,10 +103,3 @@
   background: color-mix(in srgb, var(--accent) 22%, $line-2);
 }
 .dotOn { background: $accent; }
-
-.stateText {
-  font-size: 10px;
-  font-weight: 600;
-  color: $fg-3;
-  text-transform: none;
-}

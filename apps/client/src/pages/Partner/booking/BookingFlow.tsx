@@ -202,8 +202,11 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
     })
       .then(rows => {
         if (!active) return
+        // Store the raw density only. Don't fold server `closed` into 0 — the
+        // strip derives `closed` from the branch's hours; conflating them made a
+        // real working day (with slots) render as an empty/"full" chip.
         const map: Record<string, 0 | 1 | 2 | 3> = {}
-        for (const r of rows) map[r.date] = r.closed ? 0 : r.openDots
+        for (const r of rows) if (!r.closed) map[r.date] = r.openDots
         setAvailability(map)
       })
       .catch(() => { if (active) setAvailability({}) })
