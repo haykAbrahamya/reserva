@@ -1,4 +1,4 @@
-import { useState, useMemo, type ReactElement } from 'react'
+import { useState, useMemo, useRef, useEffect, type ReactElement } from 'react'
 import { Sparkles, Star, Images, MapPin } from 'lucide-react'
 import { useT } from '@/i18n'
 import type { TemplateProps } from '../types'
@@ -42,6 +42,21 @@ export function TabbedTemplate({ partner, onBook }: TemplateProps) {
 
   const [active, setActive] = useState<TabKey>(() => tabs[0]?.key ?? 'services')
 
+  // Center the active tab within the (horizontally scrollable) bar so it's
+  // obvious more tabs exist on either side. The centering math naturally clamps
+  // to [0, maxScroll], so the first tab rests flush-left and the last flush-right
+  // — no awkward empty gutter at the ends.
+  const barRef = useRef<HTMLDivElement>(null)
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({})
+  useEffect(() => {
+    const bar = barRef.current
+    const el = tabRefs.current[active]
+    if (!bar || !el) return
+    const target = el.offsetLeft - (bar.clientWidth - el.clientWidth) / 2
+    const max = bar.scrollWidth - bar.clientWidth
+    bar.scrollTo({ left: Math.max(0, Math.min(target, max)), behavior: 'smooth' })
+  }, [active])
+
   return (
     <main className={s.main}>
       <TabbedHero partner={partner} />
@@ -50,10 +65,11 @@ export function TabbedTemplate({ partner, onBook }: TemplateProps) {
         <>
           {/* Sticky tab bar */}
           <nav className={s.tabBar} role="tablist" aria-label={t('partner.services.title')}>
-            <div className={s.tabInner}>
+            <div className={s.tabInner} ref={barRef}>
               {tabs.map((tab) => (
                 <button
                   key={tab.key}
+                  ref={(el) => { tabRefs.current[tab.key] = el }}
                   role="tab"
                   aria-selected={active === tab.key}
                   className={[s.tab, active === tab.key ? s.tabActive : ''].filter(Boolean).join(' ')}
