@@ -40,6 +40,9 @@
   margin: 0;
   font-family: $font-serif;
   letter-spacing: -0.01em;
+  /* Honor the line breaks the partner typed in the About field (collapses runs
+     of spaces like normal text, but keeps \n as real line breaks). */
+  white-space: pre-line;
 }
 
 /* Info card with quick facts */
