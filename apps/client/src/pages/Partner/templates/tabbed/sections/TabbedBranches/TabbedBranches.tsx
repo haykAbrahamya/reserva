@@ -26,6 +26,9 @@ export function TabbedBranches({ partner, onBook }: Props) {
   const bookable = bookableLocations(partner)
   if (bookable.length === 0) return null
 
+  // Solo pro → drop the per-card "N specialists here" row (always "1", noise).
+  const isSingle = partner.kind === 'single'
+
   const dayLabels = {
     mon: t('partner.locations.days.mon'), tue: t('partner.locations.days.tue'),
     wed: t('partner.locations.days.wed'), thu: t('partner.locations.days.thu'),
@@ -63,7 +66,9 @@ export function TabbedBranches({ partner, onBook }: Props) {
                   <Phone size={15} /> <span>{loc.phone}</span>
                 </a>
                 {hours && <div className={s.row}><Clock size={15} /> <span>{hours}</span></div>}
-                <div className={s.row}><Users size={15} /> <span>{tp('partner.locations.specialistsHere', staffHere)}</span></div>
+                {!isSingle && (
+                  <div className={s.row}><Users size={15} /> <span>{tp('partner.locations.specialistsHere', staffHere)}</span></div>
+                )}
               </div>
               <div className={s.actions}>
                 <a className={s.directions} href={mapsUrl(loc)} target="_blank" rel="noopener noreferrer">

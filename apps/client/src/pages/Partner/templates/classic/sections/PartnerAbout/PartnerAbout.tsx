@@ -20,6 +20,10 @@ export function PartnerAbout({ partner, tone = 'plain' }: Props) {
   const serviceCount = partner.services.filter(sv => sv.active).length
   const t = useT()
 
+  // A solo pro IS the whole team, so the "Specialists · N on the team" fact is
+  // meaningless — drop it in single mode and keep the remaining facts.
+  const isSingle = partner.kind === 'single'
+
   const facts = [
     {
       icon: MapPin,
@@ -30,7 +34,9 @@ export function PartnerAbout({ partner, tone = 'plain' }: Props) {
     // which was ambiguous across branches and has been removed).
     { icon: Tag, label: t('partner.about.factCategory'), value: partner.type },
     { icon: Sparkles, label: t('partner.about.factServices'), value: t('partner.about.factServicesValue', { count: serviceCount }) },
-    { icon: Users, label: t('partner.about.factSpecialists'), value: t('partner.about.factSpecialistsValue', { count: activeStaff }) },
+    ...(isSingle
+      ? []
+      : [{ icon: Users, label: t('partner.about.factSpecialists'), value: t('partner.about.factSpecialistsValue', { count: activeStaff }) }]),
   ]
 
   return (

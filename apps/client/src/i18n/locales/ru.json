@@ -260,6 +260,7 @@
       "eyebrow": "Филиалы",
       "title": "{count} филиал",
       "title_plural": "{count} филиала на выбор",
+      "titleSingle": "Где меня найти",
       "specialistsHere": "{count} специалист здесь",
       "specialistsHere_plural": "{count} специалистов здесь",
       "bookHere": "Записаться сюда",

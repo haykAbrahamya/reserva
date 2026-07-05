@@ -260,6 +260,7 @@
       "eyebrow": "Locations",
       "title": "{count} location",
       "title_plural": "{count} branches to choose from",
+      "titleSingle": "Where to find me",
       "specialistsHere": "{count} specialist here",
       "specialistsHere_plural": "{count} specialists here",
       "bookHere": "Book here",

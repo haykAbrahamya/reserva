@@ -260,6 +260,7 @@
       "eyebrow": "Մասնաճյուղեր",
       "title": "{count} մասնաճյուղ",
       "title_plural": "Ընտրելու {count} մասնաճյուղ",
+      "titleSingle": "Հասցե",
       "specialistsHere": "{count} մասնագետ",
       "specialistsHere_plural": "{count} մասնագետ",
       "bookHere": "Ամրագրել այստեղ",

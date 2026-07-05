@@ -32,14 +32,24 @@ export function PartnerLocations({ partner, onBook, tone = 'cream' }: Props) {
   // Render the section whenever there's at least one bookable branch.
   if (bookable.length === 0) return null
 
+  // A solo pro works alone at one spot, so the section is framed as "where to
+  // find me" and the per-card "N specialists here" row is dropped (it would
+  // always read "1 specialist here", which is noise).
+  const isSingle = partner.kind === 'single'
+
   const [t1, t2] = partner.presentation.heroTints
 
   return (
     <section className={[s.section, tone === 'plain' ? s.plain : ''].filter(Boolean).join(' ')} id="locations">
       <div className={s.inner}>
         <div className={s.head}>
-          <div className={s.eyebrow}>{t('partner.locations.eyebrow')}</div>
-          <h2 className={s.title}>{tp('partner.locations.title', bookable.length, { count: bookable.length })}</h2>
+          {/* Solo pro at one spot → a single clean title, no redundant eyebrow. */}
+          {!isSingle && <div className={s.eyebrow}>{t('partner.locations.eyebrow')}</div>}
+          <h2 className={s.title}>
+            {isSingle
+              ? t('partner.locations.titleSingle')
+              : tp('partner.locations.title', bookable.length, { count: bookable.length })}
+          </h2>
         </div>
 
         <div className={s.grid}>
@@ -87,10 +97,12 @@ export function PartnerLocations({ partner, onBook, tone = 'cream' }: Props) {
                       <span>{hours}</span>
                     </div>
                   )}
-                  <div className={s.row}>
-                    <Users size={15} />
-                    <span>{tp('partner.locations.specialistsHere', staffHere)}</span>
-                  </div>
+                  {!isSingle && (
+                    <div className={s.row}>
+                      <Users size={15} />
+                      <span>{tp('partner.locations.specialistsHere', staffHere)}</span>
+                    </div>
+                  )}
 
                   <div className={s.actions}>
                     {canBook(partner) && (
