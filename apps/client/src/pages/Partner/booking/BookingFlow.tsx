@@ -3,12 +3,14 @@ import { ArrowLeft, X, Check, Users, Calendar, Clock, CheckCircle2, ArrowRight, 
 import { fmtServicePrice, fmtDuration, fmtDateInput, initials } from '@reserva/shared'
 import { StarRatingDisplay } from '@/components/StarRating/StarRating'
 import { DatePicker } from '@reserva/ui'
-import type { Service, Specialist } from '@reserva/shared'
+import { DayStrip, type DayInfo } from './DayStrip/DayStrip'
+import type { Service, Specialist, WeekSchedule } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
 import {
   specialistsForService,
   bookableLocations,
   getAvailableSlots,
+  getAvailabilitySummary,
   createBooking,
 } from '@/services/booking.service'
 import { getTelegramConnectLink } from '@/services/telegram.service'
@@ -77,6 +79,16 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   // slots
   const [slots, setSlots]           = useState<string[]>([])
   const [slotsLoading, setSlotsLoading] = useState(false)
+  // The date the current `slots` were actually loaded for. Guards the empty
+  // state: we only show "no slots" once the load for the SELECTED date has
+  // finished, so switching days shows the loader instead of a stale/empty flash.
+  const [slotsForDate, setSlotsForDate] = useState<string | null>(null)
+  // Per-day availability density for the strip dots, keyed by yyyy-mm-dd. Empty
+  // until the summary loads; the strip renders fine without it (graceful).
+  const [availability, setAvailability] = useState<Record<string, 0 | 1 | 2 | 3>>({})
+  // Anchor day the 7-chip strip starts from. Normally today, but re-anchors when
+  // the user picks a far-out date via the calendar so the strip + selection agree.
+  const [stripAnchor, setStripAnchor] = useState(() => fmtDateInput(new Date()))
 
   // First step: location (multi-branch) → service → … or jump to specialist if
   // seeded. Solo partners never have a specialist step, so a seeded service
@@ -110,6 +122,93 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
     [locations, locationId]
   )
 
+  // The 7 quick-pick days shown in the strip, starting at `stripAnchor`. `closed`
+  // is derived client-side from the branch's weekly hours (same source as the
+  // public page), so closed/open days are correct even before the backend slot-
+  // count summary lands. `openDots` stays undefined until that summary wires in.
+  const stripDays: DayInfo[] = useMemo(() => {
+    const dowKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const
+    const hours = chosenLocation?.hours as WeekSchedule | undefined
+    const [ay, am, ad] = stripAnchor.split('-').map(Number)
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(ay, am - 1, ad + i)
+      const iso = fmtDateInput(d)
+      const day = hours?.[dowKeys[d.getDay()]]
+      // No structured hours → assume open (don't disable on missing data).
+      const closed = hours ? !day?.enabled : false
+      // Dots from the server summary when loaded; undefined → no signal (chip
+      // still renders + is selectable). Server also reports closed, but the
+      // client-derived `closed` above keeps the strip correct pre-summary.
+      return { date: iso, closed, openDots: availability[iso] }
+    })
+  }, [stripAnchor, chosenLocation, availability])
+
+  /** Label for a strip date ("Today" / "Tomorrow" / "Sat 26") — used in copy. */
+  const stripDateLabel = (iso: string): string => {
+    const todayIso = fmtDateInput(new Date())
+    const tmr = new Date(); tmr.setDate(tmr.getDate() + 1)
+    if (iso === todayIso) return t('booking.strip.today')
+    if (iso === fmtDateInput(tmr)) return t('booking.strip.tomorrow')
+    const [y, m, dd] = iso.split('-').map(Number)
+    const d = new Date(y, m - 1, dd)
+    const dowKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const
+    return `${t(`partner.locations.days.${dowKeys[d.getDay()]}`)} ${dd}`
+  }
+
+  // Localized strings for the shared DatePicker (English-only by default). Full
+  // month names for the header, short weekday names (Mon-first) for the column
+  // headers, and a locale-appropriate trigger format reusing common.dateShort.
+  const datePickerLabels = useMemo(() => ({
+    monthNames: Array.from({ length: 12 }, (_, i) => t(`common.monthsLong.${i}`)),
+    weekdayNames: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map(k => t(`partner.locations.days.${k}`)),
+    today: t('common.datePicker.today'),
+    clear: t('common.datePicker.clear'),
+    formatValue: (d: Date) =>
+      t('common.dateShort', { day: d.getDate(), month: t(`common.monthsShort.${d.getMonth()}`), year: d.getFullYear() }),
+  }), [t])
+
+
+  // On entering the datetime step, land the user on a day that's actually open
+  // (usually today) so they never arrive at an empty grid. Only nudges when the
+  // current date is a closed day within the strip — a deliberate calendar pick
+  // of a far/closed date is left untouched.
+  useEffect(() => {
+    if (step !== 'datetime') return
+    const current = stripDays.find(d => d.date === date)
+    if (current && !current.closed) return
+    const firstOpen = stripDays.find(d => !d.closed)
+    if (firstOpen && firstOpen.date !== date) {
+      setDate(firstOpen.date)
+      setTime(null)
+    }
+    // Run when the step opens or the branch (→ hours) changes, not on every
+    // date change, so manual selections stick.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, chosenLocation])
+
+  // Load the 7-day availability summary for the strip dots when entering the
+  // datetime step, or when the service / specialist / branch / anchor changes.
+  // Best-effort: on failure the strip simply renders without dots.
+  useEffect(() => {
+    if (step !== 'datetime' || !service) return
+    let active = true
+    getAvailabilitySummary({
+      partner,
+      service,
+      specialistId: specialistId === ANY_SPECIALIST ? null : specialistId,
+      locationId,
+      from: stripAnchor,
+      days: 7,
+    })
+      .then(rows => {
+        if (!active) return
+        const map: Record<string, 0 | 1 | 2 | 3> = {}
+        for (const r of rows) map[r.date] = r.closed ? 0 : r.openDots
+        setAvailability(map)
+      })
+      .catch(() => { if (active) setAvailability({}) })
+    return () => { active = false }
+  }, [step, service, partner, specialistId, locationId, stripAnchor])
 
   // Load slots when entering the datetime step (or changing date/specialist).
   useEffect(() => {
@@ -117,6 +216,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
     let active = true
     setSlotsLoading(true)
     setSlots([])
+    setSlotsForDate(null) // invalidate: results below are not yet for `date`
     getAvailableSlots({
       partner,
       service,
@@ -126,6 +226,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
     }).then(res => {
       if (!active) return
       setSlots(res)
+      setSlotsForDate(date)
       setSlotsLoading(false)
     })
     return () => { active = false }
@@ -547,19 +648,57 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
               {/* STEP: datetime */}
               {step === 'datetime' && (
                 <div>
-                  <div className={s.dateField}>
-                    <label className={s.fieldLabel}>{t('booking.dateLabel')}</label>
-                    <DatePicker value={date} min={fmtDateInput(new Date())} onChange={v => { setDate(v); setTime(null) }} />
+                  <label className={s.fieldLabel}>{t('booking.dateLabel')}</label>
+
+                  {/* Quick day strip — the primary path for the common case of
+                      booking within the next week. */}
+                  <DayStrip days={stripDays} selected={date} onSelect={v => { setDate(v); setTime(null) }} />
+
+                  {/* Calendar escape hatch for dates beyond the strip. DatePicker
+                      owns its own floating calendar panel (anchored dropdown), so
+                      it overlays rather than reflowing the slots below. */}
+                  <div className={s.pickDateRow}>
+                    <DatePicker
+                      variant="link"
+                      value={date}
+                      min={fmtDateInput(new Date())}
+                      placeholder={t('booking.strip.pickAnother')}
+                      labels={datePickerLabels}
+                      onChange={v => {
+                        setDate(v); setTime(null)
+                        // Re-anchor the strip so it opens on the picked date and
+                        // the two date UIs always agree.
+                        setStripAnchor(v)
+                      }}
+                    />
                   </div>
 
                   <label className={s.fieldLabel}>{t('booking.availableTimes')}</label>
                   <div className={s.slotsWrap}>
-                    {slotsLoading ? (
+                    {slotsLoading || slotsForDate !== date ? (
                       <div className={s.slotsLoading}>
                         <span className={s.miniSpinner} /> {t('booking.findingSlots')}
                       </div>
                     ) : slots.length === 0 ? (
-                      <div className={s.noSlots}>{t('booking.noSlots')}</div>
+                      (() => {
+                        // A full/closed day is a dead end today — offer the next
+                        // open day in the strip as a one-tap jump.
+                        const next = stripDays.find(d => d.date > date && !d.closed)
+                        return (
+                          <div className={s.noSlots}>
+                            <div>{t('booking.noSlots')}</div>
+                            {next && (
+                              <button
+                                type="button"
+                                className={s.nextOpenBtn}
+                                onClick={() => { setDate(next.date); setTime(null) }}
+                              >
+                                {t('booking.strip.nextOpening', { day: stripDateLabel(next.date) })}
+                              </button>
+                            )}
+                          </div>
+                        )
+                      })()
                     ) : (
                       <div className={s.slotGrid}>
                         {slots.map(sl => (

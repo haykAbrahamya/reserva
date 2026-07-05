@@ -10,7 +10,7 @@ import { partnersService } from '@/services/partners.service'
 import { useNewBooking } from '@/App'
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
 import { useScopedLocationId } from '@/store/auth.hooks'
-import { useI18n, useDateLocale } from '@/i18n'
+import { useI18n, useDateLocale, useDatePickerLabels } from '@/i18n'
 import type { Booking } from '@/types'
 import s from './Bookings.module.scss'
 
@@ -42,6 +42,7 @@ export function Bookings() {
   const scopedLocationId = useScopedLocationId()
   const { t, tp }      = useI18n()
   const dateLocale     = useDateLocale()
+  const dateLabels     = useDatePickerLabels()
 
   const [statusFilter, setStatusFilter] = useState('all')
   const [selectedId,   setSelectedId]   = useState<string | null>(null)
@@ -178,9 +179,9 @@ export function Bookings() {
           />
 
           <div className={s.dateRange}>
-            <DatePicker className={s.dateInput} value={fromFilter} onChange={v => patchParams({ from: v })} placeholder={t('bookings.dateFrom')} />
+            <DatePicker className={s.dateInput} value={fromFilter} onChange={v => patchParams({ from: v })} placeholder={t('bookings.dateFrom')} labels={dateLabels} />
             <span className={s.dateDash}>–</span>
-            <DatePicker className={s.dateInput} value={toFilter} min={fromFilter || undefined} onChange={v => patchParams({ to: v })} placeholder={t('bookings.dateTo')} />
+            <DatePicker className={s.dateInput} value={toFilter} min={fromFilter || undefined} onChange={v => patchParams({ to: v })} placeholder={t('bookings.dateTo')} labels={dateLabels} />
           </div>
 
           {hasExtraFilters && (

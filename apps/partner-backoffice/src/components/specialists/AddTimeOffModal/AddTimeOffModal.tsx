@@ -6,7 +6,7 @@ import { usePartner } from '@/store/app.store'
 import { partnersService } from '@/services/partners.service'
 import { fmtDateInput, fmtTime } from '@/utils/format'
 import { findConflictingBookings } from '@/utils/timeOff'
-import { useI18n, useDateLocale } from '@/i18n'
+import { useI18n, useDateLocale, useDatePickerLabels } from '@/i18n'
 import type { Specialist, SpecialistTimeOff, Booking } from '@/types'
 import s from './AddTimeOffModal.module.scss'
 
@@ -59,6 +59,7 @@ export function AddTimeOffModal({ open, specialist, bookings, editing, initialDr
   const navigate = useNavigate()
   const { t, tp } = useI18n()
   const dateLocale = useDateLocale()
+  const dateLabels = useDatePickerLabels()
   const today    = fmtDateInput(new Date())
 
   const [type,      setType]      = useState<OffType>('partial')
@@ -264,15 +265,15 @@ export function AddTimeOffModal({ open, specialist, bookings, editing, initialDr
         {type === 'range' ? (
           <div className={s.row2}>
             <Field label={t('timeOff.startDateLabel')}>
-              <DatePicker value={date} min={today} onChange={v => { setDate(v); if (v > endDate) setEndDate(v) }} />
+              <DatePicker value={date} min={today} onChange={v => { setDate(v); if (v > endDate) setEndDate(v) }} labels={dateLabels} />
             </Field>
             <Field label={t('timeOff.endDateLabel')}>
-              <DatePicker value={endDate} min={date} onChange={setEndDate} />
+              <DatePicker value={endDate} min={date} onChange={setEndDate} labels={dateLabels} />
             </Field>
           </div>
         ) : (
           <Field label={t('timeOff.dateLabel')}>
-            <DatePicker value={date} min={today} onChange={setDate} />
+            <DatePicker value={date} min={today} onChange={setDate} labels={dateLabels} />
           </Field>
         )}
 

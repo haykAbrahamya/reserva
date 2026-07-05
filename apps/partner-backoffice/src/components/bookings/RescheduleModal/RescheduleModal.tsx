@@ -5,7 +5,7 @@ import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import { bookingsService } from '@/services/bookings.service'
 import { fmtDateInput, fmtDateTime } from '@/utils/format'
-import { useT, useDateLocale } from '@/i18n'
+import { useT, useDateLocale, useDatePickerLabels } from '@/i18n'
 import type { Booking } from '@/types'
 import s from './RescheduleModal.module.scss'
 
@@ -21,6 +21,7 @@ export function RescheduleModal({ booking, onClose, onDone }: Props) {
   const toast         = useToast()
   const t             = useT()
   const dateLocale    = useDateLocale()
+  const dateLabels    = useDatePickerLabels()
   const today         = fmtDateInput(new Date())
 
   const start = new Date(booking.startISO)
@@ -139,7 +140,7 @@ export function RescheduleModal({ booking, onClose, onDone }: Props) {
         </div>
 
         <div>
-          <DatePicker label={t('reschedule.newDate')} value={date} min={today} onChange={setDate} />
+          <DatePicker label={t('reschedule.newDate')} value={date} min={today} onChange={setDate} labels={dateLabels} />
         </div>
 
         <div>

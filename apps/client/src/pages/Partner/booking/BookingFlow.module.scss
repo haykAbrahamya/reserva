@@ -214,7 +214,14 @@
   display: block;
 }
 
-.slotsWrap { min-height: 120px; }
+/* Reserve a stable MIN height for the slot grid so switching between the spinner,
+   a short day, and a long day never shrinks the modal below this floor (which is
+   what caused it to jump/re-center). No max-height here on purpose: longer days
+   extend the content and use the modal body's single scrollbar, rather than
+   introducing a second inner scrollbar. */
+.slotsWrap {
+  min-height: 210px;
+}
 .slotsLoading {
   display: flex;
   align-items: center;
@@ -260,10 +267,39 @@
   }
 }
 .noSlots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   text-align: center;
-  padding: 32px 12px;
+  padding: 28px 12px;
   color: $fg-2;
   font-size: 14px;
+}
+
+/* Secondary "Pick another date" control — the shared DatePicker in its minimal
+   link variant. Its calendar panel floats (anchored dropdown), so opening it
+   never reflows the slots below. */
+.pickDateRow {
+  margin-bottom: 18px;
+}
+
+/* "Next opening: Sat 26" jump inside the empty state. */
+.nextOpenBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, $line-2);
+  background: $accent-soft;
+  color: $accent;
+  font-family: $font-sans;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  &:hover { background: color-mix(in srgb, var(--accent) 16%, transparent); }
 }
 
 /* ── Details step ── */

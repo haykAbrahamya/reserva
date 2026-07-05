@@ -37,6 +37,33 @@
   &.open .calIcon { color: $accent; }
 }
 
+/* Minimal inline link trigger (variant="link") — a quiet secondary affordance. */
+.linkTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 2px;
+  background: none;
+  border: none;
+  color: $accent;
+  font-family: $font-sans;
+  font-size: $text-md;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  &:hover { opacity: 0.78; }
+
+  .linkIcon { color: $accent; flex-shrink: 0; }
+  .linkChevron {
+    color: $accent;
+    flex-shrink: 0;
+    opacity: 0.75;
+    transition: transform 0.15s;
+  }
+  &.open .linkChevron { transform: rotate(180deg); }
+}
+
 /* â”€â”€ Popover â”€â”€ */
 /* Positioned by useAnchoredDropdown (fixed, portalled to body). */
 .popover {
@@ -146,9 +173,11 @@
   }
 
   &.selected {
-    background: $fg-0;
-    color: $bg-1;
+    background: $accent;
+    color: #fff;
     font-weight: 600;
+    // Keep the selected fill stable — no hover shift on the already-chosen day.
+    &:hover { background: $accent; }
   }
 
   &.otherMonth { color: $fg-3; }

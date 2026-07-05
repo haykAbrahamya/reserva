@@ -190,6 +190,34 @@ export async function getAvailableSlots(q: SlotQuery): Promise<string[]> {
   return api<string[]>(`/public/partners/${q.partner.slug}/slots?${params.toString()}`)
 }
 
+/** One day's availability signal for the booking day-strip. */
+export interface DayAvailability {
+  date: string
+  closed: boolean
+  openDots: 0 | 1 | 2 | 3
+}
+
+export interface AvailabilitySummaryQuery {
+  partner: PublicPartner
+  service: Service
+  specialistId: string | null
+  locationId: string | null
+  /** First day (yyyy-mm-dd) of the window. */
+  from: string
+  /** Number of days to summarize (server clamps; the strip uses 7). */
+  days?: number
+}
+
+/** Per-day availability density for the day-strip. Newest booking logic reused
+ *  server-side; here we just fetch the compact per-day buckets. */
+export async function getAvailabilitySummary(q: AvailabilitySummaryQuery): Promise<DayAvailability[]> {
+  const params = new URLSearchParams({ serviceId: q.service.id, from: q.from })
+  if (q.specialistId) params.set('specialistId', q.specialistId)
+  if (q.locationId) params.set('locationId', q.locationId)
+  if (q.days) params.set('days', String(q.days))
+  return api<DayAvailability[]>(`/public/partners/${q.partner.slug}/availability-summary?${params.toString()}`)
+}
+
 export interface CreateBookingInput {
   partner: PublicPartner
   service: Service

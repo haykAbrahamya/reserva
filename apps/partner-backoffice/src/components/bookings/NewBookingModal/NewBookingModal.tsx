@@ -9,7 +9,7 @@ import { partnersService } from '@/services/partners.service'
 import { slotBlockedByTimeOff } from '@/utils/timeOff'
 import { fmtDateInput } from '@/utils/format'
 import { errorMessage } from '@/utils/errors'
-import { useT, useDateLocale } from '@/i18n'
+import { useT, useDateLocale, useDatePickerLabels } from '@/i18n'
 import type { SpecialistTimeOff } from '@/types'
 import s from './NewBookingModal.module.scss'
 
@@ -32,6 +32,7 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
   const scopedLocationId = useScopedLocationId()
   const t             = useT()
   const dateLocale    = useDateLocale()
+  const dateLabels    = useDatePickerLabels()
   const today         = fmtDateInput(new Date())
 
   // All hooks must be declared before any conditional return
@@ -267,7 +268,7 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
         )}
 
         <div>
-          <DatePicker label={t('newBooking.dateLabel')} value={date} min={today} onChange={setDate} />
+          <DatePicker label={t('newBooking.dateLabel')} value={date} min={today} onChange={setDate} labels={dateLabels} />
         </div>
 
         <div className={s.full}>

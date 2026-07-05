@@ -1,0 +1,29 @@
+/*
+ * Internal-backoffice theme overrides.
+ *
+ * This platform console runs dark by default and is far more data-dense than the
+ * client / partner apps (small 12–13px labels, meta lines, table text). On dark,
+ * the shared muted inks (--fg-2 / --fg-3) sit below WCAG AA contrast for small
+ * text, so labels like the dashboard stat captions read as barely visible.
+ *
+ * We lift the muted inks a step for THIS app only — imported after
+ * '@reserva/ui/styles' so it wins over the shared tokens, and scoped to dark so
+ * the (unused) light theme is untouched. The client + partner palettes, which
+ * were approved as-is, are unaffected.
+ */
+[data-theme='dark'] {
+  --fg-2: #ABA192; /* muted — was #968D7F; lifted for small-text legibility */
+  --fg-3: #837B6E; /* tertiary — was #6A6358; lifted so it's not near-invisible */
+}
+
+/*
+ * <button> text does NOT inherit `color` from the body by default — the UA gives
+ * it its own (near-black) canvas text color. The shared button reset only sets
+ * font-family/cursor, so any text inside a button that lacks an explicit color
+ * (e.g. the dashboard's recent-partner NAME, which sits inside a clickable row
+ * button) renders black and vanishes on dark. Make buttons inherit the themed
+ * ink so those inherit-only labels are legible.
+ */
+button {
+  color: inherit;
+}

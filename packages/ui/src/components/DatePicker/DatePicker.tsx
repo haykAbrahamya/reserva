@@ -1,11 +1,25 @@
 import { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ChevronDown, CalendarDays } from 'lucide-react'
 import { fmtDateInput } from '@reserva/shared'
 import { useAnchoredDropdown } from '../common/useAnchoredDropdown'
 import s from './DatePicker.module.scss'
 
 const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
 const MONTHS   = ['January','February','March','April','May','June','July','August','September','October','November','December']
+
+/**
+ * Localizable text for the calendar. All optional — the package stays English by
+ * default; apps pass translated strings from their own i18n. `monthNames` is
+ * Jan→Dec (index 0–11); `weekdayNames` is Mon→Sun (Mon-first, matching the grid).
+ * `formatValue` renders the selected date in the trigger (defaults to en-GB long).
+ */
+export interface DatePickerLabels {
+  monthNames?: string[]
+  weekdayNames?: string[]
+  today?: string
+  clear?: string
+  formatValue?: (d: Date) => string
+}
 
 interface DatePickerProps {
   value: string          // 'YYYY-MM-DD' or ''
@@ -15,6 +29,15 @@ interface DatePickerProps {
   label?: string
   placeholder?: string
   className?: string
+  /**
+   * Trigger appearance. `field` (default) is the bordered input-style button;
+   * `link` is a minimal inline text+icon affordance for use as a secondary
+   * "pick a date" action beside another primary picker. Both share the same
+   * floating calendar panel.
+   */
+  variant?: 'field' | 'link'
+  /** Localized calendar strings; English fallbacks when omitted. */
+  labels?: DatePickerLabels
 }
 
 function parseDate(s: string): Date | null {
@@ -37,9 +60,16 @@ function buildCalendar(year: number, month: number): (Date | null)[] {
   return cells
 }
 
-export function DatePicker({ value, onChange, min, max, label, placeholder = 'Select date', className = '' }: DatePickerProps) {
+export function DatePicker({ value, onChange, min, max, label, placeholder = 'Select date', className = '', variant = 'field', labels }: DatePickerProps) {
   const selected = parseDate(value)
   const today    = new Date(); today.setHours(0,0,0,0)
+
+  const months     = labels?.monthNames   ?? MONTHS
+  const weekdays   = labels?.weekdayNames ?? WEEKDAYS
+  const todayLabel = labels?.today ?? 'Today'
+  const clearLabel = labels?.clear ?? 'Clear'
+  const formatValue = labels?.formatValue
+    ?? ((d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }))
 
   const { open, setOpen, triggerRef, renderPanel } = useAnchoredDropdown(288)
   const [year,  setYear]  = useState(() => selected?.getFullYear() ?? today.getFullYear())
@@ -73,9 +103,7 @@ export function DatePicker({ value, onChange, min, max, label, placeholder = 'Se
     return false
   }
 
-  const displayValue = selected
-    ? selected.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-    : ''
+  const displayValue = selected ? formatValue(selected) : ''
 
   const cells = buildCalendar(year, month)
 
@@ -83,14 +111,26 @@ export function DatePicker({ value, onChange, min, max, label, placeholder = 'Se
     <div className={[s.wrap, className].filter(Boolean).join(' ')} ref={triggerRef}>
       {label && <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', marginBottom: 6 }}>{label}</label>}
 
-      <button
-        type="button"
-        className={[s.trigger, open ? s.open : '', !displayValue ? s.placeholder : ''].filter(Boolean).join(' ')}
-        onClick={() => setOpen(o => !o)}
-      >
-        <span>{displayValue || placeholder}</span>
-        <CalendarDays size={15} className={s.calIcon} />
-      </button>
+      {variant === 'link' ? (
+        <button
+          type="button"
+          className={[s.linkTrigger, open ? s.open : ''].filter(Boolean).join(' ')}
+          onClick={() => setOpen(o => !o)}
+        >
+          <CalendarDays size={15} className={s.linkIcon} />
+          <span>{displayValue || placeholder}</span>
+          <ChevronDown size={14} className={s.linkChevron} />
+        </button>
+      ) : (
+        <button
+          type="button"
+          className={[s.trigger, open ? s.open : '', !displayValue ? s.placeholder : ''].filter(Boolean).join(' ')}
+          onClick={() => setOpen(o => !o)}
+        >
+          <span>{displayValue || placeholder}</span>
+          <CalendarDays size={15} className={s.calIcon} />
+        </button>
+      )}
 
       {renderPanel(
         <>
@@ -99,7 +139,7 @@ export function DatePicker({ value, onChange, min, max, label, placeholder = 'Se
             <button className={s.navBtn} onClick={prevMonth} type="button">
               <ChevronLeft size={13} />
             </button>
-            <span className={s.monthLabel}>{MONTHS[month]} {year}</span>
+            <span className={s.monthLabel}>{months[month]} {year}</span>
             <button className={s.navBtn} onClick={nextMonth} type="button">
               <ChevronRight size={13} />
             </button>
@@ -107,7 +147,7 @@ export function DatePicker({ value, onChange, min, max, label, placeholder = 'Se
 
           {/* Weekday headers */}
           <div className={s.weekdays}>
-            {WEEKDAYS.map(d => <div key={d} className={s.weekday}>{d}</div>)}
+            {weekdays.map((d, i) => <div key={i} className={s.weekday}>{d}</div>)}
           </div>
 
           {/* Day grid */}
@@ -143,8 +183,8 @@ export function DatePicker({ value, onChange, min, max, label, placeholder = 'Se
 
           {/* Footer */}
           <div className={s.footer}>
-            <button type="button" className={s.todayBtn} onClick={goToday}>Today</button>
-            {value && <button type="button" className={s.clearBtn} onClick={clear}>Clear</button>}
+            <button type="button" className={s.todayBtn} onClick={goToday}>{todayLabel}</button>
+            {value && <button type="button" className={s.clearBtn} onClick={clear}>{clearLabel}</button>}
           </div>
         </>,
         s.popover,

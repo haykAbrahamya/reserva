@@ -5,6 +5,7 @@
 
 export { Button } from './components/Button/Button'
 export { DatePicker } from './components/DatePicker/DatePicker'
+export type { DatePickerLabels } from './components/DatePicker/DatePicker'
 export { TimePicker } from './components/TimePicker/TimePicker'
 export { Input, Textarea } from './components/Input/Input'
 export { Badge } from './components/Badge/Badge'

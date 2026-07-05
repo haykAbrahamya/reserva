@@ -1,0 +1,117 @@
+@use 'variables' as *;
+
+.strip {
+  display: grid;
+  grid-auto-flow: column;
+  // 7 equal chips fill the modal width on desktop; on narrow screens they hold a
+  // comfortable min width and the row scrolls.
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 7px;
+  overflow-x: auto;
+  padding: 2px;
+  margin-bottom: 16px;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+
+  // Below this width, 7 equal columns get too cramped — switch to fixed-width
+  // chips that scroll, with a trailing fade to hint there's more.
+  @media (max-width: 460px) {
+    grid-auto-columns: 58px;
+    mask-image: linear-gradient(to right, #000 calc(100% - 18px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 18px), transparent 100%);
+  }
+}
+
+.chip {
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+  // Fixed, consistent height so chips read as tidy tiles regardless of how wide
+  // the 1fr columns get on desktop.
+  height: 64px;
+  padding: 8px 4px;
+  border-radius: $r-2;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-1;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s, color 0.12s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover:not(:disabled):not(.selected) { border-color: $line-strong; background: $bg-2; }
+  &:active:not(:disabled) { transform: scale(0.96); }
+
+  &.selected {
+    border-color: $accent;
+    background: $accent;
+    color: #fff;
+    // Keep the accent fill stable on hover — the chosen day shouldn't shift.
+    &:hover { border-color: $accent; background: $accent; }
+    .dow { color: color-mix(in srgb, #fff 82%, transparent); }
+    .dot { background: color-mix(in srgb, #fff 40%, transparent); }
+    .dotOn { background: #fff; }
+    .stateText { color: color-mix(in srgb, #fff 82%, transparent); }
+  }
+
+  // Fully booked: still tappable (peek at the empty grid / read the message),
+  // just visually recessed.
+  &.full:not(.selected) { opacity: 0.62; }
+
+  // Closed weekday: disabled, clearly inert.
+  &.closed {
+    opacity: 0.4;
+    cursor: default;
+    background: transparent;
+  }
+}
+
+.dow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: $fg-3;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.num {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  color: inherit;
+}
+
+// Fixed-height signal row so chips keep the same height across all states.
+.signal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 8px;
+}
+
+.dots { display: inline-flex; gap: 3px; }
+.dotsPlaceholder { display: inline-block; height: 5px; }
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 22%, $line-2);
+}
+.dotOn { background: $accent; }
+
+.stateText {
+  font-size: 10px;
+  font-weight: 600;
+  color: $fg-3;
+  text-transform: none;
+}
