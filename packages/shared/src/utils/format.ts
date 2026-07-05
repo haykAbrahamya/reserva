@@ -62,11 +62,23 @@ export function fmtDateTime(iso: string): string {
     d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
 }
 
-export function fmtDuration(minutes: number): string {
-  if (minutes < 60) return `${minutes} min`
+/**
+ * Unit labels for {@link fmtDuration}. Defaults to English so non-localized
+ * callers (e.g. backoffice) keep their current output; the client app passes
+ * translated labels from its i18n bundle.
+ */
+export interface DurationLabels {
+  /** Minutes unit, e.g. "min" / "րոպե" / "мин". */
+  min: string
+  /** Hours unit, e.g. "h" / "ժ" / "ч". */
+  h: string
+}
+
+export function fmtDuration(minutes: number, labels: DurationLabels = { min: 'min', h: 'h' }): string {
+  if (minutes < 60) return `${minutes} ${labels.min}`
   const h = Math.floor(minutes / 60)
   const m = minutes % 60
-  return m > 0 ? `${h}h ${m}min` : `${h}h`
+  return m > 0 ? `${h}${labels.h} ${m}${labels.min}` : `${h}${labels.h}`
 }
 
 export function initials(name: string): string {

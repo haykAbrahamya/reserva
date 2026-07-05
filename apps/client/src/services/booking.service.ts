@@ -257,10 +257,27 @@ export interface SpecialistReview {
   createdAt: string
 }
 
-/** Fetch a specialist's public reviews (newest first). */
-export function getSpecialistReviews(slug: string, specialistId: string): Promise<SpecialistReview[]> {
-  return api<SpecialistReview[]>(
-    `/public/partners/${encodeURIComponent(slug)}/specialists/${encodeURIComponent(specialistId)}/reviews`,
+/** One page of reviews + the cursor for the next page (null when at the end). */
+export interface SpecialistReviewPage {
+  items: SpecialistReview[]
+  nextCursor: string | null
+}
+
+/**
+ * Fetch a page of a specialist's public reviews (newest first). Pass the previous
+ * page's `nextCursor` to load the next page; omit it for the first page.
+ */
+export function getSpecialistReviews(
+  slug: string,
+  specialistId: string,
+  opts: { cursor?: string; take?: number } = {},
+): Promise<SpecialistReviewPage> {
+  const qs = new URLSearchParams()
+  if (opts.cursor) qs.set('cursor', opts.cursor)
+  if (opts.take) qs.set('take', String(opts.take))
+  const query = qs.toString()
+  return api<SpecialistReviewPage>(
+    `/public/partners/${encodeURIComponent(slug)}/specialists/${encodeURIComponent(specialistId)}/reviews${query ? `?${query}` : ''}`,
   )
 }
 

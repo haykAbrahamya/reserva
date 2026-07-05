@@ -45,7 +45,15 @@ export function PartnerLocations({ partner, onBook, tone = 'cream' }: Props) {
         <div className={s.grid}>
           {bookable.map((loc, i) => {
             const staffHere = partner.specialists.filter(sp => sp.active && sp.locationId === loc.id).length
-            const hours = summarizeHours(loc.hours, t('partner.locations.closed'))
+            const hours = summarizeHours(loc.hours, t('partner.locations.closed'), {
+              mon: t('partner.locations.days.mon'),
+              tue: t('partner.locations.days.tue'),
+              wed: t('partner.locations.days.wed'),
+              thu: t('partner.locations.days.thu'),
+              fri: t('partner.locations.days.fri'),
+              sat: t('partner.locations.days.sat'),
+              sun: t('partner.locations.days.sun'),
+            })
             return (
               <Reveal key={loc.id} className={s.card} delay={(i % 2) * 60}>
                 <div

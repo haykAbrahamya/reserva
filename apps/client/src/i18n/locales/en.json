@@ -1,7 +1,12 @@
 {
   "common": {
     "dash": "—",
-    "close": "Close"
+    "close": "Close",
+    "monthsShort": {
+      "0": "Jan", "1": "Feb", "2": "Mar", "3": "Apr", "4": "May", "5": "Jun",
+      "6": "Jul", "7": "Aug", "8": "Sep", "9": "Oct", "10": "Nov", "11": "Dec"
+    },
+    "dateShort": "{month} {day}, {year}"
   },
   "seo": {
     "home": {
@@ -227,7 +232,9 @@
       "eyebrow": "Menu",
       "title": "Services & pricing",
       "all": "All",
-      "book": "Book"
+      "book": "Book",
+      "min": "min",
+      "hour": "h"
     },
     "about": {
       "eyebrow": "About {name}",
@@ -251,7 +258,16 @@
       "call": "Call",
       "directions": "Directions",
       "openInMaps": "Open in Google Maps",
-      "closed": "Closed"
+      "closed": "Closed",
+      "days": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      }
     },
     "team": {
       "eyebrow": "The team",
@@ -280,7 +296,7 @@
     },
     "footer": {
       "title": "Ready when you are",
-      "text": "Pick a time that works for you and book your appointment at {name} in seconds.",
+      "text": "Pick a time that works for you and book your appointment in seconds.",
       "bookNow": "Book now",
       "poweredBy": "Powered by Reserva"
     }
@@ -308,7 +324,8 @@
       "anonymous": "Anonymous",
       "emptyTitle": "No reviews yet",
       "emptyText": "Be the first to share your experience with {name}.",
-      "beFirst": "Write the first review"
+      "beFirst": "Write the first review",
+      "loadMore": "Show more reviews"
     },
     "bookWith": "Book with {name}",
     "close": "Close"

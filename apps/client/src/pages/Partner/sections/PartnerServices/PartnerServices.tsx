@@ -60,7 +60,7 @@ export function PartnerServices({ partner, onBook, tone = 'cream' }: Props) {
               <div className={s.cardBody}>
                 <div className={s.svcName}>{sv.name}</div>
                 <div className={s.svcMeta}>
-                  <span>{fmtDuration(sv.duration)}</span>
+                  <span>{fmtDuration(sv.duration, { min: t('partner.services.min'), h: t('partner.services.hour') })}</span>
                   <span className={s.dot} />
                   <span>{sv.category}</span>
                 </div>

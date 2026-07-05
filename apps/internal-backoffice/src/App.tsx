@@ -20,7 +20,7 @@ import { Visits } from '@/pages/Visits/Visits'
 function ThemeApplier() {
   useEffect(() => {
     const root = document.documentElement
-    root.setAttribute('data-theme', 'light')
+    root.setAttribute('data-theme', 'dark')
     root.setAttribute('data-density', 'comfortable')
     // Reserva platform accent (indigo) — distinct from any single tenant brand.
     root.style.setProperty('--accent', '#4f46e5')

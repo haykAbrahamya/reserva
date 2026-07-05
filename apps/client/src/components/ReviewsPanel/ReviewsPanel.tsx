@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { MessageSquarePlus, Loader2, MessagesSquare } from 'lucide-react'
+import { MessageSquarePlus, Loader2, MessagesSquare, ChevronDown } from 'lucide-react'
 import { StarRatingDisplay, StarRatingInput } from '@/components/StarRating/StarRating'
 import {
   getSpecialistReviews,
@@ -27,10 +27,12 @@ interface Props {
  * PartnerReviews section so the review flow lives in exactly one place.
  */
 export function ReviewsPanel({ slug, specialistId, emptyName }: Props) {
-  const { t, locale } = useI18n()
+  const { t } = useI18n()
 
   const [reviews, setReviews] = useState<SpecialistReview[] | null>(null)
   const [loading, setLoading] = useState(true)
+  const [nextCursor, setNextCursor] = useState<string | null>(null)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [formOpen, setFormOpen] = useState(false)
   const [stars, setStars] = useState(0)
   const [author, setAuthor] = useState('')
@@ -43,11 +45,25 @@ export function ReviewsPanel({ slug, specialistId, emptyName }: Props) {
     let active = true
     setLoading(true)
     getSpecialistReviews(slug, specialistId)
-      .then(r => { if (active) setReviews(r) })
-      .catch(() => { if (active) setReviews([]) })
+      .then(page => { if (active) { setReviews(page.items); setNextCursor(page.nextCursor) } })
+      .catch(() => { if (active) { setReviews([]); setNextCursor(null) } })
       .finally(() => { if (active) setLoading(false) })
     return () => { active = false }
   }, [slug, specialistId])
+
+  const loadMore = async () => {
+    if (!nextCursor || loadingMore) return
+    setLoadingMore(true)
+    try {
+      const page = await getSpecialistReviews(slug, specialistId, { cursor: nextCursor })
+      setReviews(prev => [...(prev ?? []), ...page.items])
+      setNextCursor(page.nextCursor)
+    } catch {
+      // Leave the list as-is on failure; the button stays for a retry.
+    } finally {
+      setLoadingMore(false)
+    }
+  }
 
   const submitReview = async () => {
     if (stars < 1) { setError(t('specialistModal.review.pickStars')); return }
@@ -70,8 +86,16 @@ export function ReviewsPanel({ slug, specialistId, emptyName }: Props) {
     }
   }
 
-  const fmtDate = (iso: string) =>
-    new Date(iso).toLocaleDateString(locale === 'hy' ? 'hy-AM' : locale, { day: 'numeric', month: 'short', year: 'numeric' })
+  // Format from our own i18n bundle rather than Intl: some runtimes lack
+  // Armenian month data and silently fall back to English month names.
+  const fmtDate = (iso: string) => {
+    const d = new Date(iso)
+    return t('common.dateShort', {
+      day: d.getDate(),
+      month: t(`common.monthsShort.${d.getMonth()}`),
+      year: d.getFullYear(),
+    })
+  }
 
   const hasReviews = (reviews?.length ?? 0) > 0
 
@@ -141,6 +165,14 @@ export function ReviewsPanel({ slug, specialistId, emptyName }: Props) {
               <div className={s.reviewDate}>{fmtDate(r.createdAt)}</div>
             </div>
           ))}
+          {nextCursor && (
+            <button className={s.loadMoreBtn} onClick={loadMore} disabled={loadingMore}>
+              {loadingMore
+                ? <Loader2 size={15} className={s.spin} />
+                : <ChevronDown size={15} />}
+              {t('specialistModal.review.loadMore')}
+            </button>
+          )}
         </div>
       ) : !formOpen && (
         <div className={s.emptyReviews}>

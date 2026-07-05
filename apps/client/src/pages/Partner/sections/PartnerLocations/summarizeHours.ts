@@ -3,9 +3,11 @@ import type { WeekSchedule, WorkingDay } from '@reserva/shared'
 const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const
 type DayKey = (typeof DAY_KEYS)[number]
 
-// Short day labels for the public page. Locale-independent abbreviations match
-// the "Mon–Sat · 10:00–19:00" convention already used across the product.
-const SHORT: Record<DayKey, string> = {
+/** Short day labels keyed by day, e.g. `{ mon: 'Mon', … }`. */
+export type DayLabels = Record<DayKey, string>
+
+// English fallback so non-localized callers keep the "Mon–Sat" convention.
+const SHORT: DayLabels = {
   mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun',
 }
 
@@ -15,8 +17,13 @@ const SHORT: Record<DayKey, string> = {
  *   Mon–Sat · 10:00–19:00
  *   Mon–Fri · 09:00–18:00, Sat · 10:00–14:00
  * Returns `closedLabel` when no days are open, and '' when there's no schedule.
+ * `dayLabels` supplies localized short day names (defaults to English).
  */
-export function summarizeHours(schedule: WeekSchedule | undefined, closedLabel: string): string {
+export function summarizeHours(
+  schedule: WeekSchedule | undefined,
+  closedLabel: string,
+  dayLabels: DayLabels = SHORT,
+): string {
   if (!schedule) return ''
   const open = DAY_KEYS.filter((k) => schedule[k]?.enabled)
   if (open.length === 0) return closedLabel
@@ -39,8 +46,8 @@ export function summarizeHours(schedule: WeekSchedule | undefined, closedLabel: 
     .map((r) => {
       const span =
         r.days.length === 1
-          ? SHORT[r.days[0]]
-          : `${SHORT[r.days[0]]}–${SHORT[r.days[r.days.length - 1]]}`
+          ? dayLabels[r.days[0]]
+          : `${dayLabels[r.days[0]]}–${dayLabels[r.days[r.days.length - 1]]}`
       return `${span} · ${r.start}–${r.end}`
     })
     .join(', ')

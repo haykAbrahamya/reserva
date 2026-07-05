@@ -29,7 +29,7 @@ export function PartnerFooter({ partner, onBook }: Props) {
             <div className={s.panelInner}>
               <h2 className={s.panelTitle}>{t('partner.footer.title')}</h2>
               <p className={s.panelText}>
-                {t('partner.footer.text', { name: partner.name })}
+                {t('partner.footer.text')}
               </p>
               {canBook(partner) ? (
                 <button className={s.bookBtn} onClick={onBook}>

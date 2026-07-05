@@ -51,7 +51,7 @@ export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
       partnerId: '',
-      theme: 'light',
+      theme: 'dark',
       density: 'default',
       sidebarCollapsed: false,
       partner: null,

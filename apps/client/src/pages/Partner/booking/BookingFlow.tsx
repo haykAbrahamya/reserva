@@ -684,7 +684,7 @@ function ServiceStep({ partner, selectedId, onSelect }: {
               <div className={s.optBody}>
                 <div className={s.optName}>{sv.name}</div>
                 <div className={s.optMeta}>
-                  <span><Clock size={12} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 4 }} />{fmtDuration(sv.duration)}</span>
+                  <span><Clock size={12} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 4 }} />{fmtDuration(sv.duration, { min: t('partner.services.min'), h: t('partner.services.hour') })}</span>
                   {sv.requiresSpecialist === false && (
                     <span style={{ marginLeft: 10 }}>
                       <Users size={12} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 4 }} />
@@ -744,7 +744,7 @@ function SummaryRows({ service, specialist, anySpecialist, hideSpecialist, locat
       <Row
         icon={<Clock size={15} />}
         label={t('booking.summary.time')}
-        value={<>{time ?? '—'}{service ? ` · ${fmtDuration(service.duration)}` : ''}</>}
+        value={<>{time ?? '—'}{service ? ` · ${fmtDuration(service.duration, { min: t('partner.services.min'), h: t('partner.services.hour') })}` : ''}</>}
       />
       {name && <Row icon={<Users size={15} />} label={t('booking.summary.name')} value={name} />}
       {phone && <Row icon={<MapPin size={15} />} label={t('booking.summary.phone')} value={phone} />}
