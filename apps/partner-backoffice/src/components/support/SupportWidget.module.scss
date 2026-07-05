@@ -1,0 +1,73 @@
+@use 'variables' as *;
+
+/* ── Floating bubble (web) ── */
+.bubble {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 60;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: none;
+  background: $accent;
+  color: $fg-on-accent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: $shadow-3;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+  &:hover { transform: translateY(-2px) scale(1.04); }
+  &:active { transform: scale(0.96); }
+}
+.dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: $danger;
+  border: 2.5px solid $bg-1;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+/* ── Web: chat card anchored bottom-right ── */
+.webWrap {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 61;
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  height: 560px;
+  max-height: calc(100vh - 44px);
+  animation: support-pop 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Mobile: bottom sheet + scrim ── */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgba(0, 0, 0, 0.45);
+  animation: support-fade 0.2s ease both;
+}
+.mobileWrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 71;
+  height: 86vh;
+  animation: support-rise 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+:global {
+  @keyframes support-pop { from { opacity: 0; transform: translateY(12px) scale(0.98) } to { opacity: 1; transform: none } }
+  @keyframes support-rise { from { transform: translateY(100%) } to { transform: none } }
+  @keyframes support-fade { from { opacity: 0 } to { opacity: 1 } }
+}
+@media (prefers-reduced-motion: reduce) {
+  .webWrap, .mobileWrap, .scrim { animation: none; }
+}
