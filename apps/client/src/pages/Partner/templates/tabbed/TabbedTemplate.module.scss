@@ -50,13 +50,37 @@
 }
 
 .panels {
+  position: relative; /* positioning context for out-of-flow hidden panels */
   max-width: 1080px;
   margin: 0 auto;
   padding: 0 20px;
-  animation: tab-fade 0.28s ease both;
 }
 @media (max-width: 560px) { .panels { padding: 0 14px; } }
 
+.panel { min-width: 0; }
+/* Active panel is in normal flow → it drives the container's height, and fades
+   + rises into place on each tab switch. */
+.panelActive {
+  position: relative;
+  opacity: 1;
+  transform: none;
+  animation: tab-enter 0.28s ease both;
+}
+/* Hidden panels stay in the DOM (SEO / JSON-LD) but are pulled out of flow so
+   they don't add height, and made invisible + non-interactive. */
+.panelHidden {
+  position: absolute;
+  inset: 0 20px auto 20px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  @media (max-width: 560px) { inset: 0 14px auto 14px; }
+}
+
 :global {
-  @keyframes tab-fade { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
+  @keyframes tab-enter { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: none } }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panelActive { animation: none; }
 }

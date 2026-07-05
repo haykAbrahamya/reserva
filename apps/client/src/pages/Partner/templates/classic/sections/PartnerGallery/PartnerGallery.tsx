@@ -4,7 +4,7 @@ import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { BeforeAfter } from '@/components/BeforeAfter/BeforeAfter'
 import { useT } from '@/i18n'
-import { Lightbox, type LightboxImage } from './Lightbox'
+import { Lightbox, type LightboxImage } from '../../../../lib/Lightbox/Lightbox'
 import s from './PartnerGallery.module.scss'
 
 interface Props {

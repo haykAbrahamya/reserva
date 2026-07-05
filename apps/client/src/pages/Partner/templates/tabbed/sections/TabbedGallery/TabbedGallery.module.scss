@@ -35,41 +35,5 @@
   cursor: default;
   @media (max-width: 720px) { grid-column: span 2; }
 }
-
-/* Lightweight full-screen viewer. */
-.viewer {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  background: rgba(0, 0, 0, 0.86);
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  animation: tg-fade 0.2s ease both;
-}
-.viewerImg {
-  max-width: 92vw;
-  max-height: 88vh;
-  border-radius: $r-2;
-  object-fit: contain;
-}
-.viewerClose {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  width: 42px;
-  height: 42px;
-  border-radius: 999px;
-  border: none;
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  transition: background 0.14s;
-  &:hover { background: rgba(255, 255, 255, 0.24); }
-}
-
-:global {
-  @keyframes tg-fade { from { opacity: 0 } to { opacity: 1 } }
-}
+/* The fullscreen viewer is the shared <Lightbox> (Partner/lib/Lightbox) — same
+   design + logic as the classic template; no viewer styles live here. */

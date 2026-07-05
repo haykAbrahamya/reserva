@@ -1,7 +1,7 @@
-import { useState, useMemo, useEffect } from 'react'
-import { X } from 'lucide-react'
+import { useState, useMemo } from 'react'
 import type { PublicPartner } from '@/mock/partners'
 import { BeforeAfter } from '@/components/BeforeAfter/BeforeAfter'
+import { Lightbox, type LightboxImage } from '../../../../lib/Lightbox/Lightbox'
 import { useT } from '@/i18n'
 import s from './TabbedGallery.module.scss'
 
@@ -13,8 +13,9 @@ type Tile = NonNullable<PublicPartner['presentation']['gallery']>[number]
 
 /**
  * Gallery tab: gallery + works tiles in one responsive grid. Before/after tiles
- * render the shared draggable comparison; plain photos open in a lightweight
- * full-screen viewer. Reuses the shared BeforeAfter component.
+ * render the shared draggable comparison; plain photos open in the SAME shared
+ * Lightbox the classic template uses (identical design + nav/swipe/counter),
+ * so there's one gallery viewer across templates — no duplication.
  */
 export function TabbedGallery({ partner }: Props) {
   const t = useT()
@@ -22,15 +23,13 @@ export function TabbedGallery({ partner }: Props) {
     () => [...(partner.presentation.gallery ?? []), ...(partner.presentation.works ?? [])],
     [partner],
   )
-  const [openUrl, setOpenUrl] = useState<string | null>(null)
-
-  // Close the viewer on Escape.
-  useEffect(() => {
-    if (!openUrl) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpenUrl(null) }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [openUrl])
+  // Flat list of openable photos (with a url), in render order — the Lightbox
+  // navigates over THIS list, so indices match what the grid opens.
+  const photos: LightboxImage[] = useMemo(
+    () => tiles.filter((tile) => !!tile.url).map((tile) => ({ url: tile.url as string, label: tile.label })),
+    [tiles],
+  )
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
   if (tiles.length === 0) return null
 
@@ -51,11 +50,12 @@ export function TabbedGallery({ partner }: Props) {
             )
           }
           if (!tile.url) return null
+          const photoIndex = photos.findIndex((ph) => ph.url === tile.url)
           return (
             <button
               key={`ph-${i}`}
               className={s.tile}
-              onClick={() => setOpenUrl(tile.url!)}
+              onClick={() => setLightboxIndex(photoIndex)}
               aria-label={t('partner.gallery.openImage')}
             >
               <img src={tile.url} alt={tile.label ?? ''} loading="lazy" />
@@ -64,13 +64,13 @@ export function TabbedGallery({ partner }: Props) {
         })}
       </div>
 
-      {openUrl && (
-        <div className={s.viewer} onClick={() => setOpenUrl(null)} role="dialog" aria-modal="true">
-          <button className={s.viewerClose} onClick={() => setOpenUrl(null)} aria-label={t('common.close')}>
-            <X size={22} />
-          </button>
-          <img src={openUrl} className={s.viewerImg} alt="" onClick={(e) => e.stopPropagation()} />
-        </div>
+      {lightboxIndex !== null && (
+        <Lightbox
+          images={photos}
+          index={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+          onIndex={setLightboxIndex}
+        />
       )}
     </section>
   )

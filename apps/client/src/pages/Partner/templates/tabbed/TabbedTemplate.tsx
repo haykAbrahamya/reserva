@@ -66,21 +66,29 @@ export function TabbedTemplate({ partner, onBook }: TemplateProps) {
             </div>
           </nav>
 
-          {/* All panels mounted; inactive ones hidden (keeps content in the DOM
-              for SEO and makes switching instant). */}
+          {/* All panels stay mounted (content in the DOM for SEO); the inactive
+              ones are visually hidden via `.panelHidden` rather than `hidden`, so
+              the active panel can smoothly fade/slide in on each tab switch.
+              `aria-hidden` + inert keep hidden panels out of a11y/tab order. */}
           <div className={s.panels}>
-            <div role="tabpanel" hidden={active !== 'services'}>
-              <TabbedServices partner={partner} onBook={onBook} />
-            </div>
-            <div role="tabpanel" hidden={active !== 'reviews'}>
-              <TabbedReviews partner={partner} />
-            </div>
-            <div role="tabpanel" hidden={active !== 'gallery'}>
-              <TabbedGallery partner={partner} />
-            </div>
-            <div role="tabpanel" hidden={active !== 'branches'}>
-              <TabbedBranches partner={partner} onBook={() => onBook()} />
-            </div>
+            {([
+              ['services', <TabbedServices key="s" partner={partner} onBook={onBook} />],
+              ['reviews', <TabbedReviews key="r" partner={partner} />],
+              ['gallery', <TabbedGallery key="g" partner={partner} />],
+              ['branches', <TabbedBranches key="b" partner={partner} onBook={() => onBook()} />],
+            ] as const).map(([key, node]) => {
+              const isActive = active === key
+              return (
+                <div
+                  key={key}
+                  role="tabpanel"
+                  aria-hidden={!isActive}
+                  className={[s.panel, isActive ? s.panelActive : s.panelHidden].join(' ')}
+                >
+                  {node}
+                </div>
+              )
+            })}
           </div>
         </>
       )}
