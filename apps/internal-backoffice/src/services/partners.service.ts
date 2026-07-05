@@ -27,6 +27,8 @@ export interface PartnerListItem {
   /** Backoffice FAB behavior (support chat / new booking / hidden). Default book. */
   supportWidget: SupportWidgetMode
   createdAt: string
+  /** Most-recent backoffice activity across this partner's users. Null = never active. */
+  lastSeenAt: string | null
   counts: PartnerCounts
 }
 
@@ -55,6 +57,8 @@ export interface PartnerUser {
   active: boolean
   mustChangePassword: boolean
   lastLogin: string | null
+  /** Last time the user was active in the backoffice (app load / refresh). */
+  lastSeenAt: string | null
   createdAt: string
   location: { id: string; name: string } | null
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import {
-  Users, Mail, Phone, MapPin, ShieldCheck, Pencil, KeyRound, Copy, Check, Building2,
+  Users, Mail, Phone, MapPin, ShieldCheck, Pencil, KeyRound, Copy, Check, Building2, Clock,
 } from 'lucide-react'
 import { Avatar, Badge, Button, Input, Toggle, Modal, useToast } from '@/components/ui'
 import { useResource } from '@/store/useResource'
@@ -11,6 +11,15 @@ import {
 } from '@/services/partners.service'
 import { errorMessage } from '@/services/errors'
 import s from './PartnerUsers.module.scss'
+
+/** "Last active 6 Jul 2026, 14:05" — full date + hour:minute, or never-active. */
+function fmtLastSeen(iso: string | null): string {
+  if (!iso) return 'Never active'
+  const d = new Date(iso)
+  const date = d.toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' })
+  const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  return `Last active ${date}, ${time}`
+}
 
 /** Platform-staff panel: view + manage a partner's users (edit, reset password). */
 export function PartnerUsers({ partnerId }: { partnerId: string }) {
@@ -46,6 +55,9 @@ export function PartnerUsers({ partnerId }: { partnerId: string }) {
                 <div className={s.contact}><Mail size={11} /> {u.email}</div>
                 <div className={s.contact}><Phone size={11} /> {u.phone}</div>
                 {u.location && <div className={s.contact}><MapPin size={11} /> {u.location.name}</div>}
+                <div className={[s.contact, u.lastSeenAt ? '' : s.contactMuted].filter(Boolean).join(' ')}>
+                  <Clock size={11} /> {fmtLastSeen(u.lastSeenAt)}
+                </div>
                 {u.mustChangePassword && (
                   <div className={s.flag}><ShieldCheck size={11} /> Must change password on next login</div>
                 )}

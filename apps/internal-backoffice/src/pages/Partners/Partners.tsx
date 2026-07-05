@@ -7,6 +7,15 @@ import { partnersService } from '@/services/partners.service'
 import { CreatePartnerModal } from './CreatePartnerModal'
 import s from './Partners.module.scss'
 
+/** "6 Jul, 14:05" — date + hour:minute, or "Never" if never active in the backoffice. */
+function fmtLastSeen(iso: string | null): string {
+  if (!iso) return 'Never'
+  const d = new Date(iso)
+  const date = d.toLocaleDateString([], { day: 'numeric', month: 'short' })
+  const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  return `${date}, ${time}`
+}
+
 export function Partners() {
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
@@ -73,6 +82,7 @@ export function Partners() {
                 <Th>Type</Th>
                 <Th>Branches</Th>
                 <Th>Team</Th>
+                <Th>Last active</Th>
                 <Th>Status</Th>
               </tr>
             </thead>
@@ -89,6 +99,11 @@ export function Partners() {
                   <Td>{p.type}</Td>
                   <Td><span className={s.num}>{p.counts.locations}</span></Td>
                   <Td><span className={s.num}>{p.counts.specialists}</span></Td>
+                  <Td>
+                    <span className={p.lastSeenAt ? s.lastLogin : s.lastLoginNever}>
+                      {fmtLastSeen(p.lastSeenAt)}
+                    </span>
+                  </Td>
                   <Td><Badge variant={p.active ? 'active' : 'inactive'} label={p.active ? 'Active' : 'Inactive'} /></Td>
                 </Tr>
               ))}

@@ -43,3 +43,5 @@
 .partnerName { font-weight: 500; }
 .slug { font-family: $font-mono; font-size: 13px; color: $fg-2; }
 .num { font-family: $font-mono; }
+.lastLogin { font-size: 13px; color: $fg-1; white-space: nowrap; }
+.lastLoginNever { font-size: 13px; color: $fg-3; font-style: italic; }
