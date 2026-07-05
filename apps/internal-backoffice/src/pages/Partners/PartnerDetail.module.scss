@@ -148,17 +148,21 @@
 }
 .toggleDesc { font-size: 12.5px; color: $fg-2; line-height: 1.45; }
 
-/* ── Danger zone (full-width row below the grid) ── */
+/* ── Danger zone — a compact card in the grid, aligned with the ones above.
+      Label on top, action beneath, so it never stretches into a long bar. ── */
 .danger {
   border-color: color-mix(in srgb, $danger 25%, $line-1);
   background: color-mix(in srgb, $danger 3%, $bg-1);
 }
-.dangerCard { margin-top: 16px; padding: 16px 20px; }
-.dangerIcon { color: $danger; flex-shrink: 0; }
-.dangerRow {
+.dangerCard {
+  /* Sit in the left column directly under Visibility & booking, aligned to that
+     card's width. Label + action on one row, compact. */
+  grid-column: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
+  padding: 16px 20px;
 }
+.dangerIcon { color: $danger; flex-shrink: 0; }

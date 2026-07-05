@@ -16,16 +16,15 @@ import { DemoRequests } from '@/pages/DemoRequests/DemoRequests'
 import { PendingRegistrations } from '@/pages/PendingRegistrations/PendingRegistrations'
 import { Visits } from '@/pages/Visits/Visits'
 
-/** Apply the platform brand theme once on mount. */
+/** Apply the platform theme once on mount. The accent is intentionally NOT
+ *  overridden here: the console inherits Reserva's shared brand accent (the warm
+ *  bronze in @reserva/ui tokens), so all chrome matches the client + partner
+ *  apps instead of a one-off indigo. */
 function ThemeApplier() {
   useEffect(() => {
     const root = document.documentElement
     root.setAttribute('data-theme', 'dark')
     root.setAttribute('data-density', 'comfortable')
-    // Reserva platform accent (indigo) — distinct from any single tenant brand.
-    root.style.setProperty('--accent', '#4f46e5')
-    root.style.setProperty('--accent-strong', 'color-mix(in srgb, #4f46e5 78%, #000)')
-    root.style.setProperty('--accent-soft', 'color-mix(in srgb, #4f46e5 12%, transparent)')
   }, [])
   return null
 }

@@ -13,7 +13,9 @@ interface Props {
   onCreated: () => void
 }
 
-const DEFAULT_ACCENT = '#4f46e5'
+// Reserva brand bronze (matches @reserva/ui --accent) — a new partner starts on
+// the house brand color; staff can change it in the AccentPicker.
+const DEFAULT_ACCENT = '#A8784B'
 
 const slugify = (v: string) =>
   v.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60)

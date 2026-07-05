@@ -268,11 +268,9 @@ export function PartnerDetailPage() {
           )}
         </section>
 
-      </div>
-
-      {/* Danger zone — full-width row below the grid */}
-      <section className={`${s.card} ${s.danger} ${s.dangerCard}`}>
-        <div className={s.dangerRow}>
+        {/* Danger zone — sits in the grid so it aligns with the cards above,
+            content stacked vertically to stay compact. */}
+        <section className={`${s.card} ${s.danger} ${s.dangerCard}`}>
           <div className={s.toggleText}>
             <div className={s.toggleLabel}><AlertTriangle size={14} className={s.dangerIcon} /> Delete partner</div>
             <div className={s.toggleDesc}>Permanently removes the salon and all its connected data. This cannot be undone.</div>
@@ -280,8 +278,9 @@ export function PartnerDetailPage() {
           <Button variant="danger" size="sm" onClick={() => { setDeleteText(''); setConfirmDelete(true) }}>
             <Trash2 size={14} /> Delete partner
           </Button>
-        </div>
-      </section>
+        </section>
+
+      </div>
 
       <ConfirmDialog
         open={confirmDelete}

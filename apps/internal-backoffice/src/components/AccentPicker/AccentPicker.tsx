@@ -2,11 +2,13 @@ import { useId, useRef } from 'react'
 import { Check, Pipette } from 'lucide-react'
 import s from './AccentPicker.module.scss'
 
-/** Curated presets — kept, but now alongside a free custom picker. */
+/** Curated presets — the Reserva brand bronze leads (the house default), then a
+ *  spread of warm/neutral brand-friendly tones. A free custom picker sits
+ *  alongside for anything off-palette. */
 const PRESETS = [
-  '#4f46e5', '#0ea5e9', '#10b981', '#14b8a6',
-  '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6',
-  '#0f172a', '#64748b', '#b45309', '#0d9488',
+  '#a8784b', '#b45309', '#c2410c', '#9a3412',
+  '#2f4a3a', '#0d9488', '#0369a1', '#7a4a55',
+  '#b07683', '#6d28d9', '#334155', '#0f172a',
 ]
 
 const HEX_RE = /^#([0-9a-fA-F]{6})$/
@@ -68,7 +70,7 @@ export function AccentPicker({ value, onChange, label = 'Accent' }: Props) {
           id={inputId}
           type="color"
           className={s.nativeInput}
-          value={validHex ? value : '#4f46e5'}
+          value={validHex ? value : '#a8784b'}
           onChange={(e) => onChange(e.target.value.toLowerCase())}
         />
       </div>
