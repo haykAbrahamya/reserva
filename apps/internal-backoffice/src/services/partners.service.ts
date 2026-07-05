@@ -22,9 +22,14 @@ export interface PartnerListItem {
   bookingsEnabled: boolean
   /** 'salon' (team) or 'single' (solo professional). */
   kind: 'salon' | 'single'
+  /** Public booking-page layout (presentation-only). Defaults to classic. */
+  template: PartnerTemplate
   createdAt: string
   counts: PartnerCounts
 }
+
+/** Public booking-page layout the partner's page renders. */
+export type PartnerTemplate = 'classic' | 'tabbed'
 
 export interface PartnerAdmin {
   id: string
@@ -87,6 +92,7 @@ export interface UpdatePartnerInput {
   type?: string
   accent?: string
   active?: boolean
+  template?: PartnerTemplate
   presentation?: Partial<PartnerPresentation>
 }
 

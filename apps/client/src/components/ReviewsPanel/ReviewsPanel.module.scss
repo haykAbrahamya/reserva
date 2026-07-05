@@ -154,6 +154,14 @@
 
 /* reviews */
 .reviews { display: flex; flex-direction: column; gap: 12px; }
+/* list = single column (modal / classic); grid = responsive (tabbed full-width) */
+.reviewList { display: flex; flex-direction: column; gap: 12px; }
+.reviewGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  @media (max-width: 640px) { grid-template-columns: 1fr; }
+}
 .review {
   background: $bg-0;
   border: 1px solid $line-1;

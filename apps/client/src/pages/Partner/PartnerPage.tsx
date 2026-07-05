@@ -6,14 +6,7 @@ import type { PublicPartner } from '@/mock/partners'
 import { partnerBrandVars } from './partnerBrand'
 import { PartnerNotFound } from './components/PartnerNotFound/PartnerNotFound'
 import { PartnerNav } from './components/PartnerNav/PartnerNav'
-import { PartnerHero } from './sections/PartnerHero/PartnerHero'
-import { PartnerAbout } from './sections/PartnerAbout/PartnerAbout'
-import { PartnerGallery } from './sections/PartnerGallery/PartnerGallery'
-import { PartnerServices } from './sections/PartnerServices/PartnerServices'
-import { PartnerLocations } from './sections/PartnerLocations/PartnerLocations'
-import { PartnerTeam } from './sections/PartnerTeam/PartnerTeam'
-import { PartnerReviews } from './sections/PartnerReviews/PartnerReviews'
-import { PartnerFooter } from './sections/PartnerFooter/PartnerFooter'
+import { resolveTemplate } from './templates/registry'
 import { BookingFlow } from './booking/BookingFlow'
 import { SpecialistModal } from './components/SpecialistModal/SpecialistModal'
 import { useSeo } from '@/hooks/useSeo'
@@ -120,43 +113,17 @@ export function PartnerPage() {
   // specialist avatars. See partnerBrand.ts.
   const brandVars = partnerBrandVars(partner, theme === 'dark')
 
+  // Pick the layout for this partner's template (defaults to classic). The
+  // template is pure layout; this page still owns all booking state and renders
+  // the shared BookingFlow / SpecialistModal below, so the booking flow is never
+  // templatized or duplicated. See templates/registry.ts.
+  const Template = resolveTemplate(partner.template)
+
   return (
     <div className={s.page} style={brandVars}>
       <PartnerNav partner={partner} onBook={() => openBooking()} />
 
-      <main>
-        {/* Flow: hook → what they came for (services) → trust (about) →
-            where + who → vibe (gallery) → final CTA.
-            Backgrounds alternate over the VISIBLE sections (computed below), so a
-            hidden section (e.g. no team for a single, empty works) never leaves
-            two same-tone bands adjacent. */}
-        <PartnerHero partner={partner} onBook={() => openBooking()} />
-        {(() => {
-          const isSingle = partner.kind === 'single'
-          const showTeam = !isSingle && partner.specialists.some((sp) => sp.active)
-          const showGallery = (partner.presentation.gallery?.length ?? 0) > 0
-          const showWorks = (partner.presentation.works?.length ?? 0) > 0
-          // Single mode hides the Team grid (and with it the per-specialist review
-          // entry point in SpecialistModal), so a solo pro gets a dedicated
-          // business-framed Reviews section instead. Salons keep reviews in the modal.
-          const showReviews = isSingle && partner.specialists.length > 0
-          // Ordered list of visible content sections; assign alternating tones.
-          let i = 0
-          const tone = () => (i++ % 2 === 0 ? 'cream' : 'plain') as 'cream' | 'plain'
-          return (
-            <>
-              <PartnerServices partner={partner} onBook={openBooking} tone={tone()} />
-              <PartnerAbout partner={partner} tone={tone()} />
-              <PartnerLocations partner={partner} onBook={() => openBooking()} tone={tone()} />
-              {showTeam && <PartnerTeam partner={partner} onSelect={setActiveSpecialist} tone={tone()} />}
-              {showGallery && <PartnerGallery partner={partner} variant="gallery" tone={tone()} />}
-              {showWorks && <PartnerGallery partner={partner} variant="works" tone={tone()} />}
-              {showReviews && <PartnerReviews partner={partner} tone={tone()} />}
-            </>
-          )
-        })()}
-        <PartnerFooter partner={partner} onBook={() => openBooking()} />
-      </main>
+      <Template partner={partner} onBook={openBooking} onOpenSpecialist={setActiveSpecialist} />
 
       {activeSpecialist && (
         <SpecialistModal

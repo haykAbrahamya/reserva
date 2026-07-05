@@ -622,6 +622,18 @@
       "error": "Could not save brand color",
       "preview": "Hero gradient preview"
     },
+    "template": {
+      "title": "Page template",
+      "desc": "Choose the layout of your public booking page. Booking works the same either way.",
+      "classic": "Classic",
+      "classicDesc": "A single flowing page — hero, then services, about, team and gallery in one scroll.",
+      "tabbed": "Tabbed",
+      "tabbedDesc": "A compact hero with a tab bar — visitors switch between Services, Reviews, Gallery and Branches.",
+      "save": "Save template",
+      "saving": "Saving…",
+      "saved": "Page template updated",
+      "error": "Could not save template"
+    },
     "social": {
       "title": "Social & contact",
       "desc": "Shown as icons on your public page. Paste a full URL (or WhatsApp number), or leave blank to hide.",

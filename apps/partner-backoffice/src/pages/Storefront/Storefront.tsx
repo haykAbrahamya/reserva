@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
   Store, Instagram, Facebook, Palette, ExternalLink, FileText, Pencil,
+  LayoutTemplate, Check,
 } from 'lucide-react'
 import { Button, Input, Textarea, useToast, WhatsappIcon } from '@/components/ui'
 import { useAppStore } from '@/store/app.store'
@@ -74,9 +75,15 @@ function StorefrontInner({ profile, reload, setPartner, toast }: InnerProps) {
   useEffect(() => { setFacebook(savedFb) }, [savedFb])
   useEffect(() => { setWhatsapp(savedWa) }, [savedWa])
 
+  // ── Page template ──
+  const savedTemplate = profile.template ?? 'classic'
+  const [template, setTemplate] = useState<'classic' | 'tabbed'>(savedTemplate)
+  useEffect(() => { setTemplate(savedTemplate) }, [savedTemplate])
+
   const [aboutSaving, setAboutSaving] = useState(false)
   const [brandSaving, setBrandSaving] = useState(false)
   const [socialSaving, setSocialSaving] = useState(false)
+  const [templateSaving, setTemplateSaving] = useState(false)
 
   const syncStore = (updated: PartnerProfileResponse) => {
     const current = useAppStore.getState().partner
@@ -144,6 +151,27 @@ function StorefrontInner({ profile, reload, setPartner, toast }: InnerProps) {
       toast(err instanceof ApiError ? err.message : t('storefront.social.error'))
     } finally { setSocialSaving(false) }
   }
+
+  const templateChanged = template !== savedTemplate
+  const saveTemplate = async () => {
+    if (!templateChanged || templateSaving) return
+    setTemplateSaving(true)
+    try {
+      const updated = await partnersService.updateProfile({ template })
+      // Reflect the new template in the store so any live preview updates.
+      const current = useAppStore.getState().partner
+      if (current) setPartner({ ...current, template: updated.template })
+      await reload()
+      toast(t('storefront.template.saved'))
+    } catch (err) {
+      toast(err instanceof ApiError ? err.message : t('storefront.template.error'))
+    } finally { setTemplateSaving(false) }
+  }
+
+  const TEMPLATE_OPTIONS: { value: 'classic' | 'tabbed'; titleKey: string; descKey: string }[] = [
+    { value: 'classic', titleKey: 'storefront.template.classic', descKey: 'storefront.template.classicDesc' },
+    { value: 'tabbed', titleKey: 'storefront.template.tabbed', descKey: 'storefront.template.tabbedDesc' },
+  ]
 
   return (
     <div className={s.page}>
@@ -231,6 +259,47 @@ function StorefrontInner({ profile, reload, setPartner, toast }: InnerProps) {
           </div>
           <div className={s.previewBar} style={{ background: `linear-gradient(120deg, ${accentValid ? accent : '#A8784B'}, color-mix(in srgb, ${accentValid ? accent : '#A8784B'} 55%, #000))` }}>
             <span>{t('storefront.brand.preview')}</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Page template ── */}
+      <section className={s.card}>
+        <div className={s.cardHead}>
+          <span className={s.cardIcon}><LayoutTemplate size={18} /></span>
+          <div className={s.cardHeadText}>
+            <h2 className={s.cardTitle}>{t('storefront.template.title')}</h2>
+            <p className={s.cardDesc}>{t('storefront.template.desc')}</p>
+          </div>
+        </div>
+        <div className={s.cardBody}>
+          <div className={s.templateGrid}>
+            {TEMPLATE_OPTIONS.map((opt) => {
+              const selected = template === opt.value
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  className={[s.templateOption, selected ? s.templateOptionSelected : ''].filter(Boolean).join(' ')}
+                  onClick={() => setTemplate(opt.value)}
+                  aria-pressed={selected}
+                >
+                  <span className={[s.templatePreview, s[`preview_${opt.value}`]].join(' ')} aria-hidden="true" />
+                  <span className={s.templateInfo}>
+                    <span className={s.templateName}>
+                      {t(opt.titleKey)}
+                      {selected && <Check size={15} className={s.templateCheck} />}
+                    </span>
+                    <span className={s.templateOptDesc}>{t(opt.descKey)}</span>
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+          <div className={s.templateFoot}>
+            <Button variant="accent" disabled={!templateChanged || templateSaving} onClick={saveTemplate}>
+              {templateSaving ? t('storefront.template.saving') : t('storefront.template.save')}
+            </Button>
           </div>
         </div>
       </section>

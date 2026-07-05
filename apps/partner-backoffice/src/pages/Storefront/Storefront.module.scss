@@ -257,6 +257,73 @@
 }
 .actionsRow { display: flex; justify-content: flex-end; margin-top: 2px; }
 
+/* ── Page template selector ── */
+.templateGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  @media (max-width: 560px) { grid-template-columns: 1fr; }
+}
+.templateOption {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  text-align: left;
+  background: $bg-1;
+  border: 1.5px solid $line-2;
+  border-radius: $r-2;
+  cursor: pointer;
+  transition: border-color 0.14s, background 0.14s;
+  -webkit-tap-highlight-color: transparent;
+  &:hover { border-color: $line-strong; }
+  &.templateOptionSelected {
+    border-color: $accent;
+    background: $accent-soft;
+  }
+}
+.templatePreview {
+  display: block;
+  height: 92px;
+  border-radius: $r-1;
+  border: 1px solid $line-1;
+  background: $bg-2;
+  overflow: hidden;
+}
+/* Classic = stacked content bands (single scroll). */
+.preview_classic {
+  background:
+    linear-gradient(var(--accent) 0 0) no-repeat 10px 10px / 40% 14px,
+    linear-gradient($line-strong 0 0) no-repeat 10px 32px / 70% 8px,
+    linear-gradient($line-2 0 0) no-repeat 10px 48px / 85% 8px,
+    linear-gradient($line-2 0 0) no-repeat 10px 62px / 60% 8px,
+    linear-gradient($line-2 0 0) no-repeat 10px 76px / 80% 8px,
+    $bg-2;
+}
+/* Tabbed = tab strip on top + a small content grid. */
+.preview_tabbed {
+  background:
+    linear-gradient(var(--accent) 0 0) no-repeat 10px 12px / 18% 8px,
+    linear-gradient($line-strong 0 0) no-repeat 34px 12px / 18% 8px,
+    linear-gradient($line-2 0 0) no-repeat 58px 12px / 18% 8px,
+    linear-gradient(var(--accent) 0 0) no-repeat 10px 24px / 66% 2px,
+    linear-gradient($line-2 0 0) no-repeat 10px 36px / 38% 40px,
+    linear-gradient($line-2 0 0) no-repeat 54px 36px / 38% 40px,
+    $bg-2;
+}
+.templateInfo { display: flex; flex-direction: column; gap: 3px; }
+.templateName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: $fg-0;
+}
+.templateCheck { color: $accent; }
+.templateOptDesc { font-size: 12.5px; color: $fg-2; line-height: 1.45; }
+.templateFoot { display: flex; justify-content: flex-end; margin-top: 14px; }
+
 :global {
   @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
   @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }

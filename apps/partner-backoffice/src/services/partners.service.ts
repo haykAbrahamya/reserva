@@ -94,6 +94,9 @@ export interface PartnerPresentationFields {
   works?: GalleryItem[]
 }
 
+/** Public booking-page layout (presentation-only). */
+export type PartnerTemplate = 'classic' | 'tabbed'
+
 export type PartnerProfileResponse = Omit<Partner, 'slug'> & {
   /** Null until the partner sets a public handle in Settings. */
   slug: string | null
@@ -101,6 +104,8 @@ export type PartnerProfileResponse = Omit<Partner, 'slug'> & {
   autoConfirmBookings?: boolean
   bookingsEnabled?: boolean
   kind?: 'salon' | 'single'
+  /** Which public page layout the partner renders. Defaults to classic. */
+  template?: PartnerTemplate
   /** Featured in the public marketplace (/salons). Read-only here — curated by
    *  Reserva platform staff from the internal console. */
   marketplaceListed?: boolean
@@ -115,6 +120,7 @@ export interface PartnerSettingsPatch {
   type?: string
   accent?: string
   slug?: string
+  template?: PartnerTemplate
   presentation?: PartnerPresentationFields
 }
 

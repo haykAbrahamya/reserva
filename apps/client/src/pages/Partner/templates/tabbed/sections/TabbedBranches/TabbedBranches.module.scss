@@ -1,0 +1,105 @@
+@use 'variables' as *;
+
+.section { padding: 26px 0 40px; }
+
+/* auto-fit with a fixed track width so ONE branch sits at a natural card size
+   (not stretched full-width), while multiple branches flow into a neat grid. */
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 360px));
+  gap: 16px;
+  justify-content: start;
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  overflow: hidden;
+  box-shadow: $shadow-1;
+  transition: transform 0.25s cubic-bezier(0.22, 0.86, 0.23, 1), box-shadow 0.25s, border-color 0.25s;
+  &:hover { transform: translateY(-3px); box-shadow: $shadow-2; border-color: $line-2; }
+}
+
+/* Branded "map" banner (gradient + grid texture + pin), links to Google Maps. */
+.mapBanner {
+  height: 104px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.mapGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.14) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.mapPin {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  backdrop-filter: blur(4px);
+}
+
+.body { flex: 1; min-width: 0; padding: 18px 20px; }
+.name { font-size: 16px; font-weight: 600; color: $fg-0; margin-bottom: 10px; }
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: $fg-2;
+  margin-top: 6px;
+  svg { flex-shrink: 0; color: $fg-3; }
+  span { overflow: hidden; text-overflow: ellipsis; }
+}
+a.row:hover { color: $accent; svg { color: $accent; } }
+
+/* Actions sit as a divided footer inside the card, filling its width. */
+.actions {
+  display: flex;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid $line-1;
+}
+.directions,
+.bookHere {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 15px;
+  border-radius: $r-2;
+  font-family: $font-sans;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.14s, border-color 0.14s;
+  -webkit-tap-highlight-color: transparent;
+}
+.directions {
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-1;
+  &:hover { background: $bg-2; border-color: $line-strong; }
+}
+.bookHere {
+  border: none;
+  background: $accent;
+  color: var(--fg-on-accent, #fff);
+  &:hover { filter: brightness(1.05); }
+}

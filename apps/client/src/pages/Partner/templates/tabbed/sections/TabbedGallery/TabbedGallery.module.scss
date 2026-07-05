@@ -1,0 +1,75 @@
+@use 'variables' as *;
+
+.section { padding: 26px 0 40px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  @media (max-width: 720px) { grid-template-columns: repeat(2, 1fr); }
+}
+.tile {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: $r-2;
+  overflow: hidden;
+  border: 1px solid $line-1;
+  background: $bg-2;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+  &:hover img { transform: scale(1.05); }
+}
+/* Before/after tiles read better wider. */
+.tileWide {
+  grid-column: span 2;
+  aspect-ratio: 2 / 1;
+  cursor: default;
+  @media (max-width: 720px) { grid-column: span 2; }
+}
+
+/* Lightweight full-screen viewer. */
+.viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.86);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  animation: tg-fade 0.2s ease both;
+}
+.viewerImg {
+  max-width: 92vw;
+  max-height: 88vh;
+  border-radius: $r-2;
+  object-fit: contain;
+}
+.viewerClose {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.14s;
+  &:hover { background: rgba(255, 255, 255, 0.24); }
+}
+
+:global {
+  @keyframes tg-fade { from { opacity: 0 } to { opacity: 1 } }
+}

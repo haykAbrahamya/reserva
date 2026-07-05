@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Save, MapPin, Users, User, CalendarDays, Store, ExternalLink, Trash2, AlertTriangle, SlidersHorizontal } from 'lucide-react'
+import { ArrowLeft, Save, MapPin, Users, User, CalendarDays, Store, ExternalLink, Trash2, AlertTriangle, SlidersHorizontal, LayoutTemplate } from 'lucide-react'
 import { Avatar, Badge, Button, Input, Textarea, Toggle, Empty, ConfirmDialog, SegmentedFilter, useToast } from '@/components/ui'
 import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
 import { useResource } from '@/store/useResource'
@@ -98,6 +98,17 @@ export function PartnerDetailPage() {
     try {
       await partnersService.setKind(id, kind)
       toast(kind === 'single' ? 'Switched to solo mode' : 'Switched to salon mode')
+      await reload()
+    } catch (err) {
+      toast(errorMessage(err))
+    }
+  }
+
+  const changeTemplate = async (template: 'classic' | 'tabbed') => {
+    if (template === partner.template) return
+    try {
+      await partnersService.update(id, { template })
+      toast(template === 'tabbed' ? 'Switched to tabbed template' : 'Switched to classic template')
       await reload()
     } catch (err) {
       toast(errorMessage(err))
@@ -202,6 +213,23 @@ export function PartnerDetailPage() {
                 options={[
                   { value: 'salon', label: 'Salon' },
                   { value: 'single', label: 'Solo' },
+                ]}
+              />
+            </div>
+
+            <div className={s.toggleRow}>
+              <div className={s.toggleText}>
+                <div className={s.toggleLabel}><LayoutTemplate size={13} /> Page template</div>
+                <div className={s.toggleDesc}>Public page layout. Classic = single scroll; Tabbed = tab bar.</div>
+              </div>
+              <SegmentedFilter<'classic' | 'tabbed'>
+                size="sm"
+                ariaLabel="Page template"
+                value={partner.template ?? 'classic'}
+                onChange={changeTemplate}
+                options={[
+                  { value: 'classic', label: 'Classic' },
+                  { value: 'tabbed', label: 'Tabbed' },
                 ]}
               />
             </div>

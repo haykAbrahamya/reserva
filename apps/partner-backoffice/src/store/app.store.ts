@@ -20,6 +20,8 @@ export type PartnerProfile = Omit<Partner, 'locations' | 'services' | 'specialis
   bookingsEnabled?: boolean
   /** 'salon' (team) or 'single' (solo). Drives nav/labels (hide team etc.). */
   kind?: 'salon' | 'single'
+  /** Public booking-page layout (presentation-only). Defaults to classic. */
+  template?: 'classic' | 'tabbed'
   /** Public marketing fields edited in the Storefront section. */
   presentation?: {
     about?: string

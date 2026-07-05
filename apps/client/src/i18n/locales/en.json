@@ -293,6 +293,7 @@
       "title": "Our work"
     },
     "gallery": {
+      "eyebrow": "Gallery",
       "title": "Inside {name}",
       "titleSingle": "The space",
       "before": "Before",

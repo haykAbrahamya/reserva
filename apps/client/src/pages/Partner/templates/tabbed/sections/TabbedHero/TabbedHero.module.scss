@@ -1,0 +1,82 @@
+@use 'variables' as *;
+
+.hero { position: relative; overflow: hidden; border-bottom: 1px solid $line-1; }
+.wash { position: absolute; inset: 0; pointer-events: none; }
+
+.inner {
+  position: relative;
+  max-width: 1080px;
+  margin: 0 auto;
+  /* A real minimum height so the hero reads as a substantial banner, not a thin
+     strip. Top padding clears the fixed 60px PartnerNav and keeps the hero's
+     Book CTA clear of the navbar's Book button. */
+  min-height: 300px;
+  padding: 104px 20px 48px;
+  display: flex;
+  align-items: flex-start;
+  gap: 26px;
+
+  @media (max-width: 720px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+    min-height: 0;
+    padding: 84px 16px 30px;
+  }
+}
+
+.logo {
+  flex-shrink: 0;
+  width: 104px;
+  height: 104px;
+  border-radius: $r-3;
+  object-fit: cover;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-family: $font-serif;
+  font-size: 46px;
+  font-weight: 600;
+  box-shadow: $shadow-2;
+
+  @media (max-width: 720px) { width: 80px; height: 80px; font-size: 36px; }
+}
+
+.body { flex: 1; min-width: 0; }
+.typeRow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+.type { font-size: 12.5px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: $fg-2; }
+.rating { display: inline-flex; align-items: center; gap: 6px; }
+.reviewCount { font-size: 12px; color: $fg-2; }
+
+.name { font-family: $font-serif; font-size: 38px; line-height: 1.05; letter-spacing: -0.02em; margin: 4px 0 8px; color: $fg-0; }
+.tagline { font-size: 14.5px; color: $fg-1; margin: 0 0 8px; max-width: 46ch; line-height: 1.5; }
+.meta { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: $fg-2; }
+
+/* Contact + social links, inline under the profile — a tidy row of round
+   buttons that fill with the brand accent on hover. */
+.socials {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+.iconBtn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-1;
+  transition: background 0.16s, color 0.16s, border-color 0.16s, transform 0.12s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover {
+    background: $accent;
+    color: var(--fg-on-accent, #fff);
+    border-color: $accent;
+    transform: translateY(-2px);
+  }
+  &:active { transform: scale(0.94); }
+}

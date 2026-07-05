@@ -38,6 +38,10 @@ export interface PartnerPresentation {
   whatsapp?: string
 }
 
+/** Public booking-page layout. Presentation-only; the booking API/flow is
+ *  identical across templates. `classic` is the default every partner gets. */
+export type PartnerTemplate = 'classic' | 'tabbed'
+
 export type PublicPartner = Partner & {
   presentation: PartnerPresentation
   /** When false, the page is contact-only — booking CTAs are hidden/replaced.
@@ -45,6 +49,8 @@ export type PublicPartner = Partner & {
   bookingsEnabled?: boolean
   /** 'salon' (team) or 'single' (solo). Optional in mock; API provides it. */
   kind?: 'salon' | 'single'
+  /** Which public page layout to render. Optional in mock; API defaults classic. */
+  template?: PartnerTemplate
 }
 
 export const PARTNERS: PublicPartner[] = [

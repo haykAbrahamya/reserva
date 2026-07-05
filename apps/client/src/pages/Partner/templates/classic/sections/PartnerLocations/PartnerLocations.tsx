@@ -3,7 +3,7 @@ import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { useI18n } from '@/i18n'
 import { bookableLocations, canBook } from '@/services/booking.service'
-import { summarizeHours } from './summarizeHours'
+import { summarizeHours } from '../../../../lib/summarizeHours'
 import s from './PartnerLocations.module.scss'
 
 interface Props {

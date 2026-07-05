@@ -61,6 +61,7 @@ interface ApiPartner {
   accent: string
   bookingsEnabled?: boolean
   kind?: 'salon' | 'single'
+  template?: 'classic' | 'tabbed'
   locations: PublicPartner['locations']
   services: Service[]
   specialists: ApiSpecialist[]
@@ -107,6 +108,8 @@ function toPublicPartner(p: ApiPartner): PublicPartner {
     // Default to true when the API omits it (older payloads / safety).
     bookingsEnabled: p.bookingsEnabled !== false,
     kind: p.kind === 'single' ? 'single' : 'salon',
+    // Unknown/missing template → classic (safe fallback for old payloads/rollback).
+    template: p.template === 'tabbed' ? 'tabbed' : 'classic',
     locations: p.locations,
     services: p.services.map((sv) => ({ ...sv, priceType: sv.priceType, priceMax: sv.priceMax })),
     specialists: p.specialists.map(({ serviceIds, ...rest }) => ({ ...rest, services: serviceIds })),

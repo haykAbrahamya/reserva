@@ -18,6 +18,9 @@ interface Props {
   /** Name used in the empty-state copy ("Be the first to review {name}"). For a
    * single this is the business name; for a salon it's the specialist's first name. */
   emptyName: string
+  /** Review list layout: `list` (default, single column — modal/classic) or
+   * `grid` (responsive multi-column — the tabbed template's full-width reviews). */
+  layout?: 'list' | 'grid'
 }
 
 /**
@@ -26,7 +29,7 @@ interface Props {
  * loading states. Shared by the SpecialistModal and the single-mode
  * PartnerReviews section so the review flow lives in exactly one place.
  */
-export function ReviewsPanel({ slug, specialistId, emptyName }: Props) {
+export function ReviewsPanel({ slug, specialistId, emptyName, layout = 'list' }: Props) {
   const { t } = useI18n()
 
   const [reviews, setReviews] = useState<SpecialistReview[] | null>(null)
@@ -155,16 +158,18 @@ export function ReviewsPanel({ slug, specialistId, emptyName }: Props) {
         <div className={s.reviewsLoading}><Loader2 size={18} className={s.spin} /></div>
       ) : hasReviews ? (
         <div className={s.reviews}>
-          {reviews!.map((r) => (
-            <div key={r.id} className={s.review}>
-              <div className={s.reviewHead}>
-                <span className={s.reviewAuthor}>{r.author || t('specialistModal.review.anonymous')}</span>
-                <StarRatingDisplay value={r.rating} size={13} compact />
+          <div className={layout === 'grid' ? s.reviewGrid : s.reviewList}>
+            {reviews!.map((r) => (
+              <div key={r.id} className={s.review}>
+                <div className={s.reviewHead}>
+                  <span className={s.reviewAuthor}>{r.author || t('specialistModal.review.anonymous')}</span>
+                  <StarRatingDisplay value={r.rating} size={13} compact />
+                </div>
+                {r.text && <p className={s.reviewText}>{r.text}</p>}
+                <div className={s.reviewDate}>{fmtDate(r.createdAt)}</div>
               </div>
-              {r.text && <p className={s.reviewText}>{r.text}</p>}
-              <div className={s.reviewDate}>{fmtDate(r.createdAt)}</div>
-            </div>
-          ))}
+            ))}
+          </div>
           {nextCursor && (
             <button className={s.loadMoreBtn} onClick={loadMore} disabled={loadingMore}>
               {loadingMore
