@@ -163,13 +163,14 @@
 .composer {
   display: flex;
   align-items: flex-end;
-  gap: 8px;
+  gap: 10px;
   padding: 10px 12px;
   border-top: 1px solid $line-1;
   background: $bg-2;
 }
 .input {
   flex: 1;
+  min-width: 0;
   resize: none;
   max-height: 120px;
   border: 1px solid $line-2;
@@ -177,7 +178,8 @@
   background: $bg-1;
   color: $fg-0;
   font-family: $font-sans;
-  font-size: 14px;
+  /* 16px avoids iOS Safari focus auto-zoom. */
+  font-size: 16px;
   line-height: 1.4;
   padding: 9px 12px;
   &:focus { outline: none; border-color: $accent; }
@@ -185,8 +187,8 @@
 }
 .send {
   flex-shrink: 0;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: $r-2;
   border: none;
   background: $accent;
@@ -195,6 +197,11 @@
   place-items: center;
   cursor: pointer;
   &:disabled { opacity: 0.5; cursor: default; }
+}
+
+@media (max-width: 768px) {
+  .composer { gap: 12px; padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px)); }
+  .send { width: 44px; height: 44px; }
 }
 
 .center { margin: auto; padding: 30px; color: $fg-2; }

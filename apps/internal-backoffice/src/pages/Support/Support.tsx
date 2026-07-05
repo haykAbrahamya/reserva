@@ -203,8 +203,7 @@ function Conversation({
   }
   useEffect(() => () => { if (typingTimer.current) clearTimeout(typingTimer.current) }, [])
 
-  const send = async () => {
-    const body = text.trim()
+  const sendBody = async (body: string) => {
     if (!body || sending) return
     setSending(true)
     setText('')
@@ -219,9 +218,27 @@ function Conversation({
       onChanged()
     } catch { setText(body) } finally { setSending(false) }
   }
+  const send = () => void sendBody(text.trim())
 
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void send() }
+  // Enter = send, Shift+Enter = newline; IME-safe.
+  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+      e.preventDefault()
+      void send()
+    }
+  }
+  // Mobile fallback: "Send" key that inserts a trailing newline → send.
+  const onInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const v = e.target.value
+    if (v.endsWith('\n') && !v.slice(0, -1).includes('\n')) {
+      const body = v.replace(/\n+$/, '').trim()
+      setText('')
+      signalTyping()
+      if (body) void sendBody(body)
+      return
+    }
+    setText(v)
+    signalTyping()
   }
 
   const doClose = async () => {
@@ -286,8 +303,9 @@ function Conversation({
         <textarea
           className={s.input}
           value={text}
-          onChange={(e) => { setText(e.target.value); signalTyping() }}
+          onChange={onInputChange}
           onKeyDown={onKeyDown}
+          enterKeyHint="send"
           placeholder="Reply to the partner…"
           rows={1}
         />

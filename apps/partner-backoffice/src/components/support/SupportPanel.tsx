@@ -130,8 +130,7 @@ export function SupportPanel({ onClose, mobile }: Props) {
   }
   useEffect(() => () => { if (typingTimer.current) clearTimeout(typingTimer.current) }, [])
 
-  const send = async () => {
-    const body = text.trim()
+  const sendBody = async (body: string) => {
     if (!body || sending) return
     setSending(true)
     setText('')
@@ -150,9 +149,33 @@ export function SupportPanel({ onClose, mobile }: Props) {
       setSending(false)
     }
   }
+  const send = () => void sendBody(text.trim())
 
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void send() }
+  // Enter = send, Shift+Enter = newline. `isComposing` guards IME (e.g. typing
+  // Armenian/Russian via a composition editor) so committing a character with
+  // Enter doesn't send. Works for desktop and mobile hardware/soft keyboards.
+  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+      e.preventDefault()
+      void send()
+    }
+  }
+
+  // Fallback for mobile keyboards whose "Send"/Enter key inserts a newline
+  // instead of firing a clean Enter keydown: if the value gains a trailing
+  // newline (and it's not a Shift+Enter multiline), treat it as send.
+  const onInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const v = e.target.value
+    if (v.endsWith('\n') && !v.slice(0, -1).includes('\n')) {
+      setText(v.replace(/\n+$/, ''))
+      signalTyping()
+      // Defer so state settles before send reads it.
+      const body = v.replace(/\n+$/, '').trim()
+      if (body) { void sendBody(body) }
+      return
+    }
+    setText(v)
+    signalTyping()
   }
 
   return (
@@ -220,8 +243,9 @@ export function SupportPanel({ onClose, mobile }: Props) {
         <textarea
           className={s.input}
           value={text}
-          onChange={(e) => { setText(e.target.value); signalTyping() }}
+          onChange={onInputChange}
           onKeyDown={onKeyDown}
+          enterKeyHint="send"
           placeholder={t('support.placeholder')}
           rows={1}
         />
