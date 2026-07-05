@@ -23,6 +23,7 @@
   &::-webkit-scrollbar { display: none; }
 }
 .tab {
+  position: relative;
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
@@ -30,22 +31,37 @@
   padding: 15px 16px 13px;
   background: none;
   border: none;
-  border-bottom: 2px solid transparent;
   color: $fg-2;
   font-family: $font-sans;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  transition: color 0.14s, border-color 0.14s;
+  transition: color 0.24s ease;
   -webkit-tap-highlight-color: transparent;
 
-  svg { opacity: 0.7; transition: opacity 0.14s; }
+  /* Underline as a pseudo-element so it can grow from the center rather than
+     just fade — reads as a smooth "settle" on the tapped tab. */
+  &::after {
+    content: '';
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 0;
+    height: 2px;
+    border-radius: 2px;
+    background: $accent;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  svg { opacity: 0.7; transition: opacity 0.24s ease; }
   &:hover { color: $fg-1; }
   &.tabActive {
     color: $accent;
-    border-bottom-color: $accent;
     svg { opacity: 1; }
+    &::after { transform: scaleX(1); }
   }
 }
 
@@ -83,4 +99,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .panelActive { animation: none; }
+  .tab::after { transition: none; }
 }

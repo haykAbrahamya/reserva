@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import type { PublicPartner } from '@/mock/partners'
 import { initials } from '@reserva/shared'
 import { ReviewsPanel } from '@/components/ReviewsPanel/ReviewsPanel'
@@ -26,6 +26,21 @@ export function TabbedReviews({ partner }: Props) {
   const [selectedId, setSelectedId] = useState<string>(() => team[0]?.id ?? '')
 
   const specialist = team.find((sp) => sp.id === selectedId) ?? team[0]
+
+  // Center the selected member within the (horizontally scrollable) picker —
+  // same behavior as the tabbed nav bar. The clamp to [0, maxScroll] keeps the
+  // first flush-left and the last flush-right, so no empty gutter at the ends.
+  const pickerRef = useRef<HTMLDivElement>(null)
+  const personRefs = useRef<Record<string, HTMLButtonElement | null>>({})
+  useEffect(() => {
+    const bar = pickerRef.current
+    const el = specialist ? personRefs.current[specialist.id] : null
+    if (!bar || !el) return
+    const target = el.offsetLeft - (bar.clientWidth - el.clientWidth) / 2
+    const max = bar.scrollWidth - bar.clientWidth
+    bar.scrollTo({ left: Math.max(0, Math.min(target, max)), behavior: 'smooth' })
+  }, [selectedId, specialist])
+
   if (!specialist) return null
 
   const t1 = partner.presentation.heroTints[0] ?? partner.accent
@@ -34,12 +49,13 @@ export function TabbedReviews({ partner }: Props) {
   return (
     <section className={s.section}>
       {!isSingle && (
-        <div className={s.picker}>
+        <div className={s.picker} ref={pickerRef}>
           {team.map((sp) => {
             const isSel = sp.id === specialist.id
             return (
               <button
                 key={sp.id}
+                ref={(el) => { personRefs.current[sp.id] = el }}
                 className={[s.person, isSel ? s.personActive : ''].filter(Boolean).join(' ')}
                 onClick={() => setSelectedId(sp.id)}
               >

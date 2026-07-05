@@ -6,8 +6,10 @@
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding-bottom: 8px;
-  margin-bottom: 22px;
+  /* Vertical padding gives the selected pill's focus ring room inside the
+     scroll container, which otherwise clips it on the top/bottom edge. */
+  padding: 3px 0 11px;
+  margin-bottom: 19px;
   scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
 }
@@ -21,10 +23,15 @@
   border: 1px solid $line-2;
   background: $bg-1;
   cursor: pointer;
-  transition: border-color 0.14s, background 0.14s;
+  transition: border-color 0.28s ease, background 0.28s ease, box-shadow 0.28s ease, transform 0.2s ease;
   -webkit-tap-highlight-color: transparent;
-  &:hover { background: $bg-2; }
-  &.personActive { border-color: $accent; background: $accent-soft; }
+  &:hover:not(.personActive) { background: $bg-2; }
+  &:active { transform: scale(0.97); }
+  &.personActive {
+    border-color: $accent;
+    background: $accent-soft;
+    box-shadow: 0 0 0 1px $accent;
+  }
 }
 .avatar {
   width: 34px;
