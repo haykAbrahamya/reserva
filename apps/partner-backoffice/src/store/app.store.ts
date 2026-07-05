@@ -22,6 +22,8 @@ export type PartnerProfile = Omit<Partner, 'locations' | 'services' | 'specialis
   kind?: 'salon' | 'single'
   /** Public booking-page layout (presentation-only). Defaults to classic. */
   template?: 'classic' | 'tabbed'
+  /** Backoffice FAB behavior: support chat / new booking / hidden. Default book. */
+  supportWidget?: 'support' | 'book' | 'hidden'
   /** Public marketing fields edited in the Storefront section. */
   presentation?: {
     about?: string

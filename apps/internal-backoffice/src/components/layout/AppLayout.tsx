@@ -1,13 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
-  LayoutDashboard, Building2, Users, ShieldCheck, LogOut, Menu, X, KeyRound, Inbox, BarChart3, UserPlus,
+  LayoutDashboard, Building2, Users, ShieldCheck, LogOut, Menu, X, KeyRound, Inbox, BarChart3, UserPlus, LifeBuoy,
 } from 'lucide-react'
 import { Avatar } from '@/components/ui'
 import { ReservaMark } from '@/components/ReservaMark'
 import { useAuthStore, useIsOwner } from '@/store/auth.store'
 import { authService } from '@/services/auth.service'
 import { ChangePasswordModal } from '@/components/account/ChangePasswordModal'
+import { supportService } from '@/services/support.service'
+import { onSupportMessage, onSupportBadge, closeSupportSocket } from '@/services/supportSocket'
 import s from './AppLayout.module.scss'
 
 interface NavItem {
@@ -21,6 +23,7 @@ interface NavItem {
 const NAV: NavItem[] = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/partners', label: 'Partners', icon: Building2 },
+  { to: '/support', label: 'Support', icon: LifeBuoy },
   { to: '/pending-registrations', label: 'Pending Registrations', icon: UserPlus },
   { to: '/demo-requests', label: 'Demo Requests', icon: Inbox },
   { to: '/visits', label: 'Visits', icon: BarChart3 },
@@ -37,12 +40,29 @@ export function AppLayout() {
 
   const [navOpen, setNavOpen] = useState(false)
   const [pwOpen, setPwOpen] = useState(false)
+  const [supportUnread, setSupportUnread] = useState(0)
 
   // Reset scroll + close the mobile nav on every route change.
   useEffect(() => {
     contentRef.current?.scrollTo({ top: 0 })
     setNavOpen(false)
   }, [pathname])
+
+  // Support unread badge: seed from REST, keep fresh via WS. Refreshed on any
+  // new message / badge hint. Cleared here when viewing the Support page (the
+  // page itself marks threads read). Socket torn down on unmount/logout.
+  const refreshUnread = useCallback(() => {
+    supportService.unread().then((r) => setSupportUnread(r.count)).catch(() => undefined)
+  }, [])
+  useEffect(() => {
+    if (!user) { closeSupportSocket(); setSupportUnread(0); return }
+    refreshUnread()
+    const off1 = onSupportMessage(() => refreshUnread())
+    const off2 = onSupportBadge(() => refreshUnread())
+    return () => { off1(); off2() }
+  }, [user, refreshUnread])
+  // Re-check when leaving the Support page (it may have marked things read).
+  useEffect(() => { if (pathname !== '/support') refreshUnread() }, [pathname, refreshUnread])
 
   const items = NAV.filter((n) => !n.ownerOnly || isOwner)
 
@@ -72,6 +92,9 @@ export function AppLayout() {
           >
             <item.icon size={18} className={s.navIcon} />
             <span>{item.label}</span>
+            {item.to === '/support' && supportUnread > 0 && (
+              <span className={s.navBadge}>{supportUnread}</span>
+            )}
           </NavLink>
         ))}
       </nav>

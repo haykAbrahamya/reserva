@@ -83,6 +83,17 @@
     box-shadow: 0 4px 12px rgba(168, 120, 75, 0.3);
   }
 }
+.fabDot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: $danger;
+  border: 2.5px solid $bg-1;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
 
 /* ── More / profile bottom sheet ── */
 .moreScrim {
@@ -196,4 +207,25 @@
   height: 1px;
   background: $line-1;
   margin: 4px 12px;
+}
+
+/* Unread markers for the support entry point. */
+.sheetDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $danger;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.tabIconWrap { position: relative; display: inline-flex; }
+.tabDot {
+  position: absolute;
+  top: -2px;
+  right: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $danger;
+  border: 1.5px solid $bg-1;
 }

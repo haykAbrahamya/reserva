@@ -15,6 +15,7 @@ import { Staff } from '@/pages/Staff/Staff'
 import { DemoRequests } from '@/pages/DemoRequests/DemoRequests'
 import { PendingRegistrations } from '@/pages/PendingRegistrations/PendingRegistrations'
 import { Visits } from '@/pages/Visits/Visits'
+import { Support } from '@/pages/Support/Support'
 
 /** Apply the platform theme once on mount. The accent is intentionally NOT
  *  overridden here: the console inherits Reserva's shared brand accent (the warm
@@ -52,6 +53,7 @@ export default function App() {
             <Route index element={<Dashboard />} />
             <Route path="partners" element={<Partners />} />
             <Route path="partners/:id" element={<PartnerDetailPage />} />
+            <Route path="support" element={<Support />} />
             <Route path="demo-requests" element={<DemoRequests />} />
             <Route path="pending-registrations" element={<PendingRegistrations />} />
             <Route path="visits" element={<Visits />} />

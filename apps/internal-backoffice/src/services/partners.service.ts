@@ -24,12 +24,17 @@ export interface PartnerListItem {
   kind: 'salon' | 'single'
   /** Public booking-page layout (presentation-only). Defaults to classic. */
   template: PartnerTemplate
+  /** Backoffice FAB behavior (support chat / new booking / hidden). Default book. */
+  supportWidget: SupportWidgetMode
   createdAt: string
   counts: PartnerCounts
 }
 
 /** Public booking-page layout the partner's page renders. */
 export type PartnerTemplate = 'classic' | 'tabbed'
+
+/** Backoffice FAB behavior. */
+export type SupportWidgetMode = 'support' | 'book' | 'hidden'
 
 export interface PartnerAdmin {
   id: string
@@ -93,6 +98,7 @@ export interface UpdatePartnerInput {
   accent?: string
   active?: boolean
   template?: PartnerTemplate
+  supportWidget?: SupportWidgetMode
   presentation?: Partial<PartnerPresentation>
 }
 

@@ -7,7 +7,11 @@ import axios, { AxiosError, type AxiosRequestConfig } from 'axios'
 // - Unwraps the standard `{ data }` envelope so callers get the payload.
 // ─────────────────────────────────────────────────────────────
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1'
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1'
+
+/** Origin of the API (API_URL without the /api/v1 suffix) — used by the
+ *  WebSocket client, which connects to the server root + a namespace. */
+export const API_ORIGIN = API_URL.replace(/\/api\/v\d+\/?$/, '')
 
 const ACCESS_KEY = 'reserva-access'
 const REFRESH_KEY = 'reserva-refresh'

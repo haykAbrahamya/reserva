@@ -63,6 +63,19 @@
   color: $accent-strong;
 }
 .navIcon { flex-shrink: 0; }
+.navBadge {
+  margin-left: auto;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: $danger;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+}
 
 .account {
   display: flex;

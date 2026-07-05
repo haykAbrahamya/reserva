@@ -9,6 +9,10 @@ import axios, { AxiosError, type AxiosRequestConfig } from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1'
 
+/** Origin of the API (without the /api/v1 suffix) — used by the WebSocket
+ *  client, which connects to the server root + a namespace. */
+export const API_ORIGIN = API_URL.replace(/\/api\/v\d+\/?$/, '')
+
 const ACCESS_KEY = 'reserva-platform-access'
 const REFRESH_KEY = 'reserva-platform-refresh'
 

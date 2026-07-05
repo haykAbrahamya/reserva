@@ -60,6 +60,19 @@
     "admin": "Admin",
     "manager": "Manager"
   },
+  "support": {
+    "title": "Help & Support",
+    "subtitle": "Chat with the Reserva team",
+    "open": "Open support chat",
+    "close": "Close",
+    "send": "Send",
+    "placeholder": "Type your message…",
+    "emptyTitle": "How can we help?",
+    "emptyText": "Ask us anything about your account, bookings or the platform — we usually reply quickly.",
+    "typing": "typing…",
+    "today": "Today",
+    "yesterday": "Yesterday"
+  },
   "changePassword": {
     "title": "Change password",
     "subtitle": "Update the password you use to sign in.",
@@ -661,6 +674,17 @@
       "updated": "Logo updated",
       "removed": "Logo removed",
       "fallbackNote": "No logo yet — your salon's initial is shown instead."
+    },
+    "quickButton": {
+      "title": "Quick button",
+      "desc": "The floating button in your backoffice (bottom-right on desktop, above the tab bar on mobile).",
+      "book": "New booking",
+      "support": "Support chat",
+      "hidden": "Hidden",
+      "hint_book": "The button opens the new-booking form.",
+      "hint_support": "The button opens the support chat with the Reserva team.",
+      "hint_hidden": "No floating button is shown.",
+      "saved": "Quick button updated"
     },
     "online": {
       "title": "Online booking",

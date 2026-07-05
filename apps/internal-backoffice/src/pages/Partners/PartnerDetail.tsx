@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Save, MapPin, Users, User, CalendarDays, Store, ExternalLink, Trash2, AlertTriangle, SlidersHorizontal, LayoutTemplate } from 'lucide-react'
+import { ArrowLeft, Save, MapPin, Users, User, CalendarDays, Store, ExternalLink, Trash2, AlertTriangle, SlidersHorizontal, LayoutTemplate, LifeBuoy } from 'lucide-react'
 import { Avatar, Badge, Button, Input, Textarea, Toggle, Empty, ConfirmDialog, SegmentedFilter, useToast } from '@/components/ui'
 import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
 import { useResource } from '@/store/useResource'
@@ -109,6 +109,17 @@ export function PartnerDetailPage() {
     try {
       await partnersService.update(id, { template })
       toast(template === 'tabbed' ? 'Switched to tabbed template' : 'Switched to classic template')
+      await reload()
+    } catch (err) {
+      toast(errorMessage(err))
+    }
+  }
+
+  const changeSupportWidget = async (supportWidget: 'support' | 'book' | 'hidden') => {
+    if (supportWidget === (partner.supportWidget ?? 'support')) return
+    try {
+      await partnersService.update(id, { supportWidget })
+      toast('Quick button updated')
       await reload()
     } catch (err) {
       toast(errorMessage(err))
@@ -230,6 +241,24 @@ export function PartnerDetailPage() {
                 options={[
                   { value: 'classic', label: 'Classic' },
                   { value: 'tabbed', label: 'Tabbed' },
+                ]}
+              />
+            </div>
+
+            <div className={s.toggleRow}>
+              <div className={s.toggleText}>
+                <div className={s.toggleLabel}><LifeBuoy size={13} /> Quick button</div>
+                <div className={s.toggleDesc}>Backoffice floating button: Book (new booking), Support (chat with us), or Hidden.</div>
+              </div>
+              <SegmentedFilter<'support' | 'book' | 'hidden'>
+                size="sm"
+                ariaLabel="Quick button"
+                value={partner.supportWidget ?? 'support'}
+                onChange={changeSupportWidget}
+                options={[
+                  { value: 'book', label: 'Book' },
+                  { value: 'support', label: 'Support' },
+                  { value: 'hidden', label: 'Hidden' },
                 ]}
               />
             </div>

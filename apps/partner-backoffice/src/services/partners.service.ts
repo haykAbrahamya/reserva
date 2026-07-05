@@ -97,6 +97,9 @@ export interface PartnerPresentationFields {
 /** Public booking-page layout (presentation-only). */
 export type PartnerTemplate = 'classic' | 'tabbed'
 
+/** Backoffice floating action button behavior. */
+export type SupportWidgetMode = 'support' | 'book' | 'hidden'
+
 export type PartnerProfileResponse = Omit<Partner, 'slug'> & {
   /** Null until the partner sets a public handle in Settings. */
   slug: string | null
@@ -106,6 +109,8 @@ export type PartnerProfileResponse = Omit<Partner, 'slug'> & {
   kind?: 'salon' | 'single'
   /** Which public page layout the partner renders. Defaults to classic. */
   template?: PartnerTemplate
+  /** Backoffice FAB behavior (support chat / new booking / hidden). Default book. */
+  supportWidget?: SupportWidgetMode
   /** Featured in the public marketplace (/salons). Read-only here — curated by
    *  Reserva platform staff from the internal console. */
   marketplaceListed?: boolean
@@ -121,6 +126,7 @@ export interface PartnerSettingsPatch {
   accent?: string
   slug?: string
   template?: PartnerTemplate
+  supportWidget?: SupportWidgetMode
   presentation?: PartnerPresentationFields
 }
 

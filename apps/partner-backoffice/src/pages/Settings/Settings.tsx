@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { CheckCircle2, Lock, Globe, ExternalLink, Download, Share, CheckCircle, Store, Image, Trash2, Upload, CalendarCheck, Copy } from 'lucide-react'
-import { Toggle, Button, Input, useToast } from '@/components/ui'
+import { Toggle, Button, Input, SegmentedFilter, useToast } from '@/components/ui'
 import { useAppStore } from '@/store/app.store'
 import { useIsAdmin } from '@/store/auth.hooks'
 import { partnersService, galleryImageUrl, type PartnerProfileResponse } from '@/services/partners.service'
@@ -46,18 +46,22 @@ export function Settings() {
   const [slug, setSlug] = useState('')
   const [autoConfirm, setAutoConfirm] = useState(false)
   const [bookingsOn, setBookingsOn] = useState(true)
+  const [fabMode, setFabMode] = useState<'support' | 'book' | 'hidden'>('support')
 
   const savedSlug = profile?.slug ?? ''
   const savedAuto = profile?.autoConfirmBookings ?? false
   const savedBookingsOn = profile?.bookingsEnabled ?? true
+  const savedFab = profile?.supportWidget ?? 'support'
 
   useEffect(() => { setSlug(savedSlug) }, [savedSlug])
   useEffect(() => { setAutoConfirm(savedAuto) }, [savedAuto])
   useEffect(() => { setBookingsOn(savedBookingsOn) }, [savedBookingsOn])
+  useEffect(() => { setFabMode(savedFab) }, [savedFab])
 
   const [slugSaving, setSlugSaving] = useState(false)
   const [autoSaving, setAutoSaving] = useState(false)
   const [bookingsSaving, setBookingsSaving] = useState(false)
+  const [fabSaving, setFabSaving] = useState(false)
 
   // ── Brand logo ──
   const logoInputRef = useRef<HTMLInputElement>(null)
@@ -130,9 +134,34 @@ export function Settings() {
         slug: updated.slug,
         autoConfirmBookings: updated.autoConfirmBookings,
         bookingsEnabled: updated.bookingsEnabled,
+        supportWidget: updated.supportWidget,
       })
     }
     reload()
+  }
+
+  // ── Quick-button (FAB) preference ──
+  const changeFab = async (mode: 'support' | 'book' | 'hidden') => {
+    if (!isAdmin || fabSaving || mode === fabMode) return
+    setFabSaving(true)
+    const prevMode = fabMode
+    setFabMode(mode)
+    // Reflect in the global store IMMEDIATELY so the FAB/bubble switch live
+    // (don't wait on the response — which may omit the field before a backend
+    // redeploy, and shouldn't gate the UI anyway).
+    const current = useAppStore.getState().partner
+    if (current) setPartner({ ...current, supportWidget: mode })
+    try {
+      await partnersService.updateProfile({ supportWidget: mode })
+      toast(t('settings.quickButton.saved'))
+    } catch (err) {
+      setFabMode(prevMode)
+      const cur = useAppStore.getState().partner
+      if (cur) setPartner({ ...cur, supportWidget: prevMode })
+      toast(errorMessage(err, t))
+    } finally {
+      setFabSaving(false)
+    }
   }
 
   // ── Slug ──
@@ -329,6 +358,30 @@ export function Settings() {
         </div>
       </section>
       )}
+
+      {/* ── Quick button (mobile FAB + web bubble) preference ── */}
+      <section className={s.card}>
+        <div className={s.cardHead}>
+          <span className={s.cardIcon}><CalendarCheck size={18} /></span>
+          <div className={s.cardHeadText}>
+            <h2 className={s.cardTitle}>{t('settings.quickButton.title')}</h2>
+            <p className={s.cardDesc}>{t('settings.quickButton.desc')}</p>
+          </div>
+          {adminLock}
+        </div>
+        <div className={s.cardBody}>
+          <SegmentedFilter<'support' | 'book' | 'hidden'>
+            value={fabMode}
+            onChange={changeFab}
+            options={[
+              { value: 'book', label: t('settings.quickButton.book') },
+              { value: 'support', label: t('settings.quickButton.support') },
+              { value: 'hidden', label: t('settings.quickButton.hidden') },
+            ]}
+          />
+          <div className={s.statusLine}>{t(`settings.quickButton.hint_${fabMode}`)}</div>
+        </div>
+      </section>
 
       {/* ── Marketplace listing (read-only — curated by Reserva) ── */}
       <section className={s.card}>

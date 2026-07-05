@@ -4,6 +4,8 @@ import { Sidebar } from '../Sidebar/Sidebar'
 import { Topbar } from '../Topbar/Topbar'
 import { PublicLinkBar } from '../PublicLinkBar/PublicLinkBar'
 import { MobileTabBar } from '../MobileTabBar/MobileTabBar'
+import { SupportProvider } from '@/components/support/SupportProvider'
+import { SupportWidget } from '@/components/support/SupportWidget'
 import s from './AppLayout.module.scss'
 
 export function AppLayout() {
@@ -16,18 +18,22 @@ export function AppLayout() {
   }, [pathname])
 
   return (
-    <div className={s.root}>
-      {/* Sidebar — hidden on mobile via CSS */}
-      <Sidebar />
-      <div className={s.main}>
-        <Topbar />
-        <PublicLinkBar />
-        <main className={s.content} ref={contentRef}>
-          <Outlet />
-        </main>
+    <SupportProvider>
+      <div className={s.root}>
+        {/* Sidebar — hidden on mobile via CSS */}
+        <Sidebar />
+        <div className={s.main}>
+          <Topbar />
+          <PublicLinkBar />
+          <main className={s.content} ref={contentRef}>
+            <Outlet />
+          </main>
+        </div>
+        {/* Bottom tab bar — shown only on mobile via CSS */}
+        <MobileTabBar />
+        {/* Support chat: floating ? bubble (web) / bottom sheet (mobile) */}
+        <SupportWidget />
       </div>
-      {/* Bottom tab bar — shown only on mobile via CSS */}
-      <MobileTabBar />
-    </div>
+    </SupportProvider>
   )
 }

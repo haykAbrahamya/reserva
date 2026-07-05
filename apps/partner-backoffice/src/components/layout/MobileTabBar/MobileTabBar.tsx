@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { MoreHorizontal, Plus, LogOut, KeyRound } from 'lucide-react'
+import { MoreHorizontal, HelpCircle, Plus, LogOut, KeyRound, LifeBuoy } from 'lucide-react'
 import { useAuthStore } from '@/store/auth.store'
 import { usePartner } from '@/store/app.store'
 import { useIsAdmin } from '@/store/auth.hooks'
 import { authService } from '@/services/auth.service'
 import { ChangePasswordModal } from '@/components/account/ChangePasswordModal/ChangePasswordModal'
+import { useSupport } from '@/components/support/SupportProvider'
 import { Avatar } from '@/components/ui'
 import { useNewBooking } from '@/App'
 import { useT } from '@/i18n'
@@ -17,7 +18,6 @@ import s from './MobileTabBar.module.scss'
 const TABS = PRIMARY_TABS.map(t => ({ ...t, labelKey: t.to === '/' ? 'nav.home' : t.labelKey }))
 
 export function MobileTabBar() {
-  const openNewBooking = useNewBooking()
   const [moreOpen, setMoreOpen] = useState(false)
   const [closing,  setClosing]  = useState(false)
   const [pwOpen,   setPwOpen]   = useState(false)
@@ -26,6 +26,9 @@ export function MobileTabBar() {
   const isAdmin = useIsAdmin()
   const partner = usePartner()
   const navigate = useNavigate()
+  const { unread, openChat } = useSupport()
+  const openNewBooking = useNewBooking()
+  const fabMode = partner?.supportWidget ?? 'support'
   const t = useT()
 
   // Animate the sheet out before unmounting
@@ -46,10 +49,19 @@ export function MobileTabBar() {
 
   return (
     <>
-      {/* FAB */}
-      <button className={s.fab} onClick={openNewBooking} aria-label={t('dashboard.newBooking')}>
-        <Plus size={22} />
-      </button>
+      {/* FAB — follows the partner's preference: support chat / new booking /
+          hidden. Booking always remains reachable from the Bookings page. */}
+      {fabMode === 'support' && (
+        <button className={s.fab} onClick={openChat} aria-label={t('support.open')}>
+          <HelpCircle size={24} />
+          {unread > 0 && <span className={s.fabDot} />}
+        </button>
+      )}
+      {fabMode === 'book' && (
+        <button className={s.fab} onClick={openNewBooking} aria-label={t('dashboard.newBooking')}>
+          <Plus size={22} />
+        </button>
+      )}
 
       {/* Tab bar */}
       <nav className={s.tabbar}>
@@ -65,9 +77,13 @@ export function MobileTabBar() {
           </NavLink>
         ))}
 
-        {/* More tab — opens profile + logout sheet */}
+        {/* More tab — opens profile + logout sheet. Shows a dot when support has
+            unread replies, so the entry point is discoverable from the bar. */}
         <button className={s.tab} onClick={() => setMoreOpen(true)}>
-          <MoreHorizontal size={20} className={s.icon} />
+          <span className={s.tabIconWrap}>
+            <MoreHorizontal size={20} className={s.icon} />
+            {unread > 0 && <span className={s.tabDot} />}
+          </span>
           <span>{t('nav.more')}</span>
         </button>
       </nav>
@@ -117,6 +133,15 @@ export function MobileTabBar() {
               })}
 
               <div className={s.sheetDivider} />
+
+              <button
+                className={s.sheetItem}
+                onClick={() => closeMore(() => openChat())}
+              >
+                <span className={s.sheetItemIcon}><LifeBuoy size={18} /></span>
+                {t('support.title')}
+                {unread > 0 && <span className={s.sheetDot} />}
+              </button>
 
               <button
                 className={s.sheetItem}
