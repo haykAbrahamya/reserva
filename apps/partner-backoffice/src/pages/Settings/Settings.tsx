@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSpotlight } from '@/components/onboarding/useSpotlight'
+import { notifyProfileUpdated } from '@/components/onboarding/useProfileCompletion'
 import { CheckCircle2, Lock, Globe, ExternalLink, Download, Share, CheckCircle, Store, Image, Trash2, Upload, CalendarCheck, Copy } from 'lucide-react'
 import { Toggle, Button, Input, SegmentedFilter, useToast } from '@/components/ui'
 import { useAppStore } from '@/store/app.store'
@@ -72,6 +73,7 @@ export function Settings() {
     const cur = useAppStore.getState().partner
     if (cur) setPartner({ ...cur, presentation: { ...(cur.presentation ?? {}), logoUrl: url } })
     reload()
+    notifyProfileUpdated()
   }
   const onPickLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -93,23 +95,10 @@ export function Settings() {
     } catch (err) { toast(errorMessage(err, t)) } finally { setLogoBusy(false) }
   }
 
-  // Deep-link from the PublicLinkBar's "set up your link" CTA: scroll the public
-  // address card into view and pulse it so the new partner knows what to do.
-  const [searchParams, setSearchParams] = useSearchParams()
-  const addressRef = useRef<HTMLElement>(null)
-  const [highlightAddress, setHighlightAddress] = useState(false)
-  useEffect(() => {
-    if (searchParams.get('highlight') !== 'address' || !profile) return
-    addressRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    setHighlightAddress(true)
-    const t = window.setTimeout(() => setHighlightAddress(false), 4200)
-    // Clear the query param so a refresh/re-navigation doesn't re-trigger it.
-    searchParams.delete('highlight')
-    setSearchParams(searchParams, { replace: true })
-    return () => window.clearTimeout(t)
-    // Run once, after the profile is available.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile])
+  // Deep-link from the onboarding checklist ("Set your page address"): the shared
+  // spotlight scrolls the address card into view and pulses it via the
+  // `data-spotlight="slug"` attribute below.
+  useSpotlight()
 
   if (!profile) {
     return (
@@ -138,6 +127,8 @@ export function Settings() {
       })
     }
     reload()
+    // Nudge the onboarding checklist/sidebar to re-check (e.g. slug just set).
+    notifyProfileUpdated()
   }
 
   // ── Quick-button (FAB) preference ──
@@ -226,7 +217,7 @@ export function Settings() {
       </div>
 
       {/* ── Brand logo ── */}
-      <section className={s.card}>
+      <section className={s.card} data-spotlight="logo">
         <div className={s.cardHead}>
           <span className={s.cardIcon}><Image size={18} /></span>
           <div className={s.cardHeadText}>
@@ -259,10 +250,7 @@ export function Settings() {
       </section>
 
       {/* ── Public address ── */}
-      <section
-        ref={addressRef}
-        className={`${s.card} ${highlightAddress ? s.highlight : ''}`}
-      >
+      <section className={s.card} data-spotlight="slug">
         <div className={s.cardHead}>
           <span className={s.cardIcon}><Globe size={18} /></span>
           <div className={s.cardHeadText}>

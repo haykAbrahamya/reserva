@@ -6,6 +6,7 @@ import { partnersService, galleryImageUrl } from '@/services/partners.service'
 import { useIsAdmin, useScopedLocationId } from '@/store/auth.hooks'
 import { useI18n } from '@/i18n'
 import { NAV, isNavItemVisible } from '../nav.config'
+import { SidebarSetupNudge } from '@/components/onboarding/SidebarSetupNudge'
 import s from './Sidebar.module.scss'
 
 interface SidebarProps {
@@ -108,6 +109,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
 
         {/* Collapse toggle — icon-only button aligned to the right */}
         <div className={s.bottom}>
+          <SidebarSetupNudge collapsed={collapsed} />
           <button
             className={s.collapseBtn}
             onClick={() => setSidebarCollapsed(!collapsed)}

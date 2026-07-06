@@ -1,0 +1,245 @@
+@use 'variables' as *;
+
+.card {
+  position: relative;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: $shadow-1;
+  /* Subtle accent wash so it reads as a "getting started" surface, not chrome. */
+  background-image: linear-gradient(180deg, $accent-soft 0%, transparent 90px);
+  animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+/* Collapsed → gently pulse the border/shadow so it keeps inviting a click,
+   without being loud. Pauses on hover so it doesn't fight the pointer. */
+.throb {
+  animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both,
+             onboarding-throb 2.6s ease-in-out infinite;
+  &:hover { animation-play-state: running, paused; }
+}
+@keyframes onboarding-throb {
+  0%, 100% { border-color: $line-1; box-shadow: $shadow-1; }
+  50%      { border-color: $accent; box-shadow: 0 0 0 3px $accent-soft, $shadow-1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .throb { animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both; border-color: $accent; }
+}
+
+/* ── Header (also the expand/collapse toggle) ── */
+.head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+.chevron {
+  flex-shrink: 0;
+  color: $fg-3;
+  transition: transform 0.25s ease, color 0.15s ease;
+}
+.chevronUp { transform: rotate(180deg); }
+.head:hover .chevron { color: $accent-contrast; }
+/* When expanded, no bottom margin clash between bar and body. */
+.expanded .bar { margin-bottom: 18px; }
+/* Collapsed: the bar is the last visible element — tighten its bottom gap. */
+.throb .bar { margin-bottom: 0; }
+.body { animation: onboarding-expand 0.28s ease both; }
+@keyframes onboarding-expand {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: none; }
+}
+.headIcon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: $r-2;
+  background: $accent;
+  color: $fg-on-accent;
+  display: grid;
+  place-items: center;
+  box-shadow: $shadow-1;
+}
+.headText { flex: 1; min-width: 0; }
+.title { font-family: $font-serif; font-size: 19px; letter-spacing: -0.01em; color: $fg-0; }
+.subtitle { font-size: 12.5px; color: $fg-2; margin-top: 2px; }
+/* The descriptive subtitle; the progress fallback shows on mobile-collapsed
+   (where the chip is hidden). */
+.subtitleProgress { display: none; font-weight: 600; color: $accent-contrast; }
+.progressWrap { flex-shrink: 0; }
+.progressCount {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: $accent-contrast;
+  background: $accent-soft;
+  padding: 5px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* ── Progress bar ── */
+.bar {
+  height: 6px;
+  border-radius: 999px;
+  background: $bg-3;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+.barFill {
+  height: 100%;
+  border-radius: 999px;
+  background: $accent;
+  transition: width 0.5s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+
+/* ── Group labels + rows ── */
+.groupLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $fg-3;
+  margin: 4px 2px 8px;
+}
+.groupLabel + .rows { margin-bottom: 10px; }
+
+.rows { display: flex; flex-direction: column; gap: 6px; }
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 11px 12px;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  background: $bg-1;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  &:hover:not(:disabled) {
+    border-color: $accent;
+    background: $bg-2;
+  }
+  &:active:not(:disabled) { transform: scale(0.995); }
+  &:disabled { cursor: default; }
+}
+.rowDone {
+  background: transparent;
+  border-color: transparent;
+  &:hover { background: transparent; border-color: transparent; }
+}
+
+/* Status circle → check */
+.check {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid $line-strong;
+  display: grid;
+  place-items: center;
+  color: $fg-on-accent;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+.checkOn {
+  background: $accent;
+  border-color: $accent;
+  animation: pop 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
+}
+
+.rowText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.rowTitle { font-size: 14px; font-weight: 500; color: $fg-0; }
+.rowDone .rowTitle { color: $fg-2; text-decoration: line-through; text-decoration-color: $line-strong; }
+.rowHint { font-size: 12px; color: $fg-2; line-height: 1.35; }
+.rowArrow { flex-shrink: 0; color: $fg-3; transition: transform 0.15s, color 0.15s; }
+.row:hover:not(:disabled) .rowArrow { color: $accent-contrast; transform: translateX(2px); }
+
+/* ── Completed / celebratory state ── */
+.done {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  /* Reserve room on the right so the CTA never slides under the dismiss X. */
+  padding-right: 44px;
+  background-image: linear-gradient(120deg, $accent-soft 0%, transparent 70%);
+}
+.doneIcon {
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: $accent;
+  color: $fg-on-accent;
+  display: grid;
+  place-items: center;
+  animation: pop 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
+}
+.doneText { flex: 1; min-width: 0; }
+.doneTitle { font-family: $font-serif; font-size: 19px; color: $fg-0; }
+.doneSub { font-size: 13px; color: $fg-2; margin-top: 2px; }
+.doneCta {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: $fg-on-accent;
+  background: $accent;
+  padding: 9px 14px;
+  border-radius: $r-2;
+  text-decoration: none;
+  transition: filter 0.15s;
+  &:hover { filter: brightness(1.06); }
+}
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: none;
+  color: $fg-3;
+  cursor: pointer;
+  border-radius: $r-1;
+  display: grid;
+  place-items: center;
+  transition: color 0.15s, background 0.15s;
+  &:hover { color: $fg-0; background: $bg-3; }
+}
+
+@keyframes pop {
+  0% { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .card { padding: 16px; margin-bottom: 18px; border-radius: $r-2; }
+  .head { gap: 10px; }
+  .title { font-size: 17px; }
+  /* Hide the chip on mobile; instead show the progress fallback in the subtitle
+     when collapsed (the descriptive line is hidden to keep it minimal). */
+  .progressWrap { display: none; }
+  .throb .subtitleFull { display: none; }
+  .throb .subtitleProgress { display: inline; }
+  .row { padding: 12px 12px; gap: 12px; }
+  .rowTitle { font-size: 14.5px; }
+  /* Celebratory state stacks vertically with a full-width CTA; drop the
+     right reservation since nothing sits beside the X here. */
+  .done { flex-direction: column; text-align: center; padding-right: 20px; padding-top: 26px; }
+  .doneCta { width: 100%; justify-content: center; }
+  .close { top: 8px; right: 8px; }
+}

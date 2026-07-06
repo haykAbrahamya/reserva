@@ -194,9 +194,12 @@
   border-top: 1px solid $line-1;
   flex-shrink: 0;
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
 }
+/* Keep the collapse toggle right-aligned within the now-stacked footer. */
+.bottom .collapseBtn { align-self: flex-end; }
 
 .collapseBtn {
   width: 30px;

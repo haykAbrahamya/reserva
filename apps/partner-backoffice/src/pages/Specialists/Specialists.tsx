@@ -9,6 +9,8 @@ import { partnersService } from '@/services/partners.service'
 import { errorMessage } from '@/utils/errors'
 import { useScopedLocationId } from '@/store/auth.hooks'
 import { useI18n } from '@/i18n'
+import { useSpotlight } from '@/components/onboarding/useSpotlight'
+import { notifyProfileUpdated } from '@/components/onboarding/useProfileCompletion'
 import type { Specialist } from '@/types'
 import s from './Specialists.module.scss'
 
@@ -30,6 +32,7 @@ export function Specialists() {
   const scopedLocationId = useScopedLocationId()
   const { t }       = useI18n()
   const toast       = useToast()
+  useSpotlight()
 
   const [page,     setPage]     = useState(1)
   const [pageSize, setPageSize] = useState(5)
@@ -94,6 +97,7 @@ export function Specialists() {
       if (editing) await partnersService.updateSpecialist(editing.id, form)
       else await partnersService.createSpecialist(form)
       await reload()
+      notifyProfileUpdated()
       setModalOpen(false)
       setErrs({})
     } catch (err) {
@@ -113,12 +117,14 @@ export function Specialists() {
           <h1 className={s.h1}>{t('specialists.title')}</h1>
           <p className={s.sub}>{t('specialists.subtitle', { name: partner.name, count: total })}</p>
         </div>
-        <Button variant="accent" onClick={openNew}><Plus size={14} /> {t('specialists.addSpecialist')}</Button>
+        <span data-spotlight="addSpecialist" style={{ display: 'inline-flex' }}>
+          <Button variant="accent" onClick={openNew}><Plus size={14} /> {t('specialists.addSpecialist')}</Button>
+        </span>
       </div>
 
       {total === 0 ? (
         <Empty icon={User} title={t('specialists.emptyTitle')} description={t('specialists.emptyDesc')}
-          action={<Button variant="accent" onClick={openNew}><Plus size={14} /> {t('specialists.addSpecialist')}</Button>}
+          action={<span data-spotlight="addSpecialist" style={{ display: 'inline-flex' }}><Button variant="accent" onClick={openNew}><Plus size={14} /> {t('specialists.addSpecialist')}</Button></span>}
         />
       ) : isMobile ? (
         /* ── Mobile: cards ── */

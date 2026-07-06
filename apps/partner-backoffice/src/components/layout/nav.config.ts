@@ -47,7 +47,7 @@ export const NAV: NavSection[] = [
   ]},
   { section: 'account', items: [
     { to: '/storefront', labelKey: 'nav.storefront', icon: Store,    adminOnly: true },
-    { to: '/users',      labelKey: 'nav.users',      icon: UserCog,  adminOnly: true },
+    { to: '/users',      labelKey: 'nav.users',      icon: UserCog,  adminOnly: true, singleHidden: true },
     { to: '/settings',   labelKey: 'nav.settings',   icon: Settings },
   ]},
 ]

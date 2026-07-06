@@ -7,6 +7,8 @@ import { fmtDuration, fmtServicePrice } from '@/utils/format'
 import { partnersService } from '@/services/partners.service'
 import { errorMessage } from '@/utils/errors'
 import { useI18n } from '@/i18n'
+import { useSpotlight } from '@/components/onboarding/useSpotlight'
+import { notifyProfileUpdated } from '@/components/onboarding/useProfileCompletion'
 import type { Service } from '@/types'
 import s from './Services.module.scss'
 
@@ -57,6 +59,7 @@ export function Services() {
   const isMobile    = useIsMobile()
   const { t, tp }   = useI18n()
   const toast       = useToast()
+  useSpotlight()
 
   const [page,     setPage]     = useState(1)
   const [pageSize, setPageSize] = useState(5)
@@ -140,6 +143,7 @@ export function Services() {
       if (editing) await partnersService.updateService(editing.id, data)
       else await partnersService.createService(data)
       await reload()
+      notifyProfileUpdated()
       setModalOpen(false)
       setErrs({})
     } catch (err) {
@@ -152,6 +156,7 @@ export function Services() {
   const handleToggleActive = async (svc: Service) => {
     await partnersService.updateService(svc.id, { active: !svc.active })
     await reload()
+    notifyProfileUpdated()
   }
 
   // Group by category for mobile
@@ -169,12 +174,14 @@ export function Services() {
           <h1 className={s.h1}>{t('services.title')}</h1>
           <p className={s.sub}>{tp('services.subtitle', total, { name: partner.name })}</p>
         </div>
-        <Button variant="accent" onClick={openNew}><Plus size={14} /> {t('services.addService')}</Button>
+        <span data-spotlight="addService" style={{ display: 'inline-flex' }}>
+          <Button variant="accent" onClick={openNew}><Plus size={14} /> {t('services.addService')}</Button>
+        </span>
       </div>
 
       {total === 0 ? (
         <Empty icon={Sparkles} title={t('services.emptyTitle')} description={t('services.emptyDesc')}
-          action={<Button variant="accent" onClick={openNew}><Plus size={14} /> {t('services.addService')}</Button>}
+          action={<span data-spotlight="addService" style={{ display: 'inline-flex' }}><Button variant="accent" onClick={openNew}><Plus size={14} /> {t('services.addService')}</Button></span>}
         />
       ) : isMobile ? (
         /* ── Mobile: grouped cards ── */

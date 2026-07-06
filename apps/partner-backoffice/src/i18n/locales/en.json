@@ -1,4 +1,60 @@
 {
+  "onboarding": {
+    "title": "Complete your profile",
+    "subtitle": "A few steps and you're ready to be booked.",
+    "progress": "{done} of {total} done",
+    "groups": {
+      "required": "Required — to accept bookings",
+      "recommended": "Recommended — look professional"
+    },
+    "items": {
+      "slug": {
+        "title": "Set your page address",
+        "hint": "Pick a public link like yourname.reserva.am."
+      },
+      "location": {
+        "title": "Add a branch",
+        "hint": "Where clients come to you — your salon address."
+      },
+      "specialist": {
+        "title": "Add a specialist",
+        "hint": "The people who provide your services."
+      },
+      "address": {
+        "title": "Add your address",
+        "hint": "Where clients find you — shown on your public page."
+      },
+      "service": {
+        "title": "Add a service",
+        "hint": "What clients can book — with a price and duration."
+      },
+      "linkedService": {
+        "title": "Assign a service to a specialist",
+        "hint": "Link who does what, so clients can be booked with someone."
+      },
+      "availability": {
+        "title": "Set working hours",
+        "hint": "Weekly hours decide the time slots clients can pick."
+      },
+      "logo": {
+        "title": "Upload your logo",
+        "hint": "Your brand mark on your public page and here."
+      },
+      "about": {
+        "title": "Write an about section",
+        "hint": "A short intro so clients know who you are."
+      }
+    },
+    "nudge": {
+      "label": "Complete setup"
+    },
+    "done": {
+      "title": "You're all set!",
+      "subtitle": "Your profile is complete and ready for bookings.",
+      "viewPage": "View your page",
+      "dismiss": "Dismiss"
+    }
+  },
   "pagination": {
     "summary": "Showing {from}–{to} of {total}",
     "perPage": "Per page"

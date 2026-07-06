@@ -1,34 +1,28 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Globe, Copy, Check, ExternalLink, ArrowRight, Sparkles } from 'lucide-react'
+import { Globe, Copy, Check, ExternalLink } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
-import { useIsAdmin } from '@/store/auth.hooks'
 import { useT } from '@/i18n'
 import s from './PublicLinkBar.module.scss'
 
 /**
- * A slim, always-visible bar beneath the topbar that surfaces the partner's
- * public booking page. A freshly-activated partner otherwise has no idea their
- * page exists — so:
- *  - if no slug is set yet, show a prominent call-to-action that deep-links to
- *    Settings with the address card highlighted;
- *  - once set, show the live link with quick Copy / Open actions.
+ * A slim bar beneath the topbar that surfaces the partner's live public booking
+ * page (link + quick Copy / Open). Shown ONLY once a slug is set — while it's
+ * still missing, the "Complete your profile" onboarding checklist owns that
+ * guidance, so we render nothing here to avoid a duplicate call-to-action.
  */
 export function PublicLinkBar() {
   const partner = usePartner()
-  const isAdmin = useIsAdmin()
-  const navigate = useNavigate()
   const t = useT()
   const [copied, setCopied] = useState(false)
 
-  // Until the partner profile is loaded there's nothing meaningful to show.
-  if (!partner) return null
+  // Nothing to show until the profile loads, or before a slug is configured
+  // (the onboarding checklist guides that step instead).
+  if (!partner?.slug) return null
 
   const slug = partner.slug
-  const url = slug ? `https://${slug}.reserva.am` : null
+  const url = `https://${slug}.reserva.am`
 
   const copy = async () => {
-    if (!url) return
     try {
       await navigator.clipboard.writeText(url)
       setCopied(true)
@@ -38,32 +32,8 @@ export function PublicLinkBar() {
     }
   }
 
-  // ── Not configured: setup CTA ──
-  if (!slug) {
-    return (
-      <div className={`${s.bar} ${s.setup}`}>
-        <span className={s.iconWrap}><Sparkles size={15} /></span>
-        <div className={s.text}>
-          <span className={s.title}>{t('publicLink.setupTitle')}</span>
-          <span className={s.desc}>{t('publicLink.setupDesc')}</span>
-        </div>
-        {isAdmin ? (
-          <button
-            className={s.cta}
-            onClick={() => navigate('/settings?highlight=address')}
-          >
-            {t('publicLink.setupBtn')} <ArrowRight size={14} />
-          </button>
-        ) : (
-          <span className={s.adminHint}>{t('publicLink.adminHint')}</span>
-        )}
-      </div>
-    )
-  }
-
   // ── Configured: live link + actions ──
-  // `slug` is non-null past the guard above, so the URL is always a string here.
-  const liveUrl = `https://${slug}.reserva.am`
+  const liveUrl = url
   return (
     <div className={s.bar}>
       <span className={s.iconWrap}><Globe size={15} /></span>

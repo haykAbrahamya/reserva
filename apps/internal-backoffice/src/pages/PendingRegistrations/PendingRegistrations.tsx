@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { UserPlus, Phone, Mail, Send, Trash2, Clock } from 'lucide-react'
+import { UserPlus, Phone, Mail, Send, Trash2, Clock, CheckCircle2 } from 'lucide-react'
 import { Badge, Button, Empty, Pagination, SegmentedFilter, ConfirmDialog, useToast } from '@/components/ui'
 import { useResource } from '@/store/useResource'
 import {
@@ -39,6 +39,8 @@ export function PendingRegistrations() {
   const [resendingId, setResendingId] = useState<string | null>(null)
   const [confirmDel, setConfirmDel] = useState<PendingRegistration | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [confirmActivate, setConfirmActivate] = useState<PendingRegistration | null>(null)
+  const [activating, setActivating] = useState(false)
 
   const { data: result, reload } = useResource(
     () => pendingRegistrationsService.list({ page, pageSize, status }),
@@ -63,6 +65,21 @@ export function PendingRegistrations() {
       toast(errorMessage(err))
     } finally {
       setResendingId(null)
+    }
+  }
+
+  const activate = async () => {
+    if (!confirmActivate) return
+    setActivating(true)
+    try {
+      await pendingRegistrationsService.activate(confirmActivate.id)
+      toast(`${confirmActivate.companyName} activated — the partner can now log in`)
+      setConfirmActivate(null)
+      await reload()
+    } catch (err) {
+      toast(errorMessage(err))
+    } finally {
+      setActivating(false)
     }
   }
 
@@ -150,7 +167,10 @@ export function PendingRegistrations() {
                 </div>
 
                 <div className={s.cardActions}>
-                  <Button variant="accent" size="sm" disabled={resendingId === r.id} onClick={() => resend(r)}>
+                  <Button variant="accent" size="sm" onClick={() => setConfirmActivate(r)}>
+                    <CheckCircle2 size={14} /> Activate
+                  </Button>
+                  <Button variant="ghost" size="sm" disabled={resendingId === r.id} onClick={() => resend(r)}>
                     <Send size={14} /> {r.expired ? 'Resend link' : 'Resend email'}
                   </Button>
                   <button className={s.iconDelete} title="Delete" aria-label="Delete" onClick={() => setConfirmDel(r)}>
@@ -172,6 +192,17 @@ export function PendingRegistrations() {
           />
         </>
       )}
+
+      <ConfirmDialog
+        open={!!confirmActivate}
+        title="Activate this partner?"
+        message={`This creates the partner account for "${confirmActivate?.companyName}" now, without waiting for the email link. ${confirmActivate?.adminName} (${confirmActivate?.adminEmail}) will be able to log in immediately with the password they chose at signup.`}
+        confirmLabel={activating ? 'Activating…' : 'Activate now'}
+        cancelLabel="Cancel"
+        loading={activating}
+        onConfirm={activate}
+        onClose={() => { if (!activating) setConfirmActivate(null) }}
+      />
 
       <ConfirmDialog
         open={!!confirmDel}

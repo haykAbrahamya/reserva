@@ -42,6 +42,14 @@ export const pendingRegistrationsService = {
     return apiPost<{ email: string }>(`/platform/pending-registrations/${id}/resend`, {})
   },
 
+  /** Manually activate a pending signup (provisions the partner now, no email). */
+  activate(id: string): Promise<{ partnerId: string; adminEmail: string }> {
+    return apiPost<{ partnerId: string; adminEmail: string }>(
+      `/platform/pending-registrations/${id}/activate`,
+      {},
+    )
+  },
+
   remove(id: string): Promise<void> {
     return apiDelete(`/platform/pending-registrations/${id}`)
   },

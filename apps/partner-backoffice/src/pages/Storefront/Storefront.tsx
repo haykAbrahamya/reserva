@@ -12,6 +12,8 @@ import {
 } from '@/services/partners.service'
 import { ApiError } from '@/services/http'
 import { useT } from '@/i18n'
+import { useSpotlight } from '@/components/onboarding/useSpotlight'
+import { notifyProfileUpdated } from '@/components/onboarding/useProfileCompletion'
 import s from './Storefront.module.scss'
 import { PhotoSection } from './PhotoSection'
 
@@ -21,6 +23,7 @@ const isHex = (v: string) => /^#([0-9a-fA-F]{6})$/.test(v)
 export function Storefront() {
   const setPartner = useAppStore((st) => st.setPartner)
   const toast = useToast()
+  useSpotlight()
   const { data: profile, reload } = useResource(() => partnersService.getOwn(), [])
 
   if (!profile) {
@@ -112,6 +115,7 @@ function StorefrontInner({ profile, reload, setPartner, toast }: InnerProps) {
     try {
       const updated = await partnersService.updateProfile({ presentation: { about: about.trim() } })
       syncStore(updated); await reload()
+      notifyProfileUpdated()
       toast(t('storefront.about.saved'))
     } catch (err) {
       toast(err instanceof ApiError ? err.message : t('storefront.about.error'))
@@ -201,7 +205,7 @@ function StorefrontInner({ profile, reload, setPartner, toast }: InnerProps) {
       />
 
       {/* ── About ── */}
-      <section className={s.card}>
+      <section className={s.card} data-spotlight="about">
         <div className={s.cardHead}>
           <span className={s.cardIcon}><FileText size={18} /></span>
           <div className={s.cardHeadText}>

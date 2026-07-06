@@ -8,6 +8,7 @@ import { useAuthStore } from '@/store/auth.store'
 import { bookingsService } from '@/services/bookings.service'
 import { Button, Card, CardHeader, CardTitle, BookingBadge, Avatar } from '@/components/ui'
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
+import { ProfileChecklist } from '@/components/onboarding/ProfileChecklist'
 import { fmtAMD, fmtTime, isSameDay } from '@/utils/format'
 import { useScopedLocationId } from '@/store/auth.hooks'
 import { useI18n, useDateLocale } from '@/i18n'
@@ -119,6 +120,9 @@ export function Dashboard() {
           </Button>
         </div>
       </div>
+
+      {/* Onboarding checklist — auto-hides once the profile is complete. */}
+      <ProfileChecklist />
 
       {/* KPIs */}
       <div className={s.kpiGrid}>

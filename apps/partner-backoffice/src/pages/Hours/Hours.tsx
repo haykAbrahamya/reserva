@@ -11,6 +11,8 @@ import { AddTimeOffModal, type TimeOffDraft } from '@/components/specialists/Add
 import { findConflictingBookings } from '@/utils/timeOff'
 import { fmtTime, fmtDateInput } from '@/utils/format'
 import { useI18n, useDateLocale } from '@/i18n'
+import { useSpotlight } from '@/components/onboarding/useSpotlight'
+import { notifyProfileUpdated } from '@/components/onboarding/useProfileCompletion'
 import type { WeekSchedule, WorkingDay, SpecialistTimeOff } from '@/types'
 import s from './Hours.module.scss'
 
@@ -43,6 +45,7 @@ export function Hours() {
   const navigate = useNavigate()
   const { t } = useI18n()
   const dateLocale = useDateLocale()
+  useSpotlight()
 
   const [schedules, setSchedules] = useState<Record<string, WeekSchedule>>({})
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -160,6 +163,7 @@ export function Hours() {
     if (!selectedId || !schedule) return
     setSaving(true)
     await partnersService.updateHours(selectedId, schedule)
+    notifyProfileUpdated()
     setSaving(false)
   }
 
@@ -177,7 +181,7 @@ export function Hours() {
         )}
       </div>
 
-      <div className={s.layout}>
+      <div className={s.layout} data-spotlight="setHours">
         {/* Left: Specialist list */}
         <div className={s.spList}>
           <div className={s.spListTitle}>{t('hours.specialists')}</div>

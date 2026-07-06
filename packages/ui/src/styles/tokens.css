@@ -261,6 +261,26 @@ input, textarea, select { font-family: inherit; }
 @keyframes modal-out  { from { opacity:1; transform: none }    to { opacity:0; transform: scale(0.96) translateY(8px) } }
 @keyframes drawer-out { from { opacity:1; transform: none }    to { opacity:0; transform: translateX(24px) } }
 
+/* ── Spotlight: draw the eye to a section after a deep-link (onboarding etc.) ──
+   Add class `.spotlight-target` to any element to run a smooth accent glow +
+   ring pulse, then remove the class when done. Works on any surface; the ring
+   is drawn with box-shadow so it never affects layout. */
+@keyframes spotlight-pulse {
+  0%   { box-shadow: 0 0 0 0 var(--accent-soft), 0 0 0 1px transparent; }
+  15%  { box-shadow: 0 0 0 6px var(--accent-soft), 0 0 0 2px var(--accent); }
+  60%  { box-shadow: 0 0 0 6px var(--accent-soft), 0 0 0 2px var(--accent); }
+  100% { box-shadow: 0 0 0 0 transparent, 0 0 0 1px transparent; }
+}
+.spotlight-target {
+  /* Two calm pulses read as intentional guidance, not a glitch. */
+  animation: spotlight-pulse 1.5s cubic-bezier(0.4, 0, 0.2, 1) 2 both;
+  border-radius: var(--r-2);
+  scroll-margin-top: 80px; /* clear the sticky topbar when scrolled into view */
+}
+@media (prefers-reduced-motion: reduce) {
+  .spotlight-target { animation: none; box-shadow: 0 0 0 2px var(--accent); }
+}
+
 /* ── Google Places Autocomplete dropdown (.pac-container) ──────────────────
    Google renders this widget itself; we can only restyle via these classes.
    Theme it to the Reserva design tokens so it doesn't show as stark white. */

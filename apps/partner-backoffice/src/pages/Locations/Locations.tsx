@@ -12,6 +12,8 @@ import {
 import { MapPicker } from '@/components/maps/MapPicker/MapPicker'
 import { mapsEnabled } from '@/lib/googleMaps'
 import { useI18n } from '@/i18n'
+import { useSpotlight } from '@/components/onboarding/useSpotlight'
+import { notifyProfileUpdated } from '@/components/onboarding/useProfileCompletion'
 import type { Location, WeekSchedule, WorkingDay } from '@/types'
 import s from './Locations.module.scss'
 
@@ -31,6 +33,7 @@ export function Locations() {
   const partner     = usePartner()
   const toast       = useToast()
   const { t, tp }   = useI18n()
+  useSpotlight()
 
   // Branches are few per partner — load them all as cards, no pagination.
   const { data: locations, reload } = useResource(
@@ -49,6 +52,10 @@ export function Locations() {
   if (!partner) return null
 
   const total = locations.length
+  // A solo pro has exactly one location (auto-provisioned) — they only ever edit
+  // it, never add or delete. Hide those affordances and present it as "your
+  // address" rather than a branch list.
+  const isSingle = partner.kind === 'single'
 
   const openNew = () => { setEditing(null); setForm(EMPTY_FORM); setErrs({}); setModalOpen(true) }
   const openEdit = (loc: Location) => {
@@ -77,6 +84,7 @@ export function Locations() {
       if (editing) await partnersService.updateLocation(editing.id, form)
       else await partnersService.createLocation(form)
       await reload()
+      notifyProfileUpdated()
       toast(editing ? t('locations.toast.updated') : t('locations.toast.added'))
       setErrs({})
       setModalOpen(false)
@@ -109,27 +117,38 @@ export function Locations() {
             {tp('locations.subtitle', total, { name: partner.name })}
           </p>
         </div>
-        <Button variant="accent" onClick={openNew}><Plus size={14} /> {t('locations.addLocation')}</Button>
+        {!isSingle && (
+          <span data-spotlight="addLocation" style={{ display: 'inline-flex' }}>
+            <Button variant="accent" onClick={openNew}><Plus size={14} /> {t('locations.addLocation')}</Button>
+          </span>
+        )}
       </div>
 
-      {total === 0 ? (
+      {total === 0 && !isSingle ? (
         <Empty
           icon={MapPin}
           title={t('locations.emptyTitle')}
           description={t('locations.emptyDesc')}
-          action={<Button variant="accent" onClick={openNew}><Plus size={14} /> {t('locations.addLocation')}</Button>}
+          action={<span data-spotlight="addLocation" style={{ display: 'inline-flex' }}><Button variant="accent" onClick={openNew}><Plus size={14} /> {t('locations.addLocation')}</Button></span>}
         />
       ) : (
         <div className={s.grid}>
-          {locations.map(loc => (
-            <div key={loc.id} className={s.card}>
+          {locations.map((loc, i) => (
+            <div
+              key={loc.id}
+              className={s.card}
+              // For singles, the sole location is the "address" onboarding target.
+              {...(isSingle && i === 0 ? { 'data-spotlight': 'addLocation' } : {})}
+            >
               <div className={s.actions}>
                 <Button variant="ghost" size="sm" icon onClick={() => openEdit(loc)}>
                   <Pencil size={13} />
                 </Button>
-                <Button variant="ghost" size="sm" icon onClick={() => setConfirmDel(loc)}>
-                  <Trash2 size={13} />
-                </Button>
+                {!isSingle && (
+                  <Button variant="ghost" size="sm" icon onClick={() => setConfirmDel(loc)}>
+                    <Trash2 size={13} />
+                  </Button>
+                )}
               </div>
 
               <div className={s.cardTop}>
