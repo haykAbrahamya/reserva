@@ -29,6 +29,9 @@
     font-size: 13px;
     color: $fg-0;
     flex: 1;
+    /* Allow the input to shrink below its placeholder's intrinsic width so a
+       long placeholder can't push the box past the viewport edge. */
+    min-width: 0;
     &::placeholder { color: $fg-3; }
   }
 
@@ -104,5 +107,7 @@
 @media (max-width: 768px) {
   .page { padding: 16px; }
   .h1   { font-size: 26px; }
-  .search { min-width: 0; flex: 1; }
+  /* Search drops to its own full-width line so it never overflows the viewport.
+     `min-width: 0` lets the input shrink; `width: 100%` claims the wrapped row. */
+  .search { min-width: 0; width: 100%; flex: 1 1 100%; }
 }
