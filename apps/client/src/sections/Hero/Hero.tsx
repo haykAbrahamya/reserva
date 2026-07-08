@@ -1,11 +1,9 @@
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, PlayCircle, Sparkles } from 'lucide-react'
+import { ArrowRight, Sparkles } from 'lucide-react'
 import { useT } from '@/i18n'
 import s from './Hero.module.scss'
 
-function scrollToId(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-}
+const DEMO_URL = 'https://demo.reserva.am'
 
 export function Hero() {
   const t = useT()
@@ -34,17 +32,22 @@ export function Hero() {
         </h1>
 
         <p className={s.subtitle}>
-          {t('hero.subtitle1')}
-          <br className={s.brDesktop} /> {t('hero.subtitle2')}
+          {t('hero.subtitle1')} {t('hero.subtitle2')}
         </p>
 
         <div className={s.actions}>
           <button className={s.ctaPrimary} onClick={() => navigate('/signup')}>
             {t('hero.startFree')} <ArrowRight size={17} />
           </button>
-          <button className={s.ctaGhost} onClick={() => scrollToId('how')}>
-            <PlayCircle size={17} /> {t('hero.seeHow')}
-          </button>
+          <a
+            className={s.ctaDemo}
+            href={DEMO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className={s.ctaDemoDot} />
+            {t('hero.viewDemo')}
+          </a>
         </div>
       </div>
 

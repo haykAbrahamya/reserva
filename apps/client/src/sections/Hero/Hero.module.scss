@@ -11,6 +11,7 @@
   background: $bg-0;
 
   @media (max-width: 640px) { padding: 120px 18px 70px; }
+  @media (max-width: 560px) { padding: 104px 20px 56px; }
 }
 
 /* Decorative grid with radial mask */
@@ -69,6 +70,17 @@
     background: $accent-soft;
     border-radius: 999px;
     padding: 3px 8px;
+    flex-shrink: 0;
+  }
+
+  /* Mobile: keep it to a single tidy line — smaller text, tighter gaps. */
+  @media (max-width: 560px) {
+    font-size: 12px;
+    gap: 6px;
+    padding: 5px 12px 5px 6px;
+    margin-bottom: 20px;
+    max-width: calc(100% - 8px);
+    .pillTag { font-size: 10px; padding: 2px 7px; }
   }
 }
 
@@ -101,21 +113,43 @@
     line-height: 1.08;
     max-width: 1000px;
   }
+
+  /* Mobile: the tall Armenian/Russian glyphs made the headline dominate the
+     screen — bring it down and tighten leading so the block reads as one calm
+     unit rather than a wall. */
+  @media (max-width: 560px) {
+    font-size: 30px;
+    margin-bottom: 18px;
+    :global(html:lang(hy)) &,
+    :global(html:lang(ru)) & {
+      font-size: 27px;
+      line-height: 1.12;
+    }
+  }
 }
 
 .subtitle {
   font-size: clamp(16px, 2.2vw, 19px);
   line-height: 1.65;
   color: $fg-2;
-  max-width: 760px;
+  /* Balanced measure — a comfortable reading width so the copy settles into an
+     even block instead of the ragged full-width/short-line pairs a forced break
+     produced (Armenian & Russian run long, so we cap the measure rather than
+     hard-breaking between sentences). */
+  max-width: 46rem;
   margin: 0 auto 36px;
-  text-wrap: pretty;
+  text-wrap: balance;
   animation: hero-rise 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.16s both;
 
-  /* Manual line break — controlled 2-line layout on desktop, natural wrap on mobile */
-  .brDesktop { display: none; }
-  @media (min-width: 720px) {
-    .brDesktop { display: inline; }
+  /* Armenian/Russian glyphs are wider — give them a slightly roomier measure. */
+  :global(html:lang(hy)) &,
+  :global(html:lang(ru)) & { max-width: 50rem; }
+
+  @media (max-width: 560px) {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 28px;
+    max-width: 30rem;   /* narrower measure so lines aren't edge-to-edge */
   }
 }
 
@@ -126,6 +160,17 @@
   flex-wrap: wrap;
   margin-bottom: 40px;
   animation: hero-rise 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both;
+
+  /* Mobile: clean full-width stack, sized to a comfortable reading column so
+     the buttons don't run the full screen width. */
+  @media (max-width: 560px) {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 20rem;
+    margin: 0 auto 32px;
+    > * { width: 100%; justify-content: center; }
+  }
 }
 
 .ctaPrimary {
@@ -146,9 +191,14 @@
   transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
   &:hover { background: $accent-strong; box-shadow: 0 10px 28px rgba(168,120,75,.32); transform: translateY(-1px); }
   &:active { transform: translateY(0); }
+  @media (max-width: 560px) { height: 46px; font-size: 15px; }
 }
 
-.ctaGhost {
+/* Secondary CTA → opens the live public-page demo. Accent-outlined so it's
+   clearly a real action next to the primary, with a live dot + a gentle
+   breathing glow that draws the eye. */
+.ctaDemo {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -156,16 +206,34 @@
   padding: 0 24px;
   border-radius: $r-2;
   background: $bg-1;
-  color: $fg-0;
+  color: $accent;
   font-family: $font-sans;
   font-size: 16px;
   font-weight: 600;
-  border: 1px solid $line-2;
+  text-decoration: none;
+  border: 1.5px solid color-mix(in srgb, $accent 45%, transparent);
   cursor: pointer;
-  box-shadow: $shadow-1;
-  transition: background 0.15s, border-color 0.15s, transform 0.1s;
-  &:hover { background: $bg-2; border-color: $line-strong; transform: translateY(-1px); }
+  box-shadow: 0 0 0 0 color-mix(in srgb, $accent 40%, transparent);
+  animation: cta-demo-glow 2.6s ease-in-out infinite;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s, box-shadow 0.2s;
+  &:hover {
+    background: $accent-soft;
+    border-color: $accent;
+    transform: translateY(-1px);
+    animation: none;
+    box-shadow: 0 8px 22px color-mix(in srgb, $accent 28%, transparent);
+  }
   &:active { transform: translateY(0); }
+  svg { flex-shrink: 0; }
+  @media (max-width: 560px) { height: 46px; font-size: 15px; }
+}
+.ctaDemoDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $accent;
+  box-shadow: 0 0 0 0 color-mix(in srgb, $accent 60%, transparent);
+  animation: cta-demo-live 1.7s ease-out infinite;
 }
 
 /* Hero preview frame (mock dashboard) */
@@ -192,6 +260,7 @@
   background: $bg-2;
 }
 .dot { width: 11px; height: 11px; border-radius: 50%; }
+
 .previewBody {
   padding: 22px;
   display: grid;
@@ -212,6 +281,22 @@
 .previewBars { display: flex; align-items: flex-end; gap: 4px; height: 36px; margin-top: 10px; }
 .previewBars span { flex: 1; border-radius: 3px 3px 0 0; background: $accent-soft; }
 .previewBars span:last-child { background: $accent; }
+
+/* Demo-CTA attention animations (module-scoped so the class refs match). */
+@keyframes cta-demo-glow {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, $accent 0%, transparent); }
+  50%      { box-shadow: 0 0 0 5px color-mix(in srgb, $accent 18%, transparent); }
+}
+@keyframes cta-demo-live {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, $accent 60%, transparent); }
+  70%  { box-shadow: 0 0 0 6px color-mix(in srgb, $accent 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in srgb, $accent 0%, transparent); }
+}
+/* Respect reduced-motion — keep the CTA visible/styled, just stop moving it. */
+@media (prefers-reduced-motion: reduce) {
+  .ctaDemo { animation: none; }
+  .ctaDemoDot { animation: none; }
+}
 
 :global {
   @keyframes hero-rise { from { opacity: 0; transform: translateY(22px) } to { opacity: 1; transform: none } }
