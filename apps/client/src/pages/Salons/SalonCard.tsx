@@ -19,8 +19,6 @@ interface Props {
 
 export const SalonCard = memo(function SalonCard({ salon, isResult, query, distanceKm, onOpen }: Props) {
   const t = useT()
-  const t1 = salon.heroTints[0] ?? salon.accent
-  const t2 = salon.heroTints[1] ?? `color-mix(in srgb, ${salon.accent} 55%, #000)`
   const city = salon.locations[0]?.address ?? salon.locations[0]?.name ?? ''
   const q = query?.trim().toLowerCase() ?? ''
   const status = salonOpenStatus(salon)
@@ -34,10 +32,23 @@ export const SalonCard = memo(function SalonCard({ salon, isResult, query, dista
       onClick={open}
       style={{ ['--salon-accent' as string]: salon.accent }}
     >
-      {/* Branded header band */}
-      <div className={s.banner} style={{ background: `linear-gradient(140deg, ${t1}, ${t2})` }}>
-        <div className={s.bannerGrid} />
-        <span className={s.logo}>{salon.name.charAt(0)}</span>
+      {/* Header — inline logo, name/type, rating */}
+      <div className={s.head}>
+        {salon.logoUrl ? (
+          <img
+            className={[s.logo, s.logoImg].join(' ')}
+            src={salon.logoUrl}
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <span className={s.logo}>{salon.name.charAt(0)}</span>
+        )}
+        <div className={s.headText}>
+          <h3 className={s.name}>{salon.name}</h3>
+          <span className={s.type}>{salon.type}</span>
+        </div>
         {salon.rating > 0 && (
           <span className={s.rating}>
             <Star size={12} className={s.ratingStar} /> {salon.rating.toFixed(1)}
@@ -45,14 +56,24 @@ export const SalonCard = memo(function SalonCard({ salon, isResult, query, dista
         )}
       </div>
 
-      <div className={s.body}>
-        <div className={s.titleRow}>
-          <h3 className={s.name}>{salon.name}</h3>
-          <span className={s.type}>{salon.type}</span>
+      {salon.tagline && <p className={s.tagline}>{salon.tagline}</p>}
+
+      {/* Category chips — quiet ghost tags */}
+      {salon.categories.length > 0 && (
+        <div className={s.chips}>
+          {salon.categories.slice(0, 3).map((c) => {
+            const hit = q !== '' && c.toLowerCase().includes(q)
+            return (
+              <span key={c} className={[s.chip, hit ? s.chipHit : ''].filter(Boolean).join(' ')}>
+                {c}
+              </span>
+            )
+          })}
         </div>
+      )}
 
-        {salon.tagline && <p className={s.tagline}>{salon.tagline}</p>}
-
+      {/* Location + open status, as one grouped meta block */}
+      <div className={s.meta}>
         {city && (
           <div className={s.metaRow}>
             <MapPin size={14} />
@@ -67,48 +88,37 @@ export const SalonCard = memo(function SalonCard({ salon, isResult, query, dista
             )}
           </div>
         )}
-
-        {/* Open-now status (hidden when we have no schedule to judge by) */}
         {!status.unknown && (
-          status.open ? (
-            <span className={[s.status, s.statusOpen].join(' ')}>
-              <span className={s.statusDot} /> {t('salons.open.now')}
-            </span>
-          ) : (
-            <span className={[s.status, s.statusClosed].join(' ')}>
-              <Clock size={12} />
-              {status.opensAt
-                ? (status.opensDay
-                    ? t('salons.open.opensDay', { day: status.opensDay, time: status.opensAt })
-                    : t('salons.open.opensAt', { time: status.opensAt }))
-                : t('salons.open.closed')}
-            </span>
-          )
-        )}
-
-        {/* Category chips */}
-        {salon.categories.length > 0 && (
-          <div className={s.chips}>
-            {salon.categories.slice(0, 4).map((c) => {
-              const hit = q !== '' && c.toLowerCase().includes(q)
-              return (
-                <span key={c} className={[s.chip, hit ? s.chipHit : ''].filter(Boolean).join(' ')}>
-                  {c}
+          <div className={s.metaRow}>
+            {status.open ? (
+              <>
+                <span className={[s.statusDot, s.statusDotOpen].join(' ')} />
+                <span className={s.statusOpenText}>{t('salons.open.now')}</span>
+              </>
+            ) : (
+              <>
+                <Clock size={14} className={s.statusIcon} />
+                <span className={s.metaText}>
+                  {status.opensAt
+                    ? (status.opensDay
+                        ? t('salons.open.opensDay', { day: t(`partner.locations.days.${status.opensDay}`), time: status.opensAt })
+                        : t('salons.open.opensAt', { time: status.opensAt }))
+                    : t('salons.open.closed')}
                 </span>
-              )
-            })}
+              </>
+            )}
           </div>
         )}
+      </div>
 
-        <div className={s.footer}>
-          <div className={s.counts}>
-            <span className={s.count}><Sparkles size={13} /> {salon.serviceCount}</span>
-            <span className={s.count}><Users size={13} /> {salon.specialistCount}</span>
-          </div>
-          <span className={s.cta}>
-            {t('salons.card.view')} <ArrowRight size={15} />
-          </span>
+      <div className={s.footer}>
+        <div className={s.counts}>
+          <span className={s.count}><Sparkles size={13} /> {salon.serviceCount}</span>
+          <span className={s.count}><Users size={13} /> {salon.specialistCount}</span>
         </div>
+        <span className={s.cta}>
+          {t('salons.card.view')} <ArrowRight size={15} />
+        </span>
       </div>
     </button>
   )

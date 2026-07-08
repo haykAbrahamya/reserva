@@ -5,6 +5,17 @@ import type { WeekSchedule } from '@reserva/shared'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1'
 
+// Logos may be stored as same-origin "/uploads/.." paths (relative to the API
+// ORIGIN, not /api/v1). Resolve those to absolute; pass through http(s) URLs.
+const API_ORIGIN = (() => {
+  try { return new URL(API_URL).origin } catch { return '' }
+})()
+function resolveImageUrl(url?: string | null): string | null {
+  if (!url) return null
+  if (/^https?:\/\//i.test(url)) return url
+  return `${API_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`
+}
+
 export interface SalonCard {
   id: string
   slug: string | null
@@ -12,6 +23,8 @@ export interface SalonCard {
   type: string
   accent: string
   tagline: string
+  /** Absolute brand logo URL, or null (client shows a letter avatar instead). */
+  logoUrl: string | null
   rating: number
   reviews: number
   heroTints: string[]
@@ -37,5 +50,7 @@ export async function listSalons(search: SalonSearch = {}, signal?: AbortSignal)
   const res = await fetch(`${API_URL}/public/salons${qs ? `?${qs}` : ''}`, { signal })
   const json = await res.json().catch(() => null)
   if (!res.ok) throw new Error(json?.error?.message ?? 'Failed to load salons')
-  return (json?.data ?? json) as SalonCard[]
+  const items = (json?.data ?? json) as SalonCard[]
+  // Resolve relative logo paths to absolute so <img> works from the client origin.
+  return items.map((s) => ({ ...s, logoUrl: resolveImageUrl(s.logoUrl) }))
 }

@@ -97,7 +97,7 @@
   "howItWorks": {
     "eyebrow": "How it works",
     "titlePre": "Up and running in ",
-    "titleEm": "days",
+    "titleEm": "hours",
     "titlePost": ", not months",
     "subtitle": "No technical setup on your side. We handle the heavy lifting so you can start taking bookings fast.",
     "steps": {
@@ -114,6 +114,20 @@
         "text": "Manage everything from one backoffice: confirm, reschedule, track revenue and grow with confidence."
       }
     }
+  },
+  "partners": {
+    "label": "Trusted by leading salons & studios"
+  },
+  "marketplace": {
+    "eyebrow": "Marketplace",
+    "titlePre": "Get discovered on the ",
+    "titleEm": "Reserva marketplace",
+    "titlePost": "",
+    "text": "Every salon on Reserva gets a spot in our public directory — so new clients can find you, browse your services and book, all on their own.",
+    "browse": "Browse the marketplace",
+    "mockSearch": "Search salons near you",
+    "mockName": "Lumé Studio",
+    "mockCity": "Yerevan"
   },
   "pricing": {
     "eyebrow": "Pricing",
@@ -192,7 +206,7 @@
     "titlePre": "Ready to take bookings ",
     "titleEm": "online",
     "titlePost": "?",
-    "text": "Set up in days and start your free 1-month trial today.",
+    "text": "Set up in hours and start your free 1-month trial today.",
     "startTrial": "Start free trial",
     "bookDemo": "Book a demo",
     "tagline": "The online reservation platform built for Armenian salons, barbershops and beauty studios.",

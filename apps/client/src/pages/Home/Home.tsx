@@ -1,6 +1,8 @@
 import { Nav } from '@/components/Nav/Nav'
 import { Hero } from '@/sections/Hero/Hero'
+import { Partners } from '@/sections/Partners/Partners'
 import { Features } from '@/sections/Features/Features'
+import { Marketplace } from '@/sections/Marketplace/Marketplace'
 import { HowItWorks } from '@/sections/HowItWorks/HowItWorks'
 import { Pricing } from '@/sections/Pricing/Pricing'
 import { Faq } from '@/sections/Faq/Faq'
@@ -17,7 +19,9 @@ export function Home() {
       <Nav />
       <main>
         <Hero />
+        <Partners />
         <Features />
+        <Marketplace />
         <HowItWorks />
         <Pricing />
         <Faq />

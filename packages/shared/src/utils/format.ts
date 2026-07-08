@@ -3,12 +3,15 @@
 // Used across all Reserva apps and by @reserva/ui components.
 // ─────────────────────────────────────────────────────────────
 
+/** Armenian dram sign (U+058F). NOT the tögrög sign ₮ (U+20AE) — some ICU builds
+ *  wrongly render ₮ for `currency: 'AMD'`, so we append this literal ourselves. */
+export const AMD_SIGN = '֏'
+
 export function fmtAMD(amount: number): string {
-  return new Intl.NumberFormat('hy-AM', {
-    style: 'currency',
-    currency: 'AMD',
-    maximumFractionDigits: 0,
-  }).format(amount)
+  // Format the number only (grouping, no fraction) and append ֏ ourselves, so
+  // the symbol is deterministic across runtimes/ICU versions.
+  const n = new Intl.NumberFormat('hy-AM', { maximumFractionDigits: 0 }).format(amount)
+  return `${n} ${AMD_SIGN}`
 }
 
 /**
@@ -25,7 +28,7 @@ export function fmtServicePrice(svc: {
     // Currency once, at the end: "1,000 – 6,000 ֏". Compact and unambiguous —
     // avoids the awkward "AMD 1,000 – AMD 6,000" that overflowed tight cards.
     const nf = new Intl.NumberFormat('hy-AM', { maximumFractionDigits: 0 })
-    return `${nf.format(svc.price)} – ${nf.format(svc.priceMax)} ֏`
+    return `${nf.format(svc.price)} – ${nf.format(svc.priceMax)} ${AMD_SIGN}`
   }
   return fmtAMD(svc.price)
 }

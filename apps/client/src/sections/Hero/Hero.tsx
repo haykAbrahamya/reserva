@@ -14,7 +14,7 @@ export function Hero() {
   const KPIS = [
     { label: t('hero.previewBookingsToday'), num: '24', meta: t('hero.previewConfirmed') },
     { label: t('hero.previewThisWeek'), num: '142', meta: t('hero.previewVsLast') },
-    { label: t('hero.previewRevenue'), num: '₮ 840K', meta: t('hero.previewDays') },
+    { label: t('hero.previewRevenue'), num: '840K ֏', meta: t('hero.previewDays') },
   ]
 
   return (

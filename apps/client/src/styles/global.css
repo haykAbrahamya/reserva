@@ -50,3 +50,17 @@ body {
 html.modal-open {
   overflow-y: hidden;
 }
+
+/* ── Armenian heading emphasis ───────────────────────────────────────────────
+   Section titles emphasize a word with an italic serif <em> (Fraunces). Fraunces
+   has no Armenian glyphs, so Armenian falls back to a generic serif whose ITALIC
+   mangles the script (barely readable). For Armenian only, keep the accent color
+   but drop the italic and use the sans face, which renders Armenian cleanly.
+   Scoped to heading <em> so body text is untouched; hy-only so en/ru keep the
+   designed italic serif. */
+html:lang(hy) h1 em,
+html:lang(hy) h2 em {
+  font-family: var(--font-sans);
+  font-style: normal;
+  font-weight: 600;
+}

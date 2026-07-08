@@ -10,7 +10,8 @@ export interface OpenStatus {
   open: boolean
   /** When closed but opening later today / on a known next day: "HH:mm". */
   opensAt?: string
-  /** Short day label for opensAt when it's not today (e.g. "Mon"). undefined = today. */
+  /** Weekday KEY (mon..sun) for opensAt when it's not today; the caller
+   *  localizes it. undefined = opens today. */
   opensDay?: string
   /** No usable schedule on any location → we can't say. */
   unknown: boolean
@@ -19,10 +20,6 @@ export interface OpenStatus {
 const toMin = (hhmm: string): number => {
   const [h, m] = hhmm.split(':').map(Number)
   return (h || 0) * 60 + (m || 0)
-}
-
-const SHORT: Record<string, string> = {
-  mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun',
 }
 
 function hasSchedule(h?: WeekSchedule): boolean {
@@ -52,7 +49,7 @@ function statusForSchedule(h: WeekSchedule, now: Date): { open: boolean; opensAt
   for (let i = 1; i <= 7; i++) {
     const key = ORDER[(todayIdx + i) % 7]
     const day = h[key] as WorkingDay | undefined
-    if (day?.enabled) return { open: false, opensAt: day.start, opensDay: SHORT[key] }
+    if (day?.enabled) return { open: false, opensAt: day.start, opensDay: key }
   }
   return { open: false }
 }

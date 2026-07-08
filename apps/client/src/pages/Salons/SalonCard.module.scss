@@ -1,5 +1,9 @@
 @use 'variables' as *;
 
+/* ── Card ────────────────────────────────────────────────────────────────────
+   Simplified, flat card: no gradient banner, no overhanging logo. A quiet
+   surface with a tinted top hairline that lights up in the salon's accent on
+   hover. The logo sits inline in the header next to the name. */
 .card {
   position: relative;
   display: flex;
@@ -11,17 +15,30 @@
   overflow: hidden;
   cursor: pointer;
   font-family: $font-sans;
-  padding: 0;
+  padding: 18px;
+  gap: 12px;
   box-shadow: $shadow-1;
   transition: transform 0.22s cubic-bezier(0.22, 0.86, 0.23, 1), box-shadow 0.22s, border-color 0.22s;
+
+  /* Accent hairline across the top — subtle by default, brightens on hover. */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: var(--salon-accent);
+    opacity: 0.55;
+    transition: opacity 0.22s;
+  }
 
   &:hover {
     transform: translateY(-4px);
     box-shadow: $shadow-3;
     border-color: color-mix(in srgb, var(--salon-accent) 40%, transparent);
   }
-  &:hover .logo { transform: scale(1.06) rotate(-3deg); }
-  &:hover .cta { gap: 9px; color: var(--salon-accent); }
+  &:hover::before { opacity: 1; }
+  &:hover .logo { transform: scale(1.05); }
+  &:hover .cta svg { transform: translateX(3px); }
   &:active { transform: translateY(-1px); }
 }
 
@@ -32,81 +49,72 @@
   animation: salon-pop 0.4s cubic-bezier(0.22, 0.86, 0.23, 1) both;
 }
 
-/* ── Banner ── */
-.banner {
-  position: relative;
-  height: 104px;
-  overflow: hidden;
-}
-.bannerGrid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.14) 1px, transparent 1px);
-  background-size: 26px 26px;
-  mask-image: radial-gradient(ellipse 80% 80% at 30% 20%, #000 10%, transparent 75%);
-  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 30% 20%, #000 10%, transparent 75%);
+/* ── Header: logo + name + type ── */
+.head {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-top: 4px; /* clearance under the accent hairline */
 }
 .logo {
-  position: absolute;
-  left: 18px;
-  bottom: -22px;
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
   display: grid;
   place-items: center;
   font-family: $font-serif;
-  font-size: 27px;
+  font-size: 23px;
   color: #fff;
   background: color-mix(in srgb, var(--salon-accent) 88%, #000);
-  border: 2.5px solid $bg-1;
-  box-shadow: $shadow-2;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
   transition: transform 0.25s cubic-bezier(0.22, 0.86, 0.23, 1);
 }
-.rating {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.32);
-  backdrop-filter: blur(6px);
-  padding: 4px 9px;
-  border-radius: 999px;
+/* Logo variant — real brand image fills the tile. White backing so
+   transparent/dark logos read; hairline border keeps it defined on white. */
+.logoImg {
+  object-fit: cover;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px $line-2;
+  font-size: 0; /* suppress any alt-text flash before load */
 }
-.ratingStar { color: #FFCB5C; fill: #FFCB5C; }
-
-/* ── Body ── */
-.body {
-  padding: 30px 18px 18px; /* top room for the overhanging logo */
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  flex: 1;
-}
-.titleRow { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.headText { min-width: 0; flex: 1; }
 .name {
   font-family: $font-serif;
-  font-size: 20px;
+  font-size: 19px;
   letter-spacing: -0.015em;
   color: $fg-0;
   margin: 0;
-  line-height: 1.15;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .type {
-  flex-shrink: 0;
+  display: block;
+  margin-top: 2px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--salon-accent);
 }
+.rating {
+  flex-shrink: 0;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: $fg-1;
+  background: $bg-2;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.ratingStar { color: #FFCB5C; fill: #FFCB5C; }
+
+/* ── Body ── */
 .tagline {
   font-size: 13.5px;
   color: $fg-2;
@@ -117,10 +125,16 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+/* Grouped meta block — location + open status stacked as calm, aligned rows. */
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
 .metaRow {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   font-size: 13px;
   color: $fg-1;
   svg { color: var(--salon-accent); flex-shrink: 0; }
@@ -151,50 +165,37 @@
   svg { color: var(--salon-accent) !important; }
 }
 
-/* Open-now status pill */
-.status {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  align-self: flex-start;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 999px;
-  svg { flex-shrink: 0; }
-}
-.statusOpen {
-  color: $success;
-  background: color-mix(in srgb, $success 12%, transparent);
-}
-.statusClosed {
-  color: $fg-2;
-  background: $bg-2;
-}
+/* Open-now status — inline meta row, not a pill. Green dot + text when open,
+   muted clock + text when closed. Sits inside .meta with the location. */
+.statusIcon { color: $fg-3 !important; }
+.statusOpenText { color: $success; font-weight: 600; }
 .statusDot {
-  width: 7px;
-  height: 7px;
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
+}
+.statusDotOpen {
   background: $success;
   box-shadow: 0 0 0 3px color-mix(in srgb, $success 22%, transparent);
 }
 
+/* Category chips — ghost tags: borderless, low-key, so they read as metadata
+   rather than competing buttons. */
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip {
   font-size: 11.5px;
   font-weight: 500;
-  color: $fg-1;
-  background: $bg-2;
-  border: 1px solid $line-1;
-  padding: 3px 9px;
-  border-radius: 999px;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  color: $fg-2;
+  background: color-mix(in srgb, $fg-3 8%, transparent);
+  padding: 3px 10px;
+  border-radius: 8px;
+  transition: background 0.15s, color 0.15s;
 }
 /* Matched-against-search chip — highlighted in the salon's accent. */
 .chipHit {
   color: var(--salon-accent);
-  background: color-mix(in srgb, var(--salon-accent) 12%, transparent);
-  border-color: color-mix(in srgb, var(--salon-accent) 30%, transparent);
+  background: color-mix(in srgb, var(--salon-accent) 13%, transparent);
 }
 
 .footer {
@@ -220,8 +221,9 @@
   gap: 6px;
   font-size: 13px;
   font-weight: 600;
-  color: $fg-1;
-  transition: gap 0.18s, color 0.18s;
+  color: var(--salon-accent);
+  transition: gap 0.18s;
+  svg { transition: transform 0.18s; }
 }
 
 :global {

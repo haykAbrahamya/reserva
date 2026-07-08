@@ -1,0 +1,99 @@
+@use 'variables' as *;
+
+.section {
+  padding: 40px 0;
+  background: $bg-0;
+  border-bottom: 1px solid $line-1;
+  overflow: hidden;
+}
+
+.label {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $fg-3;
+  margin: 0 0 22px;
+  padding: 0 20px;
+}
+
+/* ── Marquee ── */
+.marquee {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  /* Fade the strip into the background at both edges. */
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  gap: 14px;
+  padding-right: 14px; /* keep the inter-tile gap consistent across the seam */
+  /* The list is repeated N times; sliding by exactly one set's width
+     (--partners-shift = -100/N%) lands on an identical copy → seamless loop. */
+  animation: partners-scroll 40s linear infinite;
+  will-change: transform;
+
+  &:hover { animation-play-state: paused; }
+}
+
+@keyframes partners-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(var(--partners-shift, -50%)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track { animation: none; flex-wrap: wrap; justify-content: center; width: 100%; }
+}
+
+/* ── Chip (small, inline logo + name) ── */
+.chip {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 44px;
+  padding: 0 16px 0 10px;
+  border: 1px solid $line-1;
+  border-radius: 999px;
+  background: $bg-1;
+  text-decoration: none;
+  transition: border-color 0.18s ease, background 0.18s ease;
+
+  &:hover { border-color: $accent; background: $bg-2; }
+}
+
+.logo {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: $bg-2;
+}
+
+.dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-family: $font-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 500;
+  color: $fg-1;
+  white-space: nowrap;
+}
+.chip:hover .name { color: $fg-0; }

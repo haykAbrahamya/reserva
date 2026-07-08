@@ -28,7 +28,12 @@ export function PartnerAbout({ partner, tone = 'plain' }: Props) {
     {
       icon: MapPin,
       label: multiLocation ? t('partner.about.factBranches') : t('partner.about.factLocation'),
-      value: multiLocation ? t('partner.about.factBranchesValue', { count: locations.length }) : (loc ? loc.name : '—'),
+      // Single-location: show the actual street address (what the footer shows),
+      // falling back to the branch name then em-dash. Using `name` here left it
+      // blank for solo partners whose auto-provisioned location has no name.
+      value: multiLocation
+        ? t('partner.about.factBranchesValue', { count: locations.length })
+        : (loc ? (loc.address || loc.name || '—') : '—'),
     },
     // Category — always meaningful (replaces the old free-text hours summary,
     // which was ambiguous across branches and has been removed).

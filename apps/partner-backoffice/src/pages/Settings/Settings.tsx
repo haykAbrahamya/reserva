@@ -12,8 +12,15 @@ import { errorMessage } from '@/utils/errors'
 import { useT } from '@/i18n'
 import s from './Settings.module.scss'
 
-const slugify = (v: string) =>
-  v.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60)
+// Live input sanitizer: lowercase, spaces/invalid chars → hyphen. Crucially we
+// do NOT strip trailing hyphens here — doing so on every keystroke made it
+// impossible to TYPE a hyphen (e.g. "karen-" → "karen"), so "karen-barber"
+// could never be entered. Edge hyphens are trimmed on save instead.
+const slugifyInput = (v: string) =>
+  v.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/-{2,}/g, '-').slice(0, 60)
+
+// Final normalization applied when saving: also strip leading/trailing hyphens.
+const normalizeSlug = (v: string) => v.replace(/^-+|-+$/g, '')
 
 export function Settings() {
   const setPartner = useAppStore((st) => st.setPartner)
@@ -164,7 +171,8 @@ export function Settings() {
     if (!canSaveSlug) return
     setSlugSaving(true)
     try {
-      applyUpdate(await partnersService.updateProfile({ slug }))
+      // Trim any leading/trailing hyphens only now, at save time.
+      applyUpdate(await partnersService.updateProfile({ slug: normalizeSlug(slug) }))
       toast(t('settings.address.updated'))
     } catch (err) {
       toast(errorMessage(err, t))
@@ -266,7 +274,7 @@ export function Settings() {
               <Input
                 value={slug}
                 disabled={!isAdmin || slugSaving}
-                onChange={(e) => setSlug(slugify(e.target.value))}
+                onChange={(e) => setSlug(slugifyInput(e.target.value))}
                 placeholder={t('settings.address.placeholder')}
                 error={!slugValid ? t('settings.address.invalid') : undefined}
               />
