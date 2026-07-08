@@ -59,7 +59,10 @@ export function PartnerPage() {
           '@type': 'LocalBusiness',
           name: partner.name,
           description: partner.presentation?.about?.slice(0, 300),
-          url: slug ? `https://${slug}.reserva.am` : 'https://reserva.am',
+          // Match the canonical host (reserva.am/p/:slug). The salon is also
+          // reachable at slug.reserva.am, but we canonicalize to the path form
+          // everywhere so Google sees one URL, not two duplicates.
+          url: slug ? `https://reserva.am/p/${slug}` : 'https://reserva.am',
           address: partner.locations?.map((l) => ({
             '@type': 'PostalAddress',
             streetAddress: l.address,

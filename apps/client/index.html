@@ -28,13 +28,15 @@
     />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
     <meta name="author" content="Reserva" />
-    <link rel="canonical" href="https://reserva.am/" />
-
-    <!-- Language alternates (hreflang) — same SPA serves all locales -->
-    <link rel="alternate" hreflang="hy" href="https://reserva.am/" />
-    <link rel="alternate" hreflang="en" href="https://reserva.am/" />
-    <link rel="alternate" hreflang="ru" href="https://reserva.am/" />
-    <link rel="alternate" hreflang="x-default" href="https://reserva.am/" />
+    <!--
+      NOTE: canonical & hreflang are intentionally NOT hardcoded here.
+      This is a client-rendered SPA serving one HTML shell for every route, so a
+      static canonical/hreflang would make EVERY crawled URL (/salons, /p/:slug…)
+      declare the homepage as its canonical — Google then reports "Alternate page
+      with proper canonical tag" and refuses to index those pages.
+      The per-route canonical + self-referential hreflang are set at runtime by
+      useSeo() (src/hooks/useSeo.ts). At crawl time each URL self-canonicalizes.
+    -->
 
     <!-- ─────────────────────────  Open Graph  ───────────────────────── -->
     <meta property="og:type" content="website" />

@@ -41,6 +41,42 @@ function setCanonical(href: string) {
 }
 
 /**
+ * Self-referential hreflang alternates. All locales are served from the SAME
+ * URL (locale is a client-side preference, not part of the path), so every
+ * hreflang points at the canonical URL of the current route — never at the
+ * homepage. This tells Google the page is the same doc across hy/en/ru and
+ * stops it flagging duplicate/alternate canonicals.
+ */
+function setHreflang(url: string) {
+  const HREFLANGS = ['hy', 'en', 'ru', 'x-default']
+  // Remove any managed alternates from a previous route before re-adding.
+  document.head
+    .querySelectorAll('link[rel="alternate"][data-seo-hreflang]')
+    .forEach((el) => el.remove())
+  for (const lang of HREFLANGS) {
+    const el = document.createElement('link')
+    el.setAttribute('rel', 'alternate')
+    el.setAttribute('hreflang', lang)
+    el.setAttribute('href', url)
+    el.setAttribute('data-seo-hreflang', '')
+    document.head.appendChild(el)
+  }
+}
+
+/**
+ * Normalize a path into a clean canonical URL: absolute origin + path with any
+ * trailing slash removed (except root) and query/hash stripped. This makes
+ * /salons and /salons/ (and /salons?x=1) all canonicalize to the SAME clean
+ * URL, so sitemap entries and crawled variants agree with the canonical.
+ */
+function canonicalUrl(path: string): string {
+  let p = path.split('?')[0].split('#')[0]
+  if (p.length > 1) p = p.replace(/\/+$/, '')
+  if (p === '') p = '/'
+  return `${SITE}${p}`
+}
+
+/**
  * Per-route SEO. A pure SPA serves one HTML shell, so without this every page
  * would share the same title/description — invisible to search. This hook
  * rewrites the document head for the active route + locale on mount and whenever
@@ -52,7 +88,7 @@ export function useSeo({ title, description, path, image, noindex, jsonLd }: Seo
   useEffect(() => {
     if (typeof document === 'undefined') return
 
-    const url = `${SITE}${path ?? window.location.pathname}`
+    const url = canonicalUrl(path ?? window.location.pathname)
     const img = image ?? `${SITE}/og-image.png`
     const ogLocale = LOCALE_META[locale].lang.replace('-', '_')
 
@@ -62,6 +98,10 @@ export function useSeo({ title, description, path, image, noindex, jsonLd }: Seo
       ? 'noindex, follow'
       : 'index, follow, max-image-preview:large, max-snippet:-1')
     setCanonical(url)
+    // Self-referential hreflang per route (skip for noindex pages — they
+    // shouldn't advertise alternates).
+    if (!noindex) setHreflang(url)
+    else document.head.querySelectorAll('link[rel="alternate"][data-seo-hreflang]').forEach((el) => el.remove())
 
     // Open Graph
     setMeta('property', 'og:title', title)
