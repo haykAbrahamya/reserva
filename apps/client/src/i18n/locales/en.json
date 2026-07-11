@@ -257,7 +257,11 @@
       "all": "All",
       "book": "Book",
       "min": "min",
-      "hour": "h"
+      "hour": "h",
+      "searchPlaceholder": "Search services…",
+      "seeMore": "See {count} more",
+      "showLess": "Show less",
+      "noResults": "No services match “{query}”"
     },
     "about": {
       "eyebrow": "About {name}",

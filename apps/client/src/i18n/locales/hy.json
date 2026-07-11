@@ -257,7 +257,11 @@
       "all": "Բոլորը",
       "book": "Ամրագրել",
       "min": "րոպե",
-      "hour": "ժ"
+      "hour": "ժ",
+      "searchPlaceholder": "Փնտրել ծառայություններ…",
+      "seeMore": "Տեսնել ևս {count}-ը",
+      "showLess": "Ցույց տալ քիչ",
+      "noResults": "«{query}»-ին համապատասխան ծառայություն չկա"
     },
     "about": {
       "eyebrow": "{name}-ի մասին",

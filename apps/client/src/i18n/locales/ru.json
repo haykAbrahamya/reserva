@@ -257,7 +257,11 @@
       "all": "Все",
       "book": "Записаться",
       "min": "мин",
-      "hour": "ч"
+      "hour": "ч",
+      "searchPlaceholder": "Поиск услуг…",
+      "seeMore": "Показать ещё {count}",
+      "showLess": "Свернуть",
+      "noResults": "Нет услуг по запросу «{query}»"
     },
     "about": {
       "eyebrow": "О салоне {name}",

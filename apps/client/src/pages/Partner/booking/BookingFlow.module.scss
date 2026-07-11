@@ -77,12 +77,16 @@
 .closeBtn { margin-left: auto; }
 
 .stepLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: $fg-3;
 }
+.stepIcon { color: $accent; flex-shrink: 0; }
 
 /* progress bar segments */
 .progress {

@@ -2,15 +2,20 @@
 
 .section { padding: 26px 0 40px; }
 
+/* Masonry-style grid driven by each image's real orientation. A small
+   grid-auto-rows unit + per-shape row spans lets portraits stand tall and
+   landscapes sit short/wide, so photos fit their natural aspect ratio instead
+   of being square-cropped (faces no longer get chopped). */
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 10px;      /* base row unit; tiles span N of these */
+  grid-auto-flow: row dense; /* backfill gaps left by wide/tall tiles */
   gap: 10px;
   @media (max-width: 720px) { grid-template-columns: repeat(2, 1fr); }
 }
 .tile {
   position: relative;
-  aspect-ratio: 1;
   border-radius: $r-2;
   overflow: hidden;
   border: 1px solid $line-1;
@@ -18,6 +23,9 @@
   padding: 0;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  /* Default (square) footprint until the image measures itself. ~1 column
+     width is ~ (container/3); 20 rows × 10px ≈ 200px keeps it roughly square. */
+  grid-row: span 20;
 
   img {
     width: 100%;
@@ -28,10 +36,22 @@
   }
   &:hover img { transform: scale(1.05); }
 }
+
+/* Orientation spans (measured from natural dimensions in the component). */
+.square    { grid-row: span 20; }
+.portrait  { grid-row: span 27; }              /* taller cell for tall photos */
+.landscape { grid-row: span 14; grid-column: span 2; } /* short + wide */
+
+@media (max-width: 720px) {
+  /* Only 2 columns on mobile — a landscape spanning 2 cols would fill the row,
+     so keep it single-column but short; portraits stay tall. */
+  .landscape { grid-column: span 2; grid-row: span 16; }
+}
+
 /* Before/after tiles read better wider. */
 .tileWide {
   grid-column: span 2;
-  aspect-ratio: 2 / 1;
+  grid-row: span 14;
   cursor: default;
   @media (max-width: 720px) { grid-column: span 2; }
 }

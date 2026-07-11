@@ -11,6 +11,15 @@ interface Props {
 
 type Tile = NonNullable<PublicPartner['presentation']['gallery']>[number]
 
+/** Orientation bucket derived from an image's natural aspect ratio. Drives how
+ *  many grid rows/cols the tile spans so photos aren't square-cropped. */
+type Shape = 'portrait' | 'landscape' | 'square'
+function shapeFor(ratio: number): Shape {
+  if (ratio <= 0.8) return 'portrait'   // clearly tall (e.g. 4:5, 9:16 selfies)
+  if (ratio >= 1.3) return 'landscape'  // clearly wide
+  return 'square'                        // near-square → keep square
+}
+
 /**
  * Gallery tab: gallery + works tiles in one responsive grid. Before/after tiles
  * render the shared draggable comparison; plain photos open in the SAME shared
@@ -30,6 +39,9 @@ export function TabbedGallery({ partner }: Props) {
     [tiles],
   )
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  // Per-tile shape, measured from the loaded image's natural dimensions. Keyed
+  // by the tile's url so it's stable across re-renders.
+  const [shapes, setShapes] = useState<Record<string, Shape>>({})
 
   if (tiles.length === 0) return null
 
@@ -51,14 +63,25 @@ export function TabbedGallery({ partner }: Props) {
           }
           if (!tile.url) return null
           const photoIndex = photos.findIndex((ph) => ph.url === tile.url)
+          const shape = shapes[tile.url] ?? 'square'
           return (
             <button
               key={`ph-${i}`}
-              className={s.tile}
+              className={[s.tile, s[shape]].join(' ')}
               onClick={() => setLightboxIndex(photoIndex)}
               aria-label={t('partner.gallery.openImage')}
             >
-              <img src={tile.url} alt={tile.label ?? ''} loading="lazy" />
+              <img
+                src={tile.url}
+                alt={tile.label ?? ''}
+                loading="lazy"
+                onLoad={(e) => {
+                  const img = e.currentTarget
+                  if (!img.naturalWidth || !img.naturalHeight) return
+                  const next = shapeFor(img.naturalWidth / img.naturalHeight)
+                  setShapes((prev) => (prev[tile.url as string] === next ? prev : { ...prev, [tile.url as string]: next }))
+                }}
+              />
             </button>
           )
         })}

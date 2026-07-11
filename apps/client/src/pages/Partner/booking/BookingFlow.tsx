@@ -454,7 +454,9 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
               <button className={s.backBtn} onClick={goBack} disabled={stepIndex === 0 || (step === 'specialist' && !!seedServiceId && !multiLocation)}>
                 <ArrowLeft size={16} />
               </button>
-              <span className={s.stepLabel}>{stepLabel}</span>
+              <span className={s.stepLabel}>
+                <Sparkles size={13} className={s.stepIcon} /> {stepLabel}
+              </span>
               <button className={s.closeBtn} onClick={animatedClose}><X size={16} /></button>
             </div>
             <div className={s.progress}>

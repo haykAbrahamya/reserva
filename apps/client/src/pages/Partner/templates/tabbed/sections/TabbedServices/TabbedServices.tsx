@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react'
-import { Plus, Clock } from 'lucide-react'
+import { useState, useMemo, useEffect } from 'react'
+import { Plus, Clock, Search, X, ChevronDown } from 'lucide-react'
 import { fmtServicePrice, fmtDuration } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
 import { canBook } from '@/services/booking.service'
@@ -12,6 +12,8 @@ interface Props {
 }
 
 const ALL = 'All'
+/** Collapsed view shows this many; the rest hide behind "See more". */
+const INITIAL_LIMIT = 6
 
 /** Services tab: category chips + a two-column service card grid. Reuses the
  *  shared price/duration formatters and the canBook rule. */
@@ -24,10 +26,47 @@ export function TabbedServices({ partner, onBook }: Props) {
     return [ALL, ...Array.from(set)]
   }, [services])
   const [cat, setCat] = useState(ALL)
-  const filtered = cat === ALL ? services : services.filter((sv) => sv.category === cat)
+  const [query, setQuery] = useState('')
+  const [expanded, setExpanded] = useState(false)
+
+  // Filter by category + free-text search (name or category, case-insensitive).
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return services.filter((sv) => {
+      if (cat !== ALL && sv.category !== cat) return false
+      if (!q) return true
+      return sv.name.toLowerCase().includes(q) || (sv.category ?? '').toLowerCase().includes(q)
+    })
+  }, [services, cat, query])
+
+  // Collapse back to the limit whenever the filter set changes, so switching
+  // category / typing never leaves a stale "expanded" list.
+  useEffect(() => { setExpanded(false) }, [cat, query])
+
+  const overLimit = filtered.length > INITIAL_LIMIT
+  const visible = expanded || !overLimit ? filtered : filtered.slice(0, INITIAL_LIMIT)
+  const hiddenCount = filtered.length - INITIAL_LIMIT
 
   return (
     <section className={s.section}>
+      {/* Search bar */}
+      <div className={s.search}>
+        <Search size={16} className={s.searchIcon} />
+        <input
+          className={s.searchInput}
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t('partner.services.searchPlaceholder')}
+          aria-label={t('partner.services.searchPlaceholder')}
+        />
+        {query && (
+          <button className={s.searchClear} onClick={() => setQuery('')} aria-label="Clear">
+            <X size={15} />
+          </button>
+        )}
+      </div>
+
       {categories.length > 2 && (
         <div className={s.chips}>
           {categories.map((c) => (
@@ -42,8 +81,14 @@ export function TabbedServices({ partner, onBook }: Props) {
         </div>
       )}
 
+      {visible.length === 0 ? (
+        <div className={s.empty}>
+          <Search size={22} className={s.emptyIcon} />
+          <p>{t('partner.services.noResults', { query: query.trim() })}</p>
+        </div>
+      ) : (
       <div className={s.grid}>
-        {filtered.map((sv) => (
+        {visible.map((sv) => (
           <div key={sv.id} className={s.card}>
             <div className={s.cardBody}>
               <div className={s.name}>{sv.name}</div>
@@ -65,6 +110,23 @@ export function TabbedServices({ partner, onBook }: Props) {
           </div>
         ))}
       </div>
+      )}
+
+      {/* See more / Show less — only when a filter set exceeds the limit. */}
+      {overLimit && (
+        <div className={s.moreRow}>
+          <button
+            className={s.moreBtn}
+            onClick={() => setExpanded((v) => !v)}
+            aria-expanded={expanded}
+          >
+            {expanded
+              ? t('partner.services.showLess')
+              : t('partner.services.seeMore', { count: hiddenCount })}
+            <ChevronDown size={15} className={[s.moreChevron, expanded ? s.moreChevronUp : ''].join(' ')} />
+          </button>
+        </div>
+      )}
     </section>
   )
 }
