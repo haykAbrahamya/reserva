@@ -173,6 +173,7 @@ export function CreatePartnerModal({ open, onClose, onCreated }: Props) {
     <Modal
       open={open}
       onClose={close}
+      size="lg"
       title="New partner"
       subtitle="Provision a salon + its first admin"
       footer={
@@ -188,32 +189,32 @@ export function CreatePartnerModal({ open, onClose, onCreated }: Props) {
         {error && <div className={s.error}>{error}</div>}
 
         <div className={s.groupLabel}>Salon</div>
-        <Input label="Name" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Antheris" error={submitted ? fieldErrors.name : undefined} />
         <div className={s.row}>
-          <div className={s.slugField}>
-            <Input
-              label="Slug (domain handle)"
-              value={effectiveSlug}
-              onChange={(e) => { setSlugTouched(true); set('slug', slugify(e.target.value)) }}
-              placeholder="antheris"
-              error={submitted && effectiveSlug.length < 2 ? fieldErrors.slug : undefined}
-            />
-            <div className={s.slugStatus}>
-              {effectiveSlug.length >= 2 && slugStatus === 'checking' && (
-                <span className={s.slugChecking}><Loader2 size={12} className={s.spin} /> Checking…</span>
-              )}
-              {slugStatus === 'available' && (
-                <span className={s.slugOk}><Check size={12} /> {effectiveSlug}.reserva.am is available</span>
-              )}
-              {slugStatus === 'taken' && (
-                <span className={s.slugTaken}>This slug is already taken</span>
-              )}
-              {(slugStatus === 'idle' || effectiveSlug.length < 2) && (
-                <span className={s.slugHint}>{effectiveSlug ? `${effectiveSlug}.reserva.am` : 'becomes a subdomain'}</span>
-              )}
-            </div>
-          </div>
+          <Input label="Name" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Antheris" error={submitted ? fieldErrors.name : undefined} />
           <Input label="Type" value={form.type} onChange={(e) => set('type', e.target.value)} placeholder="Aesthetic clinic" error={submitted ? fieldErrors.type : undefined} />
+        </div>
+        <div className={s.slugField}>
+          <Input
+            label="Slug (domain handle)"
+            value={effectiveSlug}
+            onChange={(e) => { setSlugTouched(true); set('slug', slugify(e.target.value)) }}
+            placeholder="antheris"
+            error={submitted && effectiveSlug.length < 2 ? fieldErrors.slug : undefined}
+          />
+          <div className={s.slugStatus}>
+            {effectiveSlug.length >= 2 && slugStatus === 'checking' && (
+              <span className={s.slugChecking}><Loader2 size={12} className={s.spin} /> Checking…</span>
+            )}
+            {slugStatus === 'available' && (
+              <span className={s.slugOk}><Check size={12} /> {effectiveSlug}.reserva.am is available</span>
+            )}
+            {slugStatus === 'taken' && (
+              <span className={s.slugTaken}>This slug is already taken</span>
+            )}
+            {(slugStatus === 'idle' || effectiveSlug.length < 2) && (
+              <span className={s.slugHint}>{effectiveSlug ? `${effectiveSlug}.reserva.am` : 'becomes a subdomain'}</span>
+            )}
+          </div>
         </div>
 
         <AccentPicker value={form.accent} onChange={(c) => set('accent', c)} />
