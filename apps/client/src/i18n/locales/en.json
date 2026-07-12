@@ -334,6 +334,8 @@
     "reviewsCount": "({count})",
     "about": "About",
     "services": "Services",
+    "moreServices": "+{count} more",
+    "showLess": "Show less",
     "whatClientsSay": "What clients say",
     "stats": {
       "rating": "Rating",

@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
-import { CalendarCheck, MapPin, Phone, ChevronDown, Instagram, Facebook } from 'lucide-react'
+import { CalendarCheck, MapPin, Phone, ChevronDown, Instagram, Facebook, Star } from 'lucide-react'
 import { WhatsappIcon } from '@reserva/ui'
 import { useT } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
 import { bookableLocations, canBook } from '@/services/booking.service'
-import { StarRatingDisplay } from '@/components/StarRating/StarRating'
 import s from './PartnerHero.module.scss'
 
 interface Props {
@@ -98,7 +97,8 @@ export function PartnerHero({ partner, onBook }: Props) {
               className={s.rating}
               title={t('partner.hero.ratingAria', { rating: p.rating.toFixed(1), count: p.reviews })}
             >
-              <StarRatingDisplay value={p.rating} size={15} />
+              <Star size={15} className={s.ratingStar} />
+              <span className={s.ratingNum}>{p.rating.toFixed(1)}</span>
               <span className={s.reviewCount}>{t('partner.hero.reviews', { count: p.reviews })}</span>
             </span>
           )}

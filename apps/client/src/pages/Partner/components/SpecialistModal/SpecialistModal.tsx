@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { X, CalendarCheck, Star } from 'lucide-react'
 import { initials } from '@reserva/shared'
 import type { Specialist } from '@reserva/shared'
@@ -26,6 +26,13 @@ export function SpecialistModal({ partner, specialist, onClose, onBook }: Props)
 
   // Services this specialist offers.
   const services = partner.services.filter(sv => sv.active && specialist.services.includes(sv.id))
+
+  // A prolific specialist can offer many services — cap the chip cloud and let
+  // the user expand, so the popup stays tidy instead of sprawling.
+  const SVC_LIMIT = 6
+  const [svcExpanded, setSvcExpanded] = useState(false)
+  const svcOverLimit = services.length > SVC_LIMIT
+  const shownServices = svcExpanded || !svcOverLimit ? services : services.slice(0, SVC_LIMIT)
 
   // Real, server-computed rating (never fabricated).
   const rating = specialist.rating ?? 0
@@ -64,9 +71,21 @@ export function SpecialistModal({ partner, specialist, onClose, onBook }: Props)
             <>
               <p className={s.sectionLabel}>{t('specialistModal.services')}</p>
               <div className={s.svcChips}>
-                {services.map(sv => (
+                {shownServices.map(sv => (
                   <span key={sv.id} className={s.chip}>{sv.name}</span>
                 ))}
+                {svcOverLimit && (
+                  <button
+                    type="button"
+                    className={[s.chip, s.chipMore].join(' ')}
+                    onClick={() => setSvcExpanded(v => !v)}
+                    aria-expanded={svcExpanded}
+                  >
+                    {svcExpanded
+                      ? t('specialistModal.showLess')
+                      : t('specialistModal.moreServices', { count: services.length - SVC_LIMIT })}
+                  </button>
+                )}
               </div>
             </>
           )}

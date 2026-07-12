@@ -114,7 +114,7 @@
 .rating {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-size: 13px;
   color: $fg-1;
   padding: 5px 13px 5px 11px;
@@ -125,6 +125,9 @@
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
+/* Single filled star + the numeric score — cleaner than a 5-star row. */
+.ratingStar { color: #FFCB5C; fill: #FFCB5C; flex-shrink: 0; }
+.ratingNum { font-weight: 700; color: $fg-0; }
 .reviewCount { color: $fg-3; }
 
 .name {

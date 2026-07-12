@@ -171,6 +171,21 @@
   color: $fg-1;
   border: 1px solid $line-2;
 }
+/* "+N more" / "Show less" — an ACTION, not a service. Accent-tinted + tappable
+   so it reads distinctly from the passive service chips beside it. */
+.chipMore {
+  cursor: pointer;
+  font-weight: 600;
+  color: $accent-contrast;
+  background: color-mix(in srgb, $accent 12%, transparent);
+  border-color: color-mix(in srgb, $accent 30%, transparent);
+  transition: background 0.14s, border-color 0.14s;
+  -webkit-tap-highlight-color: transparent;
+  &:hover {
+    background: color-mix(in srgb, $accent 20%, transparent);
+    border-color: color-mix(in srgb, $accent 45%, transparent);
+  }
+}
 
 /* ── Reviews header + write button ── */
 .reviewsHead {

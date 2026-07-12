@@ -335,6 +335,8 @@
     "reviewsCount": "({count})",
     "about": "О специалисте",
     "services": "Услуги",
+    "moreServices": "+{count} ещё",
+    "showLess": "Свернуть",
     "whatClientsSay": "Что говорят клиенты",
     "stats": {
       "rating": "Рейтинг",

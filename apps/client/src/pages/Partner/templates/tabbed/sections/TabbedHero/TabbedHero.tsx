@@ -1,9 +1,8 @@
-import { MapPin, Phone, Instagram, Facebook } from 'lucide-react'
+import { MapPin, Phone, Instagram, Facebook, Star } from 'lucide-react'
 import { WhatsappIcon } from '@reserva/ui'
 import { useT } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
 import { bookableLocations } from '@/services/booking.service'
-import { StarRatingDisplay } from '@/components/StarRating/StarRating'
 import s from './TabbedHero.module.scss'
 
 interface Props {
@@ -49,7 +48,8 @@ export function TabbedHero({ partner }: Props) {
             <span className={s.type}>{partner.type}</span>
             {p.rating > 0 && p.reviews > 0 && (
               <span className={s.rating}>
-                <StarRatingDisplay value={p.rating} size={14} />
+                <Star size={14} className={s.ratingStar} />
+                <span className={s.ratingNum}>{p.rating.toFixed(1)}</span>
                 <span className={s.reviewCount}>{t('partner.hero.reviews', { count: p.reviews })}</span>
               </span>
             )}

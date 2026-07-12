@@ -335,6 +335,8 @@
     "reviewsCount": "({count})",
     "about": "Մասին",
     "services": "Ծառայություններ",
+    "moreServices": "+ևս {count}",
+    "showLess": "Ցույց տալ քիչ",
     "whatClientsSay": "Ինչ են ասում հաճախորդները",
     "stats": {
       "rating": "Վարկանիշ",
