@@ -411,7 +411,16 @@
       "phonePlaceholder": "+374 91 …",
       "locationLabel": "Филиал",
       "servicesLabel": "Услуги",
-      "active": "Активен"
+      "active": "Активен",
+      "avatar": {
+        "title": "Фото профиля",
+        "hint": "JPG или PNG, до 8 МБ",
+        "upload": "Загрузить фото",
+        "change": "Изменить фото",
+        "remove": "Удалить",
+        "notImage": "Пожалуйста, выберите файл изображения",
+        "tooLarge": "Изображение слишком большое (макс. 8 МБ)"
+      }
     }
   },
   "specialistDashboard": {

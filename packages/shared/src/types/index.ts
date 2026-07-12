@@ -46,6 +46,8 @@ export interface Specialist {
   active: boolean
   phone: string
   services: string[]
+  /** Optional profile photo URL. Empty/absent → letter-initial avatar. */
+  avatarUrl?: string
   /** Recurring weekly schedule. Present when loaded from the API. */
   schedule?: WeekSchedule
   /** Computed average rating (0 when no reviews). Present on public payloads. */

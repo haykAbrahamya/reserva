@@ -1,0 +1,126 @@
+@use 'variables' as *;
+
+/* Framed "profile photo" zone so the control reads as an intentional section
+   rather than a stray avatar + button floating in space. */
+.panel {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: $r-2;
+  border: 1px solid $line-2;
+  background: $bg-0;
+}
+
+/* Circular preview + hover overlay */
+.disc {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow: $shadow-1;
+  -webkit-tap-highlight-color: transparent;
+  transition: box-shadow 0.16s, transform 0.12s;
+
+  &:hover { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18); }
+  &:hover .overlay { opacity: 1; }
+  &:active { transform: scale(0.97); }
+}
+
+.img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.initials {
+  font-size: 26px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.placeholder { color: rgba(255, 255, 255, 0.85); }
+
+/* Camera scrim shown on hover */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.42);
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.16s;
+}
+
+/* Text + actions column */
+.body {
+  flex: 1;
+  min-width: 0;
+}
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: $fg-0;
+}
+.hint {
+  font-size: 11.5px;
+  color: $fg-3;
+  margin-top: 2px;
+  margin-bottom: 10px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: $r-1;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-1;
+  font-family: $font-sans;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.13s, border-color 0.13s, color 0.13s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover { background: $bg-2; border-color: $line-strong; color: $fg-0; }
+
+  /* Primary "upload/change" — accent-tinted so it invites a click. */
+  &.primary {
+    background: $accent-soft;
+    border-color: transparent;
+    color: $accent;
+    &:hover { background: $accent-soft; border-color: $accent; color: $accent; }
+  }
+
+  &.remove {
+    background: transparent;
+    color: $fg-2;
+    &:hover { background: $danger-soft; border-color: transparent; color: $danger; }
+  }
+}
+
+@media (max-width: 520px) {
+  .panel { gap: 13px; padding: 14px; }
+  .disc { width: 64px; height: 64px; }
+}

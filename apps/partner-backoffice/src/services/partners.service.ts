@@ -281,6 +281,22 @@ export const partnersService = {
     await apiDelete(`/specialists/${specialistId}`)
   },
 
+  // ── Specialist profile photo ──
+  /** Upload a specialist's profile photo; returns the new avatar URL. */
+  async uploadSpecialistAvatar(specialistId: string, file: File): Promise<{ avatarUrl: string }> {
+    const form = new FormData()
+    form.append('file', file)
+    const res = await http.post(`/specialists/${specialistId}/avatar`, form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    return (res.data?.data ?? res.data) as { avatarUrl: string }
+  },
+  /** Remove a specialist's profile photo; returns the (now empty) avatar URL. */
+  async removeSpecialistAvatar(specialistId: string): Promise<{ avatarUrl: string }> {
+    const res = await http.delete(`/specialists/${specialistId}/avatar`)
+    return (res.data?.data ?? res.data) as { avatarUrl: string }
+  },
+
   // ── Specialist reviews ──
   async listSpecialistReviews(specialistId: string): Promise<SpecialistReview[]> {
     return apiGet<SpecialistReview[]>(`/specialists/${specialistId}/reviews`)

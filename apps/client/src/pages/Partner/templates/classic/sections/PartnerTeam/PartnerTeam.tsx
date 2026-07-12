@@ -40,7 +40,9 @@ export function PartnerTeam({ partner, onSelect, tone = 'plain' }: Props) {
                   className={s.avatar}
                   style={{ background: `linear-gradient(140deg, ${t1}, ${t2})` }}
                 >
-                  {initials(sp.name)}
+                  {sp.avatarUrl
+                    ? <img src={sp.avatarUrl} alt={sp.name} className={s.avatarImg} />
+                    : initials(sp.name)}
                 </div>
                 <div className={s.spName}>{sp.name}</div>
                 <div className={s.spTitle}>{sp.title}</div>

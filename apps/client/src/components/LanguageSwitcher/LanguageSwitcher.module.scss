@@ -81,6 +81,10 @@
 
   &:hover { background: $bg-2; }
   &.active { background: $accent-soft; }
+
+  /* Breathing room between rows so a hovered item never sits flush against
+     the selected one (their tinted backgrounds would otherwise touch). */
+  & + & { margin-top: 2px; }
 }
 
 .flag {

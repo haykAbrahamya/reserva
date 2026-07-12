@@ -633,7 +633,9 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
                       onClick={() => selectSpecialist(sp.id)}
                     >
                       <span className={s.optAvatar} style={{ background: `linear-gradient(140deg, ${t1}, ${t2})` }}>
-                        {initials(sp.name)}
+                        {sp.avatarUrl
+                          ? <img src={sp.avatarUrl} alt={sp.name} className={s.optAvatarImg} />
+                          : initials(sp.name)}
                       </span>
                       <div className={s.optBody}>
                         <div className={s.optName}>{sp.name}</div>

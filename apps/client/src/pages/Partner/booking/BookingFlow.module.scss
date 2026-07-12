@@ -188,6 +188,13 @@
   font-size: 17px;
   color: #fff;
   border: 1.5px solid rgba(255,255,255,0.2);
+  overflow: hidden; /* clip a photo to the circle */
+}
+.optAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 /* "Any specialist" option highlight */

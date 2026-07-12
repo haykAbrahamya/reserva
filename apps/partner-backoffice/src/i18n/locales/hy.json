@@ -411,7 +411,16 @@
       "phonePlaceholder": "+374 91 …",
       "locationLabel": "Մասնաճյուղ",
       "servicesLabel": "Ծառայություններ",
-      "active": "Ակտիվ"
+      "active": "Ակտիվ",
+      "avatar": {
+        "title": "Պրոֆիլի լուսանկար",
+        "hint": "JPG կամ PNG, մինչև 8 ՄԲ",
+        "upload": "Վերբեռնել լուսանկար",
+        "change": "Փոխել լուսանկարը",
+        "remove": "Հեռացնել",
+        "notImage": "Խնդրում ենք ընտրել նկարի ֆայլ",
+        "tooLarge": "Նկարը չափազանց մեծ է (առավելագույնը 8 ՄԲ)"
+      }
     }
   },
   "specialistDashboard": {

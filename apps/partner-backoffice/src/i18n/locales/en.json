@@ -411,7 +411,16 @@
       "phonePlaceholder": "+374 91 …",
       "locationLabel": "Location",
       "servicesLabel": "Services",
-      "active": "Active"
+      "active": "Active",
+      "avatar": {
+        "title": "Profile photo",
+        "hint": "JPG or PNG, up to 8 MB",
+        "upload": "Upload photo",
+        "change": "Change photo",
+        "remove": "Remove",
+        "notImage": "Please choose an image file",
+        "tooLarge": "Image is too large (max 8 MB)"
+      }
     }
   },
   "specialistDashboard": {

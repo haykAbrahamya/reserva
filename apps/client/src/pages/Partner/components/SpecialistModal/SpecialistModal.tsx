@@ -49,7 +49,9 @@ export function SpecialistModal({ partner, specialist, onClose, onBook }: Props)
         <div className={s.banner} style={{ background: `linear-gradient(140deg, ${t1}, ${t2})` }}>
           <div className={s.bannerGrid} />
           <div className={s.avatar} style={{ background: 'rgba(255,255,255,0.18)' }}>
-            {initials(specialist.name)}
+            {specialist.avatarUrl
+              ? <img src={specialist.avatarUrl} alt={specialist.name} className={s.avatarImg} />
+              : initials(specialist.name)}
           </div>
           <div className={s.bannerInfo}>
             <div className={s.spName}>{specialist.name}</div>

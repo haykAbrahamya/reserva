@@ -4,6 +4,7 @@ import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Select, Avatar, Empty, Badge, Pagination, FieldError, useToast } from '@/components/ui'
 import { SpecialistDashboard } from '@/components/specialists/SpecialistDashboard/SpecialistDashboard'
+import { AvatarPicker } from '@/components/specialists/AvatarPicker/AvatarPicker'
 import { normalizePhoneInput } from '@reserva/shared'
 import { partnersService } from '@/services/partners.service'
 import { errorMessage } from '@/utils/errors'
@@ -59,6 +60,12 @@ export function Specialists() {
   const [saving,      setSaving]      = useState(false)
   const [dashboardSp, setDashboardSp] = useState<Specialist | null>(null)
 
+  // Staged profile photo. `avatarFile` is a newly-picked file to upload on save;
+  // `avatarCleared` marks that the existing photo should be removed. The upload
+  // itself happens after the specialist row exists (a new one has no id yet).
+  const [avatarFile,    setAvatarFile]    = useState<File | null>(null)
+  const [avatarCleared, setAvatarCleared] = useState(false)
+
   if (!partner) return null
 
   const specialists = result?.items ?? []
@@ -74,6 +81,8 @@ export function Specialists() {
   const openNew = () => {
     setEditing(null)
     setErrs({})
+    setAvatarFile(null)
+    setAvatarCleared(false)
     setForm({ ...EMPTY_FORM, locationId: lockedLocation ?? locations[0]?.id ?? '' })
     setModalOpen(true)
   }
@@ -81,6 +90,8 @@ export function Specialists() {
   const openEdit = (sp: Specialist) => {
     setEditing(sp)
     setErrs({})
+    setAvatarFile(null)
+    setAvatarCleared(false)
     setForm({ name: sp.name, title: sp.title, locationId: sp.locationId, phone: sp.phone, active: sp.active, services: sp.services })
     setModalOpen(true)
   }
@@ -94,12 +105,25 @@ export function Specialists() {
     if (Object.keys(e).length) { toast(t('errors.fixFields')); return }
     setSaving(true)
     try {
-      if (editing) await partnersService.updateSpecialist(editing.id, form)
-      else await partnersService.createSpecialist(form)
+      // 1) Persist the specialist first — a new one needs an id before we can
+      //    attach a photo (the avatar route is /specialists/:id/avatar).
+      const saved = editing
+        ? await partnersService.updateSpecialist(editing.id, form)
+        : await partnersService.createSpecialist(form)
+
+      // 2) Apply any staged photo change against the now-existing row.
+      if (avatarFile) {
+        await partnersService.uploadSpecialistAvatar(saved.id, avatarFile)
+      } else if (avatarCleared && editing?.avatarUrl) {
+        await partnersService.removeSpecialistAvatar(saved.id)
+      }
+
       await reload()
       notifyProfileUpdated()
       setModalOpen(false)
       setErrs({})
+      setAvatarFile(null)
+      setAvatarCleared(false)
     } catch (err) {
       toast(errorMessage(err, t))
     } finally {
@@ -136,7 +160,7 @@ export function Specialists() {
             return (
               <div key={sp.id} className={s.spCard} onClick={() => setDashboardSp(sp)}>
                 <div className={s.spCardTop}>
-                  <Avatar name={sp.name} color={partner.accent} size="lg" />
+                  <Avatar name={sp.name} src={sp.avatarUrl} color={partner.accent} size="lg" />
                   <div className={s.spCardInfo}>
                     <div className={s.spCardName}>{sp.name}</div>
                     <div className={s.spCardTitle}>{sp.title}</div>
@@ -195,7 +219,7 @@ export function Specialists() {
                   <Tr key={sp.id} onClick={() => setDashboardSp(sp)}>
                     <Td>
                       <div className={s.spInfo}>
-                        <Avatar name={sp.name} color={partner.accent} size="md" />
+                        <Avatar name={sp.name} src={sp.avatarUrl} color={partner.accent} size="md" />
                         <div>
                           <div className={s.spName}>{sp.name}</div>
                           <div className={s.spTitle}>{sp.title}</div>
@@ -250,6 +274,16 @@ export function Specialists() {
         }
       >
         <div className={s.formGrid}>
+          <div className={[s.formFull, s.avatarRow].join(' ')}>
+            <AvatarPicker
+              currentUrl={avatarCleared ? '' : editing?.avatarUrl ?? ''}
+              name={form.name}
+              accent={partner.accent}
+              onPick={(file) => { setAvatarFile(file); setAvatarCleared(false) }}
+              onClear={() => { setAvatarFile(null); setAvatarCleared(true) }}
+              onError={(msg) => toast(msg)}
+            />
+          </div>
           <div className={s.formFull}>
             <Input label={t('specialists.modal.nameLabel')} value={form.name} onChange={e => { setForm(f => ({ ...f, name: e.target.value })); setErrs(x => ({ ...x, name: '' })) }} placeholder={t('specialists.modal.namePlaceholder')} error={errs.name || undefined} />
           </div>
