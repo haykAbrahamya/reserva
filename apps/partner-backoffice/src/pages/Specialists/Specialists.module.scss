@@ -5,45 +5,117 @@
 .h1   { font-family: $font-serif; font-size: 32px; letter-spacing: -0.022em; margin: 0 0 4px; }
 .sub  { font-size: 13px; color: $fg-2; margin: 0; }
 
-/* ── Desktop table ── */
-.tableWrap {
+/* ── Desktop: profile cards ── */
+.gridWrap { display: flex; flex-direction: column; gap: 20px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+.profileCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
   background: $bg-1;
   border: 1px solid $line-1;
   border-radius: $r-2;
   box-shadow: $shadow-1;
-  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.16s cubic-bezier(0.2, 0.7, 0.1, 1), box-shadow 0.16s, border-color 0.16s;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: $line-strong;
+    box-shadow: $shadow-2;
+  }
+  &:hover .viewHint { color: $accent; }
 }
 
-.spInfo  { display: flex; align-items: center; gap: 10px; }
-.spName  { font-size: 13px; font-weight: 500; }
-.spTitle { font-size: 11px; color: $fg-2; }
+/* Edit affordance, top-right */
+.cardEdit {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: $r-1;
+  border: 1px solid transparent;
+  background: transparent;
+  color: $fg-3;
+  cursor: pointer;
+  transition: background 0.13s, color 0.13s, border-color 0.13s;
+  -webkit-tap-highlight-color: transparent;
 
-/* Hint shown on row hover */
+  &:hover { background: $bg-2; color: $fg-0; border-color: $line-2; }
+}
+
+.cardHead { display: flex; align-items: center; gap: 14px; }
+.cardAvatar { width: 56px !important; height: 56px !important; font-size: 20px !important; }
+.cardIdentity { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; padding-right: 26px; }
+.cardName {
+  font-size: 15px; font-weight: 600; color: $fg-0; letter-spacing: -0.01em;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cardTitle {
+  font-size: 12px; color: $fg-2;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.cardLoc {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12.5px; color: $fg-2; min-width: 0;
+  span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+
+.cardSvcs { display: flex; flex-wrap: wrap; gap: 6px; min-height: 24px; }
+.cardNoSvc { font-size: 12px; color: $fg-3; font-style: italic; }
+
+.svcTag {
+  display: inline-block;
+  max-width: 100%;
+  height: 24px;
+  line-height: 22px;
+  padding: 0 11px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  background: $bg-2;
+  color: $fg-1;
+  border: 1px solid $line-2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.svcTagMore { background: $accent-soft; color: $accent; border-color: transparent; }
+}
+
+/* Local "load more" footer (replaces server pagination) */
+.loadMore {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0 4px;
+}
+.loadMoreCount { font-size: 12.5px; color: $fg-3; }
+
+.cardFoot { margin-top: auto; padding-top: 4px; border-top: 1px solid $line-1; }
 .viewHint {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 500;
   color: $fg-3;
   white-space: nowrap;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  transition: color 0.15s, background 0.15s, border-color 0.15s;
-
-  tr:hover & {
-    color: $accent;
-    background: $accent-soft;
-    border-color: rgba(168, 120, 75, 0.18);
-  }
-}
-
-.services { display: flex; flex-wrap: wrap; gap: 4px; }
-.svcTag {
-  font-size: 11px; font-weight: 500;
-  padding: 2px 8px; border-radius: 999px;
-  background: $bg-2; color: $fg-1;
+  padding-top: 10px;
+  transition: color 0.15s;
 }
 
 /* ── Mobile: cards ── */
@@ -109,10 +181,12 @@
 }
 
 .svcPill {
-  display: inline-flex;
-  align-items: center;
+  /* Plain inline-block so text-overflow: ellipsis actually applies to the
+     label (an inline-flex pill won't ellipsize its own text and clips mid-word). */
+  display: inline-block;
   height: 24px;
-  padding: 0 10px;
+  line-height: 22px; /* vertically center within the 24px pill (minus borders) */
+  padding: 0 12px;
   border-radius: 999px;
   font-size: 11px;
   font-weight: 500;
@@ -120,7 +194,7 @@
   color: $fg-1;
   border: 1px solid $line-2;
   white-space: nowrap;
-  max-width: 120px;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
 

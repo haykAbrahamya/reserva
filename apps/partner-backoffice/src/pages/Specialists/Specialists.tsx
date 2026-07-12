@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Plus, User, Pencil, MapPin } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
-import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Select, Avatar, Empty, Badge, Pagination, FieldError, useToast } from '@/components/ui'
+import { Button, Toggle, Modal, Input, Select, Avatar, Empty, Badge, FieldError, useToast } from '@/components/ui'
 import { SpecialistDashboard } from '@/components/specialists/SpecialistDashboard/SpecialistDashboard'
 import { AvatarPicker } from '@/components/specialists/AvatarPicker/AvatarPicker'
 import { normalizePhoneInput } from '@reserva/shared'
@@ -35,18 +35,19 @@ export function Specialists() {
   const toast       = useToast()
   useSpotlight()
 
-  const [page,     setPage]     = useState(1)
-  const [pageSize, setPageSize] = useState(5)
+  // How many cards to reveal at once. Grows on "Load more" — the full roster is
+  // fetched once and paginated locally (no per-page round-trips).
+  const PAGE_STEP = 12
+  const [visible, setVisible] = useState(PAGE_STEP)
 
-  // Server-paginated roster. Managers are scoped to their own branch server-side.
-  const { data: result, reload } = useResource(
-    () => partnersService.listSpecialistsPaged({
-      page,
-      pageSize,
+  // Full roster, fetched once. Managers are scoped to their own branch server-side.
+  const { data: allSpecialists, reload } = useResource(
+    () => partnersService.listSpecialists({
       includeInactive: true,
       ...(scopedLocationId ? { locationId: scopedLocationId } : {}),
     }),
-    [page, pageSize, scopedLocationId],
+    [scopedLocationId],
+    [],
   )
 
   // Catalog lookups for rendering names (full lists, not paginated).
@@ -68,12 +69,9 @@ export function Specialists() {
 
   if (!partner) return null
 
-  const specialists = result?.items ?? []
-  const total       = result?.total ?? 0
-  const pageCount   = result?.pageCount ?? 1
-  const from        = total === 0 ? 0 : (page - 1) * pageSize + 1
-  const to          = Math.min(page * pageSize, total)
-  const changePageSize = (n: number) => { setPageSize(n); setPage(1) }
+  const total       = allSpecialists.length
+  const specialists = allSpecialists.slice(0, visible)
+  const hasMore     = visible < total
 
   // Managers can't reassign branches — lock the location select to their branch.
   const lockedLocation = scopedLocationId
@@ -134,6 +132,18 @@ export function Specialists() {
   const toggleSvc = (id: string) =>
     setForm(f => ({ ...f, services: f.services.includes(id) ? f.services.filter(x => x !== id) : [...f.services, id] }))
 
+  // Local "load more" footer — shared by the mobile list + desktop card grid.
+  const loadMore = total > 0 && (
+    <div className={s.loadMore}>
+      <span className={s.loadMoreCount}>{t('specialists.showingCount', { shown: specialists.length, total })}</span>
+      {hasMore && (
+        <Button variant="ghost" onClick={() => setVisible(v => v + PAGE_STEP)}>
+          {t('specialists.loadMore')}
+        </Button>
+      )}
+    </div>
+  )
+
   return (
     <div className={s.page}>
       <div className={s.head}>
@@ -155,8 +165,9 @@ export function Specialists() {
         <div className={s.cardList}>
           {specialists.map(sp => {
             const loc = locations.find(l => l.id === sp.locationId)
-            const visibleSvcs = sp.services.slice(0, 3)
-            const extra = sp.services.length - visibleSvcs.length
+            const uniqueSvcs = Array.from(new Set(sp.services))
+            const visibleSvcs = uniqueSvcs.slice(0, 3)
+            const extra = uniqueSvcs.length - visibleSvcs.length
             return (
               <div key={sp.id} className={s.spCard} onClick={() => setDashboardSp(sp)}>
                 <div className={s.spCardTop}>
@@ -188,77 +199,68 @@ export function Specialists() {
               </div>
             )
           })}
-          <Pagination
-            page={page}
-            pageCount={pageCount}
-            onPageChange={setPage}
-            pageSize={pageSize}
-            onPageSizeChange={changePageSize}
-            pageSizeLabel={t('pagination.perPage')}
-            summary={t('pagination.summary', { from, to, total })}
-          />
+          {loadMore}
         </div>
       ) : (
-        /* ── Desktop: table ── */
-        <div className={s.tableWrap}>
-          <Table>
-            <thead>
-              <tr>
-                <Th>{t('specialists.col.name')}</Th>
-                <Th>{t('specialists.col.location')}</Th>
-                <Th>{t('specialists.col.services')}</Th>
-                <Th>{t('specialists.col.active')}</Th>
-                <Th></Th>
-                <Th></Th>
-              </tr>
-            </thead>
-            <tbody>
-              {specialists.map(sp => {
-                const loc = locations.find(l => l.id === sp.locationId)
-                return (
-                  <Tr key={sp.id} onClick={() => setDashboardSp(sp)}>
-                    <Td>
-                      <div className={s.spInfo}>
-                        <Avatar name={sp.name} src={sp.avatarUrl} color={partner.accent} size="md" />
-                        <div>
-                          <div className={s.spName}>{sp.name}</div>
-                          <div className={s.spTitle}>{sp.title}</div>
-                        </div>
-                      </div>
-                    </Td>
-                    <Td>{loc?.name ?? '—'}</Td>
-                    <Td>
-                      <div className={s.services}>
-                        {sp.services.slice(0, 3).map(sid => {
+        /* ── Desktop: profile cards ── */
+        <div className={s.gridWrap}>
+          <div className={s.grid}>
+            {specialists.map(sp => {
+              const loc = locations.find(l => l.id === sp.locationId)
+              // Dedupe defensively — a specialist can carry duplicate service ids
+              // from the join, and we never want the same tag rendered twice.
+              const uniqueSvcs = Array.from(new Set(sp.services))
+              const shownSvcs = uniqueSvcs.slice(0, 3)
+              const extra = uniqueSvcs.length - shownSvcs.length
+              return (
+                <div key={sp.id} className={s.profileCard} onClick={() => setDashboardSp(sp)}>
+                  <button
+                    className={s.cardEdit}
+                    onClick={e => { e.stopPropagation(); openEdit(sp) }}
+                    aria-label={t('common.edit')}
+                  >
+                    <Pencil size={13} />
+                  </button>
+
+                  <div className={s.cardHead}>
+                    <Avatar name={sp.name} src={sp.avatarUrl} color={partner.accent} size="lg" className={s.cardAvatar} />
+                    <div className={s.cardIdentity}>
+                      <div className={s.cardName}>{sp.name}</div>
+                      {sp.title && <div className={s.cardTitle}>{sp.title}</div>}
+                      <Badge
+                        variant={sp.active ? 'active' : 'inactive'}
+                        label={sp.active ? t('common.active') : t('common.inactive')}
+                      />
+                    </div>
+                  </div>
+
+                  <div className={s.cardLoc}>
+                    <MapPin size={13} style={{ flexShrink: 0 }} />
+                    <span>{loc?.name ?? '—'}</span>
+                  </div>
+
+                  <div className={s.cardSvcs}>
+                    {shownSvcs.length === 0 ? (
+                      <span className={s.cardNoSvc}>{t('specialists.noServices')}</span>
+                    ) : (
+                      <>
+                        {shownSvcs.map(sid => {
                           const svc = services.find(sv => sv.id === sid)
                           return svc ? <span key={sid} className={s.svcTag}>{svc.name}</span> : null
                         })}
-                        {sp.services.length > 3 && <span className={s.svcTag}>+{sp.services.length - 3}</span>}
-                      </div>
-                    </Td>
-                    <Td><Badge variant={sp.active ? 'active' : 'inactive'} label={sp.active ? t('common.active') : t('common.inactive')} /></Td>
-                    <Td>
-                      <Button variant="ghost" size="sm" icon onClick={e => { e.stopPropagation(); openEdit(sp) }}>
-                        <Pencil size={13} />
-                      </Button>
-                    </Td>
-                    <Td>
-                      <span className={s.viewHint}>{t('specialists.viewStats')}</span>
-                    </Td>
-                  </Tr>
-                )
-              })}
-            </tbody>
-          </Table>
-          <Pagination
-            page={page}
-            pageCount={pageCount}
-            onPageChange={setPage}
-            pageSize={pageSize}
-            onPageSizeChange={changePageSize}
-            pageSizeLabel={t('pagination.perPage')}
-            summary={t('pagination.summary', { from, to, total })}
-          />
+                        {extra > 0 && <span className={[s.svcTag, s.svcTagMore].join(' ')}>+{extra}</span>}
+                      </>
+                    )}
+                  </div>
+
+                  <div className={s.cardFoot}>
+                    <span className={s.viewHint}>{t('specialists.viewStats')}</span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          {loadMore}
         </div>
       )}
 

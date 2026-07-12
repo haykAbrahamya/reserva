@@ -394,6 +394,9 @@
     "emptyTitle": "No specialists yet",
     "emptyDesc": "Add your first team member.",
     "viewStats": "View stats →",
+    "noServices": "No services assigned",
+    "loadMore": "Load more",
+    "showingCount": "Showing {shown} of {total}",
     "col": {
       "name": "Name",
       "location": "Location",

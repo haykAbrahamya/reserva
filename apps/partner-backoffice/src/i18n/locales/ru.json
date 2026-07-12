@@ -394,6 +394,9 @@
     "emptyTitle": "Специалистов пока нет",
     "emptyDesc": "Добавьте первого члена команды.",
     "viewStats": "Статистика →",
+    "noServices": "Нет услуг",
+    "loadMore": "Показать ещё",
+    "showingCount": "Показано {shown} из {total}",
     "col": {
       "name": "Имя",
       "location": "Филиал",
