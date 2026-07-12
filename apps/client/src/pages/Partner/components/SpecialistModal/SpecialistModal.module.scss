@@ -69,7 +69,9 @@
 /* ── Header banner (branded gradient) ── */
 .banner {
   position: relative;
-  padding: 30px 24px 22px;
+  /* Extra right padding reserves a lane for the close button (top-right at
+     right:14px, 34px wide) so a long specialist name never runs under it. */
+  padding: 30px 62px 22px 24px;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -100,9 +102,29 @@
   border: 2px solid rgba(255,255,255,0.3);
   box-shadow: 0 6px 18px rgba(0,0,0,0.25);
 }
-.bannerInfo { position: relative; min-width: 0; }
-.spName { font-family: $font-serif; font-size: 24px; letter-spacing: -0.01em; color: #fff; line-height: 1.1; }
-.spTitle { font-size: 14px; color: rgba(255,255,255,0.82); margin-top: 3px; }
+.bannerInfo { position: relative; min-width: 0; flex: 1; }
+.spName {
+  font-family: $font-serif;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  color: #fff;
+  line-height: 1.15;
+  /* Wrap long names onto up to 2 lines instead of overflowing under the ✕. */
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.spTitle {
+  font-size: 14px;
+  color: rgba(255,255,255,0.82);
+  margin-top: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .spRating {
   display: inline-flex;
   align-items: center;
