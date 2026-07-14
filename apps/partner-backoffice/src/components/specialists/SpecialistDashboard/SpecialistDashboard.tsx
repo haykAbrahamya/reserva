@@ -139,8 +139,10 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
         )}
 
         <div className={s.heroBody}>
-          <div className={s.heroAvatar} style={{ background: accentColor }}>
-            {initials(sp.name)}
+          <div className={s.heroAvatar} style={{ background: sp.avatarUrl ? undefined : accentColor }}>
+            {sp.avatarUrl
+              ? <img src={sp.avatarUrl} alt={sp.name} className={s.heroAvatarImg} />
+              : initials(sp.name)}
           </div>
           <div className={s.heroInfo}>
             <div className={s.heroName}>{sp.name}</div>
