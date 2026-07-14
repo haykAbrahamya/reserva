@@ -22,6 +22,12 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
+// Curated SEO category landing pages — the SAME list the client route uses
+// (src/lib/categories.ts imports this JSON too). Single source of truth.
+const SEO_CATEGORIES = JSON.parse(
+  readFileSync(fileURLToPath(new URL('../src/lib/categories.data.json', import.meta.url)), 'utf-8'),
+)
+
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = resolve(__dirname, '..')
 const distDir = resolve(root, 'dist')
@@ -90,12 +96,16 @@ function partnerMeta(salon) {
   return { title, description }
 }
 
-/** LocalBusiness JSON-LD for a listed salon — matches the runtime PartnerPage LD. */
+/** LocalBusiness + BreadcrumbList JSON-LD for a listed salon (matches the
+ *  runtime PartnerPage @graph). */
 function partnerJsonLd(salon) {
   const url = `${SITE}/p/${encodeURIComponent(salon.slug)}`
-  const ld = {
-    '@context': 'https://schema.org',
+  const geo = (salon.locations || []).find(
+    (l) => typeof l.lat === 'number' && typeof l.lng === 'number',
+  )
+  const business = {
     '@type': 'HealthAndBeautyBusiness',
+    '@id': `${url}#business`,
     name: salon.name,
     url,
     ...(salon.tagline ? { description: String(salon.tagline).slice(0, 300) } : {}),
@@ -113,9 +123,11 @@ function partnerJsonLd(salon) {
       ? {
           address: salon.locations
             .filter((l) => l.address)
-            .map((l) => ({ '@type': 'PostalAddress', streetAddress: l.address, addressCountry: 'AM' })),
+            .map((l) => ({ '@type': 'PostalAddress', streetAddress: l.address, addressLocality: 'Yerevan', addressCountry: 'AM' })),
         }
       : {}),
+    ...(geo ? { geo: { '@type': 'GeoCoordinates', latitude: geo.lat, longitude: geo.lng } } : {}),
+    areaServed: { '@type': 'Country', name: 'Armenia' },
     ...(Array.isArray(salon.categories) && salon.categories.length
       ? {
           hasOfferCatalog: {
@@ -129,7 +141,15 @@ function partnerJsonLd(salon) {
         }
       : {}),
   }
-  return ld
+  const breadcrumb = {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Reserva', item: SITE },
+      { '@type': 'ListItem', position: 2, name: 'Սրահներ', item: `${SITE}/salons` },
+      { '@type': 'ListItem', position: 3, name: salon.name, item: url },
+    ],
+  }
+  return { '@context': 'https://schema.org', '@graph': [business, breadcrumb] }
 }
 
 /** Make a possibly-relative uploads path absolute against the API origin. */
@@ -157,6 +177,91 @@ function partnerSeoBody(salon) {
     (salon.tagline ? `<p>${esc(salon.tagline)}</p>` : '') +
     (cats ? `<h2>Ծառայություններ</h2><ul>${cats}</ul>` : '') +
     (addrs ? `<h2>Հասցե</h2><ul>${addrs}</ul>` : '') +
+    `</div>`
+  )
+}
+
+/** CollectionPage + ItemList JSON-LD for the /salons directory. */
+function salonsDirectoryJsonLd(salons) {
+  const url = `${SITE}/salons`
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Սրահներ և ստուդիաներ',
+    description:
+      'Հայկական լավագույն սրահները, վարսավիրանոցներն ու գեղեցկության ստուդիաները — ամրագրեք ժամ առցանց։',
+    url,
+    breadcrumb: {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Reserva', item: SITE },
+        { '@type': 'ListItem', position: 2, name: 'Սրահներ', item: url },
+      ],
+    },
+    ...(salons.length
+      ? {
+          mainEntity: {
+            '@type': 'ItemList',
+            itemListElement: salons.slice(0, 30).map((s, i) => ({
+              '@type': 'ListItem',
+              position: i + 1,
+              url: `${SITE}/p/${encodeURIComponent(s.slug)}`,
+              name: s.name,
+            })),
+          },
+        }
+      : {}),
+  }
+}
+
+/** CollectionPage + BreadcrumbList JSON-LD for a category landing page. */
+function categoryJsonLd(cat, salons) {
+  const url = `${SITE}/salons/c/${cat.slug}`
+  const matching = salons.filter((s) =>
+    (s.categories || []).some((c) => String(c).toLowerCase().includes(cat.match.toLowerCase())),
+  )
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: cat.h1,
+    description: cat.description,
+    url,
+    breadcrumb: {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Reserva', item: SITE },
+        { '@type': 'ListItem', position: 2, name: 'Սրահներ', item: `${SITE}/salons` },
+        { '@type': 'ListItem', position: 3, name: cat.h1, item: url },
+      ],
+    },
+    ...(matching.length
+      ? {
+          mainEntity: {
+            '@type': 'ItemList',
+            itemListElement: matching.slice(0, 20).map((s, i) => ({
+              '@type': 'ListItem',
+              position: i + 1,
+              url: `${SITE}/p/${encodeURIComponent(s.slug)}`,
+              name: s.name,
+            })),
+          },
+        }
+      : {}),
+  }
+}
+
+/** Crawlable text block for a category page: H1 + intro + matching salon links. */
+function categorySeoBody(cat, salons) {
+  const matching = salons.filter((s) =>
+    (s.categories || []).some((c) => String(c).toLowerCase().includes(cat.match.toLowerCase())),
+  )
+  const items = matching
+    .map((s) => `<li><a href="${SITE}/p/${encodeURIComponent(s.slug)}">${esc(s.name)}</a></li>`)
+    .join('')
+  return (
+    `<div id="seo-content" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">` +
+    `<h1>${esc(cat.h1)}</h1><p>${esc(cat.intro)}</p>` +
+    (items ? `<ul>${items}</ul>` : '') +
     `</div>`
   )
 }
@@ -231,6 +336,10 @@ async function main() {
   }
   const { render } = await import(pathToFileURL(ssrEntry).href)
 
+  // Fetch the listed salons up front — used for partner pages, category pages,
+  // AND the /salons directory's CollectionPage + ItemList structured data.
+  const salons = await fetchListedSalons()
+
   for (const [url, meta] of Object.entries(ROUTES)) {
     try {
       let bodyHtml = ''
@@ -240,7 +349,9 @@ async function main() {
         console.warn(`[prerender] render failed for ${url} — using SPA shell:`, err?.message)
       }
 
-      let html = injectHead(template, url, meta)
+      // /salons gets a CollectionPage + ItemList of listed salons baked in.
+      const routeLd = url === '/salons' ? salonsDirectoryJsonLd(salons) : undefined
+      let html = injectHead(template, url, meta, routeLd ? { jsonLd: routeLd } : undefined)
       // Bake the FAQPage schema into the home page's static HTML.
       if (url === '/') {
         const ld = faqJsonLd()
@@ -263,13 +374,8 @@ async function main() {
   }
 
   // ── Partner pages (/p/<slug>) — marketplace-listed salons only ──
-  // The API list endpoint already filters to marketplaceListed && active, so
-  // unlisted/private partners are never prerendered or advertised to Google.
-  const salons = await fetchListedSalons()
-  if (!salons.length) {
-    console.log('[prerender] no listed salons to prerender.')
-    return
-  }
+  // (salons fetched once at the top of main(); the list endpoint already filters
+  // to marketplaceListed && active, so unlisted partners are never prerendered.)
   let ok = 0
   for (const salon of salons) {
     const url = `/p/${salon.slug}`
@@ -306,6 +412,41 @@ async function main() {
     }
   }
   console.log(`[prerender] ✓ ${ok}/${salons.length} partner page(s) → dist/p/<slug>/index.html`)
+
+  // ── Category keyword landing pages (/salons/c/<slug>) ──
+  // Prerendered regardless of salon count — they target generic Armenian search
+  // terms (e.g. "Մատնահարդարում") and stay valuable even when a category is
+  // temporarily empty.
+  let catOk = 0
+  for (const cat of SEO_CATEGORIES) {
+    const url = `/salons/c/${cat.slug}`
+    try {
+      const meta = { title: `${cat.title} | Reserva`, description: cat.description }
+      const canonical = `${SITE}/salons/c/${cat.slug}`
+      let bodyHtml = ''
+      try {
+        bodyHtml = render(url)
+      } catch {
+        /* SPA shell is fine — the injected SEO body carries the crawlable text */
+      }
+      let html = injectHead(template, url, meta, {
+        canonical,
+        jsonLd: categoryJsonLd(cat, salons),
+      })
+      if (bodyHtml) {
+        html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`)
+      }
+      html = html.replace('</body>', `${categorySeoBody(cat, salons)}</body>`)
+
+      const outPath = resolve(distDir, `salons/c/${cat.slug}/index.html`)
+      mkdirSync(dirname(outPath), { recursive: true })
+      writeFileSync(outPath, html)
+      catOk++
+    } catch (err) {
+      console.warn(`[prerender] skipped ${url}:`, err?.message)
+    }
+  }
+  console.log(`[prerender] ✓ ${catOk}/${SEO_CATEGORIES.length} category page(s) → dist/salons/c/<slug>/index.html`)
 }
 
 main().catch((err) => {

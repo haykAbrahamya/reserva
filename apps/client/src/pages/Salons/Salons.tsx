@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams, useParams } from 'react-router-dom'
 import { Search, Scissors, MapPin, X, SearchX, Sparkles, Loader2, SlidersHorizontal, ArrowUpDown, Navigation } from 'lucide-react'
 import { Select } from '@reserva/ui'
 import { Logo } from '@/components/Logo/Logo'
@@ -12,6 +12,7 @@ import { distanceKm, type LatLng } from '@/lib/geo'
 import { useSeo } from '@/hooks/useSeo'
 import { useScrollToTop } from '@/hooks/useScrollToTop'
 import { useT } from '@/i18n'
+import { categoryBySlug } from '@/lib/categories'
 import { SalonCard } from './SalonCard'
 import s from './Salons.module.scss'
 
@@ -50,13 +51,23 @@ function paramsFromFilters(f: Filters): URLSearchParams {
 
 export function Salons() {
   const t = useT()
-  useSeo({ title: t('seo.salons.title'), description: t('seo.salons.description'), path: '/salons' })
   useScrollToTop()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
+  const { category: categorySlug } = useParams()
+
+  // On a /salons/c/<slug> landing page this resolves the curated category (H1,
+  // keyword title/description, and the DB term to pre-filter by). undefined on
+  // the plain /salons directory.
+  const seoCategory = categorySlug ? categoryBySlug(categorySlug) : undefined
 
   // Seed filters from the URL so returning to /salons?q=… restores the search.
-  const [filters, setFilters] = useState<Filters>(() => filtersFromParams(searchParams))
+  // A category landing page pre-seeds the service filter from its curated term.
+  const [filters, setFilters] = useState<Filters>(() =>
+    seoCategory
+      ? { ...EMPTY, service: seoCategory.match }
+      : filtersFromParams(searchParams),
+  )
   const [salons, setSalons] = useState<Salon[] | null>(null)
   // First-load skeletons vs. re-search: on re-search we KEEP the current results
   // on screen (no grid teardown) and show a subtle inline spinner instead, so
@@ -108,12 +119,13 @@ export function Salons() {
       })
   }, [])
 
-  // Initial load — fetch with whatever the URL seeded (restores prior search).
+  // Initial load — fetch with whatever seeded the filters (a category landing
+  // page pre-filters by its term; the plain directory restores the URL search).
   useEffect(() => {
-    runFetch(filtersFromParams(searchParams), true)
+    runFetch(filters, true)
     return () => abortRef.current?.abort()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [runFetch])
+  }, [runFetch, seoCategory])
 
   // Reflect filters into the URL (replace, so Back returns to the previous page,
   // not through every keystroke). Coming back to this URL restores the search.
@@ -182,6 +194,50 @@ export function Salons() {
 
   const count = salons?.length ?? 0
 
+  // ── SEO ── directory vs. keyword-category landing page.
+  const SITE = 'https://reserva.am'
+  const seoPath = seoCategory ? `/salons/c/${seoCategory.slug}` : '/salons'
+  const seoTitle = seoCategory ? `${seoCategory.title} | Reserva` : t('seo.salons.title')
+  const seoDescription = seoCategory ? seoCategory.description : t('seo.salons.description')
+
+  // CollectionPage + BreadcrumbList + an ItemList of the (loaded) salons, so a
+  // category page ships rich structured data Google can turn into a list result.
+  const seoJsonLd = useMemo(() => {
+    const url = `${SITE}${seoPath}`
+    const breadcrumb = {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Reserva', item: SITE },
+        { '@type': 'ListItem', position: 2, name: t('salons.hero.title'), item: `${SITE}/salons` },
+        ...(seoCategory
+          ? [{ '@type': 'ListItem', position: 3, name: seoCategory.h1, item: url }]
+          : []),
+      ],
+    }
+    const itemList = sortedSalons && sortedSalons.length
+      ? {
+          '@type': 'ItemList',
+          itemListElement: sortedSalons.slice(0, 20).map((sl, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            url: sl.slug ? `${SITE}/p/${sl.slug}` : undefined,
+            name: sl.name,
+          })),
+        }
+      : undefined
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: seoCategory ? seoCategory.h1 : t('salons.hero.title'),
+      description: seoDescription,
+      url,
+      breadcrumb,
+      ...(itemList ? { mainEntity: itemList } : {}),
+    }
+  }, [seoPath, seoCategory, seoDescription, sortedSalons, t])
+
+  useSeo({ title: seoTitle, description: seoDescription, path: seoPath, jsonLd: seoJsonLd })
+
   // A category chip is "active" when it's the current service filter.
   const activeCategory = filters.service.trim().toLowerCase()
   const toggleCategory = (cat: string) => {
@@ -207,8 +263,8 @@ export function Salons() {
         <div className={s.heroWash} />
         <div className={s.heroInner}>
           <span className={s.eyebrow}><Sparkles size={13} /> {t('salons.hero.eyebrow')}</span>
-          <h1 className={s.title}>{t('salons.hero.title')}</h1>
-          <p className={s.subtitle}>{t('salons.hero.subtitle')}</p>
+          <h1 className={s.title}>{seoCategory ? seoCategory.h1 : t('salons.hero.title')}</h1>
+          <p className={s.subtitle}>{seoCategory ? seoCategory.intro : t('salons.hero.subtitle')}</p>
 
           {/* ── Desktop: inline 3-field search bar ── */}
           <div className={s.searchBar}>

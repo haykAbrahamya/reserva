@@ -14,6 +14,28 @@ import { useT } from '@/i18n'
 import type { Specialist } from '@reserva/shared'
 import s from './PartnerPage.module.scss'
 
+// Map our weekly schedule ({ mon: { enabled, start, end }, … }) to schema.org
+// OpeningHoursSpecification entries. Used in the partner LocalBusiness JSON-LD.
+const DOW: Record<string, string> = {
+  mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday',
+  fri: 'Friday', sat: 'Saturday', sun: 'Sunday',
+}
+function openingHoursSpec(hours: unknown): Array<Record<string, unknown>> {
+  if (!hours || typeof hours !== 'object') return []
+  const out: Array<Record<string, unknown>> = []
+  for (const [key, day] of Object.entries(hours as Record<string, { enabled?: boolean; start?: string; end?: string }>)) {
+    const name = DOW[key]
+    if (!name || !day?.enabled || !day.start || !day.end) continue
+    out.push({
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: name,
+      opens: day.start,
+      closes: day.end,
+    })
+  }
+  return out
+}
+
 export function PartnerPage() {
   const slug = useTenantSlug()
   const t = useT()
@@ -46,40 +68,86 @@ export function PartnerPage() {
   // can surface for "<salon name>" and local "book <service>" searches. Called
   // unconditionally (rules of hooks) with safe fallbacks until the data loads.
   const seoName = partner?.name ?? 'Reserva'
+  const partnerUrl = slug ? `https://reserva.am/p/${slug}` : 'https://reserva.am'
   useSeo({
     title: partner ? t('seo.partner.title', { name: seoName }) : t('seo.home.title'),
     description: partner
       ? (partner.presentation?.about?.slice(0, 160) || t('seo.partner.description', { name: seoName }))
       : t('seo.home.description'),
     path: slug ? `/p/${slug}` : '/',
+    image: partner?.presentation?.logoUrl || undefined,
     noindex: !partner,
     jsonLd: partner
       ? {
           '@context': 'https://schema.org',
-          '@type': 'LocalBusiness',
-          name: partner.name,
-          description: partner.presentation?.about?.slice(0, 300),
-          // Match the canonical host (reserva.am/p/:slug). The salon is also
-          // reachable at slug.reserva.am, but we canonicalize to the path form
-          // everywhere so Google sees one URL, not two duplicates.
-          url: slug ? `https://reserva.am/p/${slug}` : 'https://reserva.am',
-          address: partner.locations?.map((l) => ({
-            '@type': 'PostalAddress',
-            streetAddress: l.address,
-            addressLocality: 'Yerevan',
-            addressCountry: 'AM',
-          })),
-          telephone: partner.locations?.[0]?.phone,
-          areaServed: { '@type': 'Country', name: 'Armenia' },
-          makesOffer: partner.services
-            ?.filter((sv) => sv.active)
-            .slice(0, 20)
-            .map((sv) => ({
-              '@type': 'Offer',
-              itemOffered: { '@type': 'Service', name: sv.name },
-              price: sv.price,
-              priceCurrency: 'AMD',
-            })),
+          '@graph': [
+            {
+              '@type': 'HealthAndBeautyBusiness',
+              '@id': `${partnerUrl}#business`,
+              name: partner.name,
+              description: partner.presentation?.about?.slice(0, 300),
+              // Match the canonical host (reserva.am/p/:slug). The salon is also
+              // reachable at slug.reserva.am, but we canonicalize to the path
+              // form everywhere so Google sees one URL, not two duplicates.
+              url: partnerUrl,
+              ...(partner.presentation?.logoUrl ? { image: partner.presentation.logoUrl } : {}),
+              ...(partner.presentation?.rating > 0 && partner.presentation?.reviews > 0
+                ? {
+                    aggregateRating: {
+                      '@type': 'AggregateRating',
+                      ratingValue: partner.presentation.rating,
+                      reviewCount: partner.presentation.reviews,
+                    },
+                  }
+                : {}),
+              address: partner.locations?.map((l) => ({
+                '@type': 'PostalAddress',
+                streetAddress: l.address,
+                addressLocality: 'Yerevan',
+                addressCountry: 'AM',
+              })),
+              // First branch with real coordinates → a geo point (helps local
+              // pack / map eligibility).
+              ...(() => {
+                const geo = partner.locations?.find(
+                  (l) => typeof l.lat === 'number' && typeof l.lng === 'number',
+                )
+                return geo
+                  ? { geo: { '@type': 'GeoCoordinates', latitude: geo.lat, longitude: geo.lng } }
+                  : {}
+              })(),
+              telephone: partner.locations?.find((l) => l.phone)?.phone,
+              // Weekly opening hours from the first branch's schedule.
+              ...(() => {
+                const spec = openingHoursSpec(partner.locations?.[0]?.hours)
+                return spec.length ? { openingHoursSpecification: spec } : {}
+              })(),
+              ...(() => {
+                const prices = partner.services?.filter((sv) => sv.active).map((sv) => sv.price) ?? []
+                return prices.length
+                  ? { priceRange: `${Math.min(...prices)}–${Math.max(...prices)} AMD` }
+                  : {}
+              })(),
+              areaServed: { '@type': 'Country', name: 'Armenia' },
+              makesOffer: partner.services
+                ?.filter((sv) => sv.active)
+                .slice(0, 20)
+                .map((sv) => ({
+                  '@type': 'Offer',
+                  itemOffered: { '@type': 'Service', name: sv.name },
+                  price: sv.price,
+                  priceCurrency: 'AMD',
+                })),
+            },
+            {
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'Reserva', item: 'https://reserva.am' },
+                { '@type': 'ListItem', position: 2, name: t('salons.hero.title'), item: 'https://reserva.am/salons' },
+                { '@type': 'ListItem', position: 3, name: partner.name, item: partnerUrl },
+              ],
+            },
+          ],
         }
       : undefined,
   })

@@ -48,6 +48,9 @@ export function AppRoutes() {
         <Route path="/signup" element={<SignUp />} />
         {/* Public salon marketplace directory */}
         <Route path="/salons" element={<Salons />} />
+        {/* Keyword/category landing — same directory, pre-filtered by service
+            category (prerendered for SEO, e.g. /salons/c/manicure). */}
+        <Route path="/salons/c/:category" element={<Salons />} />
         {/* Partner booking page — reserva.am/p/:slug (kept for dev + direct links) */}
         <Route path="/p/:slug" element={<PartnerPage />} />
         {/* Creative 404 for any unknown route */}
