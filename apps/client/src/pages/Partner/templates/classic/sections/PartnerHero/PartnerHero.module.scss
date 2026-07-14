@@ -67,6 +67,7 @@
 
 /* Letter-logo (stands in for a real logo for now) */
 .logo {
+  object-fit: cover;
   width: 80px;
   height: 80px;
   border-radius: 22px;
