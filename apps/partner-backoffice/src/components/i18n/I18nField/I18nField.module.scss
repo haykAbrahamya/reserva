@@ -1,0 +1,53 @@
+@use 'variables' as *;
+
+.wrap { display: flex; flex-direction: column; gap: 6px; }
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+/* No label → right-align the pills on their own row. */
+.headNoLabel { justify-content: flex-end; }
+.label { font-size: 12px; font-weight: 500; color: $fg-1; }
+
+.pills { display: inline-flex; gap: 4px; }
+.pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: $r-1;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-2;
+  font-family: $font-sans;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover { background: $bg-2; color: $fg-0; }
+  &.pillActive {
+    background: $accent-soft;
+    border-color: transparent;
+    color: $accent;
+  }
+}
+
+/* Small dot marking a locale that already has a translation. */
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: $accent;
+  flex-shrink: 0;
+}
+
+.hint { font-size: 11px; color: $fg-3; }

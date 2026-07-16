@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { CalendarCheck, MapPin, Phone, ChevronDown, Instagram, Facebook, Star } from 'lucide-react'
 import { WhatsappIcon } from '@reserva/ui'
-import { useT } from '@/i18n'
+import { useT, useLocalized } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
 import { bookableLocations, canBook } from '@/services/booking.service'
 import s from './PartnerHero.module.scss'
@@ -24,6 +24,7 @@ export function PartnerHero({ partner, onBook }: Props) {
   const t1 = p.heroTints[0] ?? partner.accent
   const t2 = p.heroTints[1] ?? `color-mix(in srgb, ${partner.accent} 55%, #7c3aed)`
   const t = useT()
+  const loc = useLocalized()
 
   // Hide the scroll hint once the user starts scrolling.
   const [showHint, setShowHint] = useState(true)
@@ -105,7 +106,7 @@ export function PartnerHero({ partner, onBook }: Props) {
         </div>
 
         <h1 className={s.name}>{partner.name}</h1>
-        <p className={s.tagline}>{p.tagline}</p>
+        <p className={s.tagline}>{loc(p.tagline, p.taglineI18n)}</p>
 
         <div className={s.metaRow}>
           {multiLocation ? (

@@ -4,7 +4,7 @@ import { fmtServicePrice, fmtDuration } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { canBook } from '@/services/booking.service'
-import { useT } from '@/i18n'
+import { useT, useLocalized } from '@/i18n'
 import s from './PartnerServices.module.scss'
 
 interface Props {
@@ -19,6 +19,7 @@ const INITIAL_LIMIT = 6
 
 export function PartnerServices({ partner, onBook, tone = 'cream' }: Props) {
   const t = useT()
+  const loc = useLocalized()
   const bookable = canBook(partner)
   const services = useMemo(
     () => partner.services.filter(sv => sv.active),
@@ -30,19 +31,33 @@ export function PartnerServices({ partner, onBook, tone = 'cream' }: Props) {
     return [ALL, ...Array.from(set)]
   }, [services])
 
+  // Chips keep the base category as their value; display the localized label.
+  const catLabel = (base: string): string => {
+    if (base === ALL) return t('partner.services.all')
+    const svc = services.find(sv => sv.category === base && sv.categoryI18n)
+    return svc ? loc(svc.category, svc.categoryI18n) : base
+  }
+
   const [cat, setCat] = useState(ALL)
   const [query, setQuery] = useState('')
   const [expanded, setExpanded] = useState(false)
 
-  // Category + free-text (name or category) filter, case-insensitive.
+  // Category + free-text filter — matches localized + base name/category.
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     return services.filter(sv => {
       if (cat !== ALL && sv.category !== cat) return false
       if (!q) return true
-      return sv.name.toLowerCase().includes(q) || (sv.category ?? '').toLowerCase().includes(q)
+      const name = loc(sv.name, sv.nameI18n).toLowerCase()
+      const category = loc(sv.category ?? '', sv.categoryI18n).toLowerCase()
+      return (
+        name.includes(q) ||
+        category.includes(q) ||
+        sv.name.toLowerCase().includes(q) ||
+        (sv.category ?? '').toLowerCase().includes(q)
+      )
     })
-  }, [services, cat, query])
+  }, [services, cat, query, loc])
 
   // Collapse back to the limit whenever the filter set changes.
   useEffect(() => { setExpanded(false) }, [cat, query])
@@ -85,7 +100,7 @@ export function PartnerServices({ partner, onBook, tone = 'cream' }: Props) {
                 className={[s.chip, c === cat ? s.active : ''].filter(Boolean).join(' ')}
                 onClick={() => setCat(c)}
               >
-                {c === ALL ? t('partner.services.all') : c}
+                {catLabel(c)}
               </button>
             ))}
           </div>
@@ -101,12 +116,12 @@ export function PartnerServices({ partner, onBook, tone = 'cream' }: Props) {
             {visible.map((sv, i) => (
               <Reveal key={sv.id} className={s.card} delay={(i % 2) * 60}>
                 <div className={s.cardBody}>
-                  <div className={s.svcName}>{sv.name}</div>
+                  <div className={s.svcName}>{loc(sv.name, sv.nameI18n)}</div>
                   <div className={s.svcMeta}>
                     <span className={s.metaItem}>
                       <Clock size={13} /> {fmtDuration(sv.duration, { min: t('partner.services.min'), h: t('partner.services.hour') })}
                     </span>
-                    {sv.category && <span className={s.metaCat}>{sv.category}</span>}
+                    {sv.category && <span className={s.metaCat}>{loc(sv.category, sv.categoryI18n)}</span>}
                   </div>
                 </div>
                 <div className={s.right}>

@@ -12,7 +12,8 @@ import { useScopedLocationId } from '@/store/auth.hooks'
 import { useI18n } from '@/i18n'
 import { useSpotlight } from '@/components/onboarding/useSpotlight'
 import { notifyProfileUpdated } from '@/components/onboarding/useProfileCompletion'
-import type { Specialist } from '@/types'
+import { I18nField } from '@/components/i18n/I18nField/I18nField'
+import type { Specialist, LocalizedText } from '@/types'
 import s from './Specialists.module.scss'
 
 function useIsMobile() {
@@ -25,7 +26,7 @@ function useIsMobile() {
   return m
 }
 
-const EMPTY_FORM = { name: '', title: '', locationId: '', phone: '', active: true, services: [] as string[] }
+const EMPTY_FORM = { name: '', title: '', titleI18n: null as LocalizedText | null, locationId: '', phone: '', active: true, services: [] as string[] }
 
 export function Specialists() {
   const partner     = usePartner()
@@ -90,7 +91,7 @@ export function Specialists() {
     setErrs({})
     setAvatarFile(null)
     setAvatarCleared(false)
-    setForm({ name: sp.name, title: sp.title, locationId: sp.locationId, phone: sp.phone, active: sp.active, services: sp.services })
+    setForm({ name: sp.name, title: sp.title, titleI18n: sp.titleI18n ?? null, locationId: sp.locationId, phone: sp.phone, active: sp.active, services: sp.services })
     setModalOpen(true)
   }
 
@@ -289,8 +290,19 @@ export function Specialists() {
           <div className={s.formFull}>
             <Input label={t('specialists.modal.nameLabel')} value={form.name} onChange={e => { setForm(f => ({ ...f, name: e.target.value })); setErrs(x => ({ ...x, name: '' })) }} placeholder={t('specialists.modal.namePlaceholder')} error={errs.name || undefined} />
           </div>
-          <Input label={t('specialists.modal.titleLabel')} value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder={t('specialists.modal.titlePlaceholder')} />
-          <Input label={t('specialists.modal.phoneLabel')} value={form.phone} onChange={e => setForm(f => ({ ...f, phone: normalizePhoneInput(e.target.value) }))} placeholder="+37491234567" />
+          <div className={s.formFull}>
+            <I18nField
+              label={t('specialists.modal.titleLabel')}
+              value={form.title}
+              onChange={v => setForm(f => ({ ...f, title: v }))}
+              i18n={form.titleI18n}
+              onI18nChange={next => setForm(f => ({ ...f, titleI18n: next }))}
+              placeholder={t('specialists.modal.titlePlaceholder')}
+            />
+          </div>
+          <div className={s.formFull}>
+            <Input label={t('specialists.modal.phoneLabel')} value={form.phone} onChange={e => setForm(f => ({ ...f, phone: normalizePhoneInput(e.target.value) }))} placeholder="+37491234567" />
+          </div>
           <div className={s.formFull}>
             <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('specialists.modal.locationLabel')}</label>
             <Select

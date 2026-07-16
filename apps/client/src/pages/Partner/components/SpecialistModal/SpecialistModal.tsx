@@ -8,7 +8,7 @@ import { useAppSelector } from '@/store/hooks'
 import { ModalShell } from '@/components/ModalShell/ModalShell'
 import { ReviewsPanel } from '@/components/ReviewsPanel/ReviewsPanel'
 import { canBook } from '@/services/booking.service'
-import { useI18n } from '@/i18n'
+import { useI18n, useLocalized } from '@/i18n'
 import s from './SpecialistModal.module.scss'
 
 interface Props {
@@ -21,6 +21,7 @@ interface Props {
 export function SpecialistModal({ partner, specialist, onClose, onBook }: Props) {
   const [t1, t2] = partner.presentation.heroTints
   const { t } = useI18n()
+  const loc = useLocalized()
   const theme = useAppSelector((st) => st.theme.theme)
   const brandVars = useMemo(() => partnerBrandVars(partner, theme === 'dark'), [partner, theme])
 
@@ -55,7 +56,7 @@ export function SpecialistModal({ partner, specialist, onClose, onBook }: Props)
           </div>
           <div className={s.bannerInfo}>
             <div className={s.spName}>{specialist.name}</div>
-            <div className={s.spTitle}>{specialist.title}</div>
+            <div className={s.spTitle}>{loc(specialist.title, specialist.titleI18n)}</div>
             {/* Rating only when there are real reviews — never fake stars. */}
             {rating > 0 && reviewCount > 0 && (
               <span className={s.spRating}>

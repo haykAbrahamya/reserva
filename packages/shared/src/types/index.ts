@@ -3,6 +3,17 @@
 // internal-backoffice and the public client app.
 // ─────────────────────────────────────────────────────────────
 
+/** Locales that can carry a tenant-content translation (matches app locales). */
+export type ContentLocale = 'hy' | 'en' | 'ru'
+
+/** Per-language overrides for one translatable field. Any locale may be absent
+ *  → the field falls back to its base string. See utils/localize. */
+export interface LocalizedText {
+  hy?: string | null
+  en?: string | null
+  ru?: string | null
+}
+
 /** Server-side pagination envelope returned by every list endpoint. */
 export interface Paginated<T> {
   items: T[]
@@ -42,6 +53,8 @@ export interface Specialist {
   id: string
   name: string
   title: string
+  /** Optional per-language overrides for `title` (falls back to `title`). */
+  titleI18n?: LocalizedText | null
   locationId: string
   active: boolean
   phone: string
@@ -63,6 +76,8 @@ export type ServicePriceType = 'fixed' | 'range'
 export interface Service {
   id: string
   name: string
+  /** Optional per-language overrides for `name` (falls back to `name`). */
+  nameI18n?: LocalizedText | null
   /** 'fixed' → `price` is exact. 'range' → `price`..`priceMax`. Absent = fixed. */
   priceType?: ServicePriceType
   /** Fixed price, or the LOWER bound for a range service. */
@@ -72,6 +87,8 @@ export interface Service {
   duration: number
   active: boolean
   category: string
+  /** Optional per-language overrides for `category` (falls back to `category`). */
+  categoryI18n?: LocalizedText | null
   /** Recurrence interval in total days (null = no repeat). Backoffice-only. */
   repeatEveryDays?: number | null
   /**

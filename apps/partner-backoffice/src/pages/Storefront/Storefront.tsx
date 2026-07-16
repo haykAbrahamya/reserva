@@ -3,7 +3,8 @@ import {
   Store, Instagram, Facebook, Palette, ExternalLink, FileText, Pencil,
   LayoutTemplate, Check,
 } from 'lucide-react'
-import { Button, Input, Textarea, useToast, WhatsappIcon } from '@/components/ui'
+import { Button, Input, useToast, WhatsappIcon } from '@/components/ui'
+import { I18nField } from '@/components/i18n/I18nField/I18nField'
 import { useAppStore } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import {
@@ -11,6 +12,7 @@ import {
   type PartnerProfileResponse,
 } from '@/services/partners.service'
 import { ApiError } from '@/services/http'
+import type { LocalizedText } from '@/types'
 import { useT } from '@/i18n'
 import { useSpotlight } from '@/components/onboarding/useSpotlight'
 import { notifyProfileUpdated } from '@/components/onboarding/useProfileCompletion'
@@ -63,16 +65,19 @@ function StorefrontInner({ profile, reload, setPartner, toast }: InnerProps) {
   const t = useT()
   // ── About + brand + socials ──
   const [about, setAbout] = useState(profile.presentation?.about ?? '')
+  const [aboutI18n, setAboutI18n] = useState<LocalizedText | null>(profile.presentation?.aboutI18n ?? null)
   const [accent, setAccent] = useState(profile.accent ?? '#A8784B')
   const [instagram, setInstagram] = useState(profile.presentation?.instagram ?? '')
   const [facebook, setFacebook] = useState(profile.presentation?.facebook ?? '')
   const [whatsapp, setWhatsapp] = useState(profile.presentation?.whatsapp ?? '')
   const savedAbout = profile.presentation?.about ?? ''
+  const savedAboutI18n = profile.presentation?.aboutI18n ?? null
   const savedAccent = profile.accent ?? '#A8784B'
   const savedIg = profile.presentation?.instagram ?? ''
   const savedFb = profile.presentation?.facebook ?? ''
   const savedWa = profile.presentation?.whatsapp ?? ''
   useEffect(() => { setAbout(savedAbout) }, [savedAbout])
+  useEffect(() => { setAboutI18n(savedAboutI18n) }, [savedAboutI18n])
   useEffect(() => { setAccent(savedAccent) }, [savedAccent])
   useEffect(() => { setInstagram(savedIg) }, [savedIg])
   useEffect(() => { setFacebook(savedFb) }, [savedFb])
@@ -97,6 +102,7 @@ function StorefrontInner({ profile, reload, setPartner, toast }: InnerProps) {
         presentation: {
           ...current.presentation,
           about: updated.presentation?.about ?? '',
+          aboutI18n: updated.presentation?.aboutI18n ?? null,
           instagram: updated.presentation?.instagram ?? '',
           facebook: updated.presentation?.facebook ?? '',
           whatsapp: updated.presentation?.whatsapp ?? '',
@@ -108,12 +114,16 @@ function StorefrontInner({ profile, reload, setPartner, toast }: InnerProps) {
   }
 
   // ── Saves ──
-  const aboutChanged = about.trim() !== savedAbout.trim()
+  const aboutChanged =
+    about.trim() !== savedAbout.trim() ||
+    JSON.stringify(aboutI18n ?? {}) !== JSON.stringify(savedAboutI18n ?? {})
   const saveAbout = async () => {
     if (!aboutChanged || aboutSaving) return
     setAboutSaving(true)
     try {
-      const updated = await partnersService.updateProfile({ presentation: { about: about.trim() } })
+      const updated = await partnersService.updateProfile({
+        presentation: { about: about.trim(), aboutI18n },
+      })
       syncStore(updated); await reload()
       notifyProfileUpdated()
       toast(t('storefront.about.saved'))
@@ -214,12 +224,15 @@ function StorefrontInner({ profile, reload, setPartner, toast }: InnerProps) {
           </div>
         </div>
         <div className={s.cardBody}>
-          <Textarea
-            value={about}
-            onChange={(e) => setAbout(e.target.value)}
-            placeholder={t('storefront.about.placeholder')}
+          <I18nField
+            label=""
+            multiline
             rows={5}
-            maxLength={4000}
+            value={about}
+            onChange={setAbout}
+            i18n={aboutI18n}
+            onI18nChange={setAboutI18n}
+            placeholder={t('storefront.about.placeholder')}
           />
           <div className={s.aboutFoot}>
             <span className={s.charCount}>{about.length}/4000</span>

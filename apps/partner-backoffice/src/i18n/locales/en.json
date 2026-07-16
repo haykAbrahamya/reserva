@@ -1,4 +1,9 @@
 {
+  "i18nField": {
+    "base": "Base",
+    "translatePlaceholder": "In {lang}…",
+    "overrideHint": "Leave blank to use the base text for this language."
+  },
   "onboarding": {
     "title": "Complete your profile",
     "subtitle": "A few steps and you're ready to be booked.",

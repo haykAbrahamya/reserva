@@ -2,7 +2,7 @@ import { MapPin, Sparkles, Users, Tag } from 'lucide-react'
 import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { bookableLocations } from '@/services/booking.service'
-import { useT } from '@/i18n'
+import { useT, useLocalized } from '@/i18n'
 import s from './PartnerAbout.module.scss'
 
 interface Props {
@@ -19,6 +19,7 @@ export function PartnerAbout({ partner, tone = 'plain' }: Props) {
   const activeStaff = partner.specialists.filter(sp => sp.active).length
   const serviceCount = partner.services.filter(sv => sv.active).length
   const t = useT()
+  const tr = useLocalized()
 
   // A solo pro IS the whole team, so the "Specialists · N on the team" fact is
   // meaningless — drop it in single mode and keep the remaining facts.
@@ -49,7 +50,7 @@ export function PartnerAbout({ partner, tone = 'plain' }: Props) {
       <div className={s.inner}>
         <Reveal className={s.about}>
           <div className={s.eyebrow}>{t('partner.about.eyebrow', { name: partner.name })}</div>
-          <p className={s.aboutText}>{p.about}</p>
+          <p className={s.aboutText}>{tr(p.about, p.aboutI18n)}</p>
         </Reveal>
 
         <Reveal className={s.facts} delay={100}>

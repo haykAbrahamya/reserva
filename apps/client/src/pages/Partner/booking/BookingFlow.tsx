@@ -19,7 +19,7 @@ import { friendlyError } from '@/services/errors'
 import { ModalShell } from '@/components/ModalShell/ModalShell'
 import { partnerBrandVars } from '../partnerBrand'
 import { useAppSelector } from '@/store/hooks'
-import { useT, useI18n, LOCALE_META } from '@/i18n'
+import { useT, useI18n, useLocalized, LOCALE_META } from '@/i18n'
 import { addToCalendar } from '@/lib/ics'
 import s from './BookingFlow.module.scss'
 
@@ -38,6 +38,7 @@ const ANY_SPECIALIST = '__any__'
 export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, onClose }: Props) {
   const t = useT()
   const { locale } = useI18n()
+  const loc = useLocalized()
   // The modal portals to <body>, escaping the page's brand-scoped vars — so
   // re-apply the partner's accent here for on-brand coloring.
   const theme = useAppSelector((st) => st.theme.theme)
@@ -354,9 +355,10 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
     const end = new Date(start.getTime() + service.duration * 60_000)
 
     const spName = chosenSpecialist?.name
-    const title = t('booking.ics.title', { service: service.name, salon: partner.name })
+    const svcName = loc(service.name, service.nameI18n)
+    const title = t('booking.ics.title', { service: svcName, salon: partner.name })
     const description = t('booking.ics.description', {
-      service: service.name,
+      service: svcName,
       salon: partner.name,
       specialist: spName ?? t('booking.ics.anySpecialist'),
     })
@@ -640,7 +642,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
                       <div className={s.optBody}>
                         <div className={s.optName}>{sp.name}</div>
                         <div className={s.optMeta}>
-                          <span>{sp.title}</span>
+                          <span>{loc(sp.title, sp.titleI18n)}</span>
                           {(sp.rating ?? 0) > 0 && (sp.reviewCount ?? 0) > 0 && (
                             <StarRatingDisplay value={sp.rating!} count={sp.reviewCount!} size={12} compact />
                           )}
@@ -813,14 +815,18 @@ function ServiceStep({ partner, selectedId, onSelect }: {
   onSelect: (id: string) => void
 }) {
   const t = useT()
+  const loc = useLocalized()
   const services = partner.services.filter(sv => sv.active)
   const categories = Array.from(new Set(services.map(sv => sv.category)))
 
   return (
     <div>
-      {categories.map(cat => (
+      {categories.map(cat => {
+        const catSvc = services.find(sv => sv.category === cat && sv.categoryI18n)
+        const catText = catSvc ? loc(catSvc.category, catSvc.categoryI18n) : cat
+        return (
         <div key={cat}>
-          <div className={s.catLabel}>{cat}</div>
+          <div className={s.catLabel}>{catText}</div>
           {services.filter(sv => sv.category === cat).map(sv => (
             <button
               key={sv.id}
@@ -828,7 +834,7 @@ function ServiceStep({ partner, selectedId, onSelect }: {
               onClick={() => onSelect(sv.id)}
             >
               <div className={s.optBody}>
-                <div className={s.optName}>{sv.name}</div>
+                <div className={s.optName}>{loc(sv.name, sv.nameI18n)}</div>
                 <div className={s.optMeta}>
                   <span><Clock size={12} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 4 }} />{fmtDuration(sv.duration, { min: t('partner.services.min'), h: t('partner.services.hour') })}</span>
                   {sv.requiresSpecialist === false && (
@@ -843,7 +849,8 @@ function ServiceStep({ partner, selectedId, onSelect }: {
             </button>
           ))}
         </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
@@ -863,6 +870,7 @@ function SummaryRows({ service, specialist, anySpecialist, hideSpecialist, locat
 }) {
   const t = useT()
   const { locale } = useI18n()
+  const loc = useLocalized()
   const dateLabel = new Date(`${date}T00:00:00`).toLocaleDateString(LOCALE_META[locale].lang, {
     weekday: 'long', day: 'numeric', month: 'long',
   })
@@ -878,7 +886,7 @@ function SummaryRows({ service, specialist, anySpecialist, hideSpecialist, locat
   return (
     <>
       {location && <Row icon={<MapPin size={15} />} label={t('booking.summary.branch')} value={location} />}
-      <Row icon={<Sparkles size={15} />} label={t('booking.summary.service')} value={service?.name ?? '—'} />
+      <Row icon={<Sparkles size={15} />} label={t('booking.summary.service')} value={service ? loc(service.name, service.nameI18n) : '—'} />
       {!hideSpecialist && (
         <Row
           icon={<Users size={15} />}

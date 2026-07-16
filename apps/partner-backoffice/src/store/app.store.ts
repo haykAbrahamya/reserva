@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { Partner } from '@/types'
+import type { Partner, LocalizedText } from '@/types'
 
 /**
  * The partner profile held in the store: identity + branding only. The catalog
@@ -27,6 +27,9 @@ export type PartnerProfile = Omit<Partner, 'locations' | 'services' | 'specialis
   /** Public marketing fields edited in the Storefront section. */
   presentation?: {
     about?: string
+    aboutI18n?: LocalizedText | null
+    tagline?: string
+    taglineI18n?: LocalizedText | null
     instagram?: string
     facebook?: string
     whatsapp?: string

@@ -1,4 +1,4 @@
-import type { Partner } from '@reserva/shared'
+import type { Partner, LocalizedText } from '@reserva/shared'
 
 /** A gallery / works tile: a simple photo, a before/after pair, or a legacy
  *  color-tone placeholder. */
@@ -17,7 +17,11 @@ export interface GalleryTile {
  */
 export interface PartnerPresentation {
   tagline: string
+  /** Optional per-language overrides for `tagline` (falls back to `tagline`). */
+  taglineI18n?: LocalizedText | null
   about: string
+  /** Optional per-language overrides for `about` (falls back to `about`). */
+  aboutI18n?: LocalizedText | null
   rating: number
   logoUrl?: string;
   reviews: number

@@ -1,6 +1,6 @@
 import { MapPin, Phone, Instagram, Facebook, Star } from 'lucide-react'
 import { WhatsappIcon } from '@reserva/ui'
-import { useT } from '@/i18n'
+import { useT, useLocalized } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
 import { bookableLocations } from '@/services/booking.service'
 import s from './TabbedHero.module.scss'
@@ -18,6 +18,7 @@ interface Props {
 export function TabbedHero({ partner }: Props) {
   const { presentation: p } = partner
   const t = useT()
+  const loc = useLocalized()
   const locations = bookableLocations(partner)
   const primary = locations[0]
   const t1 = p.heroTints[0] ?? partner.accent
@@ -55,7 +56,7 @@ export function TabbedHero({ partner }: Props) {
             )}
           </div>
           <h1 className={s.name}>{partner.name}</h1>
-          {p.tagline && <p className={s.tagline}>{p.tagline}</p>}
+          {p.tagline && <p className={s.tagline}>{loc(p.tagline, p.taglineI18n)}</p>}
           {primary && (
             <span className={s.meta}>
               <MapPin size={15} /> {primary.address}

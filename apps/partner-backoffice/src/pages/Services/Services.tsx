@@ -9,7 +9,8 @@ import { errorMessage } from '@/utils/errors'
 import { useI18n } from '@/i18n'
 import { useSpotlight } from '@/components/onboarding/useSpotlight'
 import { notifyProfileUpdated } from '@/components/onboarding/useProfileCompletion'
-import type { Service } from '@/types'
+import { I18nField } from '@/components/i18n/I18nField/I18nField'
+import type { Service, LocalizedText } from '@/types'
 import s from './Services.module.scss'
 
 function useIsMobile() {
@@ -29,6 +30,9 @@ const EMPTY_FORM = {
   priceType: 'fixed' as 'fixed' | 'range', priceMax: '',
   // Facility/entry service (spa): no specialist, N concurrent spots per slot.
   requiresSpecialist: true, capacity: '1',
+  // Per-language overrides for name + category (null = base only).
+  nameI18n: null as LocalizedText | null,
+  categoryI18n: null as LocalizedText | null,
 }
 
 // Repeat period is stored as TOTAL DAYS. The form edits months + days; 1 month
@@ -99,6 +103,8 @@ export function Services() {
       priceMax: svc.priceMax != null ? String(svc.priceMax) : '',
       requiresSpecialist: svc.requiresSpecialist ?? true,
       capacity: String(svc.capacity ?? 1),
+      nameI18n: svc.nameI18n ?? null,
+      categoryI18n: svc.categoryI18n ?? null,
       ...fromTotalDays(svc.repeatEveryDays),
     })
     setRepeatOpen(!!svc.repeatEveryDays) // auto-expand if a period already exists
@@ -127,11 +133,13 @@ export function Services() {
 
     const data = {
       name: form.name.trim(),
+      nameI18n: form.nameI18n,
       priceType: form.priceType,
       price: Number(form.price),
       priceMax: form.priceType === 'range' ? Number(form.priceMax) : null,
       duration: Number(form.duration),
       category: form.category,
+      categoryI18n: form.categoryI18n,
       active: form.active,
       repeatEveryDays: toTotalDays(form.repeatMonths, form.repeatDays),
       requiresSpecialist: form.requiresSpecialist,
@@ -295,7 +303,15 @@ export function Services() {
       >
         <div className={s.formGrid}>
           <div className={s.formFull}>
-            <Input label={t('services.modal.nameLabel')} value={form.name} onChange={e => { setForm(f => ({ ...f, name: e.target.value })); setErrs(x => ({ ...x, name: '' })) }} placeholder={t('services.modal.namePlaceholder')} error={errs.name || undefined} />
+            <I18nField
+              label={t('services.modal.nameLabel')}
+              value={form.name}
+              onChange={v => { setForm(f => ({ ...f, name: v })); setErrs(x => ({ ...x, name: '' })) }}
+              i18n={form.nameI18n}
+              onI18nChange={next => setForm(f => ({ ...f, nameI18n: next }))}
+              placeholder={t('services.modal.namePlaceholder')}
+              error={errs.name || undefined}
+            />
           </div>
           {/* Pricing — a fixed amount, or a "from – to" range (e.g. a service
               whose price depends on hair length). The toggle picks the mode;
@@ -322,7 +338,14 @@ export function Services() {
           )}
           <Input label={t('services.modal.durationLabel')} type="number" value={form.duration} onChange={e => { setForm(f => ({ ...f, duration: e.target.value })); setErrs(x => ({ ...x, duration: '' })) }} placeholder={t('services.modal.durationPlaceholder')} error={errs.duration || undefined} />
           <div className={s.formFull}>
-            <Input label={t('services.modal.categoryLabel')} value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} placeholder={t('services.modal.categoryPlaceholder')} />
+            <I18nField
+              label={t('services.modal.categoryLabel')}
+              value={form.category}
+              onChange={v => setForm(f => ({ ...f, category: v }))}
+              i18n={form.categoryI18n}
+              onI18nChange={next => setForm(f => ({ ...f, categoryI18n: next }))}
+              placeholder={t('services.modal.categoryPlaceholder')}
+            />
           </div>
 
           {/* Repeat period — collapsed behind a button until needed, so the form

@@ -3,7 +3,7 @@ import type { Specialist } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { StarRatingDisplay } from '@/components/StarRating/StarRating'
-import { useI18n } from '@/i18n'
+import { useI18n, useLocalized } from '@/i18n'
 import s from './PartnerTeam.module.scss'
 
 interface Props {
@@ -14,6 +14,7 @@ interface Props {
 
 export function PartnerTeam({ partner, onSelect, tone = 'plain' }: Props) {
   const { t, tp } = useI18n()
+  const loc = useLocalized()
   const team = partner.specialists.filter(sp => sp.active)
   const [t1, t2] = partner.presentation.heroTints
 
@@ -45,7 +46,7 @@ export function PartnerTeam({ partner, onSelect, tone = 'plain' }: Props) {
                     : initials(sp.name)}
                 </div>
                 <div className={s.spName}>{sp.name}</div>
-                <div className={s.spTitle}>{sp.title}</div>
+                <div className={s.spTitle}>{loc(sp.title, sp.titleI18n)}</div>
                 {/* Real rating only — never fabricated. */}
                 {(sp.rating ?? 0) > 0 && (sp.reviewCount ?? 0) > 0 && (
                   <StarRatingDisplay

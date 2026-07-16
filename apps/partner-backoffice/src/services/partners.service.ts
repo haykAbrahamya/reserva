@@ -8,6 +8,7 @@ import type {
   WeekSchedule,
   Paginated,
   PageParams,
+  LocalizedText,
 } from '@/types'
 import http, { apiGet, apiPost, apiPatch, apiDelete } from './http'
 
@@ -82,7 +83,9 @@ export type PhotoList = 'gallery' | 'works'
 
 export interface PartnerPresentationFields {
   about?: string
+  aboutI18n?: LocalizedText | null
   tagline?: string
+  taglineI18n?: LocalizedText | null
   instagram?: string
   facebook?: string
   /** WhatsApp number in international digits (e.g. "37491234567"). */
