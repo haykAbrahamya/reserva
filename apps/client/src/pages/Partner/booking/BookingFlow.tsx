@@ -54,8 +54,9 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   )
   const [serviceId, setServiceId]       = useState<string | null>(seedServiceId)
   // null = not chosen, ANY_SPECIALIST = any. Solo partners always auto-assign.
+  // A seeded specialist (from "Book with X") pre-selects that specialist.
   const [specialistId, setSpecialistId] = useState<string | null>(
-    partner.kind === 'single' ? ANY_SPECIALIST : null,
+    seedSpecialistId ?? (partner.kind === 'single' ? ANY_SPECIALIST : null),
   )
   const [date, setDate]                 = useState(fmtDateInput(new Date()))
   const [time, setTime]                 = useState<string | null>(null)
@@ -242,12 +243,17 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   // Solo professional: there's only one specialist, so never show the picker —
   // the backend auto-assigns when specialistId is ANY_SPECIALIST.
   const isSingle = partner.kind === 'single'
+  // "Book with X": the visitor already chose the specialist on their profile, so
+  // skip the picker step and scope services to that specialist.
+  const seededSpecialist = seedSpecialistId
+    ? partner.specialists.find((sp) => sp.id === seedSpecialistId && sp.active) ?? null
+    : null
   const STEP_ORDER: Step[] = useMemo(() => {
     const steps: Step[] = ['service', 'datetime', 'details', 'confirm']
-    if (!isFacility && !isSingle) steps.splice(1, 0, 'specialist')
+    if (!isFacility && !isSingle && !seededSpecialist) steps.splice(1, 0, 'specialist')
     if (multiLocation) steps.unshift('location')
     return steps
-  }, [multiLocation, isFacility, isSingle])
+  }, [multiLocation, isFacility, isSingle, seededSpecialist])
   const stepIndex = STEP_ORDER.indexOf(step)
   const totalSteps = STEP_ORDER.length
 
@@ -607,6 +613,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
                   partner={partner}
                   selectedId={serviceId}
                   onSelect={selectService}
+                  onlyServiceIds={seededSpecialist?.services}
                 />
               )}
 
@@ -809,14 +816,17 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
 
 /* ── Sub-components ── */
 
-function ServiceStep({ partner, selectedId, onSelect }: {
+function ServiceStep({ partner, selectedId, onSelect, onlyServiceIds }: {
   partner: PublicPartner
   selectedId: string | null
   onSelect: (id: string) => void
+  /** When set (e.g. "Book with X"), only these service ids are shown. */
+  onlyServiceIds?: string[]
 }) {
   const t = useT()
   const loc = useLocalized()
-  const services = partner.services.filter(sv => sv.active)
+  const allow = onlyServiceIds ? new Set(onlyServiceIds) : null
+  const services = partner.services.filter(sv => sv.active && (!allow || allow.has(sv.id)))
   const categories = Array.from(new Set(services.map(sv => sv.category)))
 
   return (
