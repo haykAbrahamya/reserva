@@ -106,7 +106,7 @@ export function PartnerServices({ partner, onBook, tone = 'cream' }: Props) {
                     <span className={s.metaItem}>
                       <Clock size={13} /> {fmtDuration(sv.duration, { min: t('partner.services.min'), h: t('partner.services.hour') })}
                     </span>
-                    {sv.category && <><span className={s.dot} /><span>{sv.category}</span></>}
+                    {sv.category && <span className={s.metaCat}>{sv.category}</span>}
                   </div>
                 </div>
                 <div className={s.right}>

@@ -86,8 +86,9 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   padding: 17px 18px 17px 22px;
+  min-height: 74px;
   /* Richer warm wash: a clear diagonal of the salon accent over the surface. */
   background:
     linear-gradient(135deg, color-mix(in srgb, $accent 14%, transparent), color-mix(in srgb, $accent 3%, transparent) 60%),
@@ -117,13 +118,23 @@
   &:hover::before { opacity: 1; width: 6px; }
 }
 .cardBody { flex: 1; min-width: 0; }
-.name { font-size: 15.5px; font-weight: 600; color: $fg-0; margin-bottom: 6px; letter-spacing: -0.01em; }
-.meta { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: $fg-2; font-family: $font-mono; }
-.metaItem {
-  display: inline-flex; align-items: center; gap: 4px;
-  svg { color: color-mix(in srgb, $accent 75%, $fg-3); }
+.name {
+  font-size: 15.5px; font-weight: 600; color: $fg-0; margin-bottom: 6px; letter-spacing: -0.01em;
+  line-height: 1.3;
+  overflow-wrap: anywhere; /* long single-word names wrap instead of overflowing */
 }
-.dot { width: 3px; height: 3px; border-radius: 50%; background: color-mix(in srgb, $accent 55%, $fg-3); }
+/* Wraps as a whole (long category drops to its own line) but each item stays
+   intact — the duration ("1ժ 30րոպե") never breaks mid-value. */
+.meta {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px;
+  font-size: 12.5px; color: $fg-2; font-family: $font-mono; min-width: 0;
+}
+.metaItem {
+  display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
+  svg { color: color-mix(in srgb, $accent 75%, $fg-3); flex-shrink: 0; }
+}
+.metaCat { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.dot { width: 3px; height: 3px; border-radius: 50%; background: color-mix(in srgb, $accent 55%, $fg-3); flex-shrink: 0; }
 
 .right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
 /* Serif price — uses $accent-contrast (the theme-aware "accent text on a
