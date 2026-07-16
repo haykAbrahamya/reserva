@@ -70,6 +70,7 @@
     "saveChanges": "Сохранить изменения",
     "saving": "Сохранение…",
     "remove": "Удалить",
+    "clear": "Очистить",
     "edit": "Изменить",
     "add": "Добавить",
     "active": "Активен",
@@ -402,6 +403,16 @@
     "noServices": "Нет услуг",
     "loadMore": "Показать ещё",
     "showingCount": "Показано {shown} из {total}",
+    "picker": {
+      "searchPlaceholder": "Поиск услуг…",
+      "selectAll": "Выбрать все",
+      "clearAll": "Очистить все",
+      "selectGroup": "Выбрать все",
+      "clearGroup": "Очистить",
+      "selectedCount": "Выбрано: {count}",
+      "uncategorized": "Другое",
+      "noResults": "Нет услуг по вашему запросу."
+    },
     "col": {
       "name": "Имя",
       "location": "Филиал",

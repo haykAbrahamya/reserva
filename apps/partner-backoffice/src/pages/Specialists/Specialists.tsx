@@ -5,6 +5,7 @@ import { useResource } from '@/store/useResource'
 import { Button, Toggle, Modal, Input, Select, Avatar, Empty, Badge, FieldError, useToast } from '@/components/ui'
 import { SpecialistDashboard } from '@/components/specialists/SpecialistDashboard/SpecialistDashboard'
 import { AvatarPicker } from '@/components/specialists/AvatarPicker/AvatarPicker'
+import { ServicePicker } from '@/components/specialists/ServicePicker/ServicePicker'
 import { normalizePhoneInput } from '@reserva/shared'
 import { partnersService } from '@/services/partners.service'
 import { errorMessage } from '@/utils/errors'
@@ -26,7 +27,7 @@ function useIsMobile() {
   return m
 }
 
-const EMPTY_FORM = { name: '', title: '', titleI18n: null as LocalizedText | null, locationId: '', phone: '', active: true, services: [] as string[] }
+const EMPTY_FORM = { name: '', nameI18n: null as LocalizedText | null, title: '', titleI18n: null as LocalizedText | null, locationId: '', phone: '', active: true, services: [] as string[] }
 
 export function Specialists() {
   const partner     = usePartner()
@@ -91,7 +92,7 @@ export function Specialists() {
     setErrs({})
     setAvatarFile(null)
     setAvatarCleared(false)
-    setForm({ name: sp.name, title: sp.title, titleI18n: sp.titleI18n ?? null, locationId: sp.locationId, phone: sp.phone, active: sp.active, services: sp.services })
+    setForm({ name: sp.name, nameI18n: sp.nameI18n ?? null, title: sp.title, titleI18n: sp.titleI18n ?? null, locationId: sp.locationId, phone: sp.phone, active: sp.active, services: sp.services })
     setModalOpen(true)
   }
 
@@ -130,8 +131,6 @@ export function Specialists() {
     }
   }
 
-  const toggleSvc = (id: string) =>
-    setForm(f => ({ ...f, services: f.services.includes(id) ? f.services.filter(x => x !== id) : [...f.services, id] }))
 
   // Local "load more" footer — shared by the mobile list + desktop card grid.
   const loadMore = total > 0 && (
@@ -288,7 +287,15 @@ export function Specialists() {
             />
           </div>
           <div className={s.formFull}>
-            <Input label={t('specialists.modal.nameLabel')} value={form.name} onChange={e => { setForm(f => ({ ...f, name: e.target.value })); setErrs(x => ({ ...x, name: '' })) }} placeholder={t('specialists.modal.namePlaceholder')} error={errs.name || undefined} />
+            <I18nField
+              label={t('specialists.modal.nameLabel')}
+              value={form.name}
+              onChange={v => { setForm(f => ({ ...f, name: v })); setErrs(x => ({ ...x, name: '' })) }}
+              i18n={form.nameI18n}
+              onI18nChange={next => setForm(f => ({ ...f, nameI18n: next }))}
+              placeholder={t('specialists.modal.namePlaceholder')}
+              error={errs.name || undefined}
+            />
           </div>
           <div className={s.formFull}>
             <I18nField
@@ -315,24 +322,11 @@ export function Specialists() {
           </div>
           <div className={s.formFull}>
             <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', marginBottom: 8 }}>{t('specialists.modal.servicesLabel')}</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {services.map(svc => (
-                <button
-                  key={svc.id}
-                  type="button"
-                  onClick={() => toggleSvc(svc.id)}
-                  style={{
-                    padding: '5px 12px', borderRadius: 999, fontSize: 12, fontWeight: 500,
-                    cursor: 'pointer', border: '1px solid', transition: 'all .15s',
-                    background: form.services.includes(svc.id) ? 'var(--accent-soft)' : 'var(--bg-2)',
-                    borderColor: form.services.includes(svc.id) ? 'var(--accent)' : 'var(--line-2)',
-                    color: form.services.includes(svc.id) ? 'var(--fg-0)' : 'var(--fg-1)',
-                  }}
-                >
-                  {svc.name}
-                </button>
-              ))}
-            </div>
+            <ServicePicker
+              services={services}
+              selected={form.services}
+              onChange={next => setForm(f => ({ ...f, services: next }))}
+            />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Toggle checked={form.active} onChange={v => setForm(f => ({ ...f, active: v }))} />

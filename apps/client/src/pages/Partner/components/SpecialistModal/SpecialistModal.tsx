@@ -25,6 +25,10 @@ export function SpecialistModal({ partner, specialist, onClose, onBook }: Props)
   const theme = useAppSelector((st) => st.theme.theme)
   const brandVars = useMemo(() => partnerBrandVars(partner, theme === 'dark'), [partner, theme])
 
+  // Localized display name + its first word (for "Book with …" / reviews empty).
+  const displayName = loc(specialist.name, specialist.nameI18n)
+  const firstName = displayName.split(' ')[0]
+
   // Services this specialist offers.
   const services = partner.services.filter(sv => sv.active && specialist.services.includes(sv.id))
 
@@ -55,7 +59,7 @@ export function SpecialistModal({ partner, specialist, onClose, onBook }: Props)
               : initials(specialist.name)}
           </div>
           <div className={s.bannerInfo}>
-            <div className={s.spName}>{specialist.name}</div>
+            <div className={s.spName}>{displayName}</div>
             <div className={s.spTitle}>{loc(specialist.title, specialist.titleI18n)}</div>
             {/* Rating only when there are real reviews — never fake stars. */}
             {rating > 0 && reviewCount > 0 && (
@@ -97,14 +101,14 @@ export function SpecialistModal({ partner, specialist, onClose, onBook }: Props)
           <ReviewsPanel
             slug={partner.slug}
             specialistId={specialist.id}
-            emptyName={specialist.name.split(' ')[0]}
+            emptyName={firstName}
           />
         </div>
 
         {canBook(partner) && (
           <div className={s.footer}>
             <button className={s.bookBtn} onClick={() => { onBook(); requestClose() }}>
-              <CalendarCheck size={17} /> {t('specialistModal.bookWith', { name: specialist.name.split(' ')[0] })}
+              <CalendarCheck size={17} /> {t('specialistModal.bookWith', { name: firstName })}
             </button>
           </div>
         )}

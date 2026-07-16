@@ -70,6 +70,7 @@
     "saveChanges": "Պահպանել փոփոխությունները",
     "saving": "Պահպանվում է…",
     "remove": "Հեռացնել",
+    "clear": "Մաքրել",
     "edit": "Խմբագրել",
     "add": "Ավելացնել",
     "active": "Ակտիվ",
@@ -402,6 +403,16 @@
     "noServices": "Ծառայություններ չկան",
     "loadMore": "Ցույց տալ ավելին",
     "showingCount": "Ցուցադրվում է {shown}-ը {total}-ից",
+    "picker": {
+      "searchPlaceholder": "Փնտրել ծառայություններ…",
+      "selectAll": "Ընտրել բոլորը",
+      "clearAll": "Մաքրել բոլորը",
+      "selectGroup": "Ընտրել բոլորը",
+      "clearGroup": "Մաքրել",
+      "selectedCount": "Ընտրված է {count}",
+      "uncategorized": "Այլ",
+      "noResults": "Ձեր որոնմանը համապատասխան ծառայություն չկա։"
+    },
     "col": {
       "name": "Անուն",
       "location": "Մասնաճյուղ",

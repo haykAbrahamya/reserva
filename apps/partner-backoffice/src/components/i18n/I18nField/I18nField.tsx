@@ -17,6 +17,9 @@ interface Props {
   /** Render a multi-line textarea instead of a single-line input. */
   multiline?: boolean
   rows?: number
+  /** Existing values to offer as autocomplete suggestions on the BASE input
+   *  (e.g. existing service categories). Free text is still allowed. */
+  suggestions?: string[]
 }
 
 /**
@@ -26,12 +29,18 @@ interface Props {
  * a filled dot marks languages that already have a translation. Keeps the form
  * calm — Base is selected by default, translations are opt-in.
  */
+let i18nFieldSeq = 0
+
 export function I18nField({
-  label, value, onChange, i18n, onI18nChange, placeholder, error, multiline, rows,
+  label, value, onChange, i18n, onI18nChange, placeholder, error, multiline, rows, suggestions,
 }: Props) {
   const { t } = useI18n()
   // `active === null` → editing the base value; otherwise a locale override.
   const [active, setActive] = useState<Locale | null>(null)
+  // Stable datalist id for the (optional) base-value autocomplete.
+  const [listId] = useState(() => `i18n-sug-${++i18nFieldSeq}`)
+  // Suggestions only make sense on the base value (translations are free text).
+  const showSuggestions = !multiline && active === null && !!suggestions?.length
 
   const setOverride = (locale: Locale, v: string) => {
     const next: LocalizedText = { ...(i18n ?? {}) }
@@ -89,12 +98,21 @@ export function I18nField({
           rows={rows ?? 4}
         />
       ) : (
-        <Input
-          value={activeValue}
-          onChange={(e) => handleChange(e.target.value)}
-          placeholder={activePlaceholder}
-          error={active === null ? error : undefined}
-        />
+        <>
+          <Input
+            value={activeValue}
+            onChange={(e) => handleChange(e.target.value)}
+            placeholder={activePlaceholder}
+            error={active === null ? error : undefined}
+            list={showSuggestions ? listId : undefined}
+            autoComplete="off"
+          />
+          {showSuggestions && (
+            <datalist id={listId}>
+              {suggestions!.map((sug) => <option key={sug} value={sug} />)}
+            </datalist>
+          )}
+        </>
       )}
 
       {active !== null && (

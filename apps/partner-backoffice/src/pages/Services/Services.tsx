@@ -74,6 +74,17 @@ export function Services() {
     [page, pageSize],
   )
 
+  // Full catalog (unpaginated) → distinct existing categories for the category
+  // autocomplete. Reloads when the paginated list changes (e.g. after a save).
+  const { data: allServices } = useResource(
+    () => partnersService.listServices({ includeInactive: true }),
+    [result],
+    [],
+  )
+  const categorySuggestions = Array.from(
+    new Set(allServices.map((sv) => sv.category?.trim()).filter((c): c is string => !!c)),
+  ).sort((a, b) => a.localeCompare(b))
+
   const [modalOpen, setModalOpen] = useState(false)
   const [editing,   setEditing]   = useState<Service | null>(null)
   const [form,      setForm]      = useState(EMPTY_FORM)
@@ -345,6 +356,7 @@ export function Services() {
               i18n={form.categoryI18n}
               onI18nChange={next => setForm(f => ({ ...f, categoryI18n: next }))}
               placeholder={t('services.modal.categoryPlaceholder')}
+              suggestions={categorySuggestions}
             />
           </div>
 

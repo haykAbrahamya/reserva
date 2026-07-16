@@ -70,6 +70,7 @@
     "saveChanges": "Save changes",
     "saving": "Saving…",
     "remove": "Remove",
+    "clear": "Clear",
     "edit": "Edit",
     "add": "Add",
     "active": "Active",
@@ -402,6 +403,16 @@
     "noServices": "No services assigned",
     "loadMore": "Load more",
     "showingCount": "Showing {shown} of {total}",
+    "picker": {
+      "searchPlaceholder": "Search services…",
+      "selectAll": "Select all",
+      "clearAll": "Clear all",
+      "selectGroup": "Select all",
+      "clearGroup": "Clear",
+      "selectedCount": "{count} selected",
+      "uncategorized": "Other",
+      "noResults": "No services match your search."
+    },
     "col": {
       "name": "Name",
       "location": "Location",

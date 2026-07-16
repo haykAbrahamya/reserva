@@ -52,6 +52,8 @@ export interface Location {
 export interface Specialist {
   id: string
   name: string
+  /** Optional per-language overrides for `name` (falls back to `name`). */
+  nameI18n?: LocalizedText | null
   title: string
   /** Optional per-language overrides for `title` (falls back to `title`). */
   titleI18n?: LocalizedText | null

@@ -354,7 +354,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
     start.setHours(h, m, 0, 0)
     const end = new Date(start.getTime() + service.duration * 60_000)
 
-    const spName = chosenSpecialist?.name
+    const spName = chosenSpecialist ? loc(chosenSpecialist.name, chosenSpecialist.nameI18n) : undefined
     const svcName = loc(service.name, service.nameI18n)
     const title = t('booking.ics.title', { service: svcName, salon: partner.name })
     const description = t('booking.ics.description', {
@@ -640,7 +640,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
                           : initials(sp.name)}
                       </span>
                       <div className={s.optBody}>
-                        <div className={s.optName}>{sp.name}</div>
+                        <div className={s.optName}>{loc(sp.name, sp.nameI18n)}</div>
                         <div className={s.optMeta}>
                           <span>{loc(sp.title, sp.titleI18n)}</span>
                           {(sp.rating ?? 0) > 0 && (sp.reviewCount ?? 0) > 0 && (
@@ -891,7 +891,7 @@ function SummaryRows({ service, specialist, anySpecialist, hideSpecialist, locat
         <Row
           icon={<Users size={15} />}
           label={t('booking.summary.specialist')}
-          value={anySpecialist ? t('booking.summary.anyAvailable') : specialist?.name ?? '—'}
+          value={anySpecialist ? t('booking.summary.anyAvailable') : (specialist ? loc(specialist.name, specialist.nameI18n) : '—')}
         />
       )}
       <Row icon={<Calendar size={15} />} label={t('booking.summary.date')} value={dateLabel} />

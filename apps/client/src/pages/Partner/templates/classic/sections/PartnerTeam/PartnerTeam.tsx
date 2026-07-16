@@ -45,7 +45,7 @@ export function PartnerTeam({ partner, onSelect, tone = 'plain' }: Props) {
                     ? <img src={sp.avatarUrl} alt={sp.name} className={s.avatarImg} />
                     : initials(sp.name)}
                 </div>
-                <div className={s.spName}>{sp.name}</div>
+                <div className={s.spName}>{loc(sp.name, sp.nameI18n)}</div>
                 <div className={s.spTitle}>{loc(sp.title, sp.titleI18n)}</div>
                 {/* Real rating only — never fabricated. */}
                 {(sp.rating ?? 0) > 0 && (sp.reviewCount ?? 0) > 0 && (
