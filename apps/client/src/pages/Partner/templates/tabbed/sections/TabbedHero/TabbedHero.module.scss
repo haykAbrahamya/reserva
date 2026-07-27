@@ -45,7 +45,31 @@
 .body { flex: 1; min-width: 0; }
 .typeRow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
 .type { font-size: 12.5px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: $fg-2; }
-.rating { display: inline-flex; align-items: center; gap: 6px; }
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: $fg-1;
+}
+/* When rendered as a button (rating → Reviews tab): strip native chrome and add
+   a subtle pill hover so it reads as tappable, without changing the resting look. */
+button.rating {
+  padding: 3px 9px;
+  margin: -3px -9px; /* keep resting position identical to the span variant */
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font-family: $font-sans;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover { background: color-mix(in srgb, $fg-0 8%, transparent); }
+  &:focus-visible {
+    outline: 2px solid color-mix(in srgb, $accent 55%, transparent);
+    outline-offset: 2px;
+  }
+}
 .ratingStar { color: #FFCB5C; fill: #FFCB5C; flex-shrink: 0; }
 .ratingNum { font-weight: 700; color: $fg-0; }
 .reviewCount { font-size: 12px; color: $fg-2; }

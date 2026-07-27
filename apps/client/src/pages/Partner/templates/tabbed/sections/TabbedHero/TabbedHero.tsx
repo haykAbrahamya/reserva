@@ -7,6 +7,9 @@ import s from './TabbedHero.module.scss'
 
 interface Props {
   partner: PublicPartner
+  /** Optional: clicking the rating jumps to the Reviews tab. Only wired by the
+   *  template when a Reviews tab actually exists. */
+  onReviewsClick?: () => void
 }
 
 /**
@@ -15,7 +18,7 @@ interface Props {
  * tab bar sits directly beneath it. The primary "Book" action is the persistent
  * top-nav button, so the hero deliberately doesn't repeat it.
  */
-export function TabbedHero({ partner }: Props) {
+export function TabbedHero({ partner, onReviewsClick }: Props) {
   const { presentation: p } = partner
   const t = useT()
   const loc = useLocalized()
@@ -48,11 +51,24 @@ export function TabbedHero({ partner }: Props) {
           <div className={s.typeRow}>
             <span className={s.type}>{partner.type}</span>
             {p.rating > 0 && p.reviews > 0 && (
-              <span className={s.rating}>
-                <Star size={14} className={s.ratingStar} />
-                <span className={s.ratingNum}>{p.rating.toFixed(1)}</span>
-                <span className={s.reviewCount}>{t('partner.hero.reviews', { count: p.reviews })}</span>
-              </span>
+              onReviewsClick ? (
+                <button
+                  type="button"
+                  className={s.rating}
+                  onClick={onReviewsClick}
+                  title={t('partner.hero.ratingAria', { rating: p.rating.toFixed(1), count: p.reviews })}
+                >
+                  <Star size={14} className={s.ratingStar} />
+                  <span className={s.ratingNum}>{p.rating.toFixed(1)}</span>
+                  <span className={s.reviewCount}>{t('partner.hero.reviews', { count: p.reviews })}</span>
+                </button>
+              ) : (
+                <span className={s.rating}>
+                  <Star size={14} className={s.ratingStar} />
+                  <span className={s.ratingNum}>{p.rating.toFixed(1)}</span>
+                  <span className={s.reviewCount}>{t('partner.hero.reviews', { count: p.reviews })}</span>
+                </span>
+              )
             )}
           </div>
           <h1 className={s.name}>{partner.name}</h1>

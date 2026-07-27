@@ -126,6 +126,25 @@
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
+/* When the rating is a button (clickable → scrolls to reviews/team), reset the
+   native button chrome and add a subtle hover/press so it reads as interactive.
+   The plain-span variant (no scroll target) keeps the static look above. */
+button.rating {
+  cursor: pointer;
+  font-family: $font-sans;
+  font-size: 13px;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+
+  &:hover {
+    background: color-mix(in srgb, $bg-1 92%, transparent);
+    border-color: $line-2;
+  }
+  &:active { transform: translateY(1px); }
+  &:focus-visible {
+    outline: 2px solid color-mix(in srgb, $accent 55%, transparent);
+    outline-offset: 2px;
+  }
+}
 /* Single filled star + the numeric score — cleaner than a 5-star row. */
 .ratingStar { color: #FFCB5C; fill: #FFCB5C; flex-shrink: 0; }
 .ratingNum { font-weight: 700; color: $fg-0; }

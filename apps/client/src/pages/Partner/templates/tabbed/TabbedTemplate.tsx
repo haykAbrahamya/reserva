@@ -42,6 +42,16 @@ export function TabbedTemplate({ partner, onBook }: TemplateProps) {
 
   const [active, setActive] = useState<TabKey>(() => tabs[0]?.key ?? 'services')
 
+  const hasReviewsTab = tabs.some((tab) => tab.key === 'reviews')
+  const panelsRef = useRef<HTMLDivElement>(null)
+  // Hero rating → jump to the Reviews tab. Switch the tab, then bring the panel
+  // area into view (the tab bar is sticky, so without this the switch can happen
+  // off-screen if the user has scrolled). Only offered when a Reviews tab exists.
+  const goToReviews = () => {
+    setActive('reviews')
+    panelsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   // Center the active tab within the (horizontally scrollable) bar so it's
   // obvious more tabs exist on either side. The centering math naturally clamps
   // to [0, maxScroll], so the first tab rests flush-left and the last flush-right
@@ -59,7 +69,7 @@ export function TabbedTemplate({ partner, onBook }: TemplateProps) {
 
   return (
     <main className={s.main}>
-      <TabbedHero partner={partner} />
+      <TabbedHero partner={partner} onReviewsClick={hasReviewsTab ? goToReviews : undefined} />
 
       {tabs.length > 0 && (
         <>
@@ -86,7 +96,7 @@ export function TabbedTemplate({ partner, onBook }: TemplateProps) {
               ones are visually hidden via `.panelHidden` rather than `hidden`, so
               the active panel can smoothly fade/slide in on each tab switch.
               `aria-hidden` + inert keep hidden panels out of a11y/tab order. */}
-          <div className={s.panels}>
+          <div className={s.panels} ref={panelsRef}>
             {([
               ['services', <TabbedServices key="s" partner={partner} onBook={onBook} />],
               ['reviews', <TabbedReviews key="r" partner={partner} />],

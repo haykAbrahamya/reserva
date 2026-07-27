@@ -38,6 +38,20 @@ export function PartnerHero({ partner, onBook }: Props) {
     window.scrollTo({ top: window.innerHeight * 0.82, behavior: 'smooth' })
   }
 
+  // Clicking the rating jumps to where a visitor can actually read/leave reviews.
+  // Mirrors ClassicTemplate's section visibility exactly: a salon surfaces its
+  // reviews through the Team grid (each specialist opens a review modal), so we
+  // scroll to #team; a solo pro gets a dedicated #reviews section. We compute the
+  // target the SAME way the template decides which section to render, and only
+  // make the rating a clickable button when that target will actually exist.
+  const isSingle = partner.kind === 'single'
+  const showTeam = !isSingle && partner.specialists.some((sp) => sp.active)
+  const showReviews = isSingle && partner.specialists.length > 0
+  const ratingTargetId = showTeam ? 'team' : showReviews ? 'reviews' : null
+  const scrollToReviews = () => {
+    if (ratingTargetId) document.getElementById(ratingTargetId)?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   return (
     <section className={s.hero}>
       {/* Branded background wash. color-mix keeps this valid whether the tint is
@@ -94,14 +108,27 @@ export function PartnerHero({ partner, onBook }: Props) {
               partner-wide score is computed server-side from every specialist's
               reviews (works for solo pros and salons alike). */}
           {p.rating > 0 && p.reviews > 0 && (
-            <span
-              className={s.rating}
-              title={t('partner.hero.ratingAria', { rating: p.rating.toFixed(1), count: p.reviews })}
-            >
-              <Star size={15} className={s.ratingStar} />
-              <span className={s.ratingNum}>{p.rating.toFixed(1)}</span>
-              <span className={s.reviewCount}>{t('partner.hero.reviews', { count: p.reviews })}</span>
-            </span>
+            ratingTargetId ? (
+              <button
+                type="button"
+                className={s.rating}
+                onClick={scrollToReviews}
+                title={t('partner.hero.ratingAria', { rating: p.rating.toFixed(1), count: p.reviews })}
+              >
+                <Star size={15} className={s.ratingStar} />
+                <span className={s.ratingNum}>{p.rating.toFixed(1)}</span>
+                <span className={s.reviewCount}>{t('partner.hero.reviews', { count: p.reviews })}</span>
+              </button>
+            ) : (
+              <span
+                className={s.rating}
+                title={t('partner.hero.ratingAria', { rating: p.rating.toFixed(1), count: p.reviews })}
+              >
+                <Star size={15} className={s.ratingStar} />
+                <span className={s.ratingNum}>{p.rating.toFixed(1)}</span>
+                <span className={s.reviewCount}>{t('partner.hero.reviews', { count: p.reviews })}</span>
+              </span>
+            )
           )}
         </div>
 
