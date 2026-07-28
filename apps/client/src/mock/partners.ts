@@ -55,6 +55,9 @@ export type PublicPartner = Partner & {
   kind?: 'salon' | 'single'
   /** Which public page layout to render. Optional in mock; API defaults classic. */
   template?: PartnerTemplate
+  /** Default page language for first-time visitors. Optional in mock; API
+   *  defaults to 'hy'. A visitor's own saved choice always wins. */
+  defaultLocale?: 'hy' | 'en' | 'ru'
 }
 
 export const PARTNERS: PublicPartner[] = [

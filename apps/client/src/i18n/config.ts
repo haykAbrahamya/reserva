@@ -35,6 +35,19 @@ export const LOCALE_META: Record<Locale, LocaleMeta> = {
 }
 
 export const STORAGE_KEY = 'reserva-client-locale'
+/**
+ * Set once the visitor EXPLICITLY picks a language (via the switcher). Distinct
+ * from STORAGE_KEY (which tracks the last-applied locale, including a partner
+ * default): a partner's default-language setting may override the initial locale
+ * only while this flag is absent — a real visitor choice always wins.
+ */
+export const EXPLICIT_KEY = 'reserva-client-locale-explicit'
+
+/** True if the visitor has actively chosen a language before. */
+export function hasExplicitLocaleChoice(): boolean {
+  if (typeof window === 'undefined') return false
+  return window.localStorage.getItem(EXPLICIT_KEY) === '1'
+}
 
 /**
  * Where remote bundles will live once servers are up. Today unused — bundles

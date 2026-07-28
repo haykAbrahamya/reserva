@@ -24,6 +24,8 @@ export type PartnerProfile = Omit<Partner, 'locations' | 'services' | 'specialis
   template?: 'classic' | 'tabbed'
   /** Backoffice FAB behavior: support chat / new booking / hidden. Default book. */
   supportWidget?: 'support' | 'book' | 'hidden'
+  /** Default language for the public client page (first-time visitors). */
+  defaultLocale?: 'hy' | 'en' | 'ru'
   /** Public marketing fields edited in the Storefront section. */
   presentation?: {
     about?: string

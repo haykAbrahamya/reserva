@@ -770,6 +770,15 @@
       "hint_hidden": "No floating button is shown.",
       "saved": "Quick button updated"
     },
+    "clientLanguage": {
+      "title": "Default page language",
+      "desc": "The language your public booking page opens in for first-time visitors. They can still switch, and their choice is remembered.",
+      "hy": "Armenian",
+      "en": "English",
+      "ru": "Russian",
+      "hint": "New visitors see your page in this language by default.",
+      "saved": "Default language updated"
+    },
     "online": {
       "title": "Online booking",
       "desc": "Whether clients can book online from your public page.",

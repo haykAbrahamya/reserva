@@ -1,4 +1,4 @@
-import type { Booking, Service, Specialist } from '@reserva/shared'
+import type { Booking, Service, Specialist, LocalizedText } from '@reserva/shared'
 import type { PublicPartner, PartnerPresentation } from '@/mock/partners'
 
 // ─────────────────────────────────────────────────────────────
@@ -67,7 +67,9 @@ interface ApiPartner {
   specialists: ApiSpecialist[]
   presentation: {
     tagline: string
+    taglineI18n?: LocalizedText | null
     about: string
+    aboutI18n?: LocalizedText | null
     logoUrl?: string;
     hours: string
     instagram?: string
@@ -85,7 +87,9 @@ type ApiGalleryTile = { type?: 'simple' | 'beforeAfter'; url?: string; beforeUrl
 function toPublicPartner(p: ApiPartner): PublicPartner {
   const presentation: PartnerPresentation = {
     tagline: p.presentation?.tagline ?? '',
+    taglineI18n: p.presentation?.taglineI18n ?? null,
     about: p.presentation?.about ?? '',
+    aboutI18n: p.presentation?.aboutI18n ?? null,
     rating: Number(p.presentation?.rating ?? 0),
     reviews: p.presentation?.reviews ?? 0,
     logoUrl: resolveImageUrl(p.presentation?.logoUrl),

@@ -10,7 +10,8 @@ import { resolveTemplate } from './templates/registry'
 import { BookingFlow } from './booking/BookingFlow'
 import { SpecialistModal } from './components/SpecialistModal/SpecialistModal'
 import { useSeo } from '@/hooks/useSeo'
-import { useT } from '@/i18n'
+import { useI18n } from '@/i18n'
+import { hasExplicitLocaleChoice, isLocale } from '@/i18n/config'
 import type { Specialist } from '@reserva/shared'
 import s from './PartnerPage.module.scss'
 
@@ -38,7 +39,7 @@ function openingHoursSpec(hours: unknown): Array<Record<string, unknown>> {
 
 export function PartnerPage() {
   const slug = useTenantSlug()
-  const t = useT()
+  const { t, setLocale } = useI18n()
   const theme = useAppSelector((st) => st.theme.theme)
   const [partner, setPartner] = useState<PublicPartner | null>(null)
   const [loading, setLoading] = useState(true)
@@ -59,9 +60,14 @@ export function PartnerPage() {
       if (!active) return
       setPartner(p)
       setLoading(false)
+      // Open the page in the partner's chosen default language — but ONLY for a
+      // visitor who hasn't explicitly picked one (their choice always wins).
+      if (p && !hasExplicitLocaleChoice() && isLocale(p.defaultLocale)) {
+        setLocale(p.defaultLocale)
+      }
     })
     return () => { active = false }
-  }, [slug])
+  }, [slug, setLocale])
 
   // Per-salon SEO: each partner page is a unique indexable URL. We give it the
   // salon's own title/description + a LocalBusiness structured-data record so it

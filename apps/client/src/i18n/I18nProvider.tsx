@@ -4,6 +4,7 @@ import {
   type Messages,
   LOCALE_META,
   STORAGE_KEY,
+  EXPLICIT_KEY,
   detectInitialLocale,
 } from './config'
 import { loadLocale, bundledMessages } from './loader'
@@ -12,7 +13,10 @@ type Vars = Record<string, string | number>
 
 interface I18nValue {
   locale: Locale
-  setLocale: (l: Locale) => void
+  /** Change the active locale. Pass `explicit: true` for a real user choice
+   *  (via the switcher) so it's remembered and a partner default can't override
+   *  it. Programmatic defaults (e.g. a partner's default language) omit it. */
+  setLocale: (l: Locale, explicit?: boolean) => void
   /** Translate a dotted key, with optional {placeholder} interpolation. */
   t: (key: string, vars?: Vars) => string
   /**
@@ -66,7 +70,14 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     return () => { active = false }
   }, [locale])
 
-  const setLocale = useCallback((l: Locale) => setLocaleState(l), [])
+  const setLocale = useCallback((l: Locale, explicit = false) => {
+    // Record a real user choice so it's respected on future visits and a partner
+    // default can never override it. Programmatic defaults skip this.
+    if (explicit) {
+      try { window.localStorage.setItem(EXPLICIT_KEY, '1') } catch { /* ignore */ }
+    }
+    setLocaleState(l)
+  }, [])
 
   const t = useCallback(
     (key: string, vars?: Vars): string => {

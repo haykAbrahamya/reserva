@@ -55,21 +55,25 @@ export function Settings() {
   const [autoConfirm, setAutoConfirm] = useState(false)
   const [bookingsOn, setBookingsOn] = useState(true)
   const [fabMode, setFabMode] = useState<'support' | 'book' | 'hidden'>('support')
+  const [defaultLocale, setDefaultLocale] = useState<'hy' | 'en' | 'ru'>('hy')
 
   const savedSlug = profile?.slug ?? ''
   const savedAuto = profile?.autoConfirmBookings ?? false
   const savedBookingsOn = profile?.bookingsEnabled ?? true
   const savedFab = profile?.supportWidget ?? 'support'
+  const savedLocale = profile?.defaultLocale ?? 'hy'
 
   useEffect(() => { setSlug(savedSlug) }, [savedSlug])
   useEffect(() => { setAutoConfirm(savedAuto) }, [savedAuto])
   useEffect(() => { setBookingsOn(savedBookingsOn) }, [savedBookingsOn])
   useEffect(() => { setFabMode(savedFab) }, [savedFab])
+  useEffect(() => { setDefaultLocale(savedLocale) }, [savedLocale])
 
   const [slugSaving, setSlugSaving] = useState(false)
   const [autoSaving, setAutoSaving] = useState(false)
   const [bookingsSaving, setBookingsSaving] = useState(false)
   const [fabSaving, setFabSaving] = useState(false)
+  const [localeSaving, setLocaleSaving] = useState(false)
 
   // ── Brand logo ──
   const logoInputRef = useRef<HTMLInputElement>(null)
@@ -159,6 +163,27 @@ export function Settings() {
       toast(errorMessage(err, t))
     } finally {
       setFabSaving(false)
+    }
+  }
+
+  // ── Default client-page language ──
+  const changeLocale = async (locale: 'hy' | 'en' | 'ru') => {
+    if (!isAdmin || localeSaving || locale === defaultLocale) return
+    setLocaleSaving(true)
+    const prev = defaultLocale
+    setDefaultLocale(locale)
+    const current = useAppStore.getState().partner
+    if (current) setPartner({ ...current, defaultLocale: locale })
+    try {
+      await partnersService.updateProfile({ defaultLocale: locale })
+      toast(t('settings.clientLanguage.saved'))
+    } catch (err) {
+      setDefaultLocale(prev)
+      const cur = useAppStore.getState().partner
+      if (cur) setPartner({ ...cur, defaultLocale: prev })
+      toast(errorMessage(err, t))
+    } finally {
+      setLocaleSaving(false)
     }
   }
 
@@ -376,6 +401,30 @@ export function Settings() {
             ]}
           />
           <div className={s.statusLine}>{t(`settings.quickButton.hint_${fabMode}`)}</div>
+        </div>
+      </section>
+
+      {/* ── Default language for the public client page ── */}
+      <section className={s.card}>
+        <div className={s.cardHead}>
+          <span className={s.cardIcon}><Globe size={18} /></span>
+          <div className={s.cardHeadText}>
+            <h2 className={s.cardTitle}>{t('settings.clientLanguage.title')}</h2>
+            <p className={s.cardDesc}>{t('settings.clientLanguage.desc')}</p>
+          </div>
+          {adminLock}
+        </div>
+        <div className={s.cardBody}>
+          <SegmentedFilter<'hy' | 'en' | 'ru'>
+            value={defaultLocale}
+            onChange={changeLocale}
+            options={[
+              { value: 'hy', label: t('settings.clientLanguage.hy') },
+              { value: 'en', label: t('settings.clientLanguage.en') },
+              { value: 'ru', label: t('settings.clientLanguage.ru') },
+            ]}
+          />
+          <div className={s.statusLine}>{t('settings.clientLanguage.hint')}</div>
         </div>
       </section>
 

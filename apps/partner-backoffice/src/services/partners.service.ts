@@ -102,6 +102,8 @@ export type PartnerTemplate = 'classic' | 'tabbed'
 
 /** Backoffice floating action button behavior. */
 export type SupportWidgetMode = 'support' | 'book' | 'hidden'
+/** Client-app languages a partner can pick as their public-page default. */
+export type PartnerLocale = 'hy' | 'en' | 'ru'
 
 export type PartnerProfileResponse = Omit<Partner, 'slug'> & {
   /** Null until the partner sets a public handle in Settings. */
@@ -114,6 +116,8 @@ export type PartnerProfileResponse = Omit<Partner, 'slug'> & {
   template?: PartnerTemplate
   /** Backoffice FAB behavior (support chat / new booking / hidden). Default book. */
   supportWidget?: SupportWidgetMode
+  /** Default language for the public client page (first-time visitors). */
+  defaultLocale?: PartnerLocale
   /** Featured in the public marketplace (/salons). Read-only here — curated by
    *  Reserva platform staff from the internal console. */
   marketplaceListed?: boolean
@@ -130,6 +134,7 @@ export interface PartnerSettingsPatch {
   slug?: string
   template?: PartnerTemplate
   supportWidget?: SupportWidgetMode
+  defaultLocale?: PartnerLocale
   presentation?: PartnerPresentationFields
 }
 

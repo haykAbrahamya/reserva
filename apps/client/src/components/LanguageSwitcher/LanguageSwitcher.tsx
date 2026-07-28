@@ -29,7 +29,8 @@ export function LanguageSwitcher() {
   }, [open])
 
   const choose = (l: Locale) => {
-    setLocale(l)
+    // Explicit user choice — remembered and never overridden by a partner default.
+    setLocale(l, true)
     close()
   }
 
