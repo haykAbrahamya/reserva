@@ -1,7 +1,7 @@
 import { MapPin, Phone, CalendarCheck, Clock, Users, Navigation } from 'lucide-react'
 import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
-import { useI18n } from '@/i18n'
+import { useI18n, useLocalized } from '@/i18n'
 import { bookableLocations, canBook } from '@/services/booking.service'
 import { summarizeHours } from '../../../../lib/summarizeHours'
 import s from './PartnerLocations.module.scss'
@@ -24,6 +24,9 @@ function mapsUrl(loc: { address: string; name: string; lat?: number | null; lng?
 
 export function PartnerLocations({ partner, onBook, tone = 'cream' }: Props) {
   const { t, tp } = useI18n()
+  // Named `tr` (not `loc`) to avoid colliding with the `loc` location variable in
+  // the branches map below.
+  const tr = useLocalized()
 
   // Only functional branches (active + ≥1 active specialist). Shared helper so
   // every place that lists/counts locations agrees.
@@ -75,7 +78,7 @@ export function PartnerLocations({ partner, onBook, tone = 'cream' }: Props) {
                 </div>
 
                 <div className={s.cardBody}>
-                  <div className={s.branchName}>{loc.name}</div>
+                  <div className={s.branchName}>{tr(loc.name, loc.nameI18n)}</div>
 
                   <a
                     className={[s.row, s.addressLink].join(' ')}

@@ -513,7 +513,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
                   specialist={chosenSpecialist}
                   anySpecialist={specialistId === ANY_SPECIALIST}
                   hideSpecialist={isFacility || isSingle}
-                  location={multiLocation ? chosenLocation?.name ?? null : null}
+                  location={multiLocation && chosenLocation ? loc(chosenLocation.name, chosenLocation.nameI18n) : null}
                   date={date}
                   time={time}
                   hidePrice
@@ -597,18 +597,18 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
               {/* STEP: location (multi-branch only) */}
               {step === 'location' && (
                 <div>
-                  {locations.map(loc => (
+                  {locations.map(l => (
                     <button
-                      key={loc.id}
-                      className={[s.option, locationId === loc.id ? s.selected : ''].filter(Boolean).join(' ')}
-                      onClick={() => selectLocation(loc.id)}
+                      key={l.id}
+                      className={[s.option, locationId === l.id ? s.selected : ''].filter(Boolean).join(' ')}
+                      onClick={() => selectLocation(l.id)}
                     >
                       <span className={s.anyIcon}><MapPin size={20} /></span>
                       <div className={s.optBody}>
-                        <div className={s.optName}>{loc.name}</div>
-                        <div className={s.optMeta}>{loc.address}</div>
+                        <div className={s.optName}>{loc(l.name, l.nameI18n)}</div>
+                        <div className={s.optMeta}>{l.address}</div>
                       </div>
-                      {locationId === loc.id && <Check size={18} className={s.check} />}
+                      {locationId === l.id && <Check size={18} className={s.check} />}
                     </button>
                   ))}
                 </div>
@@ -780,7 +780,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
                     specialist={chosenSpecialist}
                     anySpecialist={specialistId === ANY_SPECIALIST}
                     hideSpecialist={isFacility || isSingle}
-                    location={multiLocation ? chosenLocation?.name ?? null : null}
+                    location={multiLocation && chosenLocation ? loc(chosenLocation.name, chosenLocation.nameI18n) : null}
                     date={date}
                     time={time}
                     name={name}

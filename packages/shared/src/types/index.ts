@@ -40,6 +40,9 @@ export type BookingStatus =
 export interface Location {
   id: string
   name: string
+  /** Optional per-language overrides for `name` (falls back to `name`). Only the
+   *  branch name is translatable — address/geo stay single-value. */
+  nameI18n?: LocalizedText | null
   address: string
   phone: string
   /** Opening hours per weekday. Optional — older locations may not have it set. */

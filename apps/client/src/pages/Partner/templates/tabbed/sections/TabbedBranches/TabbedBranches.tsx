@@ -1,6 +1,6 @@
 import { MapPin, Phone, Clock, Users, Navigation, CalendarCheck } from 'lucide-react'
 import type { PublicPartner } from '@/mock/partners'
-import { useI18n } from '@/i18n'
+import { useI18n, useLocalized } from '@/i18n'
 import { bookableLocations, canBook } from '@/services/booking.service'
 import { summarizeHours } from '../../../../lib/summarizeHours'
 import s from './TabbedBranches.module.scss'
@@ -23,6 +23,8 @@ function mapsUrl(loc: { address: string; name: string; lat?: number | null; lng?
  *  hours / staff count and quick actions. Reuses the shared hours summarizer. */
 export function TabbedBranches({ partner, onBook }: Props) {
   const { t, tp } = useI18n()
+  // `tr` (not `loc`) to avoid colliding with the `loc` location variable below.
+  const tr = useLocalized()
   const bookable = bookableLocations(partner)
   if (bookable.length === 0) return null
 
@@ -58,7 +60,7 @@ export function TabbedBranches({ partner, onBook }: Props) {
                 <span className={s.mapPin}><MapPin size={20} /></span>
               </a>
               <div className={s.body}>
-                <div className={s.name}>{loc.name}</div>
+                <div className={s.name}>{tr(loc.name, loc.nameI18n)}</div>
                 <a className={s.row} href={mapsUrl(loc)} target="_blank" rel="noopener noreferrer" title={t('partner.locations.openInMaps')}>
                   <MapPin size={15} /> <span>{loc.address}</span>
                 </a>

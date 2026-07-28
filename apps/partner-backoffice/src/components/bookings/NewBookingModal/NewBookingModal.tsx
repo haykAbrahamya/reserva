@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { Calendar } from 'lucide-react'
 import { Modal, Input, Select, Button, DatePicker, FieldError, useToast } from '@/components/ui'
 import { usePartner } from '@/store/app.store'
@@ -46,6 +46,9 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
   // Inline validation errors, keyed by field. Set on submit; cleared on edit.
   const [errs, setErrs] = useState<Record<string, string>>({})
   const [saving, setSaving] = useState(false)
+  // Anchor at the bottom of the form — we scroll to it after a date is picked so
+  // the client name/phone fields (hidden below the tall time grid) become visible.
+  const bottomAnchor = useRef<HTMLDivElement>(null)
   const clearErr = (k: string) => setErrs(e => (e[k] ? (() => { const n = { ...e }; delete n[k]; return n })() : e))
 
   // Fresh bookings for the chosen day for slot availability (backend enforces overlaps).
@@ -137,9 +140,16 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
   if (!partner) return null
 
   const locations   = locCatalog
+  // Specialists are filtered by BOTH the chosen location AND the chosen service
+  // — so you can only pick someone who actually offers that service (prevents
+  // selecting a specialist who can't do it, which would drop the service).
   const specialists = spCatalog.filter(sp =>
-    sp.active && (!locationId || sp.locationId === locationId)
+    sp.active &&
+    (!locationId || sp.locationId === locationId) &&
+    (!serviceId || sp.services.includes(serviceId))
   )
+  // Services are likewise filtered by the chosen specialist (the reverse), so the
+  // two dropdowns always agree in either order of selection.
   const services = svcCatalog.filter(sv =>
     sv.active && (!specialistId || spCatalog.find(sp => sp.id === specialistId)?.services.includes(sv.id))
   )
@@ -149,6 +159,19 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
   // The time grid is ready once we can resolve availability: a specialist for a
   // person service, or just the service itself for a facility/entry one.
   const slotsReady = isFacility ? !!serviceId : !!specialistId
+
+  /** Pick a date, then — if the client fields below are still empty — smoothly
+   *  reveal them. The tall time grid pushes name/phone off-screen, so without
+   *  this it's easy to miss that there's more form below. We wait a frame so the
+   *  slot grid has rendered (its height is what we need to scroll past). */
+  const handleDateSelect = (v: string) => {
+    setDate(v)
+    const clientFieldsEmpty = !clientName.trim() || !clientPhone.trim()
+    if (!clientFieldsEmpty) return
+    requestAnimationFrame(() => {
+      bottomAnchor.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    })
+  }
 
   /** Local validation → inline errors. Returns true when the form is valid. */
   const validate = (): boolean => {
@@ -237,8 +260,16 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
               setServiceId(v)
               setTime('')
               clearErr('serviceId')
-              // Facility services have no specialist — clear any prior pick.
-              if (svcCatalog.find(sv => sv.id === v)?.requiresSpecialist === false) setSpecialistId('')
+              const svc = svcCatalog.find(sv => sv.id === v)
+              // Clear the specialist pick if it's no longer valid for the new
+              // service: either it's a facility service (no specialist at all) or
+              // the currently-picked specialist doesn't offer this service.
+              if (specialistId) {
+                const stillValid =
+                  svc?.requiresSpecialist !== false &&
+                  spCatalog.find(sp => sp.id === specialistId)?.services.includes(v)
+                if (!stillValid) setSpecialistId('')
+              }
             }}
             options={services.map(sv => ({
               value: sv.id,
@@ -268,7 +299,7 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
         )}
 
         <div>
-          <DatePicker label={t('newBooking.dateLabel')} value={date} min={today} onChange={setDate} labels={dateLabels} />
+          <DatePicker label={t('newBooking.dateLabel')} value={date} min={today} onChange={handleDateSelect} labels={dateLabels} />
         </div>
 
         <div className={s.full}>
@@ -312,6 +343,10 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
             </span>
           </div>
         )}
+
+        {/* Scroll target: picking a date scrolls here so the client fields above
+            it (name/phone) are brought into view past the tall time grid. */}
+        <div ref={bottomAnchor} aria-hidden="true" className={s.bottomAnchor} />
       </div>
     </Modal>
   )

@@ -11,14 +11,17 @@ import {
 } from '@/utils/locationHours'
 import { MapPicker } from '@/components/maps/MapPicker/MapPicker'
 import { mapsEnabled } from '@/lib/googleMaps'
+import { I18nField } from '@/components/i18n/I18nField/I18nField'
 import { useI18n } from '@/i18n'
 import { useSpotlight } from '@/components/onboarding/useSpotlight'
 import { notifyProfileUpdated } from '@/components/onboarding/useProfileCompletion'
-import type { Location, WeekSchedule, WorkingDay } from '@/types'
+import type { Location, LocalizedText, WeekSchedule, WorkingDay } from '@/types'
 import s from './Locations.module.scss'
 
 interface LocationForm {
   name: string
+  /** Per-language overrides for the branch name (null = base only). */
+  nameI18n: LocalizedText | null
   address: string
   phone: string
   hours: WeekSchedule
@@ -26,7 +29,7 @@ interface LocationForm {
   lng: number | null
 }
 const EMPTY_FORM: LocationForm = {
-  name: '', address: '', phone: '', hours: DEFAULT_LOCATION_HOURS as WeekSchedule, lat: null, lng: null,
+  name: '', nameI18n: null, address: '', phone: '', hours: DEFAULT_LOCATION_HOURS as WeekSchedule, lat: null, lng: null,
 }
 
 export function Locations() {
@@ -62,7 +65,7 @@ export function Locations() {
     setEditing(loc)
     setErrs({})
     setForm({
-      name: loc.name, address: loc.address, phone: loc.phone,
+      name: loc.name, nameI18n: loc.nameI18n ?? null, address: loc.address, phone: loc.phone,
       hours: loc.hours ?? DEFAULT_LOCATION_HOURS,
       lat: loc.lat ?? null, lng: loc.lng ?? null,
     })
@@ -196,10 +199,12 @@ export function Locations() {
         }
       >
         <div className={s.formGrid}>
-          <Input
+          <I18nField
             label={t('locations.modal.nameLabel')}
             value={form.name}
-            onChange={e => { setForm(f => ({ ...f, name: e.target.value })); setErrs(x => ({ ...x, name: '' })) }}
+            onChange={v => { setForm(f => ({ ...f, name: v })); setErrs(x => ({ ...x, name: '' })) }}
+            i18n={form.nameI18n}
+            onI18nChange={next => setForm(f => ({ ...f, nameI18n: next }))}
             placeholder={t('locations.modal.namePlaceholder')}
             error={errs.name || undefined}
           />

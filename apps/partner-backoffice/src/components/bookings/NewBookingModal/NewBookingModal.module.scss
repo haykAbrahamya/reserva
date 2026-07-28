@@ -42,3 +42,12 @@
   color: $fg-1;
   margin-top: 4px;
 }
+
+/* Zero-height scroll marker at the bottom of the form. `scroll-margin` leaves a
+   little breathing room so the last field isn't flush against the footer when
+   we smooth-scroll here after a date is picked. */
+.bottomAnchor {
+  grid-column: span 2;
+  height: 1px;
+  scroll-margin-bottom: 12px;
+}
