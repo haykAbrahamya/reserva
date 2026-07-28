@@ -1,0 +1,111 @@
+@use 'variables' as *;
+
+.wrap {
+  display: block;
+}
+
+/* Shared field shell — mirrors BookingFlow's .input (48px, same border/focus)
+   so the phone field sits flush with the name/notes fields around it. */
+.amField,
+.intlField {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 48px;
+  border-radius: $r-2;
+  border: 1.5px solid $line-2;
+  background: $bg-1;
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  /* Lift the whole shell when the inner input is focused. */
+  &:focus-within {
+    border-color: $accent;
+    box-shadow: 0 0 0 3px $accent-soft;
+  }
+}
+
+/* ── Armenian mode: fixed "+374" prefix + local-digits input ── */
+.prefix {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  padding: 0 12px;
+  font-family: $font-sans;
+  font-size: 15px;
+  font-weight: 600;
+  color: $fg-1;
+  background: $bg-2;
+  border-right: 1.5px solid $line-2;
+  user-select: none;
+  white-space: nowrap;
+}
+.flag {
+  font-size: 15px;
+  line-height: 1;
+}
+.amInput {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 14px;
+  border: 0;
+  background: transparent;
+  color: $fg-0;
+  font-family: $font-sans;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  outline: none;
+  &::placeholder { color: $fg-3; letter-spacing: normal; }
+}
+
+/* ── International mode: single plain field with a phone glyph ── */
+.intlIcon {
+  flex: none;
+  margin-left: 12px;
+  color: $fg-3;
+}
+.intlInput {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 14px 0 10px;
+  border: 0;
+  background: transparent;
+  color: $fg-0;
+  font-family: $font-sans;
+  font-size: 15px;
+  outline: none;
+  &::placeholder { color: $fg-3; }
+}
+
+/* Invalid state — matches .inputError in BookingFlow. */
+.invalid {
+  border-color: $danger;
+  &:focus-within {
+    border-color: $danger;
+    box-shadow: 0 0 0 3px color-mix(in srgb, $danger 16%, transparent);
+  }
+}
+
+/* Quiet mode-switch link under the field. */
+.toggle {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $accent;
+  font-family: $font-sans;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s;
+  &:hover { color: $accent-strong; text-decoration: underline; }
+  &:focus-visible {
+    outline: 2px solid color-mix(in srgb, $accent 55%, transparent);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+}

@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo } from 'react'
 import { ArrowLeft, X, Check, Users, Calendar, Clock, CheckCircle2, ArrowRight, Sparkles, MapPin, Send, AlertCircle, CalendarPlus, Bell, BellRing, Share } from 'lucide-react'
-import { fmtServicePrice, fmtDuration, fmtDateInput, initials } from '@reserva/shared'
+import { fmtServicePrice, fmtDuration, fmtDateInput, initials, isValidPhone } from '@reserva/shared'
 import { StarRatingDisplay } from '@/components/StarRating/StarRating'
 import { DatePicker } from '@reserva/ui'
 import { DayStrip, type DayInfo } from './DayStrip/DayStrip'
+import { PhoneField, formatPhoneDisplay } from './PhoneField/PhoneField'
 import type { Service, Specialist, WeekSchedule } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
 import {
@@ -61,7 +62,12 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   const [date, setDate]                 = useState(fmtDateInput(new Date()))
   const [time, setTime]                 = useState<string | null>(null)
   const [name, setName]                 = useState('')
-  const [phone, setPhone]               = useState('')
+  // Phone is stored in E.164 ("+37493813296"). Default to the Armenian country
+  // code since our audience is almost entirely local — the PhoneField shows a
+  // fixed "+374" prefix and the user types only the 8 local digits.
+  const [phone, setPhone]               = useState('+374')
+  // false = Armenian +374 mode (default), true = international plain field.
+  const [phoneIntl, setPhoneIntl]       = useState(false)
   const [notes, setNotes]               = useState('')
   // Field-level validation — errors show only after a field is touched / on submit.
   const [touched, setTouched]           = useState<{ name?: boolean; phone?: boolean }>({})
@@ -424,10 +430,11 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
   }
   const phoneError = (): string | null => {
     const v = phone.trim()
-    if (!v) return 'booking.validation.phoneRequired'
-    // Allow +, spaces, dashes, parens; require at least 6 digits.
-    const digits = v.replace(/\D/g, '')
-    if (digits.length < 6) return 'booking.validation.phoneInvalid'
+    // "Empty" means no number entered yet — in Armenian mode the value is just
+    // the "+374" country code with no local digits.
+    if (!v || v === '+' || v === '+374') return 'booking.validation.phoneRequired'
+    // Value is always E.164 (PhoneField guarantees "+" + digits); validate it.
+    if (!isValidPhone(v)) return 'booking.validation.phoneInvalid'
     return null
   }
   const detailsValid = !nameError() && !phoneError()
@@ -748,13 +755,13 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, o
                   </div>
                   <div className={s.formField}>
                     <label className={s.fieldLabel}>{t('booking.phoneLabel')}</label>
-                    <input
-                      className={[s.input, touched.phone && phoneError() ? s.inputError : ''].filter(Boolean).join(' ')}
-                      placeholder={t('booking.phonePlaceholder')}
+                    <PhoneField
                       value={phone}
-                      onChange={e => setPhone(e.target.value)}
+                      onChange={setPhone}
                       onBlur={() => setTouched(p => ({ ...p, phone: true }))}
-                      inputMode="tel"
+                      invalid={!!(touched.phone && phoneError())}
+                      intl={phoneIntl}
+                      onIntlChange={setPhoneIntl}
                     />
                     {touched.phone && phoneError() && <span className={s.fieldError}>{t(phoneError()!)}</span>}
                   </div>
@@ -911,7 +918,7 @@ function SummaryRows({ service, specialist, anySpecialist, hideSpecialist, locat
         value={<>{time ?? '—'}{service ? ` · ${fmtDuration(service.duration, { min: t('partner.services.min'), h: t('partner.services.hour') })}` : ''}</>}
       />
       {name && <Row icon={<Users size={15} />} label={t('booking.summary.name')} value={name} />}
-      {phone && <Row icon={<MapPin size={15} />} label={t('booking.summary.phone')} value={phone} />}
+      {phone && <Row icon={<MapPin size={15} />} label={t('booking.summary.phone')} value={formatPhoneDisplay(phone)} />}
       {!hidePrice && service && (
         <div className={[s.sumRow, s.sumTotal].join(' ')}>
           <span className={s.sumTotalLabel}>{t('booking.summary.total')}</span>

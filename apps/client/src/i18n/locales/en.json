@@ -410,6 +410,10 @@
     "fullNamePlaceholder": "e.g. Anna Karapetyan",
     "phoneLabel": "Phone number",
     "phonePlaceholder": "+374 …",
+    "phone": {
+      "otherCountry": "Other country?",
+      "useArmenia": "← Use an Armenian number"
+    },
     "notesLabel": "Notes (optional)",
     "notesPlaceholder": "Anything the salon should know?",
     "validation": {

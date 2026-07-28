@@ -411,6 +411,10 @@
     "fullNamePlaceholder": "օր․՝ Աննա Կարապետյան",
     "phoneLabel": "Հեռախոսահամար",
     "phonePlaceholder": "+374 …",
+    "phone": {
+      "otherCountry": "Այլ երկի՞ր",
+      "useArmenia": "← Օգտագործել հայկական համար"
+    },
     "notesLabel": "Նշումներ (ըստ ցանկության)",
     "notesPlaceholder": "Ինչ-որ բան, որ սրահը պետք է իմանա՞։",
     "validation": {

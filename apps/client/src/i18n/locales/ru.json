@@ -411,6 +411,10 @@
     "fullNamePlaceholder": "напр. Анна Карапетян",
     "phoneLabel": "Номер телефона",
     "phonePlaceholder": "+374 …",
+    "phone": {
+      "otherCountry": "Другая страна?",
+      "useArmenia": "← Армянский номер"
+    },
     "notesLabel": "Заметки (необязательно)",
     "notesPlaceholder": "Что салону стоит знать?",
     "validation": {
