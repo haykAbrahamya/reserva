@@ -303,7 +303,9 @@
       "serviceCount": "{count} ծառայություն",
       "serviceCount_plural": "{count} ծառայություն",
       "viewProfile": "Դիտել պրոֆիլը",
-      "viewProfileAria": "Դիտել {name}-ի պրոֆիլը"
+      "viewProfileAria": "Դիտել {name}-ի պրոֆիլը",
+      "allBranches": "Բոլորը",
+      "filterAria": "Զտել մասնագետներն ըստ մասնաճյուղի"
     },
     "reviews": {
       "eyebrow": "Կարծիքներ",

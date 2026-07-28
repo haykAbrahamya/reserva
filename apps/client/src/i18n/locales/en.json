@@ -303,7 +303,9 @@
       "serviceCount": "{count} service",
       "serviceCount_plural": "{count} services",
       "viewProfile": "View profile",
-      "viewProfileAria": "View {name}'s profile"
+      "viewProfileAria": "View {name}'s profile",
+      "allBranches": "All",
+      "filterAria": "Filter specialists by branch"
     },
     "reviews": {
       "eyebrow": "Reviews",

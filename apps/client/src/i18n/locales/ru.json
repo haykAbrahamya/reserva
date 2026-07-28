@@ -303,7 +303,9 @@
       "serviceCount": "{count} услуга",
       "serviceCount_plural": "{count} услуг",
       "viewProfile": "Профиль",
-      "viewProfileAria": "Открыть профиль {name}"
+      "viewProfileAria": "Открыть профиль {name}",
+      "allBranches": "Все",
+      "filterAria": "Фильтровать специалистов по филиалу"
     },
     "reviews": {
       "eyebrow": "Отзывы",

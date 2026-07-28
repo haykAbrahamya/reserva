@@ -20,6 +20,73 @@
   margin: 0;
 }
 
+/* Location filter chips — a horizontally scrollable row on narrow screens. */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 22px;
+
+  @media (max-width: 600px) {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-right: -18px; /* let chips bleed to the screen edge as they scroll */
+    padding-right: 18px;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+  }
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-1;
+  font-family: $font-sans;
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+
+  &:hover { border-color: $accent-soft; background: $bg-2; }
+  &:active { transform: translateY(1px); }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+}
+.chipIcon { color: $accent-contrast; flex-shrink: 0; }
+.chipCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: $bg-3;
+  color: $fg-2;
+  font-size: 11.5px;
+  font-weight: 700;
+  transition: background 0.15s, color 0.15s;
+}
+/* Active chip: filled with the brand accent so the current filter is obvious. */
+.chipActive {
+  background: $accent;
+  border-color: $accent;
+  color: $fg-on-accent;
+
+  &:hover { background: $accent; border-color: $accent; }
+  .chipIcon { color: $fg-on-accent; }
+  .chipCount {
+    background: color-mix(in srgb, #000 18%, transparent);
+    color: $fg-on-accent;
+  }
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
