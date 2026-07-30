@@ -4,9 +4,10 @@ import { ThemeToggle } from '@/components/ThemeToggle/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher'
 import { LogoMark } from '@/components/Logo/Logo'
 import { marketingSiteUrl } from '@/hooks/useTenantSlug'
-import { canBook, partnerTelHref } from '@/services/booking.service'
+import { canBook, partnerTelHref, bookableLocations } from '@/services/booking.service'
 import { useT } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
+import { CallLocationModal } from '../CallLocationModal/CallLocationModal'
 import s from './PartnerNav.module.scss'
 
 interface Props {
@@ -19,6 +20,11 @@ export function PartnerNav({ partner, onBook }: Props) {
   const [t1, t2] = partner.presentation.heroTints
   const t = useT()
   const telHref = partnerTelHref(partner)
+  // With multiple branches, "Call now" opens a branch picker instead of dialing
+  // the primary number directly.
+  const callLocations = bookableLocations(partner)
+  const multiLocation = callLocations.length > 1
+  const [callOpen, setCallOpen] = useState(false)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 300)
@@ -56,12 +62,22 @@ export function PartnerNav({ partner, onBook }: Props) {
               <CalendarCheck size={15} /> <span className={s.bookLabel}>{t('partner.bookNow')}</span>
             </button>
           ) : telHref && (
-            <a className={s.bookBtn} href={telHref} aria-label={t('partner.callNow')}>
-              <Phone size={15} /> <span className={s.bookLabel}>{t('partner.callNow')}</span>
-            </a>
+            multiLocation ? (
+              <button className={s.bookBtn} onClick={() => setCallOpen(true)} aria-label={t('partner.callNow')}>
+                <Phone size={15} /> <span className={s.bookLabel}>{t('partner.callNow')}</span>
+              </button>
+            ) : (
+              <a className={s.bookBtn} href={telHref} aria-label={t('partner.callNow')}>
+                <Phone size={15} /> <span className={s.bookLabel}>{t('partner.callNow')}</span>
+              </a>
+            )
           )}
         </div>
       </div>
+
+      {callOpen && (
+        <CallLocationModal partner={partner} locations={callLocations} onClose={() => setCallOpen(false)} />
+      )}
     </header>
   )
 }
