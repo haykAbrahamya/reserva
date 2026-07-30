@@ -23,7 +23,8 @@
   max-width: 420px;
   max-height: 88vh;
   background: $bg-1;
-  border: 1px solid $line-1;
+  /* No outer border: the gradient header fills the top edge-to-edge, so a 1px
+     border would show as a light hairline above it. The shadow defines the edge. */
   border-radius: $r-3;
   box-shadow: $shadow-3;
   display: flex;
@@ -35,7 +36,6 @@
     max-width: 100%;
     max-height: calc(100dvh - 24px);
     border-radius: 22px 22px 0 0;
-    border-bottom: none;
     animation: cm-sheet 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
