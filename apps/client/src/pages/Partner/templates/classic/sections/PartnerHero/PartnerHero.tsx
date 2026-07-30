@@ -4,6 +4,7 @@ import { WhatsappIcon } from '@reserva/ui'
 import { useT, useLocalized } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
 import { bookableLocations, canBook } from '@/services/booking.service'
+import { CallLocationModal } from '../../../../components/CallLocationModal/CallLocationModal'
 import s from './PartnerHero.module.scss'
 
 interface Props {
@@ -25,6 +26,9 @@ export function PartnerHero({ partner, onBook }: Props) {
   const t2 = p.heroTints[1] ?? `color-mix(in srgb, ${partner.accent} 55%, #7c3aed)`
   const t = useT()
   const loc = useLocalized()
+
+  // "Which branch?" call picker — only used when the partner has >1 location.
+  const [callOpen, setCallOpen] = useState(false)
 
   // Hide the scroll hint once the user starts scrolling.
   const [showHint, setShowHint] = useState(true)
@@ -158,9 +162,15 @@ export function PartnerHero({ partner, onBook }: Props) {
             </button>
           )}
           {primaryLocation && (
-            <a className={s.callBtn} href={`tel:${primaryLocation.phone.replace(/\s/g, '')}`}>
-              <Phone size={17} /> {t('partner.hero.call')}
-            </a>
+            multiLocation ? (
+              <button type="button" className={s.callBtn} onClick={() => setCallOpen(true)}>
+                <Phone size={17} /> {t('partner.hero.call')}
+              </button>
+            ) : (
+              <a className={s.callBtn} href={`tel:${primaryLocation.phone.replace(/\s/g, '')}`}>
+                <Phone size={17} /> {t('partner.hero.call')}
+              </a>
+            )
           )}
           {(p.instagram || p.facebook || p.whatsapp) && (
             <div className={s.socials}>
@@ -196,6 +206,10 @@ export function PartnerHero({ partner, onBook }: Props) {
         </span>
         <ChevronDown size={16} className={s.scrollChevron} />
       </button>
+
+      {callOpen && (
+        <CallLocationModal partner={partner} locations={locations} onClose={() => setCallOpen(false)} />
+      )}
     </section>
   )
 }

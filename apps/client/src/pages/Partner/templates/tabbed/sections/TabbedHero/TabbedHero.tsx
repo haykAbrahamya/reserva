@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { MapPin, Phone, Instagram, Facebook, Star } from 'lucide-react'
 import { WhatsappIcon } from '@reserva/ui'
 import { useT, useLocalized } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
 import { bookableLocations } from '@/services/booking.service'
+import { CallLocationModal } from '../../../../components/CallLocationModal/CallLocationModal'
 import s from './TabbedHero.module.scss'
 
 interface Props {
@@ -24,6 +26,8 @@ export function TabbedHero({ partner, onReviewsClick }: Props) {
   const loc = useLocalized()
   const locations = bookableLocations(partner)
   const primary = locations[0]
+  const multiLocation = locations.length > 1
+  const [callOpen, setCallOpen] = useState(false)
   const t1 = p.heroTints[0] ?? partner.accent
   const t2 = p.heroTints[1] ?? `color-mix(in srgb, ${partner.accent} 55%, #7c3aed)`
 
@@ -85,9 +89,15 @@ export function TabbedHero({ partner, onReviewsClick }: Props) {
           {(primary || p.instagram || p.facebook || p.whatsapp) && (
             <div className={s.socials}>
               {primary && (
-                <a className={s.iconBtn} href={`tel:${primary.phone.replace(/\s/g, '')}`} aria-label={t('partner.hero.call')}>
-                  <Phone size={17} />
-                </a>
+                multiLocation ? (
+                  <button type="button" className={s.iconBtn} onClick={() => setCallOpen(true)} aria-label={t('partner.hero.call')}>
+                    <Phone size={17} />
+                  </button>
+                ) : (
+                  <a className={s.iconBtn} href={`tel:${primary.phone.replace(/\s/g, '')}`} aria-label={t('partner.hero.call')}>
+                    <Phone size={17} />
+                  </a>
+                )
               )}
               {p.instagram && (
                 <a className={s.iconBtn} href={p.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
@@ -108,6 +118,10 @@ export function TabbedHero({ partner, onReviewsClick }: Props) {
           )}
         </div>
       </div>
+
+      {callOpen && (
+        <CallLocationModal partner={partner} locations={locations} onClose={() => setCallOpen(false)} />
+      )}
     </section>
   )
 }

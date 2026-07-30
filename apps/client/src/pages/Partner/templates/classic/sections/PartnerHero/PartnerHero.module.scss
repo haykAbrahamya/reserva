@@ -250,6 +250,7 @@ button.rating {
   text-decoration: none;
   border: 1px solid $line-2;
   box-shadow: $shadow-1;
+  cursor: pointer; /* also renders as a <button> when there are multiple branches */
   transition: background 0.15s, border-color 0.15s, transform 0.1s;
   &:hover { background: $bg-2; border-color: $line-strong; transform: translateY(-1px); }
   &:active { transform: translateY(0); }

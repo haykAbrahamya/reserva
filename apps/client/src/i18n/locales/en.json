@@ -251,6 +251,11 @@
       "scrollToExplore": "Scroll to explore",
       "scrollDown": "Scroll down"
     },
+    "callModal": {
+      "title": "Call us",
+      "subtitle": "Choose a branch to call",
+      "close": "Close"
+    },
     "services": {
       "eyebrow": "Menu",
       "title": "Services & pricing",

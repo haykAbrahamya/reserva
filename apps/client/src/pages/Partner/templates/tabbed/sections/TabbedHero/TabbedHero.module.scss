@@ -95,6 +95,7 @@ button.rating {
   border: 1px solid $line-2;
   background: $bg-1;
   color: $fg-1;
+  cursor: pointer; /* also renders as a <button> when there are multiple branches */
   transition: background 0.16s, color 0.16s, border-color 0.16s, transform 0.12s;
   -webkit-tap-highlight-color: transparent;
 
