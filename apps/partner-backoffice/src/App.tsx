@@ -7,6 +7,7 @@ import { Activate } from '@/pages/Activate/Activate'
 import { Dashboard } from '@/pages/Dashboard/Dashboard'
 import { Bookings } from '@/pages/Bookings/Bookings'
 import { Services } from '@/pages/Services/Services'
+import { Courses } from '@/pages/Courses/Courses'
 import { Specialists } from '@/pages/Specialists/Specialists'
 import { Reviews } from '@/pages/Reviews/Reviews'
 import { Hours } from '@/pages/Hours/Hours'
@@ -17,6 +18,7 @@ import { Clients } from '@/pages/Clients/Clients'
 import { Settings as SettingsPage } from '@/pages/Settings/Settings'
 import { Storefront } from '@/pages/Storefront/Storefront'
 import { RequireAdmin } from '@/components/auth/RequireAdmin'
+import { RequireCourses } from '@/components/auth/RequireCourses'
 import { ToastProvider } from '@/components/ui'
 import { NewBookingModal } from '@/components/bookings/NewBookingModal/NewBookingModal'
 import { useAppStore, usePartner } from '@/store/app.store'
@@ -108,6 +110,7 @@ export default function App() {
             <Route path="bookings" element={<Bookings />} />
             <Route path="clients"  element={<Clients />} />
             <Route path="services"    element={<Services />} />
+            <Route path="courses"     element={<RequireCourses><Courses /></RequireCourses>} />
             <Route path="specialists" element={<Specialists />} />
             <Route path="reviews"     element={<Reviews />} />
             <Route path="hours"       element={<Hours />} />

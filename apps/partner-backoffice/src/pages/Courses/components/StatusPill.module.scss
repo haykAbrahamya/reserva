@@ -1,0 +1,30 @@
+@use 'variables' as *;
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+/* Tones — reuse the semantic token pairs so they read consistently with the
+   rest of the backoffice. */
+.draft    { background: $bg-3;        color: $fg-2; }
+.open     { background: $info-soft;   color: $info; }
+.running  { background: $success-soft; color: $success; }
+.done     { background: $accent-soft; color: $accent-contrast; }
+.muted    { background: $bg-3;        color: $fg-3; }
+.pending  { background: $warn-soft;   color: $warn; }
+.confirmed { background: $success-soft; color: $success; }

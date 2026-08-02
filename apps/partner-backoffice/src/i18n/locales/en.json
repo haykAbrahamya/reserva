@@ -83,17 +83,44 @@
       "today": "Today",
       "clear": "Clear",
       "monthsLong": {
-        "0": "January", "1": "February", "2": "March", "3": "April", "4": "May", "5": "June",
-        "6": "July", "7": "August", "8": "September", "9": "October", "10": "November", "11": "December"
+        "0": "January",
+        "1": "February",
+        "2": "March",
+        "3": "April",
+        "4": "May",
+        "5": "June",
+        "6": "July",
+        "7": "August",
+        "8": "September",
+        "9": "October",
+        "10": "November",
+        "11": "December"
       },
       "monthsShort": {
-        "0": "Jan", "1": "Feb", "2": "Mar", "3": "Apr", "4": "May", "5": "Jun",
-        "6": "Jul", "7": "Aug", "8": "Sep", "9": "Oct", "10": "Nov", "11": "Dec"
+        "0": "Jan",
+        "1": "Feb",
+        "2": "Mar",
+        "3": "Apr",
+        "4": "May",
+        "5": "Jun",
+        "6": "Jul",
+        "7": "Aug",
+        "8": "Sep",
+        "9": "Oct",
+        "10": "Nov",
+        "11": "Dec"
       },
       "weekdaysShort": {
-        "0": "Mo", "1": "Tu", "2": "We", "3": "Th", "4": "Fr", "5": "Sa", "6": "Su"
+        "0": "Mo",
+        "1": "Tu",
+        "2": "We",
+        "3": "Th",
+        "4": "Fr",
+        "5": "Sa",
+        "6": "Su"
       }
-    }
+    },
+    "loading": "Loading…"
   },
   "nav": {
     "sections": {
@@ -116,7 +143,8 @@
     "home": "Home",
     "more": "More",
     "expandSidebar": "Expand sidebar",
-    "collapseSidebar": "Collapse sidebar"
+    "collapseSidebar": "Collapse sidebar",
+    "courses": "Courses"
   },
   "roles": {
     "admin": "Admin",
@@ -885,6 +913,139 @@
       "TIME_OFF_HAS_CONFLICTS": "There are bookings during that time off.",
       "INVALID_TIME_RANGE": "The end time must be after the start time.",
       "PAST_DATE": "Please choose a time in the future."
+    }
+  },
+  "courses": {
+    "title": "Courses",
+    "subtitle": "{count} course",
+    "subtitle_plural": "{count} courses",
+    "addCourse": "Add course",
+    "emptyTitle": "No courses yet",
+    "emptyDesc": "Create your first course — a class or masterclass your students can join.",
+    "free": "Free",
+    "createdToast": "Course created",
+    "updatedToast": "Course updated",
+    "removedToast": "Course removed",
+    "card": {
+      "draft": "Draft",
+      "by": "with {name}",
+      "noRun": "No active run"
+    },
+    "level": {
+      "none": "No level",
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "status": {
+      "draft": "Draft",
+      "open": "Open",
+      "running": "Running",
+      "completed": "Completed",
+      "archived": "Archived"
+    },
+    "tutor": {
+      "label": "Tutor",
+      "none": "No tutor",
+      "guest": "Guest tutor",
+      "guestNamePlaceholder": "Tutor name",
+      "guestTitlePlaceholder": "Title (e.g. Master Stylist)"
+    },
+    "cover": {
+      "upload": "Upload cover",
+      "change": "Change cover",
+      "remove": "Remove",
+      "hint": "Landscape image, up to 8 MB",
+      "notImage": "Please choose an image file",
+      "tooLarge": "Image is too large (max 8 MB)"
+    },
+    "editor": {
+      "newTitle": "New course",
+      "editTitle": "Edit course",
+      "create": "Create course",
+      "coverLabel": "Cover image",
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g. Hair Styling Masterclass",
+      "summaryLabel": "Short description",
+      "summaryPlaceholder": "One line shown on the card",
+      "descriptionLabel": "Full description",
+      "descriptionPlaceholder": "What students will learn…",
+      "priceLabel": "Price",
+      "priceFree": "Free",
+      "priceHelp": "Leave empty for a free course",
+      "levelLabel": "Level",
+      "activeLabel": "Published",
+      "activeHint": "Show this course on your public page"
+    },
+    "detail": {
+      "subtitle": "Manage this course’s run and members",
+      "tabRun": "Run",
+      "tabMembers": "Members",
+      "tabHistory": "History"
+    },
+    "run": {
+      "start": "Start",
+      "finish": "Finish",
+      "archive": "Archive",
+      "startNew": "Start new run",
+      "unlimited": "unlimited",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "datePlaceholder": "Optional",
+      "capacity": "Capacity",
+      "capacityUnlimited": "Unlimited",
+      "capacityHelp": "Max members (empty = unlimited)",
+      "branch": "Branch",
+      "noBranch": "No specific branch",
+      "schedule": "Schedule",
+      "schedulePlaceholder": "e.g. Tue & Thu · 18:00–20:00",
+      "registrationLabel": "Online registration",
+      "registrationHint": "Let students register from your public page",
+      "saveDetails": "Save details",
+      "savedToast": "Run updated",
+      "newRunToast": "New run started",
+      "newRunConfirmTitle": "Start a new run?",
+      "newRunConfirmBody": "This archives the current run (keeping its members as history) and starts a fresh one with no members."
+    },
+    "members": {
+      "add": "Add member",
+      "addedToast": "Member added",
+      "namePlaceholder": "Full name",
+      "phonePlaceholder": "+374 …",
+      "emailPlaceholder": "Email (optional)",
+      "pendingHeading": "Pending confirmation",
+      "confirmedHeading": "{count} member",
+      "confirmedHeading_plural": "{count} members",
+      "pastHeading": "Past / cancelled",
+      "empty": "No members yet",
+      "selfRegistered": "Self-registered",
+      "confirm": "Confirm",
+      "reject": "Reject",
+      "remove": "Remove",
+      "markCompleted": "Mark completed",
+      "status": {
+        "pending": "Pending",
+        "confirmed": "Confirmed",
+        "cancelled": "Cancelled",
+        "completed": "Completed",
+        "noshow": "No-show"
+      },
+      "totalCount": "{count} member",
+      "totalCount_plural": "{count} members",
+      "confirmedShort": "Confirmed",
+      "selfShort": "self-registered",
+      "nameLabel": "Name",
+      "phoneLabel": "Phone",
+      "emailLabel": "Email"
+    },
+    "history": {
+      "empty": "No past runs yet",
+      "members": "{count} members",
+      "noMembers": "This run had no members."
+    },
+    "delete": {
+      "title": "Remove course",
+      "body": "Remove “{name}”? Its runs and members will be removed too."
     }
   }
 }

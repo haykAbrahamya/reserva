@@ -107,6 +107,107 @@ export interface Service {
   capacity?: number
 }
 
+// ── Courses ─────────────────────────────────────────────────
+// A salon "academy": a Course (reusable template) is run as one or more
+// Cohorts (a "group/run" with its own dates + members). Members (Enrollments)
+// are self-contained — a course student is NOT a booking Client.
+
+export type CourseLevel = 'beginner' | 'intermediate' | 'advanced'
+
+/** Lifecycle of one course run. */
+export type CohortStatus = 'draft' | 'open' | 'running' | 'completed' | 'archived'
+
+export type EnrollmentStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'noshow'
+
+export type EnrollmentSource = 'public' | 'backoffice'
+
+/** Lightweight rollup of a course's current run, embedded on the Course by the
+ *  API so a list can render "active run · N members" without extra fetches. */
+export interface CurrentCohortSummary {
+  id: string
+  status: CohortStatus
+  startDate: string | null
+  endDate: string | null
+  scheduleText: string
+  capacity: number
+  registrationOpen: boolean
+  locationId: string | null
+  /** Confirmed members currently occupying a seat. */
+  confirmedCount: number
+}
+
+/** The tutor credited on a course — either a linked specialist or a guest. */
+export interface CourseTutor {
+  id: string
+  name: string
+  nameI18n?: LocalizedText | null
+  title: string
+  titleI18n?: LocalizedText | null
+  avatarUrl?: string
+}
+
+export interface Course {
+  id: string
+  partnerId: string
+  title: string
+  /** Optional per-language overrides for `title` (falls back to `title`). */
+  titleI18n?: LocalizedText | null
+  summary: string
+  summaryI18n?: LocalizedText | null
+  description: string
+  descriptionI18n?: LocalizedText | null
+  /** Cover image URL. Empty → gradient placeholder. */
+  coverUrl: string
+  /** Price in whole AMD. 0 = free. */
+  price: number
+  /** Linked tutor specialist id, or null for a guest/none. */
+  tutorSpecialistId?: string | null
+  /** Free-text guest tutor (used when there's no linked specialist). */
+  tutorName: string
+  tutorTitle: string
+  level?: CourseLevel | null
+  active: boolean
+  /** Joined tutor specialist (present when `tutorSpecialistId` is set). */
+  tutorSpecialist?: CourseTutor | null
+  /** The current (non-archived) run + a rollup; null if none. */
+  currentCohort?: CurrentCohortSummary | null
+  /** Total number of runs (incl. archived). */
+  cohortCount?: number
+}
+
+/** One run of a course (the editable/lifecycle unit). */
+export interface CourseCohort {
+  id: string
+  courseId: string
+  partnerId: string
+  locationId: string | null
+  startDate: string | null
+  endDate: string | null
+  scheduleText: string
+  /** Max confirmed members. 0 = unlimited. */
+  capacity: number
+  status: CohortStatus
+  registrationOpen: boolean
+}
+
+/** A member of a course run. Self-contained contact (not a booking Client). */
+export interface CourseEnrollment {
+  id: string
+  cohortId: string
+  partnerId: string
+  memberName: string
+  memberPhone: string
+  memberEmail: string
+  status: EnrollmentStatus
+  source: EnrollmentSource
+  notes?: string | null
+  /** Price captured at enrollment time (drams). */
+  priceAtEnroll: number
+  /** UI language the member registered in; null for staff adds. */
+  locale?: string | null
+  createdAt: string
+}
+
 export interface Booking {
   id: string
   partnerId: string

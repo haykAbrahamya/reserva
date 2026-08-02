@@ -136,6 +136,19 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
     if (open && scopedLocationId) setLocationId(scopedLocationId)
   }, [open, scopedLocationId])
 
+  // Solo partners have exactly one location + one specialist, so asking is noise.
+  // Auto-fill both invisibly once the catalogs load.
+  const isSolo = partner?.kind === 'single'
+  useEffect(() => {
+    if (!open || !isSolo) return
+    if (!locationId && locCatalog.length === 1) setLocationId(locCatalog[0].id)
+  }, [open, isSolo, locationId, locCatalog])
+  useEffect(() => {
+    if (!open || !isSolo) return
+    const solo = spCatalog.find(sp => sp.active)
+    if (!specialistId && solo) setSpecialistId(solo.id)
+  }, [open, isSolo, specialistId, spCatalog])
+
   // Early return AFTER all hooks
   if (!partner) return null
 
@@ -240,17 +253,21 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
       }
     >
       <div className={s.grid}>
-        <div className={s.full}>
-          <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('newBooking.locationLabel')}</label>
-          <Select
-            value={locationId}
-            onChange={v => { setLocationId(v); setSpecialistId(''); clearErr('locationId') }}
-            options={locations.map(l => ({ value: l.id, label: l.name, sub: l.address }))}
-            placeholder={t('newBooking.locationPlaceholder')}
-            disabled={!!scopedLocationId}
-          />
-          <FieldError message={errs.locationId} />
-        </div>
+        {/* Location — hidden for solo partners (they have exactly one branch,
+            auto-filled above). */}
+        {!isSolo && (
+          <div className={s.full}>
+            <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('newBooking.locationLabel')}</label>
+            <Select
+              value={locationId}
+              onChange={v => { setLocationId(v); setSpecialistId(''); clearErr('locationId') }}
+              options={locations.map(l => ({ value: l.id, label: l.name, sub: l.address }))}
+              placeholder={t('newBooking.locationPlaceholder')}
+              disabled={!!scopedLocationId}
+            />
+            <FieldError message={errs.locationId} />
+          </div>
+        )}
 
         <div className={s.full}>
           <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('newBooking.serviceLabel')}</label>
@@ -283,8 +300,9 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
           <FieldError message={errs.serviceId} />
         </div>
 
-        {/* Specialist — hidden for facility/entry services (spa walk-ins). */}
-        {!isFacility && (
+        {/* Specialist — hidden for facility/entry services (spa walk-ins) and for
+            solo partners (their sole specialist is auto-filled above). */}
+        {!isFacility && !isSolo && (
           <div className={s.full}>
             <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('newBooking.specialistLabel')}</label>
             <Select

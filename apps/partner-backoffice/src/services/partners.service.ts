@@ -121,6 +121,9 @@ export type PartnerProfileResponse = Omit<Partner, 'slug'> & {
   /** Featured in the public marketplace (/salons). Read-only here — curated by
    *  Reserva platform staff from the internal console. */
   marketplaceListed?: boolean
+  /** Whether the Courses (academy) feature is enabled. Read-only here — curated
+   *  by Reserva platform staff from the internal console. */
+  coursesEnabled?: boolean
   presentation?: PartnerPresentationFields | null
 }
 

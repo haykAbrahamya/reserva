@@ -1,5 +1,11 @@
 import type { Booking, Service, Specialist, LocalizedText } from '@reserva/shared'
-import type { PublicPartner, PartnerPresentation } from '@/mock/partners'
+import type { PublicPartner, PartnerPresentation, PublicCourse } from '@/mock/partners'
+
+/** Raw course shape from the API (cover url is a server path resolved below). */
+type ApiCourse = Omit<PublicCourse, 'coverUrl' | 'tutorSpecialist'> & {
+  coverUrl?: string
+  tutorSpecialist?: (PublicCourse['tutorSpecialist'] & { avatarUrl?: string }) | null
+}
 
 // ─────────────────────────────────────────────────────────────
 // Public booking API client. No auth — the client app only reads a partner by
@@ -65,6 +71,7 @@ interface ApiPartner {
   locations: PublicPartner['locations']
   services: Service[]
   specialists: ApiSpecialist[]
+  courses?: ApiCourse[]
   presentation: {
     tagline: string
     taglineI18n?: LocalizedText | null
@@ -117,7 +124,19 @@ function toPublicPartner(p: ApiPartner): PublicPartner {
     locations: p.locations,
     services: p.services.map((sv) => ({ ...sv, priceType: sv.priceType, priceMax: sv.priceMax })),
     specialists: p.specialists.map(({ serviceIds, ...rest }) => ({ ...rest, services: serviceIds })),
+    courses: (p.courses ?? []).map(toPublicCourse),
     presentation,
+  }
+}
+
+/** Resolve a course's server-relative image paths for the client. */
+function toPublicCourse(c: ApiCourse): PublicCourse {
+  return {
+    ...c,
+    coverUrl: resolveImageUrl(c.coverUrl) ?? '',
+    tutorSpecialist: c.tutorSpecialist
+      ? { ...c.tutorSpecialist, avatarUrl: resolveImageUrl(c.tutorSpecialist.avatarUrl) }
+      : null,
   }
 }
 
@@ -280,6 +299,35 @@ export async function createBooking(input: CreateBookingInput): Promise<Booking>
     status: b.status,
     notes: b.notes ?? undefined,
   }
+}
+
+// ── Course registration (public) ──
+
+export interface CourseRegisterInput {
+  slug: string
+  courseId: string
+  memberName: string
+  memberPhone: string
+  memberEmail?: string
+  locale?: 'en' | 'hy' | 'ru'
+}
+
+/** Register for a course from the public page. Lands as a PENDING enrollment the
+ *  salon confirms. Returns the resulting status. Errors surface via BookingApiError
+ *  (COURSE_FULL / ENROLLMENT_CLOSED / ALREADY_ENROLLED). */
+export async function registerForCourse(
+  input: CourseRegisterInput,
+): Promise<{ status: string }> {
+  return api<{ status: string }>(`/public/partners/${input.slug}/courses/register`, {
+    method: 'POST',
+    body: JSON.stringify({
+      courseId: input.courseId,
+      memberName: input.memberName,
+      memberPhone: input.memberPhone,
+      memberEmail: input.memberEmail,
+      locale: input.locale,
+    }),
+  })
 }
 
 // ── Specialist reviews (public) ──

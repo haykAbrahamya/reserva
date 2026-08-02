@@ -1,16 +1,17 @@
 import { useState, useMemo, useRef, useEffect, type ReactElement } from 'react'
-import { Sparkles, Star, Images, MapPin } from 'lucide-react'
+import { Sparkles, Star, Images, MapPin, GraduationCap } from 'lucide-react'
 import { useT } from '@/i18n'
 import type { TemplateProps } from '../types'
 import { TabbedHero } from './sections/TabbedHero/TabbedHero'
 import { TabbedServices } from './sections/TabbedServices/TabbedServices'
+import { TabbedCourses } from './sections/TabbedCourses/TabbedCourses'
 import { TabbedReviews } from './sections/TabbedReviews/TabbedReviews'
 import { TabbedGallery } from './sections/TabbedGallery/TabbedGallery'
 import { TabbedBranches } from './sections/TabbedBranches/TabbedBranches'
 import { TabbedFooter } from './sections/TabbedFooter/TabbedFooter'
 import s from './TabbedTemplate.module.scss'
 
-type TabKey = 'services' | 'reviews' | 'gallery' | 'branches'
+type TabKey = 'services' | 'courses' | 'reviews' | 'gallery' | 'branches'
 
 /**
  * Tabbed template — a compact hero over a sticky tab bar that groups the
@@ -27,6 +28,7 @@ export function TabbedTemplate({ partner, onBook }: TemplateProps) {
   // Only offer tabs that have content, so the bar never shows an empty section.
   const tabs = useMemo(() => {
     const hasServices = partner.services.some((sv) => sv.active)
+    const hasCourses = (partner.courses?.length ?? 0) > 0
     const hasReviews = partner.specialists.some((sp) => (sp.reviewCount ?? 0) > 0)
     const hasGallery =
       (partner.presentation.gallery?.length ?? 0) > 0 || (partner.presentation.works?.length ?? 0) > 0
@@ -34,6 +36,7 @@ export function TabbedTemplate({ partner, onBook }: TemplateProps) {
 
     const list: { key: TabKey; label: string; icon: ReactElement }[] = []
     if (hasServices) list.push({ key: 'services', label: t('partner.services.title'), icon: <Sparkles size={16} /> })
+    if (hasCourses) list.push({ key: 'courses', label: t('courses.title'), icon: <GraduationCap size={16} /> })
     if (hasReviews) list.push({ key: 'reviews', label: t('partner.reviews.eyebrow'), icon: <Star size={16} /> })
     if (hasGallery) list.push({ key: 'gallery', label: t('partner.gallery.eyebrow'), icon: <Images size={16} /> })
     if (hasBranches) list.push({ key: 'branches', label: t('partner.locations.eyebrow'), icon: <MapPin size={16} /> })
@@ -99,6 +102,7 @@ export function TabbedTemplate({ partner, onBook }: TemplateProps) {
           <div className={s.panels} ref={panelsRef}>
             {([
               ['services', <TabbedServices key="s" partner={partner} onBook={onBook} />],
+              ['courses', <TabbedCourses key="c" partner={partner} />],
               ['reviews', <TabbedReviews key="r" partner={partner} />],
               ['gallery', <TabbedGallery key="g" partner={partner} />],
               ['branches', <TabbedBranches key="b" partner={partner} onBook={() => onBook()} />],

@@ -26,6 +26,8 @@ export type PartnerProfile = Omit<Partner, 'locations' | 'services' | 'specialis
   supportWidget?: 'support' | 'book' | 'hidden'
   /** Default language for the public client page (first-time visitors). */
   defaultLocale?: 'hy' | 'en' | 'ru'
+  /** Whether the Courses feature is enabled (platform-curated, read-only). */
+  coursesEnabled?: boolean
   /** Public marketing fields edited in the Storefront section. */
   presentation?: {
     about?: string

@@ -7,6 +7,7 @@ export type NotificationType =
   | 'booking_confirmed'
   | 'booking_completed'
   | 'booking_noshow'
+  | 'course_registration'
 
 export interface AppNotification {
   id: string
@@ -19,6 +20,10 @@ export interface AppNotification {
     service?: string
     specialist?: string | null
     startAt?: string
+    /** Course registration notifications. */
+    courseId?: string
+    courseTitle?: string
+    memberName?: string
   }
   read: boolean
   createdAt: string

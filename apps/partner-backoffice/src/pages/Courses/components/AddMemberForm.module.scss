@@ -1,0 +1,31 @@
+@use 'variables' as *;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: $r-2;
+  border: 1px solid $line-1;
+  background: $bg-2;
+  animation: add-in 0.16s ease both;
+}
+.fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+/* Email spans full width on its own line for breathing room. */
+.emailField { grid-column: 1 / -1; }
+
+.submit { align-self: flex-end; }
+
+@keyframes add-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 560px) {
+  .fields { grid-template-columns: 1fr; }
+  .submit { align-self: stretch; }
+}

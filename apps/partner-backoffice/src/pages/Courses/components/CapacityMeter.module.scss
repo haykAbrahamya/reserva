@@ -1,0 +1,20 @@
+@use 'variables' as *;
+
+.wrap { display: flex; flex-direction: column; gap: 6px; min-width: 120px; }
+.head { display: flex; align-items: baseline; justify-content: space-between; }
+.count { font-size: 13px; font-weight: 600; color: $fg-1; }
+
+.track {
+  height: 6px;
+  border-radius: 999px;
+  background: $bg-3;
+  overflow: hidden;
+}
+.fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.25s ease, background 0.2s;
+}
+.ok   { background: $success; }
+.near { background: $warn; }
+.full { background: $danger; }

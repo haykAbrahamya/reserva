@@ -112,7 +112,7 @@ export function MobileTabBar() {
             <div className={s.sheetItems}>
               {MORE_SECTIONS.map(group => {
                 const items = group.items.filter(item =>
-                  isNavItemVisible(item, { isAdmin, isSingle: partner?.kind === 'single' })
+                  isNavItemVisible(item, { isAdmin, isSingle: partner?.kind === 'single', coursesEnabled: !!partner?.coursesEnabled })
                 )
                 if (items.length === 0) return null
                 return (

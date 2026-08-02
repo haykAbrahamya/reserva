@@ -1,0 +1,47 @@
+@use 'variables' as *;
+
+.wrap {
+  border-radius: $r-2;
+  border: 1px solid $line-1;
+  background: $bg-1;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.open { border-color: $line-2; }
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: $font-sans;
+  text-align: left;
+  transition: background 0.15s;
+  &:hover { background: $bg-2; }
+}
+.info { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-width: 0; }
+.dates { font-size: 13px; color: $fg-1; }
+.right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.count { font-size: 13px; font-weight: 600; color: $fg-2; white-space: nowrap; }
+.chevron {
+  color: $fg-3;
+  transition: transform 0.2s;
+  .open & { transform: rotate(180deg); }
+}
+
+.body {
+  padding: 12px 14px 14px;
+  border-top: 1px solid $line-1;
+  background: $bg-2;
+}
+.noMembers {
+  padding: 16px 0;
+  text-align: center;
+  color: $fg-3;
+  font-size: 13.5px;
+}

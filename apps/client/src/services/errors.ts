@@ -21,6 +21,9 @@ const KNOWN_CODES = new Set([
   'EMAIL_TAKEN',
   'PHONE_TAKEN',
   'SLUG_TAKEN',
+  'COURSE_FULL',
+  'ENROLLMENT_CLOSED',
+  'ALREADY_ENROLLED',
 ])
 
 /** The i18n key for a given backend error code (or the generic fallback). */

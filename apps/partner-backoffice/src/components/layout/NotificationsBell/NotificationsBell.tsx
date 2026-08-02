@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  Bell, Check, CalendarPlus, CalendarClock, CalendarX, CheckCircle2, XCircle, Trash2, BellRing, BellOff,
+  Bell, Check, CalendarPlus, CalendarClock, CalendarX, CheckCircle2, XCircle, Trash2, BellRing, BellOff, GraduationCap,
 } from 'lucide-react'
 import {
   notificationsService,
@@ -44,6 +44,7 @@ const ICONS: Record<NotificationType, typeof Bell> = {
   booking_confirmed: CheckCircle2,
   booking_completed: CheckCircle2,
   booking_noshow: XCircle,
+  course_registration: GraduationCap,
 }
 
 // Lightweight polling: the unread-count query is a cheap indexed COUNT. We
@@ -144,6 +145,7 @@ export function NotificationsBell() {
     }
     setOpen(false)
     if (n.data.bookingId) navigate(`/bookings?focus=${n.data.bookingId}`)
+    else if (n.data.courseId) navigate(`/courses?focus=${n.data.courseId}`)
   }
 
   const markAll = () => {

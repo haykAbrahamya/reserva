@@ -18,6 +18,8 @@ export interface PartnerListItem {
   active: boolean
   /** Featured in the public marketplace (/salons). Curated here by platform staff. */
   marketplaceListed: boolean
+  /** Whether the Courses (academy) feature is enabled. Platform-curated; default off. */
+  coursesEnabled: boolean
   /** Whether the public page accepts online bookings (off = contact-only). */
   bookingsEnabled: boolean
   /** 'salon' (team) or 'single' (solo professional). */
@@ -146,6 +148,11 @@ export const partnersService = {
   /** Enable/disable the public booking flow (off = contact-only page). */
   setBookings(id: string, enabled: boolean): Promise<PartnerDetail> {
     return apiPatch<PartnerDetail>(`/platform/partners/${id}/bookings`, { enabled })
+  },
+
+  /** Enable/disable the Courses (academy) feature for a partner. */
+  setCourses(id: string, enabled: boolean): Promise<PartnerDetail> {
+    return apiPatch<PartnerDetail>(`/platform/partners/${id}/courses`, { enabled })
   },
 
   /** Switch between salon (team) and single (solo) mode. */

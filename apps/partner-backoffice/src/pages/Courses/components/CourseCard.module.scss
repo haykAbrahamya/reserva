@@ -1,0 +1,132 @@
+@use 'variables' as *;
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: $r-3;
+  border: 1px solid $line-1;
+  background: $bg-1;
+  box-shadow: $shadow-1;
+  overflow: hidden;
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
+  &:hover { box-shadow: $shadow-2; transform: translateY(-2px); }
+}
+.inactive { opacity: 0.72; }
+
+.coverBtn {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background: linear-gradient(135deg, $bg-3, $bg-2);
+}
+.cover { width: 100%; height: 100%; object-fit: cover; display: block; }
+.coverEmpty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $fg-3;
+}
+/* Tags sit at the BOTTOM of the cover (draft bottom-left, level bottom-right) so
+   they never collide with the top-right action buttons — which are always
+   visible on touch. Dark scrim + white text stays legible over any image. */
+.draftTag,
+.levelTag {
+  position: absolute;
+  bottom: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.62);
+  color: #fff;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.draftTag {
+  left: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.levelTag { right: 10px; }
+
+.body { display: flex; flex-direction: column; gap: 8px; padding: 14px 14px 12px; flex: 1; }
+.titleRow { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.title {
+  flex: 1;
+  text-align: left;
+  border: none;
+  background: none;
+  padding: 0;
+  font-family: $font-sans;
+  font-size: 15.5px;
+  font-weight: 700;
+  color: $fg-0;
+  cursor: pointer;
+  line-height: 1.3;
+  &:hover { color: $accent-contrast; }
+}
+.price { font-size: 14px; font-weight: 700; color: $accent-contrast; white-space: nowrap; }
+.tutor { font-size: 12.5px; color: $fg-2; }
+
+.runRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: 6px;
+}
+.members {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: $fg-1;
+}
+.dates { font-size: 12px; color: $fg-3; }
+.noRun { font-size: 12.5px; color: $fg-3; }
+
+.actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  .card:hover & { opacity: 1; }
+}
+.iconBtn {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $r-1;
+  border: 1px solid $line-2;
+  /* Theme-aware surface (adapts to light/dark) with a subtle blur so it reads
+     over the cover image. */
+  background: color-mix(in srgb, $bg-1 88%, transparent);
+  color: $fg-1;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: $shadow-1;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  &:hover { background: $bg-1; border-color: $line-strong; color: $fg-0; }
+}
+.danger:hover { color: $danger; border-color: $danger; background: $danger-soft; }
+
+/* On touch there's no hover — always show actions with comfortable tap targets. */
+@media (hover: none) {
+  .actions { opacity: 1; }
+  .iconBtn { width: 34px; height: 34px; }
+}

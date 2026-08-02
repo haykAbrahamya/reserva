@@ -5,6 +5,7 @@ import { PartnerGallery } from './sections/PartnerGallery/PartnerGallery'
 import { PartnerServices } from './sections/PartnerServices/PartnerServices'
 import { PartnerLocations } from './sections/PartnerLocations/PartnerLocations'
 import { PartnerTeam } from './sections/PartnerTeam/PartnerTeam'
+import { PartnerCourses } from './sections/PartnerCourses/PartnerCourses'
 import { PartnerReviews } from './sections/PartnerReviews/PartnerReviews'
 import { PartnerFooter } from './sections/PartnerFooter/PartnerFooter'
 
@@ -27,6 +28,7 @@ export function ClassicTemplate({ partner, onBook, onOpenSpecialist }: TemplateP
       {(() => {
         const isSingle = partner.kind === 'single'
         const showTeam = !isSingle && partner.specialists.some((sp) => sp.active)
+        const showCourses = (partner.courses?.length ?? 0) > 0
         const showGallery = (partner.presentation.gallery?.length ?? 0) > 0
         const showWorks = (partner.presentation.works?.length ?? 0) > 0
         // Single mode hides the Team grid (and with it the per-specialist review
@@ -42,6 +44,7 @@ export function ClassicTemplate({ partner, onBook, onOpenSpecialist }: TemplateP
             <PartnerAbout partner={partner} tone={tone()} />
             <PartnerLocations partner={partner} onBook={() => onBook()} tone={tone()} />
             {showTeam && <PartnerTeam partner={partner} onSelect={onOpenSpecialist} tone={tone()} />}
+            {showCourses && <PartnerCourses partner={partner} tone={tone()} />}
             {showGallery && <PartnerGallery partner={partner} variant="gallery" tone={tone()} />}
             {showWorks && <PartnerGallery partner={partner} variant="works" tone={tone()} />}
             {showReviews && <PartnerReviews partner={partner} tone={tone()} />}

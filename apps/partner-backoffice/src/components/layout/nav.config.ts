@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Calendar, List, Users, Sparkles, User,
-  Clock, MapPin, Settings, UserCog, Store, MessageSquare,
+  Clock, MapPin, Settings, UserCog, Store, MessageSquare, GraduationCap,
 } from 'lucide-react'
 
 /**
@@ -24,6 +24,8 @@ export interface NavItem {
   /** Shown ONLY for `single` (solo) partners — e.g. the solo Reviews page that
    * replaces the per-specialist reviews living in the Specialists dashboard. */
   singleOnly?: boolean
+  /** Shown ONLY when the platform has enabled Courses for this partner. */
+  requiresCourses?: boolean
 }
 
 export interface NavSection {
@@ -40,6 +42,7 @@ export const NAV: NavSection[] = [
   ]},
   { section: 'catalog', items: [
     { to: '/services',    labelKey: 'nav.services',    icon: Sparkles, primary: true },
+    { to: '/courses',     labelKey: 'nav.courses',     icon: GraduationCap, requiresCourses: true },
     { to: '/specialists', labelKey: 'nav.specialists', icon: User, singleHidden: true },
     { to: '/reviews',     labelKey: 'nav.reviews',     icon: MessageSquare, singleOnly: true },
     { to: '/hours',       labelKey: 'nav.hours',       icon: Clock },
@@ -59,11 +62,12 @@ export const NAV: NavSection[] = [
  */
 export function isNavItemVisible(
   item: NavItem,
-  ctx: { isAdmin: boolean; isSingle: boolean },
+  ctx: { isAdmin: boolean; isSingle: boolean; coursesEnabled: boolean },
 ): boolean {
   if (item.adminOnly && !ctx.isAdmin) return false
   if (item.singleHidden && ctx.isSingle) return false
   if (item.singleOnly && !ctx.isSingle) return false
+  if (item.requiresCourses && !ctx.coursesEnabled) return false
   return true
 }
 

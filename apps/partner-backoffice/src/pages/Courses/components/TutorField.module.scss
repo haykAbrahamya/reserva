@@ -1,0 +1,10 @@
+@use 'variables' as *;
+
+.wrap { display: flex; flex-direction: column; gap: 8px; }
+.label { font-size: 12px; font-weight: 500; color: $fg-1; }
+.guestRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  @media (max-width: 560px) { grid-template-columns: 1fr; }
+}

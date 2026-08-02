@@ -1,0 +1,84 @@
+@use 'variables' as *;
+
+.panel { display: flex; flex-direction: column; gap: 14px; }
+
+/* Header bar: member count + add toggle */
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.total {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: $fg-1;
+}
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 38px;
+  padding: 0 15px;
+  border-radius: $r-2;
+  border: 1px solid $accent;
+  background: $accent;
+  color: $fg-on-accent;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: $font-sans;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  &:hover { background: $accent-strong; border-color: $accent-strong; }
+}
+/* When expanded, the button becomes a quiet "cancel". */
+.addBtnOpen {
+  background: transparent;
+  border-color: $line-2;
+  color: $fg-2;
+  &:hover { background: $bg-2; border-color: $line-strong; color: $fg-1; }
+}
+
+.section { display: flex; flex-direction: column; gap: 8px; }
+.sectionHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: $fg-3;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: $warn-soft;
+  color: $warn;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.list { display: flex; flex-direction: column; gap: 6px; }
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 36px 16px;
+  color: $fg-3;
+  font-size: 14px;
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  .addBtn { height: 40px; }
+}

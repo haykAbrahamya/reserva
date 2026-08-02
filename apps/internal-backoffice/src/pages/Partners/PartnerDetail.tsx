@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Save, MapPin, Users, User, CalendarDays, Store, ExternalLink, Trash2, AlertTriangle, SlidersHorizontal, LayoutTemplate, LifeBuoy } from 'lucide-react'
+import { ArrowLeft, Save, MapPin, Users, User, CalendarDays, Store, ExternalLink, Trash2, AlertTriangle, SlidersHorizontal, LayoutTemplate, LifeBuoy, GraduationCap } from 'lucide-react'
 import { Avatar, Badge, Button, Input, Textarea, Toggle, Empty, ConfirmDialog, SegmentedFilter, useToast } from '@/components/ui'
 import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
 import { useResource } from '@/store/useResource'
@@ -87,6 +87,16 @@ export function PartnerDetailPage() {
     try {
       await partnersService.setBookings(id, next)
       toast(next ? 'Online booking enabled' : 'Online booking disabled (contact-only)')
+      await reload()
+    } catch (err) {
+      toast(errorMessage(err))
+    }
+  }
+
+  const toggleCourses = async (next: boolean) => {
+    try {
+      await partnersService.setCourses(id, next)
+      toast(next ? 'Courses enabled' : 'Courses disabled')
       await reload()
     } catch (err) {
       toast(errorMessage(err))
@@ -206,81 +216,98 @@ export function PartnerDetailPage() {
         {/* Users — view + manage (edit, reset password) */}
         <PartnerUsers partnerId={id} />
 
-        {/* Visibility & booking — grouped toggles */}
+        {/* Visibility & booking — grouped toggles, split into Presentation vs
+            Feature access so related settings sit together and are easy to scan. */}
         <section className={s.card}>
-          <h2 className={s.cardTitle}><SlidersHorizontal size={15} className={s.cardTitleIcon} /> Visibility &amp; booking</h2>
+          <h2 className={s.cardTitle}><SlidersHorizontal size={15} className={s.cardTitleIcon} /> Configuration</h2>
 
-          <div className={s.toggleList}>
-            <div className={s.toggleRow}>
-              <div className={s.toggleText}>
-                <div className={s.toggleLabel}><User size={13} /> Partner type</div>
-                <div className={s.toggleDesc}>Solo hides the team/specialists and skips the picker.</div>
+          <div className={s.group}>
+            <div className={s.groupHead}>Presentation</div>
+            <div className={s.toggleList}>
+              <div className={s.toggleRow}>
+                <div className={s.toggleText}>
+                  <div className={s.toggleLabel}><User size={13} /> Partner type</div>
+                  <div className={s.toggleDesc}>Solo hides the team/specialists and skips the picker.</div>
+                </div>
+                <SegmentedFilter<'salon' | 'single'>
+                  size="sm"
+                  ariaLabel="Partner type"
+                  value={partner.kind}
+                  onChange={changeKind}
+                  options={[
+                    { value: 'salon', label: 'Salon' },
+                    { value: 'single', label: 'Solo' },
+                  ]}
+                />
               </div>
-              <SegmentedFilter<'salon' | 'single'>
-                size="sm"
-                ariaLabel="Partner type"
-                value={partner.kind}
-                onChange={changeKind}
-                options={[
-                  { value: 'salon', label: 'Salon' },
-                  { value: 'single', label: 'Solo' },
-                ]}
-              />
+
+              <div className={s.toggleRow}>
+                <div className={s.toggleText}>
+                  <div className={s.toggleLabel}><LayoutTemplate size={13} /> Page template</div>
+                  <div className={s.toggleDesc}>Public page layout. Classic = single scroll; Tabbed = tab bar.</div>
+                </div>
+                <SegmentedFilter<'classic' | 'tabbed'>
+                  size="sm"
+                  ariaLabel="Page template"
+                  value={partner.template ?? 'classic'}
+                  onChange={changeTemplate}
+                  options={[
+                    { value: 'classic', label: 'Classic' },
+                    { value: 'tabbed', label: 'Tabbed' },
+                  ]}
+                />
+              </div>
+
+              <div className={s.toggleRow}>
+                <div className={s.toggleText}>
+                  <div className={s.toggleLabel}><LifeBuoy size={13} /> Quick button</div>
+                  <div className={s.toggleDesc}>Backoffice floating button: Book, Support, or Hidden.</div>
+                </div>
+                <SegmentedFilter<'support' | 'book' | 'hidden'>
+                  size="sm"
+                  ariaLabel="Quick button"
+                  value={partner.supportWidget ?? 'support'}
+                  onChange={changeSupportWidget}
+                  options={[
+                    { value: 'book', label: 'Book' },
+                    { value: 'support', label: 'Support' },
+                    { value: 'hidden', label: 'Hidden' },
+                  ]}
+                />
+              </div>
             </div>
+          </div>
 
-            <div className={s.toggleRow}>
-              <div className={s.toggleText}>
-                <div className={s.toggleLabel}><LayoutTemplate size={13} /> Page template</div>
-                <div className={s.toggleDesc}>Public page layout. Classic = single scroll; Tabbed = tab bar.</div>
+          <div className={s.group}>
+            <div className={s.groupHead}>Feature access</div>
+            <div className={s.toggleList}>
+              <div className={s.toggleRow}>
+                <div className={s.toggleText}>
+                  <div className={s.toggleLabel}><CalendarDays size={13} /> Online booking</div>
+                  <div className={s.toggleDesc}>Off = contact-only page (call/contact CTAs).</div>
+                </div>
+                <Toggle checked={partner.bookingsEnabled} onChange={toggleBookings} />
               </div>
-              <SegmentedFilter<'classic' | 'tabbed'>
-                size="sm"
-                ariaLabel="Page template"
-                value={partner.template ?? 'classic'}
-                onChange={changeTemplate}
-                options={[
-                  { value: 'classic', label: 'Classic' },
-                  { value: 'tabbed', label: 'Tabbed' },
-                ]}
-              />
-            </div>
 
-            <div className={s.toggleRow}>
-              <div className={s.toggleText}>
-                <div className={s.toggleLabel}><LifeBuoy size={13} /> Quick button</div>
-                <div className={s.toggleDesc}>Backoffice floating button: Book (new booking), Support (chat with us), or Hidden.</div>
+              <div className={s.toggleRow}>
+                <div className={s.toggleText}>
+                  <div className={s.toggleLabel}><GraduationCap size={13} /> Courses</div>
+                  <div className={s.toggleDesc}>Academy feature: course management + public registration.</div>
+                </div>
+                <Toggle checked={partner.coursesEnabled} onChange={toggleCourses} />
               </div>
-              <SegmentedFilter<'support' | 'book' | 'hidden'>
-                size="sm"
-                ariaLabel="Quick button"
-                value={partner.supportWidget ?? 'support'}
-                onChange={changeSupportWidget}
-                options={[
-                  { value: 'book', label: 'Book' },
-                  { value: 'support', label: 'Support' },
-                  { value: 'hidden', label: 'Hidden' },
-                ]}
-              />
-            </div>
 
-            <div className={s.toggleRow}>
-              <div className={s.toggleText}>
-                <div className={s.toggleLabel}><Store size={13} /> Marketplace listing</div>
-                <div className={s.toggleDesc}>Show on the public /salons directory.</div>
+              <div className={s.toggleRow}>
+                <div className={s.toggleText}>
+                  <div className={s.toggleLabel}><Store size={13} /> Marketplace listing</div>
+                  <div className={s.toggleDesc}>Show on the public /salons directory.</div>
+                </div>
+                <Toggle
+                  checked={partner.marketplaceListed}
+                  onChange={toggleMarketplace}
+                  disabled={!partner.active || !partner.slug}
+                />
               </div>
-              <Toggle
-                checked={partner.marketplaceListed}
-                onChange={toggleMarketplace}
-                disabled={!partner.active || !partner.slug}
-              />
-            </div>
-
-            <div className={s.toggleRow}>
-              <div className={s.toggleText}>
-                <div className={s.toggleLabel}><CalendarDays size={13} /> Online booking</div>
-                <div className={s.toggleDesc}>Off = contact-only page (call/contact CTAs).</div>
-              </div>
-              <Toggle checked={partner.bookingsEnabled} onChange={toggleBookings} />
             </div>
           </div>
 

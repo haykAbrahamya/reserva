@@ -46,6 +46,50 @@ export interface PartnerPresentation {
  *  identical across templates. `classic` is the default every partner gets. */
 export type PartnerTemplate = 'classic' | 'tabbed'
 
+/** The current run of a public course — the bits the client needs to show
+ *  dates/schedule/seats and gate registration. */
+export interface PublicCourseCohort {
+  id: string
+  status: 'draft' | 'open' | 'running' | 'completed' | 'archived'
+  startDate: string | null
+  endDate: string | null
+  scheduleText: string
+  /** Max seats. 0 = unlimited. */
+  capacity: number
+  registrationOpen: boolean
+  locationId: string | null
+  /** Seats already taken (pending + confirmed). */
+  takenCount: number
+}
+
+/** A course as shown on the public partner page. */
+export interface PublicCourse {
+  id: string
+  title: string
+  titleI18n?: LocalizedText | null
+  summary: string
+  summaryI18n?: LocalizedText | null
+  description: string
+  descriptionI18n?: LocalizedText | null
+  coverUrl: string
+  price: number
+  level?: 'beginner' | 'intermediate' | 'advanced' | null
+  /** Guest tutor (used when no linked specialist). */
+  tutorName: string
+  tutorTitle: string
+  /** Joined tutor specialist (when linked). */
+  tutorSpecialist?: {
+    id: string
+    name: string
+    nameI18n?: LocalizedText | null
+    title: string
+    titleI18n?: LocalizedText | null
+    avatarUrl?: string
+  } | null
+  /** The current run + seats; null if the course has no active run. */
+  currentCohort: PublicCourseCohort | null
+}
+
 export type PublicPartner = Partner & {
   presentation: PartnerPresentation
   /** When false, the page is contact-only — booking CTAs are hidden/replaced.
@@ -58,6 +102,8 @@ export type PublicPartner = Partner & {
   /** Default page language for first-time visitors. Optional in mock; API
    *  defaults to 'hy'. A visitor's own saved choice always wins. */
   defaultLocale?: 'hy' | 'en' | 'ru'
+  /** Published courses (academy). Optional in mock; API provides them. */
+  courses?: PublicCourse[]
 }
 
 export const PARTNERS: PublicPartner[] = [

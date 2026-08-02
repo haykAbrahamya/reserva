@@ -1,0 +1,44 @@
+@use 'variables' as *;
+
+.wrap { display: flex; flex-direction: column; gap: 16px; }
+
+/* Make the 3 course tabs a clean full-width control with NO horizontal scroll —
+   segments share the width and shrink to fit instead of overflowing. Sticky at
+   the top of the scrolling modal body so switching tabs is always reachable. */
+.tabs {
+  position: sticky;
+  top: -2px;
+  z-index: 5;
+  padding: 6px 0;
+  margin: -6px 0;
+  background: $bg-1;
+
+  :global([role='tablist']) {
+    display: flex;
+    width: 100%;
+    overflow: visible;
+  }
+  :global([role='tab']) {
+    flex: 1 1 0;
+    min-width: 0;
+    justify-content: center;
+    /* Keep a little breathing room so labels never touch the pill edges when
+       the three tabs are squeezed to share the width on narrow screens. */
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  @media (max-width: 560px) {
+    :global([role='tab']) {
+      padding-left: 6px;
+      padding-right: 6px;
+      font-size: 12px;
+      gap: 4px;
+    }
+  }
+}
+
+.loading { padding: 40px 0; text-align: center; color: $fg-3; font-size: 14px; }
+
+.history { display: flex; flex-direction: column; gap: 8px; }
+.historyEmpty { padding: 32px 0; text-align: center; color: $fg-3; font-size: 14px; }

@@ -643,7 +643,37 @@
       "RATE_LIMITED": "Too many attempts. Please wait a moment and try again.",
       "EMAIL_TAKEN": "This email is already registered.",
       "PHONE_TAKEN": "This phone number is already registered.",
-      "SLUG_TAKEN": "That address is already taken. Try another."
+      "SLUG_TAKEN": "That address is already taken. Try another.",
+      "COURSE_FULL": "Sorry, this course just filled up.",
+      "ENROLLMENT_CLOSED": "Registration for this course is closed.",
+      "ALREADY_ENROLLED": "You're already registered for this course."
+    }
+  },
+  "courses": {
+    "eyebrow": "Learn with us",
+    "title": "Courses",
+    "free": "Free",
+    "full": "Full",
+    "closed": "Registration closed",
+    "seatsLeft": "{count} spot left",
+    "seatsLeft_plural": "{count} spots left",
+    "level": { "beginner": "Beginner", "intermediate": "Intermediate", "advanced": "Advanced" },
+    "register": {
+      "cta": "Register",
+      "eyebrow": "Course registration",
+      "close": "Close",
+      "nameLabel": "Full name",
+      "namePlaceholder": "e.g. Anna Karapetyan",
+      "phoneLabel": "Phone number",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@email.com",
+      "optional": "optional",
+      "submit": "Register for the course",
+      "submitting": "Registering…",
+      "note": "The studio will confirm your spot and reach out with the details.",
+      "successTitle": "You're registered!",
+      "successText": "Thanks, {name}! Your spot is reserved — the studio will confirm it and contact you soon.",
+      "done": "Done"
     }
   },
   "demo": {
