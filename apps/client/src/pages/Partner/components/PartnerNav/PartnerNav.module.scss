@@ -102,6 +102,14 @@
   flex-shrink: 0;
 }
 
+/* Logo image variant of the mark: fill the badge, no gradient/letter styling.
+   A hairline border keeps a white/transparent logo legible on the bar. */
+.salonMarkImg {
+  object-fit: cover;
+  background: #fff;
+  border: 1px solid $line-1;
+}
+
 .salonName {
   font-family: $font-serif;
   font-size: 17px;

@@ -295,4 +295,17 @@
   .h1   { font-size: 26px; }
   .formGrid { grid-template-columns: 1fr; }
   .formFull { grid-column: span 1; }
+
+  /* Header stacks: title on top, then a single tidy action row (not three
+     stacked full-width blocks). Reorder stays compact on the left; Add takes
+     the rest of the row so it reads as the primary action. */
+  .head { align-items: stretch; gap: 14px; margin-bottom: 18px; }
+  .headActions {
+    width: 100%;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+  /* The Add-service wrapper grows; its button fills it. Reorder stays natural. */
+  .headActions > span { flex: 1 1 auto; }
+  .headActions > span > button { width: 100%; justify-content: center; }
 }

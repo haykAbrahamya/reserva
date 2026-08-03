@@ -53,6 +53,8 @@ function toTimeOff(t: ApiTimeOff): SpecialistTimeOff {
 
 export interface ListServicesOpts {
   includeInactive?: boolean
+  /** Exact category filter (base category value). '' = uncategorized only. */
+  category?: string
 }
 export interface ListSpecialistsOpts {
   includeInactive?: boolean
@@ -236,6 +238,7 @@ export const partnersService = {
         pageSize: params.pageSize ?? 5,
         includeInactive: params.includeInactive ?? false,
         ...(params.search ? { search: params.search } : {}),
+        ...(params.category !== undefined ? { category: params.category } : {}),
       },
     })
   },

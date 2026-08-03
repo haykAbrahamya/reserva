@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
-import { Plus, Sparkles, Pencil, Clock, RotateCcw, X, Users, Waves, ArrowUpDown } from 'lucide-react'
+import { Plus, Sparkles, Pencil, Clock, RotateCcw, X, Users, Waves, ArrowUpDown, Search } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useIsAdmin } from '@/store/auth.hooks'
+import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 import { ReorderServicesModal } from '@/components/services/ReorderServicesModal/ReorderServicesModal'
+import { ServicesFilterBar, ALL_CATEGORIES } from './ServicesFilterBar'
 import { useResource } from '@/store/useResource'
 import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Empty, Pagination, SegmentedFilter, useToast } from '@/components/ui'
 import { fmtDuration, fmtServicePrice } from '@/utils/format'
@@ -71,10 +73,24 @@ export function Services() {
   const [page,     setPage]     = useState(1)
   const [pageSize, setPageSize] = useState(5)
 
+  // ── Filters: name search (debounced) + exact category. ──
+  const [search,   setSearch]   = useState('')
+  const [category, setCategory] = useState<string>(ALL_CATEGORIES)
+  const debouncedSearch = useDebouncedValue(search.trim(), 300)
+  // Any filter change goes back to page 1 so results aren't hidden on a stale page.
+  useEffect(() => { setPage(1) }, [debouncedSearch, category])
+
+  // The category sentinel means "all" → send no category param.
+  const categoryParam = category === ALL_CATEGORIES ? undefined : category
+
   // Server-side paginated list (always fresh; back end does the slicing).
   const { data: result, reload } = useResource(
-    () => partnersService.listServicesPaged({ page, pageSize, includeInactive: true }),
-    [page, pageSize],
+    () => partnersService.listServicesPaged({
+      page, pageSize, includeInactive: true,
+      ...(debouncedSearch ? { search: debouncedSearch } : {}),
+      ...(categoryParam !== undefined ? { category: categoryParam } : {}),
+    }),
+    [page, pageSize, debouncedSearch, categoryParam],
   )
 
   // Full catalog (unpaginated) → distinct existing categories for the category
@@ -106,6 +122,15 @@ export function Services() {
   const from      = total === 0 ? 0 : (page - 1) * pageSize + 1
   const to        = Math.min(page * pageSize, total)
   const changePageSize = (n: number) => { setPageSize(n); setPage(1) }
+
+  // A filter is active when there's a search term or a specific category chosen.
+  const hasFilters = debouncedSearch.length > 0 || category !== ALL_CATEGORIES
+  // "Truly empty" (no services exist) vs "no matches" (filter hid them all).
+  const noneAtAll  = total === 0 && !hasFilters
+  const noMatches  = total === 0 && hasFilters
+  // Distinct categories for the filter dropdown come from the FULL catalog, so
+  // the options never shrink just because the current filter narrowed the list.
+  const clearFilters = () => { setSearch(''); setCategory(ALL_CATEGORIES) }
 
   const openNew = () => { setEditing(null); setForm(EMPTY_FORM); setRepeatOpen(false); setErrs({}); setModalOpen(true) }
   const openEdit = (svc: Service) => {
@@ -199,9 +224,17 @@ export function Services() {
         </div>
         <div className={s.headActions}>
           {isAdmin && total > 1 && (
-            <Button variant="ghost" onClick={() => setReorderOpen(true)}>
-              <ArrowUpDown size={14} /> {t('services.reorder.button')}
-            </Button>
+            // Icon-only on mobile to keep the action row compact (the Armenian
+            // label is long); full label with icon on desktop.
+            isMobile ? (
+              <Button variant="ghost" icon onClick={() => setReorderOpen(true)} title={t('services.reorder.button')} aria-label={t('services.reorder.button')}>
+                <ArrowUpDown size={16} />
+              </Button>
+            ) : (
+              <Button variant="ghost" onClick={() => setReorderOpen(true)}>
+                <ArrowUpDown size={14} /> {t('services.reorder.button')}
+              </Button>
+            )
           )}
           <span data-spotlight="addService" style={{ display: 'inline-flex' }}>
             <Button variant="accent" onClick={openNew}><Plus size={14} /> {t('services.addService')}</Button>
@@ -209,9 +242,26 @@ export function Services() {
         </div>
       </div>
 
-      {total === 0 ? (
+      {/* Filter bar — hidden only when the partner has no services at all
+          (nothing to search/filter). Stays visible on a no-match result so the
+          user can adjust or clear the filter. */}
+      {!noneAtAll && (
+        <ServicesFilterBar
+          search={search}
+          onSearchChange={setSearch}
+          category={category}
+          onCategoryChange={setCategory}
+          categories={categorySuggestions}
+        />
+      )}
+
+      {noneAtAll ? (
         <Empty icon={Sparkles} title={t('services.emptyTitle')} description={t('services.emptyDesc')}
           action={<span data-spotlight="addService" style={{ display: 'inline-flex' }}><Button variant="accent" onClick={openNew}><Plus size={14} /> {t('services.addService')}</Button></span>}
+        />
+      ) : noMatches ? (
+        <Empty icon={Search} title={t('services.noMatchTitle')} description={t('services.noMatchDesc')}
+          action={<Button variant="ghost" onClick={clearFilters}>{t('services.filter.clear')}</Button>}
         />
       ) : isMobile ? (
         /* ── Mobile: grouped cards ── */

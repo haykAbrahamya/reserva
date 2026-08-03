@@ -361,7 +361,15 @@
     "addService": "Add service",
     "emptyTitle": "No services yet",
     "emptyDesc": "Add your first service to start taking bookings.",
+    "noMatchTitle": "No services found",
+    "noMatchDesc": "No services match your search or category. Try a different term.",
     "otherCategory": "Other",
+    "filter": {
+      "searchPlaceholder": "Search services by name…",
+      "searchCategory": "Search categories…",
+      "allCategories": "All categories",
+      "clear": "Clear filters"
+    },
     "col": {
       "name": "Name",
       "category": "Category",
@@ -415,7 +423,7 @@
     "reorder": {
       "button": "Reorder",
       "title": "Reorder services",
-      "subtitle": "Drag to reorder, or use the arrows. This sets the order shown on your public page.",
+      "subtitle": "Drag or use the arrows to set the order.",
       "moveUp": "Move up",
       "moveDown": "Move down",
       "inactive": "Hidden",

@@ -36,11 +36,16 @@ export function PartnerNav({ partner, onBook }: Props) {
   return (
     <header className={[s.nav, scrolled ? s.scrolled : ''].filter(Boolean).join(' ')}>
       <div className={s.inner}>
-        {/* Salon identity — appears once the hero scrolls away */}
+        {/* Salon identity — appears once the hero scrolls away. Shows the
+            partner's logo when set (matching the hero), else a gradient letter. */}
         <div className={[s.salon, scrolled ? s.show : ''].filter(Boolean).join(' ')}>
-          <span className={s.salonMark} style={{ background: `linear-gradient(140deg, ${t1}, ${t2})` }}>
-            {partner.name.charAt(0)}
-          </span>
+          {partner.presentation.logoUrl ? (
+            <img src={partner.presentation.logoUrl} className={[s.salonMark, s.salonMarkImg].join(' ')} alt={partner.name} />
+          ) : (
+            <span className={s.salonMark} style={{ background: `linear-gradient(140deg, ${t1}, ${t2})` }}>
+              {partner.name.charAt(0)}
+            </span>
+          )}
           <span className={s.salonName}>{partner.name}</span>
         </div>
 
