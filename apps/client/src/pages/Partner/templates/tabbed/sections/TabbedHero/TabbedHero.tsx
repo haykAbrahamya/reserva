@@ -12,6 +12,9 @@ interface Props {
   /** Optional: clicking the rating jumps to the Reviews tab. Only wired by the
    *  template when a Reviews tab actually exists. */
   onReviewsClick?: () => void
+  /** Optional: clicking the address jumps to the Branches tab. Only wired by the
+   *  template when a Branches tab actually exists. */
+  onBranchesClick?: () => void
 }
 
 /**
@@ -20,7 +23,7 @@ interface Props {
  * tab bar sits directly beneath it. The primary "Book" action is the persistent
  * top-nav button, so the hero deliberately doesn't repeat it.
  */
-export function TabbedHero({ partner, onReviewsClick }: Props) {
+export function TabbedHero({ partner, onReviewsClick, onBranchesClick }: Props) {
   const { presentation: p } = partner
   const t = useT()
   const loc = useLocalized()
@@ -53,7 +56,7 @@ export function TabbedHero({ partner, onReviewsClick }: Props) {
 
         <div className={s.body}>
           <div className={s.typeRow}>
-            <span className={s.type}>{partner.type}</span>
+            <span className={s.type}>{loc(partner.type, partner.typeI18n)}</span>
             {p.rating > 0 && p.reviews > 0 && (
               onReviewsClick ? (
                 <button
@@ -75,12 +78,18 @@ export function TabbedHero({ partner, onReviewsClick }: Props) {
               )
             )}
           </div>
-          <h1 className={s.name}>{partner.name}</h1>
+          <h1 className={s.name}>{loc(partner.name, partner.nameI18n)}</h1>
           {p.tagline && <p className={s.tagline}>{loc(p.tagline, p.taglineI18n)}</p>}
           {primary && (
-            <span className={s.meta}>
-              <MapPin size={15} /> {primary.address}
-            </span>
+            onBranchesClick ? (
+              <button type="button" className={[s.meta, s.metaLink].join(' ')} onClick={onBranchesClick}>
+                <MapPin size={15} /> {primary.address}
+              </button>
+            ) : (
+              <span className={s.meta}>
+                <MapPin size={15} /> {primary.address}
+              </span>
+            )
           )}
 
           {/* Contact + social links, inline under the profile. The primary

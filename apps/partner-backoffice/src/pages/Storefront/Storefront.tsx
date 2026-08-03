@@ -63,6 +63,20 @@ interface InnerProps {
 
 function StorefrontInner({ profile, reload, setPartner, toast }: InnerProps) {
   const t = useT()
+  // ── Identity (public name + category) ──
+  const [name, setName] = useState(profile.name ?? '')
+  const [nameI18n, setNameI18n] = useState<LocalizedText | null>(profile.nameI18n ?? null)
+  const [type, setType] = useState(profile.type ?? '')
+  const [typeI18n, setTypeI18n] = useState<LocalizedText | null>(profile.typeI18n ?? null)
+  const savedName = profile.name ?? ''
+  const savedNameI18n = profile.nameI18n ?? null
+  const savedType = profile.type ?? ''
+  const savedTypeI18n = profile.typeI18n ?? null
+  useEffect(() => { setName(savedName) }, [savedName])
+  useEffect(() => { setNameI18n(savedNameI18n) }, [savedNameI18n])
+  useEffect(() => { setType(savedType) }, [savedType])
+  useEffect(() => { setTypeI18n(savedTypeI18n) }, [savedTypeI18n])
+
   // ── About + brand + socials ──
   const [about, setAbout] = useState(profile.presentation?.about ?? '')
   const [aboutI18n, setAboutI18n] = useState<LocalizedText | null>(profile.presentation?.aboutI18n ?? null)
@@ -88,6 +102,7 @@ function StorefrontInner({ profile, reload, setPartner, toast }: InnerProps) {
   const [template, setTemplate] = useState<'classic' | 'tabbed'>(savedTemplate)
   useEffect(() => { setTemplate(savedTemplate) }, [savedTemplate])
 
+  const [identitySaving, setIdentitySaving] = useState(false)
   const [aboutSaving, setAboutSaving] = useState(false)
   const [brandSaving, setBrandSaving] = useState(false)
   const [socialSaving, setSocialSaving] = useState(false)
@@ -98,6 +113,10 @@ function StorefrontInner({ profile, reload, setPartner, toast }: InnerProps) {
     if (current) {
       setPartner({
         ...current,
+        name: updated.name,
+        nameI18n: updated.nameI18n ?? null,
+        type: updated.type,
+        typeI18n: updated.typeI18n ?? null,
         accent: updated.accent,
         presentation: {
           ...current.presentation,
@@ -114,6 +133,29 @@ function StorefrontInner({ profile, reload, setPartner, toast }: InnerProps) {
   }
 
   // ── Saves ──
+  const nameValid = name.trim().length > 0
+  const typeValid = type.trim().length > 0
+  const identityChanged =
+    name.trim() !== savedName.trim() ||
+    type.trim() !== savedType.trim() ||
+    JSON.stringify(nameI18n ?? {}) !== JSON.stringify(savedNameI18n ?? {}) ||
+    JSON.stringify(typeI18n ?? {}) !== JSON.stringify(savedTypeI18n ?? {})
+  const saveIdentity = async () => {
+    if (!identityChanged || !nameValid || !typeValid || identitySaving) return
+    setIdentitySaving(true)
+    try {
+      const updated = await partnersService.updateProfile({
+        name: name.trim(), nameI18n,
+        type: type.trim(), typeI18n,
+      })
+      syncStore(updated); await reload()
+      notifyProfileUpdated()
+      toast(t('storefront.identity.saved'))
+    } catch (err) {
+      toast(err instanceof ApiError ? err.message : t('storefront.identity.error'))
+    } finally { setIdentitySaving(false) }
+  }
+
   const aboutChanged =
     about.trim() !== savedAbout.trim() ||
     JSON.stringify(aboutI18n ?? {}) !== JSON.stringify(savedAboutI18n ?? {})
@@ -190,6 +232,42 @@ function StorefrontInner({ profile, reload, setPartner, toast }: InnerProps) {
   return (
     <div className={s.page}>
       <Header />
+
+      {/* ── Identity: public name + category (both translatable) ── */}
+      <section className={s.card} data-spotlight="identity">
+        <div className={s.cardHead}>
+          <span className={s.cardIcon}><Store size={18} /></span>
+          <div className={s.cardHeadText}>
+            <h2 className={s.cardTitle}>{t('storefront.identity.title')}</h2>
+            <p className={s.cardDesc}>{t('storefront.identity.desc')}</p>
+          </div>
+        </div>
+        <div className={s.cardBody}>
+          <I18nField
+            label={t('storefront.identity.nameLabel')}
+            value={name}
+            onChange={setName}
+            i18n={nameI18n}
+            onI18nChange={setNameI18n}
+            placeholder={t('storefront.identity.namePlaceholder')}
+            error={!nameValid ? t('storefront.identity.nameError') : undefined}
+          />
+          <I18nField
+            label={t('storefront.identity.typeLabel')}
+            value={type}
+            onChange={setType}
+            i18n={typeI18n}
+            onI18nChange={setTypeI18n}
+            placeholder={t('storefront.identity.typePlaceholder')}
+            error={!typeValid ? t('storefront.identity.typeError') : undefined}
+          />
+          <div className={s.actionsRow}>
+            <Button variant="accent" disabled={!identityChanged || !nameValid || !typeValid || identitySaving} onClick={saveIdentity}>
+              {identitySaving ? t('storefront.identity.saving') : t('storefront.identity.save')}
+            </Button>
+          </div>
+        </div>
+      </section>
 
       {/* ── Inside (gallery) — simple photos of the place ── */}
       <PhotoSection

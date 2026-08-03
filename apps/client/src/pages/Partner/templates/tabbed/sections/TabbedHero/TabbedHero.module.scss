@@ -78,6 +78,18 @@ button.rating {
 .tagline { font-size: 14.5px; color: $fg-1; margin: 0 0 8px; max-width: 46ch; line-height: 1.5; }
 .meta { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: $fg-2; }
 
+/* Clickable variant of .meta (the address → Branches tab). Resets the native
+   button chrome and adds a subtle interactive affordance. */
+.metaLink {
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.16s ease;
+
+  &:hover { color: $accent; text-decoration: underline; text-underline-offset: 3px; }
+}
+
 /* Contact + social links, inline under the profile — a tidy row of round
    buttons that fill with the brand accent on hover. */
 .socials {

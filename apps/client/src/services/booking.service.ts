@@ -62,8 +62,10 @@ interface ApiSpecialist extends Omit<Specialist, 'services'> {
 interface ApiPartner {
   id: string
   name: string
+  nameI18n?: LocalizedText | null
   slug: string
   type: string
+  typeI18n?: LocalizedText | null
   accent: string
   bookingsEnabled?: boolean
   kind?: 'salon' | 'single'
@@ -113,8 +115,10 @@ function toPublicPartner(p: ApiPartner): PublicPartner {
   return {
     id: p.id,
     name: p.name,
+    nameI18n: p.nameI18n ?? null,
     slug: p.slug,
     type: p.type,
+    typeI18n: p.typeI18n ?? null,
     accent: p.accent,
     // Default to true when the API omits it (older payloads / safety).
     bookingsEnabled: p.bookingsEnabled !== false,

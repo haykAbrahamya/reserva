@@ -283,8 +283,14 @@ export interface SpecialistTimeOff {
 export interface Partner {
   id: string
   name: string
+  /** Optional per-language overrides for `name` (the public hero title). Falls
+   *  back to `name`, which stays the source of truth for search/emails/slug. */
+  nameI18n?: LocalizedText | null
   slug: string
   type: string
+  /** Optional per-language overrides for `type` (the public category chip).
+   *  Falls back to `type`. */
+  typeI18n?: LocalizedText | null
   accent: string
   locations: Location[]
   specialists: Specialist[]

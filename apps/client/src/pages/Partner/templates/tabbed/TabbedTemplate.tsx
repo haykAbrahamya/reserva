@@ -46,12 +46,19 @@ export function TabbedTemplate({ partner, onBook }: TemplateProps) {
   const [active, setActive] = useState<TabKey>(() => tabs[0]?.key ?? 'services')
 
   const hasReviewsTab = tabs.some((tab) => tab.key === 'reviews')
+  const hasBranchesTab = tabs.some((tab) => tab.key === 'branches')
   const panelsRef = useRef<HTMLDivElement>(null)
   // Hero rating → jump to the Reviews tab. Switch the tab, then bring the panel
   // area into view (the tab bar is sticky, so without this the switch can happen
   // off-screen if the user has scrolled). Only offered when a Reviews tab exists.
   const goToReviews = () => {
     setActive('reviews')
+    panelsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+  // Hero address → jump to the Branches tab, same pattern as the rating above.
+  // Only offered when a Branches tab exists.
+  const goToBranches = () => {
+    setActive('branches')
     panelsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
@@ -72,7 +79,11 @@ export function TabbedTemplate({ partner, onBook }: TemplateProps) {
 
   return (
     <main className={s.main}>
-      <TabbedHero partner={partner} onReviewsClick={hasReviewsTab ? goToReviews : undefined} />
+      <TabbedHero
+        partner={partner}
+        onReviewsClick={hasReviewsTab ? goToReviews : undefined}
+        onBranchesClick={hasBranchesTab ? goToBranches : undefined}
+      />
 
       {tabs.length > 0 && (
         <>

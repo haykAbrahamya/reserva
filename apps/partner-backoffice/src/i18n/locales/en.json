@@ -727,6 +727,20 @@
       "add": "Add",
       "adding": "Uploading…"
     },
+    "identity": {
+      "title": "Name & category",
+      "desc": "Your business name and category as shown at the top of your public page. Add translations so each visitor sees them in their language.",
+      "nameLabel": "Business name",
+      "namePlaceholder": "e.g. Elara Aesthetic Clinic",
+      "nameError": "Enter a business name",
+      "typeLabel": "Category",
+      "typePlaceholder": "e.g. Aesthetic clinic",
+      "typeError": "Enter a category",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Name & category updated",
+      "error": "Could not save name & category"
+    },
     "about": {
       "title": "About",
       "desc": "The short story shown in the “About” section of your public page.",

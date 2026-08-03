@@ -107,7 +107,7 @@ export function PartnerHero({ partner, onBook }: Props) {
               </div>
         }
         <div className={s.typeRow}>
-          <span className={s.type}>{partner.type}</span>
+          <span className={s.type}>{loc(partner.type, partner.typeI18n)}</span>
           {/* Only show a rating when there's real review data — no fake stars. The
               partner-wide score is computed server-side from every specialist's
               reviews (works for solo pros and salons alike). */}
@@ -136,7 +136,7 @@ export function PartnerHero({ partner, onBook }: Props) {
           )}
         </div>
 
-        <h1 className={s.name}>{partner.name}</h1>
+        <h1 className={s.name}>{loc(partner.name, partner.nameI18n)}</h1>
         <p className={s.tagline}>{loc(p.tagline, p.taglineI18n)}</p>
 
         <div className={s.metaRow}>
@@ -146,10 +146,10 @@ export function PartnerHero({ partner, onBook }: Props) {
               {t('partner.hero.locationsInYerevan', { count: locations.length })}
             </button>
           ) : primaryLocation && (
-            <span className={s.meta}>
+            <button className={s.metaLink} onClick={() => document.getElementById('locations')?.scrollIntoView({ behavior: 'smooth' })}>
               <MapPin size={16} />
               {primaryLocation.address}
-            </span>
+            </button>
           )}
           {/* Per-branch hours live in the Locations section (branches may differ),
               so the hero no longer shows a single ambiguous hours summary. */}

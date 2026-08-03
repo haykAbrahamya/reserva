@@ -132,7 +132,11 @@ export interface PartnerSettingsPatch {
   autoConfirmBookings?: boolean
   bookingsEnabled?: boolean
   name?: string
+  /** Per-language overrides for the public name (hero title). */
+  nameI18n?: LocalizedText | null
   type?: string
+  /** Per-language overrides for the public category (hero chip). */
+  typeI18n?: LocalizedText | null
   accent?: string
   slug?: string
   template?: PartnerTemplate
