@@ -1,0 +1,112 @@
+@use 'variables' as *;
+
+.state {
+  padding: 32px 8px;
+  text-align: center;
+  color: $fg-2;
+  font-size: 14px;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  // Long service lists scroll inside the modal body rather than pushing the
+  // sticky footer off-screen.
+  max-height: min(60vh, 520px);
+  overflow-y: auto;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: $bg-2;
+  border: 1px solid $line-1;
+  border-radius: $r-1;
+  cursor: grab;
+  user-select: none;
+  transition: border-color 0.14s ease, background 0.14s ease, box-shadow 0.14s ease;
+
+  &:hover { border-color: $line-strong; }
+  &:active { cursor: grabbing; }
+}
+
+.handle {
+  display: inline-flex;
+  align-items: center;
+  color: $fg-3;
+  flex: 0 0 auto;
+  touch-action: none;
+}
+
+.pos {
+  flex: 0 0 auto;
+  min-width: 22px;
+  text-align: center;
+  font-family: $font-mono;
+  font-size: 12px;
+  color: $fg-3;
+}
+
+.name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 14px;
+  color: $fg-0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inactive {
+  flex: 0 0 auto;
+  font-size: 11px;
+  line-height: 1;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  color: $fg-3;
+}
+
+.arrows {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 4px;
+}
+
+.arrowBtn {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid $line-1;
+  border-radius: $r-1;
+  background: $bg-1;
+  color: $fg-1;
+  cursor: pointer;
+  transition: border-color 0.14s ease, color 0.14s ease, background 0.14s ease;
+
+  &:hover:not(:disabled) {
+    border-color: $accent;
+    color: $accent;
+    background: $accent-soft;
+  }
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+// On desktop the drag handle is the primary affordance, so the arrows are a
+// secondary/mobile aid. Keep them visible everywhere (they don't hurt on
+// desktop and are essential on touch), but the handle only makes sense with a
+// pointer — hint that with the grab cursor above.

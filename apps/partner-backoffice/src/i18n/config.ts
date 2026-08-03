@@ -29,7 +29,9 @@ export interface LocaleMeta {
 }
 
 export const LOCALE_META: Record<Locale, LocaleMeta> = {
-  en: { lang: 'en',    native: 'English',  english: 'English',  short: 'EN', flag: '🇬🇧' },
+  // English is a lingua franca, not a country — show the neutral "EN" glyph
+  // instead of a national (GB) flag so it doesn't imply British-only English.
+  en: { lang: 'en',    native: 'English',  english: 'English',  short: 'EN', flag: 'EN' },
   hy: { lang: 'hy-AM', native: 'Հայերեն',  english: 'Armenian', short: 'ՀԱ', flag: '🇦🇲' },
   ru: { lang: 'ru',    native: 'Русский',  english: 'Russian',  short: 'RU', flag: '🇷🇺' },
 }

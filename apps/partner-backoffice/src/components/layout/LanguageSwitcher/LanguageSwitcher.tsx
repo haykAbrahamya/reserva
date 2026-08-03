@@ -65,7 +65,7 @@ export function LanguageSwitcher() {
                 style={{ animationDelay: `${i * 34}ms` }}
                 onClick={() => choose(l)}
               >
-                <span className={s.flag}>{meta.flag}</span>
+                <span className={[s.flag, /^[A-Za-z]+$/.test(meta.flag) ? s.flagText : ''].filter(Boolean).join(' ')}>{meta.flag}</span>
                 <span className={s.names}>
                   <span className={s.native}>{meta.native}</span>
                   <span className={s.english}>{meta.english}</span>

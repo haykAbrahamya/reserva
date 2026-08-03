@@ -37,8 +37,9 @@ export function PartnerAbout({ partner, tone = 'plain' }: Props) {
         : (loc ? (loc.address || loc.name || '—') : '—'),
     },
     // Category — always meaningful (replaces the old free-text hours summary,
-    // which was ambiguous across branches and has been removed).
-    { icon: Tag, label: t('partner.about.factCategory'), value: partner.type },
+    // which was ambiguous across branches and has been removed). Localized so it
+    // reads in the visitor's language when the partner set translations.
+    { icon: Tag, label: t('partner.about.factCategory'), value: tr(partner.type, partner.typeI18n) },
     { icon: Sparkles, label: t('partner.about.factServices'), value: t('partner.about.factServicesValue', { count: serviceCount }) },
     ...(isSingle
       ? []

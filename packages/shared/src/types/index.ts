@@ -105,6 +105,10 @@ export interface Service {
   requiresSpecialist?: boolean
   /** Max concurrent bookings per slot for a facility service (≥1, default 1). */
   capacity?: number
+  /** Manual display order within the partner's list (0-based, lower = first).
+   *  Server-owned — set via drag-to-reorder, never sent on create/update.
+   *  Optional because older/partial payloads may omit it. */
+  sortOrder?: number
 }
 
 // ── Courses ─────────────────────────────────────────────────

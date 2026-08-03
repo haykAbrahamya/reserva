@@ -411,7 +411,20 @@
       "capacityLabel": "Capacity",
       "capacityHint": "How many people can use it at the same time."
     },
-    "capacityShort": "{n} spots"
+    "capacityShort": "{n} spots",
+    "reorder": {
+      "button": "Reorder",
+      "title": "Reorder services",
+      "subtitle": "Drag to reorder, or use the arrows. This sets the order shown on your public page.",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "inactive": "Hidden",
+      "empty": "No services to reorder yet.",
+      "loadError": "Could not load services",
+      "save": "Save order",
+      "saving": "Saving…",
+      "saved": "Order updated"
+    }
   },
   "reviews": {
     "title": "Reviews",

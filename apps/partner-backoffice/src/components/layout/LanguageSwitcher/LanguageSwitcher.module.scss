@@ -92,6 +92,16 @@
   filter: saturate(1.05);
 }
 
+/* Text-based "flag" (e.g. English shows "EN" instead of a national flag).
+   Sized to sit neatly in the same 24px column as the emoji flags. */
+.flagText {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: $fg-2;
+  filter: none;
+}
+
 .names { display: flex; flex-direction: column; min-width: 0; flex: 1; }
 .native {
   font-size: 13.5px;

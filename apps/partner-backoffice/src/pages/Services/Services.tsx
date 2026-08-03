@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Plus, Sparkles, Pencil, Clock, RotateCcw, X, Users, Waves } from 'lucide-react'
+import { Plus, Sparkles, Pencil, Clock, RotateCcw, X, Users, Waves, ArrowUpDown } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
+import { useIsAdmin } from '@/store/auth.hooks'
+import { ReorderServicesModal } from '@/components/services/ReorderServicesModal/ReorderServicesModal'
 import { useResource } from '@/store/useResource'
 import { Button, Table, Th, Td, Tr, Toggle, Modal, Input, Empty, Pagination, SegmentedFilter, useToast } from '@/components/ui'
 import { fmtDuration, fmtServicePrice } from '@/utils/format'
@@ -61,6 +63,7 @@ function repeatLabel(total?: number | null): string {
 export function Services() {
   const partner     = usePartner()
   const isMobile    = useIsMobile()
+  const isAdmin     = useIsAdmin()
   const { t, tp }   = useI18n()
   const toast       = useToast()
   useSpotlight()
@@ -86,6 +89,7 @@ export function Services() {
   ).sort((a, b) => a.localeCompare(b))
 
   const [modalOpen, setModalOpen] = useState(false)
+  const [reorderOpen, setReorderOpen] = useState(false)
   const [editing,   setEditing]   = useState<Service | null>(null)
   const [form,      setForm]      = useState(EMPTY_FORM)
   const [errs,      setErrs]      = useState<Record<string, string>>({})
@@ -193,9 +197,16 @@ export function Services() {
           <h1 className={s.h1}>{t('services.title')}</h1>
           <p className={s.sub}>{tp('services.subtitle', total, { name: partner.name })}</p>
         </div>
-        <span data-spotlight="addService" style={{ display: 'inline-flex' }}>
-          <Button variant="accent" onClick={openNew}><Plus size={14} /> {t('services.addService')}</Button>
-        </span>
+        <div className={s.headActions}>
+          {isAdmin && total > 1 && (
+            <Button variant="ghost" onClick={() => setReorderOpen(true)}>
+              <ArrowUpDown size={14} /> {t('services.reorder.button')}
+            </Button>
+          )}
+          <span data-spotlight="addService" style={{ display: 'inline-flex' }}>
+            <Button variant="accent" onClick={openNew}><Plus size={14} /> {t('services.addService')}</Button>
+          </span>
+        </div>
       </div>
 
       {total === 0 ? (
@@ -490,6 +501,12 @@ export function Services() {
           </div>
         </div>
       </Modal>
+
+      <ReorderServicesModal
+        open={reorderOpen}
+        onClose={() => setReorderOpen(false)}
+        onSaved={reload}
+      />
     </div>
   )
 }

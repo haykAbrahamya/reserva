@@ -2,6 +2,7 @@
 
 .page { padding: 28px; animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both; }
 .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.headActions { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .h1   { font-family: $font-serif; font-size: 32px; letter-spacing: -0.022em; margin: 0 0 4px; }
 .sub  { font-size: 13px; color: $fg-2; margin: 0; }
 

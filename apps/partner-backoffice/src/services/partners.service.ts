@@ -248,6 +248,10 @@ export const partnersService = {
   async deleteService(serviceId: string): Promise<void> {
     await apiDelete(`/services/${serviceId}`)
   },
+  /** Persist a drag-to-reorder: `ids` in their new display order. Admin-only. */
+  async reorderServices(ids: string[]): Promise<void> {
+    await apiPatch('/services/order', { ids })
+  },
 
   // ── Specialists ──
   /** Full roster (one page) — for dropdowns/selectors and cross-page lookups. */
