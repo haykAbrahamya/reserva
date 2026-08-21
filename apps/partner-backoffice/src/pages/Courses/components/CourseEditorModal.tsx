@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { Modal, Button, Input, Select, Toggle } from '@/components/ui'
+import { Modal, Button, Input, Select, Toggle, SegmentedFilter } from '@/components/ui'
 import { I18nField } from '@/components/i18n/I18nField/I18nField'
 import { useI18n } from '@/i18n'
 import { galleryImageUrl } from '@/services/partners.service'
-import type { Course, CourseLevel, LocalizedText, Specialist } from '@/types'
+import type { Course, CourseLevel, CoursePriceMode, LocalizedText, Specialist } from '@/types'
 import type { CourseInput } from '@/services/courses.service'
 import { CoverPicker } from './CoverPicker'
 import { TutorField, type TutorValue } from './TutorField'
@@ -26,6 +26,7 @@ interface FormState {
   summaryI18n: LocalizedText | null
   description: string
   descriptionI18n: LocalizedText | null
+  priceMode: CoursePriceMode
   price: string
   level: '' | CourseLevel
   active: boolean
@@ -40,6 +41,8 @@ function fromCourse(course: Course | null): FormState {
     summaryI18n: course?.summaryI18n ?? null,
     description: course?.description ?? '',
     descriptionI18n: course?.descriptionI18n ?? null,
+    // Fall back for pre-priceMode courses: a positive price → paid, else free.
+    priceMode: course?.priceMode ?? (course && course.price > 0 ? 'paid' : 'free'),
     price: course && course.price > 0 ? String(course.price) : '',
     level: course?.level ?? '',
     active: course?.active ?? true,
@@ -77,8 +80,13 @@ export function CourseEditorModal({ course, specialists, saving, onClose, onSubm
   const submit = () => {
     const e: Record<string, string> = {}
     if (!form.title.trim()) e.title = t('errors.required')
-    const priceNum = form.price.trim() === '' ? 0 : Number(form.price)
-    if (form.price.trim() !== '' && (!Number.isFinite(priceNum) || priceNum < 0)) e.price = t('errors.invalid')
+    // Amount only matters for a paid course; free/hidden send 0.
+    const priceNum = form.priceMode === 'paid'
+      ? (form.price.trim() === '' ? NaN : Number(form.price))
+      : 0
+    if (form.priceMode === 'paid' && (!Number.isFinite(priceNum) || priceNum <= 0)) {
+      e.price = t('courses.editor.priceRequired')
+    }
     setErrs(e)
     if (Object.keys(e).length) return
 
@@ -89,6 +97,7 @@ export function CourseEditorModal({ course, specialists, saving, onClose, onSubm
       summaryI18n: form.summaryI18n,
       description: form.description.trim(),
       descriptionI18n: form.descriptionI18n,
+      priceMode: form.priceMode,
       price: priceNum,
       level: form.level || null,
       active: form.active,
@@ -159,16 +168,32 @@ export function CourseEditorModal({ course, specialists, saving, onClose, onSubm
           />
         </div>
 
-        <Input
-          label={t('courses.editor.priceLabel')}
-          type="number"
-          min={0}
-          value={form.price}
-          onChange={(e) => set('price', e.target.value)}
-          placeholder={t('courses.editor.priceFree')}
-          help={t('courses.editor.priceHelp')}
-          error={errs.price}
-        />
+        <div className={s.full}>
+          <label className={s.fieldLabel}>{t('courses.editor.priceLabel')}</label>
+          <SegmentedFilter<CoursePriceMode>
+            value={form.priceMode}
+            onChange={(v) => set('priceMode', v)}
+            ariaLabel={t('courses.editor.priceLabel')}
+            options={[
+              { value: 'paid', label: t('courses.editor.priceMode.paid') },
+              { value: 'free', label: t('courses.editor.priceMode.free') },
+              { value: 'hidden', label: t('courses.editor.priceMode.hidden') },
+            ]}
+          />
+          {form.priceMode === 'paid' && (
+            <div className={s.priceAmount}>
+              <Input
+                type="number"
+                min={1}
+                value={form.price}
+                onChange={(e) => set('price', e.target.value)}
+                placeholder={t('courses.editor.pricePlaceholder')}
+                error={errs.price}
+              />
+            </div>
+          )}
+          <span className={s.priceHint}>{t(`courses.editor.priceMode.${form.priceMode}Hint`)}</span>
+        </div>
 
         <div>
           <label className={s.fieldLabel}>{t('courses.editor.levelLabel')}</label>

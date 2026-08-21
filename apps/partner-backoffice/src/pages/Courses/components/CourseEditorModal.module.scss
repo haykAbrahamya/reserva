@@ -16,6 +16,11 @@
   margin-bottom: 6px;
 }
 
+/* Amount input revealed only for the "paid" price mode. */
+.priceAmount { margin-top: 10px; }
+/* Hint line under the price-mode selector. */
+.priceHint { display: block; font-size: 12.5px; color: $fg-2; margin-top: 8px; }
+
 .activeRow {
   display: flex;
   align-items: center;

@@ -1006,8 +1006,16 @@
       "descriptionLabel": "Full description",
       "descriptionPlaceholder": "What students will learn…",
       "priceLabel": "Price",
-      "priceFree": "Free",
-      "priceHelp": "Leave empty for a free course",
+      "priceMode": {
+        "paid": "Paid",
+        "free": "Free",
+        "hidden": "No price",
+        "paidHint": "Shows the amount on your public page.",
+        "freeHint": "Shows “Free” on your public page.",
+        "hiddenHint": "No price is shown — visitors contact you for pricing."
+      },
+      "pricePlaceholder": "e.g. 15000",
+      "priceRequired": "Enter a price above 0",
       "levelLabel": "Level",
       "activeLabel": "Published",
       "activeHint": "Show this course on your public page"

@@ -118,6 +118,10 @@ export interface Service {
 
 export type CourseLevel = 'beginner' | 'intermediate' | 'advanced'
 
+/** How a course price is presented: hidden (nothing shown), free ("Free"), or
+ *  paid (shows the amount). */
+export type CoursePriceMode = 'hidden' | 'free' | 'paid'
+
 /** Lifecycle of one course run. */
 export type CohortStatus = 'draft' | 'open' | 'running' | 'completed' | 'archived'
 
@@ -162,7 +166,9 @@ export interface Course {
   descriptionI18n?: LocalizedText | null
   /** Cover image URL. Empty → gradient placeholder. */
   coverUrl: string
-  /** Price in whole AMD. 0 = free. */
+  /** How the price is presented: 'hidden' (none), 'free', or 'paid'. */
+  priceMode: CoursePriceMode
+  /** Price in whole AMD. Only meaningful when priceMode is 'paid'. */
   price: number
   /** Linked tutor specialist id, or null for a guest/none. */
   tutorSpecialistId?: string | null

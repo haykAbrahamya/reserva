@@ -655,6 +655,7 @@
     "free": "Free",
     "full": "Full",
     "closed": "Registration closed",
+    "call": "Call",
     "seatsLeft": "{count} spot left",
     "seatsLeft_plural": "{count} spots left",
     "level": { "beginner": "Beginner", "intermediate": "Intermediate", "advanced": "Advanced" },

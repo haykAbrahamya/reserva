@@ -3,6 +3,7 @@ import type {
   CourseCohort,
   CourseEnrollment,
   CourseLevel,
+  CoursePriceMode,
   EnrollmentStatus,
   LocalizedText,
   Paginated,
@@ -23,6 +24,7 @@ export interface CourseInput {
   summaryI18n?: LocalizedText | null
   description?: string
   descriptionI18n?: LocalizedText | null
+  priceMode?: CoursePriceMode
   price?: number
   tutorSpecialistId?: string | null
   tutorName?: string

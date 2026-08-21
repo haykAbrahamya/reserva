@@ -43,7 +43,9 @@ export function CourseCard({ course, onOpen, onEdit, onDelete }: Props) {
       <div className={s.body}>
         <div className={s.titleRow}>
           <button type="button" className={s.title} onClick={onOpen}>{course.title}</button>
-          <span className={s.price}>{coursePriceLabel(course.price, t('courses.free'))}</span>
+          {coursePriceLabel(course.priceMode, course.price, t('courses.free')) && (
+            <span className={s.price}>{coursePriceLabel(course.priceMode, course.price, t('courses.free'))}</span>
+          )}
         </div>
 
         {tutor && <div className={s.tutor}>{t('courses.card.by', { name: tutor })}</div>}

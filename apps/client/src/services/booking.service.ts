@@ -138,6 +138,9 @@ function toPublicCourse(c: ApiCourse): PublicCourse {
   return {
     ...c,
     coverUrl: resolveImageUrl(c.coverUrl) ?? '',
+    // Defensive fallback for older payloads that predate priceMode: derive it
+    // from the old "0 = free" convention so nothing renders wrong.
+    priceMode: c.priceMode ?? (c.price > 0 ? 'paid' : 'free'),
     tutorSpecialist: c.tutorSpecialist
       ? { ...c.tutorSpecialist, avatarUrl: resolveImageUrl(c.tutorSpecialist.avatarUrl) }
       : null,

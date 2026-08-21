@@ -656,6 +656,7 @@
     "free": "Անվճար",
     "full": "Լրացված է",
     "closed": "Գրանցումը փակ է",
+    "call": "Զանգահարել",
     "seatsLeft": "Մնացել է {count} տեղ",
     "seatsLeft_plural": "Մնացել է {count} տեղ",
     "level": { "beginner": "Սկսնակ", "intermediate": "Միջին", "advanced": "Առաջադեմ" },

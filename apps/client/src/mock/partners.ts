@@ -72,6 +72,8 @@ export interface PublicCourse {
   description: string
   descriptionI18n?: LocalizedText | null
   coverUrl: string
+  /** How the price is presented: 'hidden' (none), 'free', or 'paid'. */
+  priceMode: 'hidden' | 'free' | 'paid'
   price: number
   level?: 'beginner' | 'intermediate' | 'advanced' | null
   /** Guest tutor (used when no linked specialist). */

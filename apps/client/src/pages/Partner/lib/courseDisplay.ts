@@ -5,9 +5,12 @@ import type { PublicCourse } from '@/mock/partners'
 /** Signature of the `useLocalized()` result — a base string + optional i18n blob. */
 type Localizer = (base: string, i18n?: LocalizedText | null) => string
 
-/** Course price: localized "Free" when 0, else the AMD amount. */
-export function fmtCoursePrice(price: number, freeLabel: string): string {
-  return price > 0 ? fmtAMD(price) : freeLabel
+/** Course price by mode: null for 'hidden' (show nothing), the localized "Free"
+ *  label for 'free', else the AMD amount for 'paid'. */
+export function fmtCoursePrice(course: PublicCourse, freeLabel: string): string | null {
+  if (course.priceMode === 'hidden') return null
+  if (course.priceMode === 'free') return freeLabel
+  return fmtAMD(course.price)
 }
 
 /**

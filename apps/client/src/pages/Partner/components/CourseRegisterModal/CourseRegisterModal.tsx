@@ -111,7 +111,9 @@ export function CourseRegisterModal({ partner, course, onClose }: Props) {
               <div className={s.body}>
                 {/* Context chips: price, date, seats */}
                 <div className={s.meta}>
-                  <span className={s.price}>{fmtCoursePrice(course.price, t('courses.free'))}</span>
+                  {fmtCoursePrice(course, t('courses.free')) && (
+                    <span className={s.price}>{fmtCoursePrice(course, t('courses.free'))}</span>
+                  )}
                   {courseDateLabel(course, locale) && (
                     <span className={s.metaChip}><CalendarClock size={14} /> {courseDateLabel(course, locale)}</span>
                   )}

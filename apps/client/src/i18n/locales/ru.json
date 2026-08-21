@@ -656,6 +656,7 @@
     "free": "Бесплатно",
     "full": "Мест нет",
     "closed": "Запись закрыта",
+    "call": "Позвонить",
     "seatsLeft": "Осталось {count} место",
     "seatsLeft_plural": "Осталось {count} мест",
     "level": { "beginner": "Начальный", "intermediate": "Средний", "advanced": "Продвинутый" },

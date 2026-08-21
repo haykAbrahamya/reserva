@@ -1,5 +1,5 @@
 import { fmtAMD } from '@reserva/shared'
-import type { CohortStatus, CourseLevel, EnrollmentStatus } from '@/types'
+import type { CohortStatus, CourseLevel, CoursePriceMode, EnrollmentStatus } from '@/types'
 
 /** i18n key for a course level badge. */
 export function levelKey(level?: CourseLevel | null): string | null {
@@ -37,9 +37,16 @@ export function memberStatusTone(status: EnrollmentStatus): 'pending' | 'confirm
   }
 }
 
-/** Course price: a localized "Free" key when 0, else the AMD amount. */
-export function coursePriceLabel(price: number, freeLabel: string): string {
-  return price > 0 ? fmtAMD(price) : freeLabel
+/** Course price label by mode: null for 'hidden' (render nothing), the "Free"
+ *  label for 'free', else the formatted AMD amount for 'paid'. */
+export function coursePriceLabel(
+  mode: CoursePriceMode,
+  price: number,
+  freeLabel: string,
+): string | null {
+  if (mode === 'hidden') return null
+  if (mode === 'free') return freeLabel
+  return fmtAMD(price)
 }
 
 /** Format an optional ISO date range for display. Falls back to a dash. */
