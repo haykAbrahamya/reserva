@@ -257,6 +257,33 @@ button.rating {
 }
 
 
+/* Jump link down to the academy. Same geometry as the Call button so the action
+   row stays one visual family, with a soft accent wash marking it as an offer
+   rather than a contact method — it must never outrank the primary Book CTA. */
+.coursesBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 52px;
+  padding: 0 24px;
+  border-radius: $r-2;
+  background: $accent-soft;
+  color: $accent-contrast;
+  font-family: $font-sans;
+  font-size: 16px;
+  font-weight: 600;
+  border: 1px solid color-mix(in srgb, $accent 32%, transparent);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  svg { flex-shrink: 0; }
+  &:hover {
+    background: color-mix(in srgb, $accent 15%, transparent);
+    border-color: $accent;
+    transform: translateY(-1px);
+  }
+  &:active { transform: translateY(0); }
+}
+
 /* Social icon links — square buttons aligned with the action row. */
 .socials { display: inline-flex; gap: 10px; align-items: center; }
 .social {
@@ -276,6 +303,37 @@ button.rating {
     background: $accent-soft;
     transform: translateY(-1px);
   }
+}
+
+/* ── Action row on phones ──
+   Left to themselves these are content-width buttons that wrap one per line at
+   three different widths, which reads as clutter. So give the row an explicit
+   structure: the primary CTA owns a full row, the two secondary actions share
+   the next one, socials sit below. `flex-grow: 1` means a secondary action left
+   on its own still fills its row, so every combination a partner can have
+   (book-only, contact-only, courses or not) stays tidy without extra classes. */
+@media (max-width: 760px) {
+  .actions { gap: 10px; }
+
+  .bookCta {
+    flex: 1 1 100%;
+    justify-content: center;
+    padding: 0 20px;
+  }
+
+  .callBtn,
+  .coursesBtn {
+    flex: 1 1 calc(50% - 5px);
+    min-width: 0;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 12px;
+    font-size: 15px;
+    /* One line always — a wrapped label would break the 52px row rhythm.
+       Measured: the longest labels (hy) still fit at a 360px viewport. */
+    white-space: nowrap;
+  }
+  .socials { flex: 1 1 100%; }
 }
 
 /* ── Animated scroll hint ──

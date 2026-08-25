@@ -34,7 +34,7 @@ export function PartnerNav({ partner, onBook }: Props) {
   }, [])
 
   return (
-    <header className={[s.nav, scrolled ? s.scrolled : ''].filter(Boolean).join(' ')}>
+    <header className={[s.nav, scrolled ? s.scrolled : ''].filter(Boolean).join(' ')} data-partner-nav>
       <div className={s.inner}>
         {/* Salon identity — appears once the hero scrolls away. Shows the
             partner's logo when set (matching the hero), else a gradient letter. */}

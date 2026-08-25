@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
-import { CalendarCheck, MapPin, Phone, ChevronDown, Instagram, Facebook, Star } from 'lucide-react'
+import { CalendarCheck, MapPin, Phone, ChevronDown, Instagram, Facebook, Star, GraduationCap } from 'lucide-react'
 import { WhatsappIcon } from '@reserva/ui'
 import { useT, useLocalized } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
 import { bookableLocations, canBook } from '@/services/booking.service'
 import { CallLocationModal } from '../../../../components/CallLocationModal/CallLocationModal'
+import { scrollToSection } from '../../../../lib/scrollToSection'
 import s from './PartnerHero.module.scss'
 
 interface Props {
@@ -53,8 +54,13 @@ export function PartnerHero({ partner, onBook }: Props) {
   const showReviews = isSingle && partner.specialists.length > 0
   const ratingTargetId = showTeam ? 'team' : showReviews ? 'reviews' : null
   const scrollToReviews = () => {
-    if (ratingTargetId) document.getElementById(ratingTargetId)?.scrollIntoView({ behavior: 'smooth' })
+    if (ratingTargetId) scrollToSection(ratingTargetId)
   }
+
+  // The academy is worth a jump link of its own, but only when this salon
+  // actually publishes courses — the same gate ClassicTemplate uses to decide
+  // whether #courses exists at all.
+  const hasCourses = (partner.courses?.length ?? 0) > 0
 
   return (
     <section className={s.hero}>
@@ -141,12 +147,12 @@ export function PartnerHero({ partner, onBook }: Props) {
 
         <div className={s.metaRow}>
           {multiLocation ? (
-            <button className={s.metaLink} onClick={() => document.getElementById('locations')?.scrollIntoView({ behavior: 'smooth' })}>
+            <button className={s.metaLink} onClick={() => scrollToSection('locations')}>
               <MapPin size={16} />
               {t('partner.hero.locationsInYerevan', { count: locations.length })}
             </button>
           ) : primaryLocation && (
-            <button className={s.metaLink} onClick={() => document.getElementById('locations')?.scrollIntoView({ behavior: 'smooth' })}>
+            <button className={s.metaLink} onClick={() => scrollToSection('locations')}>
               <MapPin size={16} />
               {primaryLocation.address}
             </button>
@@ -171,6 +177,11 @@ export function PartnerHero({ partner, onBook }: Props) {
                 <Phone size={17} /> {t('partner.hero.call')}
               </a>
             )
+          )}
+          {hasCourses && (
+            <button type="button" className={s.coursesBtn} onClick={() => scrollToSection('courses')}>
+              <GraduationCap size={18} /> {t('courses.title')}
+            </button>
           )}
           {(p.instagram || p.facebook || p.whatsapp) && (
             <div className={s.socials}>
