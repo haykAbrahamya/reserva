@@ -660,6 +660,13 @@
     "seatsLeft": "Осталось {count} место",
     "seatsLeft_plural": "Осталось {count} мест",
     "level": { "beginner": "Начальный", "intermediate": "Средний", "advanced": "Продвинутый" },
+    "details": {
+      "cta": "Подробнее",
+      "eyebrow": "Подробности курса",
+      "about": "О курсе",
+      "tutor": "Преподаватель",
+      "close": "Закрыть"
+    },
     "register": {
       "cta": "Записаться",
       "eyebrow": "Запись на курс",

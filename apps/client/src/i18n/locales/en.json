@@ -659,6 +659,13 @@
     "seatsLeft": "{count} spot left",
     "seatsLeft_plural": "{count} spots left",
     "level": { "beginner": "Beginner", "intermediate": "Intermediate", "advanced": "Advanced" },
+    "details": {
+      "cta": "See more info",
+      "eyebrow": "Course details",
+      "about": "About this course",
+      "tutor": "Tutor",
+      "close": "Close"
+    },
     "register": {
       "cta": "Register",
       "eyebrow": "Course registration",

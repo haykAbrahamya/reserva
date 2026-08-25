@@ -1,6 +1,7 @@
 import { fmtAMD } from '@reserva/shared'
 import type { LocalizedText } from '@reserva/shared'
-import type { PublicCourse } from '@/mock/partners'
+import type { PublicCourse, PublicPartner } from '@/mock/partners'
+import { canBook, bookableLocations, partnerTelHref } from '@/services/booking.service'
 
 /** Signature of the `useLocalized()` result — a base string + optional i18n blob. */
 type Localizer = (base: string, i18n?: LocalizedText | null) => string
@@ -47,9 +48,51 @@ export function courseDateLabel(course: PublicCourse, locale: string): string {
   return run.scheduleText || ''
 }
 
-/** The tutor's display name (linked specialist wins over free-text guest). */
-export function courseTutorName(course: PublicCourse, loc: Localizer): string {
+/** The course's long-form description, localized and trimmed. Empty string
+ *  when the partner never filled one in — the "see more info" affordance is
+ *  hidden in that case, since the card already shows everything there is. */
+export function courseDescription(course: PublicCourse, loc: Localizer): string {
+  return loc(course.description, course.descriptionI18n).trim()
+}
+
+/** The course tutor for display: a linked specialist wins over the free-text
+ *  guest fields. `name` is empty when the course has no tutor at all. */
+export function courseTutor(course: PublicCourse, loc: Localizer): {
+  name: string
+  title: string
+  avatarUrl?: string
+} {
   const sp = course.tutorSpecialist
-  if (sp) return loc(sp.name, sp.nameI18n)
-  return course.tutorName
+  if (sp) {
+    return {
+      name: loc(sp.name, sp.nameI18n),
+      title: loc(sp.title, sp.titleI18n),
+      avatarUrl: sp.avatarUrl,
+    }
+  }
+  return { name: course.tutorName, title: course.tutorTitle }
+}
+
+/**
+ * Which call-to-action a course should show, resolved in ONE place so the card
+ * and the details popup can never disagree:
+ *   - `register` → online sign-up is open
+ *   - `call`     → contact-only partner (booking disabled); dial `telHref`, or
+ *                  open the branch picker first when `pickBranch` is true
+ *   - `closed`   → bookable partner but the run takes no more sign-ups
+ */
+export type CourseCta =
+  | { kind: 'register' }
+  | { kind: 'call'; telHref: string | null; pickBranch: boolean }
+  | { kind: 'closed' }
+
+export function courseCta(partner: PublicPartner, course: PublicCourse): CourseCta {
+  if (!canBook(partner)) {
+    return {
+      kind: 'call',
+      telHref: partnerTelHref(partner),
+      pickBranch: bookableLocations(partner).length > 1,
+    }
+  }
+  return courseIsOpen(course) ? { kind: 'register' } : { kind: 'closed' }
 }

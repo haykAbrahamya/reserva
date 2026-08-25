@@ -660,6 +660,13 @@
     "seatsLeft": "Մնացել է {count} տեղ",
     "seatsLeft_plural": "Մնացել է {count} տեղ",
     "level": { "beginner": "Սկսնակ", "intermediate": "Միջին", "advanced": "Առաջադեմ" },
+    "details": {
+      "cta": "Մանրամասն",
+      "eyebrow": "Դասընթացի մանրամասներ",
+      "about": "Դասընթացի մասին",
+      "tutor": "Դասավանդող",
+      "close": "Փակել"
+    },
     "register": {
       "cta": "Գրանցվել",
       "eyebrow": "Դասընթացի գրանցում",
