@@ -123,7 +123,7 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
    *  slot grid has rendered (its height is what we need to scroll past). */
   const handleDateSelect = (v: string) => {
     setDate(v)
-    const clientFieldsEmpty = !clientName.trim() || !clientPhone.trim()
+    const clientFieldsEmpty = !clientName.trim()
     if (!clientFieldsEmpty) return
     requestAnimationFrame(() => {
       bottomAnchor.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
@@ -138,7 +138,12 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
     if (!isFacility && !specialistId) e.specialistId = t('errors.required')
     if (!time) e.time = t('errors.required')
     if (!clientName.trim()) e.clientName = t('errors.required')
-    if (clientPhone.replace(/\D/g, '').length < 6) e.clientPhone = clientPhone.trim() ? t('errors.invalid') : t('errors.required')
+    // Phone is OPTIONAL here: staff routinely enter a walk-in with no number to
+    // hand. The public booking flow still requires one. A partially typed number
+    // is still rejected, so a typo can't be silently saved as "no phone".
+    if (clientPhone.trim() && clientPhone.replace(/\D/g, '').length < 6) {
+      e.clientPhone = t('errors.invalid')
+    }
     setErrs(e)
     return Object.keys(e).length === 0
   }

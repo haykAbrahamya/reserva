@@ -74,6 +74,27 @@ async function refreshAccessToken(): Promise<string | null> {
   }
 }
 
+/**
+ * Collapse concurrent 401s onto ONE refresh call.
+ *
+ * This matters more than it looks: the server rotates refresh tokens and revokes
+ * the one it was given (revoke-on-rotation). Two refreshes that both read the
+ * stored token before either writes therefore send the SAME token — the first
+ * rotates it, the second presents an already-revoked token, gets 401, and the
+ * `catch` above wipes the whole session. On a page that fires many requests at
+ * once (the backoffice fires a dozen on load) that is exactly the intermittent
+ * "logged in but no data" failure.
+ *
+ * The flag is cleared in `finally`, tied to the lifetime of the promise itself,
+ * so a late 401 can never start a second rotation while the first is in flight.
+ */
+function refreshOnce(): Promise<string | null> {
+  refreshing ??= refreshAccessToken().finally(() => {
+    refreshing = null
+  })
+  return refreshing
+}
+
 http.interceptors.response.use(
   (res) => res,
   async (error: AxiosError<{ error?: { code: string; message: string; details?: unknown } }>) => {
@@ -85,9 +106,18 @@ http.interceptors.response.use(
     const isAuthRoute = original?.url?.includes('/auth/')
     if (status === 401 && !original?._retried && !isAuthRoute) {
       original._retried = true
-      refreshing = refreshing ?? refreshAccessToken()
-      const newToken = await refreshing
-      refreshing = null
+
+      // This request may have been sent with a token that another request has
+      // already refreshed away. Retrying with the current one costs nothing and
+      // avoids a pointless extra rotation.
+      const current = tokenStore.access
+      const sentWith = (original.headers?.Authorization as string | undefined) ?? ''
+      if (current && sentWith !== `Bearer ${current}`) {
+        original.headers = { ...original.headers, Authorization: `Bearer ${current}` }
+        return http(original)
+      }
+
+      const newToken = await refreshOnce()
       if (newToken) {
         original.headers = { ...original.headers, Authorization: `Bearer ${newToken}` }
         return http(original)

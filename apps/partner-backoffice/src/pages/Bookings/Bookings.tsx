@@ -232,7 +232,7 @@ export function Bookings() {
                       <BookingBadge status={b.status} />
                     </div>
                     <div className={s.cardClient}>{b.clientName}</div>
-                    <div className={s.cardPhone}>{b.clientPhone}</div>
+                    <div className={s.cardPhone}>{b.clientPhone || t('common.noPhone')}</div>
                     <div className={s.cardMeta}>
                       <div style={{ minWidth: 0 }}>
                         <div className={s.cardSvc}>{b.service?.name ?? '—'}</div>
@@ -280,7 +280,7 @@ export function Bookings() {
                         <Avatar name={b.clientName} size="sm" />
                         <div>
                           <div className={s.clientName}>{b.clientName}</div>
-                          <div className={s.clientPhone}>{b.clientPhone}</div>
+                          <div className={s.clientPhone}>{b.clientPhone || t('common.noPhone')}</div>
                         </div>
                       </div>
                     </Td>

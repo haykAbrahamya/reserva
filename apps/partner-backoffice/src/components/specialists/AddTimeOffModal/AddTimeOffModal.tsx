@@ -230,7 +230,7 @@ export function AddTimeOffModal({ open, specialist, bookings, editing, initialDr
                   </span>
                   <span className={s.conflictMeta}>
                     <span className={s.conflictClient}>{b.clientName}</span>
-                    <span className={s.conflictSvc}>{svc?.name ?? '—'} · {b.clientPhone}</span>
+                    <span className={s.conflictSvc}>{svc?.name ?? '—'}{b.clientPhone ? ` · ${b.clientPhone}` : ''}</span>
                   </span>
                   <BookingBadge status={b.status} />
                 </div>

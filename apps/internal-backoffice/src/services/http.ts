@@ -74,6 +74,24 @@ async function refreshAccessToken(): Promise<string | null> {
   }
 }
 
+/**
+ * Collapse concurrent 401s onto ONE refresh call.
+ *
+ * The server rotates refresh tokens and revokes the one it was given, so two
+ * refreshes that both read the stored token before either writes send the SAME
+ * token: the first rotates it, the second presents a revoked token, gets 401,
+ * and the `catch` above wipes the session. A page that fires several requests at
+ * once then looks logged in but shows no data. Clearing the flag in `finally`
+ * ties it to the promise's lifetime, so a late 401 cannot start a second
+ * rotation while the first is still in flight.
+ */
+function refreshOnce(): Promise<string | null> {
+  refreshing ??= refreshAccessToken().finally(() => {
+    refreshing = null
+  })
+  return refreshing
+}
+
 http.interceptors.response.use(
   (res) => res,
   async (error: AxiosError<{ error?: { code: string; message: string; details?: unknown } }>) => {
@@ -84,9 +102,17 @@ http.interceptors.response.use(
     const isAuthRoute = original?.url?.includes('/auth/')
     if (status === 401 && !original?._retried && !isAuthRoute) {
       original._retried = true
-      refreshing = refreshing ?? refreshAccessToken()
-      const newToken = await refreshing
-      refreshing = null
+
+      // Another request may have already refreshed since this one was sent —
+      // retry with the current token rather than rotating again.
+      const current = tokenStore.access
+      const sentWith = (original.headers?.Authorization as string | undefined) ?? ''
+      if (current && sentWith !== `Bearer ${current}`) {
+        original.headers = { ...original.headers, Authorization: `Bearer ${current}` }
+        return http(original)
+      }
+
+      const newToken = await refreshOnce()
       if (newToken) {
         original.headers = { ...original.headers, Authorization: `Bearer ${newToken}` }
         return http(original)

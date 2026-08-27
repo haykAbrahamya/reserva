@@ -120,7 +120,9 @@
         "6": "Կիր"
       }
     },
-    "loading": "Բեռնվում է…"
+    "loading": "Բեռնվում է…",
+    "optional": "ըստ ցանկության",
+    "noPhone": "Հեռախոս չկա"
   },
   "nav": {
     "sections": {
@@ -659,7 +661,7 @@
     "slotsHint": "Ընտրեք մասնագետ և ամսաթիվ՝ հասանելի ժամերը տեսնելու համար։",
     "clientNameLabel": "Հաճախորդի անունը",
     "clientNamePlaceholder": "Աննա Կարապետյան",
-    "clientPhoneLabel": "Հաճախորդի հեռախոսը",
+    "clientPhoneLabel": "Հաճախորդի հեռախոս · ըստ ցանկության",
     "clientPhonePlaceholder": "+374 91 …",
     "summary": "{date} ժամը {time} · {service} ({duration} րոպե)",
     "confirmedToast": "Ամրագրումը հաստատվեց {name}-ի համար",

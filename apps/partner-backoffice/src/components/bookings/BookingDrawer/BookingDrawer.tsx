@@ -198,7 +198,7 @@ export function BookingDrawer({ bookingId, onClose, sheet, onChanged }: Props) {
       <div className={s.section}>
         <div className={s.label}>{t('bookingDrawer.client')}</div>
         <div className={s.value}>{booking.clientName}</div>
-        <div className={s.sub}>{booking.clientPhone}</div>
+        <div className={s.sub}>{booking.clientPhone || t('common.noPhone')}</div>
       </div>
 
       {/* Service */}
@@ -292,7 +292,7 @@ export function BookingDrawer({ bookingId, onClose, sheet, onChanged }: Props) {
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <div>
                 <div className={s.clientName}>{booking.clientName}</div>
-                <div className={s.clientPhone}>{booking.clientPhone}</div>
+                <div className={s.clientPhone}>{booking.clientPhone || t('common.noPhone')}</div>
                 <div className={s.datetime}>{fmtDateTime(booking.startISO)}</div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
