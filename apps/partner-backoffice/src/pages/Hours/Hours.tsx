@@ -231,9 +231,6 @@ export function Hours() {
 
                 {DAY_KEYS.map((key) => {
                   const day: WorkingDay = schedule[key] ?? { enabled: false, start: '10:00', end: '19:00' }
-                  // Confirms back to the partner that a wrapping shift was
-                  // understood as overnight rather than as a mistake.
-                  const overnight = day.enabled && day.end < day.start
                   const sameTime = day.enabled && day.start === day.end
                   return (
                     <div key={key} className={[s.dayRow, !day.enabled ? s.disabled : ''].filter(Boolean).join(' ')}>
@@ -252,7 +249,6 @@ export function Hours() {
                           step={15}
                           onChange={v => updateDay(key, { end: v })}
                         />
-                        {overnight && <span className={s.overnightTag}>+1 · {t('hours.overnight')}</span>}
                         {sameTime && (
                           <span className={s.sameTimeError}>
                             <AlertTriangle size={13} /> {t('hours.sameTimeError')}

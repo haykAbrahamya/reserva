@@ -551,7 +551,6 @@
     "selectSpecialist": "Select a specialist",
     "selectSpecialistHint": "Pick someone from the list to edit their hours.",
     "weeklyTitle": "Weekly schedule",
-    "overnight": "ends next day",
     "sameTimeError": "Start and end can’t be the same. To work past midnight, set an end time earlier than the start (e.g. 18:00 – 02:30).",
     "days": {
       "mon": "Mon",

@@ -58,9 +58,14 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
     [],
   )
 
+  // Full 24 hours at 30-minute steps. Deliberately NOT clipped to a daytime
+  // window: a salon working past midnight (18:00 → 02:30) could otherwise not be
+  // booked by its own staff for most of its shift, even though clients could
+  // book those hours from the public page. The backend still enforces working
+  // hours, so an out-of-hours pick is rejected there.
   const allSlots = useMemo(() => {
     const out: string[] = []
-    for (let h = 8; h < 21; h++)
+    for (let h = 0; h < 24; h++)
       for (let m = 0; m < 60; m += 30)
         out.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`)
     return out
@@ -95,15 +100,13 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
         )
         .map(b => [new Date(b.startISO).getTime(), new Date(b.endISO).getTime()] as const)
 
-      for (let h = 8; h < 21; h++) {
-        for (let m = 0; m < 60; m += 30) {
-          const start = new Date(`${date}T00:00:00`); start.setHours(h, m, 0, 0)
-          const s0 = start.getTime(), e0 = s0 + slotMin * 60_000
-          const overlapping = windows.filter(([bs, be]) => s0 < be && bs < e0).length
-          if (overlapping >= capacity) {
-            set.add(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`)
-          }
-        }
+      // Walk the SAME grid the picker offers, so the two can't drift apart.
+      for (const slot of allSlots) {
+        const [h, m] = slot.split(':').map(Number)
+        const start = new Date(`${date}T00:00:00`); start.setHours(h, m, 0, 0)
+        const s0 = start.getTime(), e0 = s0 + slotMin * 60_000
+        const overlapping = windows.filter(([bs, be]) => s0 < be && bs < e0).length
+        if (overlapping >= capacity) set.add(slot)
       }
       return set
     }
@@ -119,17 +122,16 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
     })
     // Block slots that fall inside a time-off window. A slot is the service's
     // duration (default 30m) starting at the slot time.
-    for (let h = 8; h < 21; h++) {
-      for (let m = 0; m < 60; m += 30) {
-        const start = new Date(`${date}T00:00:00`); start.setHours(h, m, 0, 0)
-        const end = new Date(start.getTime() + slotMin * 60_000)
-        if (slotBlockedByTimeOff(timeOff, specialistId, start.getTime(), end.getTime())) {
-          set.add(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`)
-        }
+    for (const slot of allSlots) {
+      const [h, m] = slot.split(':').map(Number)
+      const start = new Date(`${date}T00:00:00`); start.setHours(h, m, 0, 0)
+      const end = new Date(start.getTime() + slotMin * 60_000)
+      if (slotBlockedByTimeOff(timeOff, specialistId, start.getTime(), end.getTime())) {
+        set.add(slot)
       }
     }
     return set
-  }, [bookings, specialistId, date, partner, serviceId, locationId, timeOff, svcCatalog])
+  }, [bookings, specialistId, date, partner, serviceId, locationId, timeOff, svcCatalog, allSlots])
 
   // When a manager opens the modal, force their branch as the location.
   useEffect(() => {
