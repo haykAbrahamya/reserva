@@ -121,7 +121,6 @@
       }
     },
     "loading": "Loading…",
-    "optional": "optional",
     "noPhone": "No phone"
   },
   "nav": {
@@ -661,7 +660,7 @@
     "slotsHint": "Select a specialist and date to see available slots.",
     "clientNameLabel": "Client name",
     "clientNamePlaceholder": "Anna Karapetyan",
-    "clientPhoneLabel": "Client phone · optional",
+    "clientPhoneLabel": "Client phone",
     "clientPhonePlaceholder": "+374 91 …",
     "summary": "{date} at {time} · {service} ({duration} min)",
     "confirmedToast": "Booking confirmed for {name}",

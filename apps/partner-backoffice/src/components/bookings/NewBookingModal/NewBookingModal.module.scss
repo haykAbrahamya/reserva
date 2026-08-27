@@ -51,3 +51,16 @@
   height: 1px;
   scroll-margin-bottom: 12px;
 }
+
+/* ── Phones ──
+   Two fields side by side leaves ~160px each on a 360px screen, which clips the
+   longer localized labels. One field per line instead.
+
+   `.full` / `.bottomAnchor` must drop their `span 2`: a 2-column span inside a
+   1-column grid makes CSS create a phantom second column, which would undo the
+   single-column layout. */
+@media (max-width: 560px) {
+  .grid { grid-template-columns: 1fr; }
+  .full,
+  .bottomAnchor { grid-column: auto; }
+}

@@ -121,7 +121,6 @@
       }
     },
     "loading": "Загрузка…",
-    "optional": "необязательно",
     "noPhone": "Без телефона"
   },
   "nav": {
@@ -661,7 +660,7 @@
     "slotsHint": "Выберите специалиста и дату, чтобы увидеть свободное время.",
     "clientNameLabel": "Имя клиента",
     "clientNamePlaceholder": "Анна Карапетян",
-    "clientPhoneLabel": "Телефон клиента · необязательно",
+    "clientPhoneLabel": "Телефон клиента",
     "clientPhonePlaceholder": "+374 91 …",
     "summary": "{date} в {time} · {service} ({duration} мин)",
     "confirmedToast": "Запись подтверждена для {name}",
