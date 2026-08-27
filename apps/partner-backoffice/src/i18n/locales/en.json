@@ -664,7 +664,8 @@
     "summary": "{date} at {time} · {service} ({duration} min)",
     "confirmedToast": "Booking confirmed for {name}",
     "facilitySub": "{duration} min · {capacity} spots",
-    "slotsHintFacility": "Select a date to see available slots."
+    "slotsHintFacility": "Select a date to see available slots.",
+    "noSlots": "No available times on this day."
   },
   "bookingDrawer": {
     "status": "Status",

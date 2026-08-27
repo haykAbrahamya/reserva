@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Calendar } from 'lucide-react'
 import { Modal, Input, Select, Button, DatePicker, FieldError, useToast } from '@/components/ui'
 import { usePartner } from '@/store/app.store'
@@ -6,11 +6,9 @@ import { useResource } from '@/store/useResource'
 import { useScopedLocationId } from '@/store/auth.hooks'
 import { bookingsService } from '@/services/bookings.service'
 import { partnersService } from '@/services/partners.service'
-import { slotBlockedByTimeOff } from '@/utils/timeOff'
 import { fmtDateInput } from '@/utils/format'
 import { errorMessage } from '@/utils/errors'
 import { useT, useDateLocale, useDatePickerLabels } from '@/i18n'
-import type { SpecialistTimeOff } from '@/types'
 import s from './NewBookingModal.module.scss'
 
 interface Props {
@@ -51,87 +49,6 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
   const bottomAnchor = useRef<HTMLDivElement>(null)
   const clearErr = (k: string) => setErrs(e => (e[k] ? (() => { const n = { ...e }; delete n[k]; return n })() : e))
 
-  // Fresh bookings for the chosen day for slot availability (backend enforces overlaps).
-  const { data: bookings } = useResource(
-    () => (open && date ? bookingsService.calendar(`${date}T00:00:00`, `${date}T23:59:59`) : Promise.resolve([])),
-    [open, date],
-    [],
-  )
-
-  // Full 24 hours at 30-minute steps. Deliberately NOT clipped to a daytime
-  // window: a salon working past midnight (18:00 → 02:30) could otherwise not be
-  // booked by its own staff for most of its shift, even though clients could
-  // book those hours from the public page. The backend still enforces working
-  // hours, so an out-of-hours pick is rejected there.
-  const allSlots = useMemo(() => {
-    const out: string[] = []
-    for (let h = 0; h < 24; h++)
-      for (let m = 0; m < 60; m += 30)
-        out.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`)
-    return out
-  }, [])
-
-  // Time off for the selected specialist — blocks slots just like bookings do.
-  const [timeOff, setTimeOff] = useState<SpecialistTimeOff[]>([])
-  useEffect(() => {
-    if (!specialistId) { setTimeOff([]); return }
-    let active = true
-    partnersService.listTimeOff(specialistId).then(t => { if (active) setTimeOff(t) })
-    return () => { active = false }
-  }, [specialistId])
-
-  const busySlots = useMemo(() => {
-    const set = new Set<string>()
-    if (!date || !partner) return set
-    const svc = svcCatalog.find(sv => sv.id === serviceId)
-    if (!svc) return set
-    const slotMin = svc.duration || 30
-
-    // ── Facility/entry service: gate by concurrent capacity ──
-    // A slot is full when `capacity` active bookings for this service+location
-    // overlap its [start, end) window. No specialist / time-off involved.
-    if (svc.requiresSpecialist === false) {
-      const capacity = Math.max(1, svc.capacity ?? 1)
-      const windows = bookings
-        .filter(b =>
-          b.serviceId === serviceId &&
-          (!locationId || b.locationId === locationId) &&
-          b.status !== 'cancelled' && b.status !== 'noshow',
-        )
-        .map(b => [new Date(b.startISO).getTime(), new Date(b.endISO).getTime()] as const)
-
-      // Walk the SAME grid the picker offers, so the two can't drift apart.
-      for (const slot of allSlots) {
-        const [h, m] = slot.split(':').map(Number)
-        const start = new Date(`${date}T00:00:00`); start.setHours(h, m, 0, 0)
-        const s0 = start.getTime(), e0 = s0 + slotMin * 60_000
-        const overlapping = windows.filter(([bs, be]) => s0 < be && bs < e0).length
-        if (overlapping >= capacity) set.add(slot)
-      }
-      return set
-    }
-
-    // ── Person service: a specialist's own bookings + time-off block slots ──
-    if (!specialistId) return set
-    bookings.forEach(b => {
-      if (b.specialistId !== specialistId) return
-      if (b.status === 'cancelled' || b.status === 'noshow') return
-      const d = new Date(b.startISO)
-      if (fmtDateInput(d) !== date) return
-      set.add(`${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`)
-    })
-    // Block slots that fall inside a time-off window. A slot is the service's
-    // duration (default 30m) starting at the slot time.
-    for (const slot of allSlots) {
-      const [h, m] = slot.split(':').map(Number)
-      const start = new Date(`${date}T00:00:00`); start.setHours(h, m, 0, 0)
-      const end = new Date(start.getTime() + slotMin * 60_000)
-      if (slotBlockedByTimeOff(timeOff, specialistId, start.getTime(), end.getTime())) {
-        set.add(slot)
-      }
-    }
-    return set
-  }, [bookings, specialistId, date, partner, serviceId, locationId, timeOff, svcCatalog, allSlots])
 
   // When a manager opens the modal, force their branch as the location.
   useEffect(() => {
@@ -151,6 +68,38 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
     if (!specialistId && solo) setSpecialistId(solo.id)
   }, [open, isSolo, specialistId, spCatalog])
 
+  const selectedService = svcCatalog.find(sv => sv.id === serviceId)
+  // Facility/entry service (spa): no specialist — a walk-in just needs a spot.
+  const isFacility = selectedService?.requiresSpecialist === false
+  // The time grid is ready once we can resolve availability: a specialist for a
+  // person service, or just the service itself for a facility/entry one.
+  const slotsReady = isFacility ? !!serviceId : !!specialistId
+
+  // Real bookable times from the server, which layers working hours (including
+  // overnight shifts) − time-off − existing bookings − past. This used to be a
+  // fixed hourly grid invented here that ignored working hours entirely: staff
+  // were offered times the server then rejected, and a salon open past midnight
+  // couldn't be booked for most of its own shift.
+  const { data: slots, loading: slotsLoading } = useResource(
+    () =>
+      open && date && locationId && serviceId && slotsReady
+        ? bookingsService.slots({
+            serviceId,
+            locationId,
+            ...(isFacility ? {} : { specialistId }),
+            date,
+          })
+        : Promise.resolve([]),
+    [open, date, locationId, serviceId, specialistId, isFacility, slotsReady],
+    [],
+  )
+
+  // Drop a selected time the latest list no longer offers (the date, service or
+  // specialist changed under it) so a stale value can't be submitted.
+  useEffect(() => {
+    if (time && !slotsLoading && !slots.includes(time)) setTime('')
+  }, [slots, slotsLoading, time])
+
   // Early return AFTER all hooks
   if (!partner) return null
 
@@ -168,13 +117,6 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
   const services = svcCatalog.filter(sv =>
     sv.active && (!specialistId || spCatalog.find(sp => sp.id === specialistId)?.services.includes(sv.id))
   )
-  const selectedService = svcCatalog.find(sv => sv.id === serviceId)
-  // Facility/entry service (spa): no specialist — a walk-in just needs a spot.
-  const isFacility = selectedService?.requiresSpecialist === false
-  // The time grid is ready once we can resolve availability: a specialist for a
-  // person service, or just the service itself for a facility/entry one.
-  const slotsReady = isFacility ? !!serviceId : !!specialistId
-
   /** Pick a date, then — if the client fields below are still empty — smoothly
    *  reveal them. The tall time grid pushes name/phone off-screen, so without
    *  this it's easy to miss that there's more form below. We wait a frame so the
@@ -325,19 +267,31 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
         <div className={s.full}>
           <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--fg-1)', display: 'block', marginBottom: 6 }}>{t('newBooking.timeLabel')}</label>
           {slotsReady && date ? (
-            <div className={s.slotGrid}>
-              {allSlots.map(sl => (
-                <button
-                  key={sl}
-                  type="button"
-                  disabled={busySlots.has(sl)}
-                  onClick={() => { if (!busySlots.has(sl)) { setTime(sl); clearErr('time') } }}
-                  className={[s.slot, time === sl ? s.selected : '', busySlots.has(sl) ? s.busy : ''].filter(Boolean).join(' ')}
-                >
-                  {sl}
-                </button>
-              ))}
-            </div>
+            slotsLoading ? (
+              <div className={s.infoBox}>
+                <Calendar size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+                <span>{t('common.loading')}</span>
+              </div>
+            ) : slots.length === 0 ? (
+              // Closed that day, or every bookable time is already taken.
+              <div className={s.infoBox}>
+                <Calendar size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+                <span>{t('newBooking.noSlots')}</span>
+              </div>
+            ) : (
+              <div className={s.slotGrid}>
+                {slots.map(sl => (
+                  <button
+                    key={sl}
+                    type="button"
+                    onClick={() => { setTime(sl); clearErr('time') }}
+                    className={[s.slot, time === sl ? s.selected : ''].filter(Boolean).join(' ')}
+                  >
+                    {sl}
+                  </button>
+                ))}
+              </div>
+            )
           ) : (
             <div className={s.infoBox}>
               <Calendar size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { CalendarClock } from 'lucide-react'
 import { Modal, Button, DatePicker, useToast } from '@/components/ui'
 import { usePartner } from '@/store/app.store'
@@ -32,73 +32,33 @@ export function RescheduleModal({ booking, onClose, onDone }: Props) {
   const [time, setTime] = useState(currentTime)
   const [saving, setSaving] = useState(false)
 
-  // Fresh bookings for the chosen day to mark taken slots (backend enforces overlaps).
-  const { data: bookings } = useResource(
-    () => bookingsService.calendar(`${date}T00:00:00`, `${date}T23:59:59`),
-    [date],
+  // Real bookable times from the server — working hours (incl. overnight
+  // shifts) − time-off − other bookings − past, from the same engine the public
+  // page uses. `excludeBookingId` keeps THIS booking's own slot pickable so the
+  // form opens on its current time. Previously this was a fixed hourly grid that
+  // ignored working hours, offering times the server then rejected.
+  const { data: slots, loading: slotsLoading } = useResource(
+    () =>
+      date
+        ? bookingsService.slots({
+            serviceId: booking.serviceId,
+            locationId: booking.locationId,
+            ...(booking.specialistId ? { specialistId: booking.specialistId } : {}),
+            date,
+            excludeBookingId: booking.id,
+          })
+        : Promise.resolve([]),
+    [date, booking.serviceId, booking.locationId, booking.specialistId, booking.id],
     [],
   )
-
-  // Full 24 hours at 30-minute steps. Deliberately NOT clipped to a daytime
-  // window: a late-night salon works past midnight (18:00–02:30), and an
-  // 08:00–20:30 grid made most of its own shift unreachable for staff. The
-  // backend still enforces working hours, so an out-of-hours pick is rejected
-  // there — exactly as it already was for early slots at a 10:00 salon.
-  const allSlots = useMemo(() => {
-    const out: string[] = []
-    for (let h = 0; h < 24; h++)
-      for (let m = 0; m < 60; m += 30)
-        out.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`)
-    return out
-  }, [])
-
-  // A facility/entry booking (spa, no specialist) is gated by concurrent
-  // capacity for its service+location; a person booking by the specialist.
-  const isFacility = booking.specialistId === null
-  const capacity = Math.max(1, booking.service?.capacity ?? 1)
-  const slotMin = booking.service?.duration ?? 30
-
-  const busySlots = useMemo(() => {
-    const set = new Set<string>()
-
-    if (isFacility) {
-      // Other live facility bookings for THIS service+location.
-      const windows = bookings
-        .filter(b =>
-          b.id !== booking.id &&
-          b.serviceId === booking.serviceId &&
-          b.locationId === booking.locationId &&
-          b.status !== 'cancelled' && b.status !== 'noshow',
-        )
-        .map(b => [new Date(b.startISO).getTime(), new Date(b.endISO).getTime()] as const)
-      // Walk the SAME grid the picker offers, so the two can't drift apart.
-      for (const slot of allSlots) {
-        const [h, m] = slot.split(':').map(Number)
-        const start = new Date(`${date}T00:00:00`); start.setHours(h, m, 0, 0)
-        const s0 = start.getTime(), e0 = s0 + slotMin * 60_000
-        const overlapping = windows.filter(([bs, be]) => s0 < be && bs < e0).length
-        if (overlapping >= capacity) set.add(slot)
-      }
-      return set
-    }
-
-    // Slots taken by *other* live bookings for the same specialist on this day.
-    bookings.forEach(b => {
-      if (b.id === booking.id) return // never block our own slot
-      if (b.specialistId !== booking.specialistId) return
-      if (b.status === 'cancelled' || b.status === 'noshow') return
-      const d = new Date(b.startISO)
-      if (fmtDateInput(d) !== date) return
-      set.add(`${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`)
-    })
-    return set
-  }, [bookings, booking.id, booking.specialistId, booking.serviceId, booking.locationId, date, isFacility, capacity, slotMin, allSlots])
 
   if (!partner) return null
 
   const svc = booking.service
   const changed = date !== currentDate || time !== currentTime
-  const canSave = !!time && !busySlots.has(time) && changed
+  // Every offered slot is bookable, so "can save" just means the chosen time
+  // is still in the current list (it may have dropped out when the date changed).
+  const canSave = !!time && slots.includes(time) && changed
 
   const handleSave = async () => {
     if (!canSave || !svc) return
@@ -150,20 +110,22 @@ export function RescheduleModal({ booking, onClose, onDone }: Props) {
 
         <div>
           <label className={s.fieldLabel}>{t('reschedule.newTime')}</label>
+          {slotsLoading ? (
+            <div className={s.emptyNote}>{t('common.loading')}</div>
+          ) : slots.length === 0 ? (
+            <div className={s.emptyNote}>{t('newBooking.noSlots')}</div>
+          ) : (
           <div className={s.slotGrid}>
-            {allSlots.map(sl => {
+            {slots.map(sl => {
               const isCurrent = sl === currentTime && date === currentDate
-              const busy = busySlots.has(sl)
               return (
                 <button
                   key={sl}
                   type="button"
-                  disabled={busy}
-                  onClick={() => !busy && setTime(sl)}
+                  onClick={() => setTime(sl)}
                   className={[
                     s.slot,
                     time === sl ? s.selected : '',
-                    busy ? s.busy : '',
                     isCurrent && time !== sl ? s.current : '',
                   ].filter(Boolean).join(' ')}
                 >
@@ -172,6 +134,7 @@ export function RescheduleModal({ booking, onClose, onDone }: Props) {
               )
             })}
           </div>
+          )}
         </div>
 
         {changed && time && svc && (

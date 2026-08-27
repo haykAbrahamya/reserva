@@ -664,7 +664,8 @@
     "summary": "{date} ժամը {time} · {service} ({duration} րոպե)",
     "confirmedToast": "Ամրագրումը հաստատվեց {name}-ի համար",
     "facilitySub": "{duration} րոպե · {capacity} տեղ",
-    "slotsHintFacility": "Ընտրեք ամսաթիվ՝ հասանելի ժամերը տեսնելու համար։"
+    "slotsHintFacility": "Ընտրեք ամսաթիվ՝ հասանելի ժամերը տեսնելու համար։",
+    "noSlots": "Այս օրվա համար հասանելի ժամեր չկան։"
   },
   "bookingDrawer": {
     "status": "Կարգավիճակ",

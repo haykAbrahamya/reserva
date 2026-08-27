@@ -664,7 +664,8 @@
     "summary": "{date} в {time} · {service} ({duration} мин)",
     "confirmedToast": "Запись подтверждена для {name}",
     "facilitySub": "{duration} мин · {capacity} мест",
-    "slotsHintFacility": "Выберите дату, чтобы увидеть свободное время."
+    "slotsHintFacility": "Выберите дату, чтобы увидеть свободное время.",
+    "noSlots": "На этот день нет доступного времени."
   },
   "bookingDrawer": {
     "status": "Статус",

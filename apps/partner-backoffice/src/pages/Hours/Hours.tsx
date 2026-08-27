@@ -185,7 +185,7 @@ export function Hours() {
         </div>
         {selectedSp && (
           <Button variant="accent" onClick={handleSave} disabled={saving || sameTimeDays.length > 0}>
-            {saving ? t('common.saving') : t('common.saveChanges')}
+            {saving ? t('common.saving') : t('common.save')}
           </Button>
         )}
       </div>

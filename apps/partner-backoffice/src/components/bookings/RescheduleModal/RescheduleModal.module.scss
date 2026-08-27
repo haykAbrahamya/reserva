@@ -66,3 +66,13 @@
 
   strong { color: $fg-0; }
 }
+
+/* Shown instead of the slot grid when the day is closed or still loading. */
+.emptyNote {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--bg-2);
+  border: 1px solid var(--line-1);
+  color: var(--fg-2);
+  font-size: 13px;
+}

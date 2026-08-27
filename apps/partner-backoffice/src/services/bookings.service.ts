@@ -99,6 +99,25 @@ export const bookingsService = {
     return rows.map(mapApiBooking)
   },
 
+  /**
+   * Bookable 'HH:MM' start times for a service on a date.
+   *
+   * The server runs the same availability engine the public booking page uses,
+   * so the pickers can't offer a time the salon is closed for (or one that's
+   * already taken) — and overnight shifts stay correct without the frontend
+   * reimplementing any of that. `excludeBookingId` keeps a booking's own slot
+   * pickable while rescheduling it.
+   */
+  async slots(params: {
+    serviceId: string
+    locationId: string
+    specialistId?: string
+    date: string
+    excludeBookingId?: string
+  }): Promise<string[]> {
+    return apiGet<string[]>('/bookings/slots', { params })
+  },
+
   async get(id: string): Promise<Booking | undefined> {
     const b = await apiGet<ApiBooking>(`/bookings/${id}`)
     return mapApiBooking(b)
