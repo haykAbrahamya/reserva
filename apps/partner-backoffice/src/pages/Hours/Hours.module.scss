@@ -114,6 +114,34 @@
   align-items: center;
   gap: 8px;
   min-width: 0;     // allow the time block to shrink instead of overflowing
+  flex-wrap: wrap;  // lets the validation message drop to its own line
+}
+
+/* "+1 · ends next day" — confirms a wrapping shift was read as overnight
+   rather than as a typo. */
+.overnightTag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: $accent-soft;
+  color: $accent;
+  white-space: nowrap;
+}
+
+/* start === end is the one impossible combination — flagged inline, and the
+   Save button is disabled while any day has it. */
+.sameTimeError {
+  flex-basis: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: $danger;
+  svg { flex-shrink: 0; margin-top: 1px; }
 }
 
 .timeInput {

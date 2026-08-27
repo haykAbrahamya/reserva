@@ -39,9 +39,14 @@ export function RescheduleModal({ booking, onClose, onDone }: Props) {
     [],
   )
 
+  // Full 24 hours at 30-minute steps. Deliberately NOT clipped to a daytime
+  // window: a late-night salon works past midnight (18:00–02:30), and an
+  // 08:00–20:30 grid made most of its own shift unreachable for staff. The
+  // backend still enforces working hours, so an out-of-hours pick is rejected
+  // there — exactly as it already was for early slots at a 10:00 salon.
   const allSlots = useMemo(() => {
     const out: string[] = []
-    for (let h = 8; h < 21; h++)
+    for (let h = 0; h < 24; h++)
       for (let m = 0; m < 60; m += 30)
         out.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`)
     return out
@@ -66,13 +71,13 @@ export function RescheduleModal({ booking, onClose, onDone }: Props) {
           b.status !== 'cancelled' && b.status !== 'noshow',
         )
         .map(b => [new Date(b.startISO).getTime(), new Date(b.endISO).getTime()] as const)
-      for (let h = 8; h < 21; h++) {
-        for (let m = 0; m < 60; m += 30) {
-          const start = new Date(`${date}T00:00:00`); start.setHours(h, m, 0, 0)
-          const s0 = start.getTime(), e0 = s0 + slotMin * 60_000
-          const overlapping = windows.filter(([bs, be]) => s0 < be && bs < e0).length
-          if (overlapping >= capacity) set.add(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`)
-        }
+      // Walk the SAME grid the picker offers, so the two can't drift apart.
+      for (const slot of allSlots) {
+        const [h, m] = slot.split(':').map(Number)
+        const start = new Date(`${date}T00:00:00`); start.setHours(h, m, 0, 0)
+        const s0 = start.getTime(), e0 = s0 + slotMin * 60_000
+        const overlapping = windows.filter(([bs, be]) => s0 < be && bs < e0).length
+        if (overlapping >= capacity) set.add(slot)
       }
       return set
     }
@@ -87,7 +92,7 @@ export function RescheduleModal({ booking, onClose, onDone }: Props) {
       set.add(`${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`)
     })
     return set
-  }, [bookings, booking.id, booking.specialistId, booking.serviceId, booking.locationId, date, isFacility, capacity, slotMin])
+  }, [bookings, booking.id, booking.specialistId, booking.serviceId, booking.locationId, date, isFacility, capacity, slotMin, allSlots])
 
   if (!partner) return null
 

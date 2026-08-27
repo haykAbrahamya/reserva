@@ -159,8 +159,17 @@ export function Hours() {
     </button>
   )
 
+  // An end BEFORE the start is a valid overnight shift (18:00 → 02:30 closes at
+  // 02:30 next morning). The only impossible combination is start === end, which
+  // can't be told apart from a zero-length day — catch it here so the partner
+  // gets a readable message instead of a raw API "Validation failed".
+  const sameTimeDays = DAY_KEYS.filter(k => {
+    const d = schedule?.[k]
+    return d?.enabled && d.start === d.end
+  })
+
   const handleSave = async () => {
-    if (!selectedId || !schedule) return
+    if (!selectedId || !schedule || sameTimeDays.length > 0) return
     setSaving(true)
     await partnersService.updateHours(selectedId, schedule)
     notifyProfileUpdated()
@@ -175,7 +184,7 @@ export function Hours() {
           <p className={s.sub}>{t('hours.subtitle', { name: partner.name })}</p>
         </div>
         {selectedSp && (
-          <Button variant="accent" onClick={handleSave} disabled={saving}>
+          <Button variant="accent" onClick={handleSave} disabled={saving || sameTimeDays.length > 0}>
             {saving ? t('common.saving') : t('common.saveChanges')}
           </Button>
         )}
@@ -222,6 +231,10 @@ export function Hours() {
 
                 {DAY_KEYS.map((key) => {
                   const day: WorkingDay = schedule[key] ?? { enabled: false, start: '10:00', end: '19:00' }
+                  // Confirms back to the partner that a wrapping shift was
+                  // understood as overnight rather than as a mistake.
+                  const overnight = day.enabled && day.end < day.start
+                  const sameTime = day.enabled && day.start === day.end
                   return (
                     <div key={key} className={[s.dayRow, !day.enabled ? s.disabled : ''].filter(Boolean).join(' ')}>
                       <span className={s.dayLabel}>{t(`hours.days.${key}`)}</span>
@@ -239,6 +252,12 @@ export function Hours() {
                           step={15}
                           onChange={v => updateDay(key, { end: v })}
                         />
+                        {overnight && <span className={s.overnightTag}>+1 · {t('hours.overnight')}</span>}
+                        {sameTime && (
+                          <span className={s.sameTimeError}>
+                            <AlertTriangle size={13} /> {t('hours.sameTimeError')}
+                          </span>
+                        )}
                       </div>
                       <Toggle checked={day.enabled} onChange={v => updateDay(key, { enabled: v })} />
                     </div>
