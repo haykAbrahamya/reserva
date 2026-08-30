@@ -175,3 +175,167 @@
   padding: 16px 20px;
 }
 .dangerIcon { color: $danger; flex-shrink: 0; }
+
+
+/* ── Products ──────────────────────────────────────────────
+   One card per catalog product. Full-width above the two-column config grid,
+   because "which products does this partner have" is the first question staff
+   ask and should not be competing for space. */
+.productsSection { margin: 0 0 20px; }
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 12px;
+}
+.sectionTitle { font-size: 15px; font-weight: 600; margin: 0; }
+.sectionCount { font-size: 12px; color: $fg-3; white-space: nowrap; }
+
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+}
+/* Below the card's own minimum, one per row rather than a squeezed grid. */
+@media (max-width: 700px) { .productGrid { grid-template-columns: 1fr; } }
+
+.productCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid $line-1;
+  border-radius: 12px;
+  background: $bg-1;
+  transition: border-color 0.15s, opacity 0.15s;
+}
+/* A product that is off stays visible and legible — staff need to see what a
+   partner could have, not just what they do have — but recedes. */
+.productOff { opacity: 0.72; background: $bg-2; }
+
+.productHead { display: flex; align-items: flex-start; gap: 11px; }
+.productIcon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: $accent-soft;
+  color: $accent;
+}
+.productTitleWrap { flex: 1; min-width: 0; }
+.productName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: $fg-0;
+}
+.curated { display: inline-flex; color: $fg-3; }
+.productStatus { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.trialNote {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  color: $fg-3;
+}
+.productDesc { margin: 0; font-size: 12.5px; line-height: 1.5; color: $fg-2; }
+.productOffHint { margin: 0; font-size: 12px; line-height: 1.5; color: $fg-3; }
+
+.usageRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+  gap: 8px;
+  padding: 10px;
+  border-radius: 9px;
+  background: $bg-2;
+}
+.productOff .usageRow { background: $bg-1; }
+.usageStat { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.usageValue { font-size: 17px; font-weight: 600; color: $fg-0; line-height: 1.1; }
+.usageLabel { font-size: 10.5px; color: $fg-3; text-align: center; }
+
+.settingList { display: flex; flex-direction: column; gap: 10px; }
+.settingRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid $line-1;
+}
+
+/* ── Bookings ──────────────────────────────────────────────
+   A real table on desktop; stacked label/value cards on phones, driven by the
+   data-label attributes so there is only one set of markup to maintain. */
+.bkTable { display: flex; flex-direction: column; }
+
+.bkHead,
+.bkRow {
+  display: grid;
+  grid-template-columns: 1.4fr 1.3fr 0.9fr 0.8fr 1.2fr;
+  gap: 10px;
+  align-items: center;
+}
+.bkHead {
+  padding: 0 0 8px;
+  border-bottom: 1px solid $line-1;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: $fg-3;
+}
+.bkRow {
+  padding: 11px 0;
+  border-bottom: 1px solid $line-1;
+  font-size: 13px;
+  color: $fg-1;
+}
+.bkRow:last-child { border-bottom: none; }
+.bkCell { min-width: 0; overflow-wrap: anywhere; }
+.bkMuted { color: $fg-3; font-size: 12px; }
+.bkSource { display: inline-flex; align-items: center; gap: 5px; }
+
+.bkPager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+}
+.bkPageInfo { font-size: 12px; color: $fg-3; }
+
+@media (max-width: 700px) {
+  .bkHead { display: none; }
+  .bkRow {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 12px;
+    margin-bottom: 8px;
+    border: 1px solid $line-1;
+    border-radius: 10px;
+  }
+  .bkRow:last-child { margin-bottom: 0; }
+  /* Each cell carries its own label once the header row is gone. */
+  .bkCell {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .bkCell::before {
+    content: attr(data-label);
+    flex: none;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: $fg-3;
+  }
+}

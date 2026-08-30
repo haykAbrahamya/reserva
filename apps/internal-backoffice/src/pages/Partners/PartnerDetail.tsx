@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Save, MapPin, Users, User, CalendarDays, Store, ExternalLink, Trash2, AlertTriangle, SlidersHorizontal, LayoutTemplate, LifeBuoy, GraduationCap } from 'lucide-react'
+import { ArrowLeft, Save, MapPin, Users, User, CalendarDays, Store, ExternalLink, Trash2, AlertTriangle, SlidersHorizontal, LayoutTemplate, LifeBuoy } from 'lucide-react'
 import { Avatar, Badge, Button, Input, Textarea, Toggle, Empty, ConfirmDialog, SegmentedFilter, useToast } from '@/components/ui'
 import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
 import { useResource } from '@/store/useResource'
 import { partnersService, type UpdatePartnerInput } from '@/services/partners.service'
 import { errorMessage } from '@/services/errors'
 import { PartnerUsers } from './PartnerUsers'
+import { PartnerProducts } from './PartnerProducts'
+import { PartnerBookings } from './PartnerBookings'
 import s from './PartnerDetail.module.scss'
 
 export function PartnerDetailPage() {
@@ -77,26 +79,6 @@ export function PartnerDetailPage() {
     try {
       await partnersService.setMarketplace(id, next)
       toast(next ? 'Featured in marketplace' : 'Removed from marketplace')
-      await reload()
-    } catch (err) {
-      toast(errorMessage(err))
-    }
-  }
-
-  const toggleBookings = async (next: boolean) => {
-    try {
-      await partnersService.setBookings(id, next)
-      toast(next ? 'Online booking enabled' : 'Online booking disabled (contact-only)')
-      await reload()
-    } catch (err) {
-      toast(errorMessage(err))
-    }
-  }
-
-  const toggleCourses = async (next: boolean) => {
-    try {
-      await partnersService.setCourses(id, next)
-      toast(next ? 'Courses enabled' : 'Courses disabled')
       await reload()
     } catch (err) {
       toast(errorMessage(err))
@@ -189,6 +171,8 @@ export function PartnerDetailPage() {
         ))}
       </div>
 
+      <PartnerProducts partnerId={id} products={partner.products ?? []} onChanged={reload} />
+
       <div className={s.grid}>
         {/* Editable profile */}
         <section className={s.card}>
@@ -215,6 +199,9 @@ export function PartnerDetailPage() {
 
         {/* Users — view + manage (edit, reset password) */}
         <PartnerUsers partnerId={id} />
+
+        {/* Minimal booking feed — volume and provenance, never client PII. */}
+        <PartnerBookings partnerId={id} />
 
         {/* Visibility & booking — grouped toggles, split into Presentation vs
             Feature access so related settings sit together and are easy to scan. */}
@@ -279,24 +266,11 @@ export function PartnerDetailPage() {
           </div>
 
           <div className={s.group}>
-            <div className={s.groupHead}>Feature access</div>
+            {/* Organization-wide only. Product entitlements and their own
+                settings live on the product cards above, so there is one place
+                to look per concern. */}
+            <div className={s.groupHead}>Visibility</div>
             <div className={s.toggleList}>
-              <div className={s.toggleRow}>
-                <div className={s.toggleText}>
-                  <div className={s.toggleLabel}><CalendarDays size={13} /> Online booking</div>
-                  <div className={s.toggleDesc}>Off = contact-only page (call/contact CTAs).</div>
-                </div>
-                <Toggle checked={partner.bookingsEnabled} onChange={toggleBookings} />
-              </div>
-
-              <div className={s.toggleRow}>
-                <div className={s.toggleText}>
-                  <div className={s.toggleLabel}><GraduationCap size={13} /> Courses</div>
-                  <div className={s.toggleDesc}>Academy feature: course management + public registration.</div>
-                </div>
-                <Toggle checked={partner.coursesEnabled} onChange={toggleCourses} />
-              </div>
-
               <div className={s.toggleRow}>
                 <div className={s.toggleText}>
                   <div className={s.toggleLabel}><Store size={13} /> Marketplace listing</div>

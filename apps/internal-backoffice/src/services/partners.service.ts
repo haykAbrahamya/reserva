@@ -7,6 +7,51 @@ export interface PartnerCounts {
   services: number
   users: number
   bookings: number
+  courses: number
+  courseEnrollments: number
+}
+
+/** One usage figure on a product card. Rendered generically — a new product
+ *  contributes stats from the backend with no change here. */
+export interface ProductUsageStat {
+  label: string
+  value: number
+}
+
+/** A product-specific setting, distinct from the entitlement itself. */
+export interface ProductSetting {
+  key: string
+  label: string
+  description: string
+  value: boolean
+}
+
+/** A catalog product as it applies to one partner. */
+export interface PartnerProduct {
+  key: string
+  name: string
+  description: string
+  /** Whether the partner may use it right now. */
+  enabled: boolean
+  status: 'active' | 'trialing' | 'suspended' | null
+  plan: string | null
+  trialEndsAt: string | null
+  enabledAt: string | null
+  /** Curated products are granted by staff only, never self-serve. */
+  selfServe: boolean
+  usage: ProductUsageStat[]
+  settings: ProductSetting[]
+}
+
+/** Minimal booking row for the console — no client PII by design. */
+export interface PartnerBookingRow {
+  id: string
+  startAt: string
+  endAt: string
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'noshow'
+  source: 'public' | 'backoffice'
+  createdAt: string
+  service: { name: string; duration: number } | null
 }
 
 export interface PartnerListItem {
@@ -81,6 +126,8 @@ export interface PartnerPresentation {
 export interface PartnerDetail extends PartnerListItem {
   presentation: PartnerPresentation | null
   users: PartnerAdmin[]
+  /** Every catalog product, granted or not, with its usage and settings. */
+  products: PartnerProduct[]
 }
 
 export interface CreatePartnerInput {
@@ -153,6 +200,22 @@ export const partnersService = {
   /** Enable/disable the Courses (academy) feature for a partner. */
   setCourses(id: string, enabled: boolean): Promise<PartnerDetail> {
     return apiPatch<PartnerDetail>(`/platform/partners/${id}/courses`, { enabled })
+  },
+
+  /** Grant or withdraw any product. Generic — works for products added later
+   *  without a new method here. */
+  setProduct(id: string, key: string, enabled: boolean): Promise<PartnerDetail> {
+    return apiPatch<PartnerDetail>(`/platform/partners/${id}/products/${key}`, { enabled })
+  },
+
+  /** Update one product-specific setting (server validates the key). */
+  setProductSetting(id: string, key: string, setting: string, value: boolean): Promise<PartnerDetail> {
+    return apiPatch<PartnerDetail>(`/platform/partners/${id}/products/${key}/settings`, { setting, value })
+  },
+
+  /** Minimal booking rows for the console (time, source, status). */
+  listBookings(id: string, params: PageParams): Promise<Paginated<PartnerBookingRow>> {
+    return apiGet<Paginated<PartnerBookingRow>>(`/platform/partners/${id}/bookings`, { params })
   },
 
   /** Switch between salon (team) and single (solo) mode. */
