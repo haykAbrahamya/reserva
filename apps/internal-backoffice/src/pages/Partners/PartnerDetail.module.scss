@@ -360,3 +360,34 @@
     color: $fg-3;
   }
 }
+
+
+/* ── Tab bar ───────────────────────────────────────────────
+   Sticky so the section switcher stays reachable while scrolling a long pane,
+   which is the whole reason the page was split. On phones the control can be
+   wider than the viewport, so the bar scrolls horizontally rather than wrapping
+   into two ragged rows. */
+.tabBar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  margin: 0 0 18px;
+  padding: 10px 0;
+  background: $bg-0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.tabBar::-webkit-scrollbar { display: none; }
+/* The control sizes to its content so it can scroll; it must not shrink. */
+.tabBar > * { width: max-content; min-width: 100%; }
+
+@media (max-width: 860px) {
+  .tabBar {
+    /* Cancel the page padding so the scroll area reaches the screen edges —
+       a cut-off tab at the edge is the affordance that says "scrollable". */
+    margin-inline: -16px;
+    padding-inline: 16px;
+  }
+}

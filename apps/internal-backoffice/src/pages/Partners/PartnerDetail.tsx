@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, Save, MapPin, Users, User, CalendarDays, Store, ExternalLink, Trash2, AlertTriangle, SlidersHorizontal, LayoutTemplate, LifeBuoy } from 'lucide-react'
 import { Avatar, Badge, Button, Input, Textarea, Toggle, Empty, ConfirmDialog, SegmentedFilter, useToast } from '@/components/ui'
 import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
@@ -11,6 +11,11 @@ import { PartnerProducts } from './PartnerProducts'
 import { PartnerBookings } from './PartnerBookings'
 import s from './PartnerDetail.module.scss'
 
+/** The page is long enough that one scroll buries things — split by intent:
+ *  what the partner has and does, their booking activity, and what staff
+ *  can change. */
+type PartnerTab = 'overview' | 'bookings' | 'settings'
+
 export function PartnerDetailPage() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
@@ -20,6 +25,14 @@ export function PartnerDetailPage() {
   const [form, setForm] = useState<UpdatePartnerInput>({})
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  // Tab lives in the URL so a refresh, the back button, or a link shared with a
+  // colleague all land on the same view.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const tabParam = searchParams.get('tab')
+  const tab: PartnerTab = tabParam === 'bookings' || tabParam === 'settings' ? tabParam : 'overview'
+  const setTab = (next: PartnerTab) =>
+    setSearchParams(next === 'overview' ? {} : { tab: next }, { replace: true })
+
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleteText, setDeleteText] = useState('')
   const [deleting, setDeleting] = useState(false)
@@ -161,6 +174,21 @@ export function PartnerDetailPage() {
         </div>
       </div>
 
+      <div className={s.tabBar}>
+        <SegmentedFilter<PartnerTab>
+          ariaLabel="Partner sections"
+          value={tab}
+          onChange={setTab}
+          options={[
+            { value: 'overview', label: 'Overview' },
+            { value: 'bookings', label: 'Bookings', count: partner.counts.bookings },
+            { value: 'settings', label: 'Settings' },
+          ]}
+        />
+      </div>
+
+      {tab === 'overview' && (
+        <>
       <div className={s.countRow}>
         {counts.map((c) => (
           <div key={c.label} className={s.countCard}>
@@ -173,9 +201,16 @@ export function PartnerDetailPage() {
 
       <PartnerProducts partnerId={id} products={partner.products ?? []} onChanged={reload} />
 
-      {/* Full width: a five-column table does not fit a half-width grid cell. */}
-      <PartnerBookings partnerId={id} />
+          {/* Who can log in — support context, so it sits with the overview. */}
+          <PartnerUsers partnerId={id} />
+        </>
+      )}
 
+      {/* Full width: a five-column table does not fit a half-width grid cell. */}
+      {tab === 'bookings' && <PartnerBookings partnerId={id} />}
+
+      {tab === 'settings' && (
+        <>
       <div className={s.grid}>
         {/* Editable profile */}
         <section className={s.card}>
@@ -199,9 +234,6 @@ export function PartnerDetailPage() {
             </Button>
           </div>
         </section>
-
-        {/* Users — view + manage (edit, reset password) */}
-        <PartnerUsers partnerId={id} />
 
         {/* Visibility & booking — grouped toggles, split into Presentation vs
             Feature access so related settings sit together and are easy to scan. */}
@@ -311,6 +343,8 @@ export function PartnerDetailPage() {
         </section>
 
       </div>
+        </>
+      )}
 
       <ConfirmDialog
         open={confirmDelete}
