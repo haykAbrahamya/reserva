@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Globe, Copy, Check, ExternalLink } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
+import { useActiveProduct } from '@/products/useProducts'
 import { useT } from '@/i18n'
 import s from './PublicLinkBar.module.scss'
 
@@ -9,15 +10,22 @@ import s from './PublicLinkBar.module.scss'
  * page (link + quick Copy / Open). Shown ONLY once a slug is set — while it's
  * still missing, the "Complete your profile" onboarding checklist owns that
  * guidance, so we render nothing here to avoid a duplicate call-to-action.
+ *
+ * It is also BOOKING-specific: the page it links to is the booking storefront.
+ * So it appears only while the Booking product is the active one — a partner
+ * reading their vacancies or their academy is not being pointed at a booking
+ * page, and a partner who has no booking product never sees it at all.
  */
 export function PublicLinkBar() {
   const partner = usePartner()
+  const activeProduct = useActiveProduct()
   const t = useT()
   const [copied, setCopied] = useState(false)
 
-  // Nothing to show until the profile loads, or before a slug is configured
-  // (the onboarding checklist guides that step instead).
-  if (!partner?.slug) return null
+  // Nothing to show until the profile loads, before a slug is configured (the
+  // onboarding checklist guides that step instead), or outside the product the
+  // link actually belongs to.
+  if (!partner?.slug || activeProduct !== 'bookings') return null
 
   const slug = partner.slug
   const url = `https://${slug}.reserva.am`

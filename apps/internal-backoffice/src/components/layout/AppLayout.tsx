@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
-  LayoutDashboard, Building2, Users, ShieldCheck, LogOut, Menu, X, KeyRound, Inbox, BarChart3, UserPlus, LifeBuoy,
+  LayoutDashboard, Building2, Users, ShieldCheck, LogOut, Menu, X, KeyRound, Inbox, BarChart3, UserPlus, LifeBuoy, Tags,
 } from 'lucide-react'
 import { Avatar } from '@/components/ui'
 import { ReservaMark } from '@/components/ReservaMark'
@@ -27,6 +27,9 @@ const NAV: NavItem[] = [
   { to: '/pending-registrations', label: 'Pending Registrations', icon: UserPlus },
   { to: '/demo-requests', label: 'Demo Requests', icon: Inbox },
   { to: '/visits', label: 'Visits', icon: BarChart3 },
+  // Platform-owned vocabulary shared by every product, so it belongs to the
+  // console rather than to any one partner.
+  { to: '/specialties', label: 'Specialties', icon: Tags },
   { to: '/staff', label: 'Staff', icon: Users, ownerOnly: true },
 ]
 

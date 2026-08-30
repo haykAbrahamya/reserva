@@ -1,0 +1,65 @@
+@use 'variables' as *;
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* Matches every page's own frame, so the skeleton occupies the same box the
+     real content will — no shift when the chunk lands. */
+  padding: 28px;
+
+  @media (max-width: 768px) { padding: 16px; }
+  /* Fade in slightly late: a chunk that arrives in 80ms should never flash a
+     skeleton at all. */
+  animation: appear 0.5s ease-out;
+}
+
+@keyframes appear {
+  0%, 40% { opacity: 0; }
+  100%    { opacity: 1; }
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.bar {
+  border-radius: $r-1;
+  background: $bg-3;
+}
+
+.title { height: 24px; width: min(220px, 55%); }
+.sub   { height: 13px; width: min(320px, 75%); }
+
+.grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr;
+
+  @media (min-width: 760px)  { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (min-width: 1240px) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.block {
+  height: 150px;
+  border-radius: $r-2;
+  border: 1px solid $line-1;
+  background: $bg-2;
+}
+
+/* A quiet shimmer so it reads as "working", not "broken". */
+.bar,
+.block {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrap, .bar, .block { animation: none; }
+}

@@ -1,9 +1,11 @@
-import { useEffect, useRef } from 'react'
+import { Suspense, useEffect, useRef } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { Sidebar } from '../Sidebar/Sidebar'
 import { Topbar } from '../Topbar/Topbar'
 import { PublicLinkBar } from '../PublicLinkBar/PublicLinkBar'
+import { ProductSwitcherHeader } from '../ProductSwitcher/ProductSwitcher'
 import { MobileTabBar } from '../MobileTabBar/MobileTabBar'
+import { RouteFallback } from '../RouteFallback/RouteFallback'
 import { SupportProvider } from '@/components/support/SupportProvider'
 import { SupportWidget } from '@/components/support/SupportWidget'
 import s from './AppLayout.module.scss'
@@ -24,9 +26,15 @@ export function AppLayout() {
         <Sidebar />
         <div className={s.main}>
           <Topbar />
+          {/* Mobile product context. Hides itself on desktop, where the
+              sidebar switcher owns this. */}
+          <ProductSwitcherHeader />
           <PublicLinkBar />
           <main className={s.content} ref={contentRef}>
-            <Outlet />
+            {/* Route chunks load lazily; the shell around them never unmounts. */}
+            <Suspense fallback={<RouteFallback />}>
+              <Outlet />
+            </Suspense>
           </main>
         </div>
         {/* Bottom tab bar — shown only on mobile via CSS */}

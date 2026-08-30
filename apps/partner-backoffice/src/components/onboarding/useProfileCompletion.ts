@@ -3,6 +3,8 @@ import { useLocation } from 'react-router-dom'
 import { usePartner } from '@/store/app.store'
 import { useIsAdmin } from '@/store/auth.hooks'
 import { partnersService } from '@/services/partners.service'
+import { vacanciesService } from '@/services/vacancies.service'
+import { useHasProduct } from '@/products/useProducts'
 import type { WeekSchedule } from '@/types'
 
 /**
@@ -15,6 +17,14 @@ import type { WeekSchedule } from '@/types'
  *                            + the specialist has a location, + a non-empty
  *                            working schedule (specialist schedule OR its
  *                            location hours) so slots are actually produced.
+ *
+ * Product awareness:
+ *  - The steps are composed from the products the organization actually holds.
+ *    Naming a page, and having an address, are ORGANIZATION steps every partner
+ *    walks. Services, specialists and working hours belong to bookings; posting
+ *    a first listing belongs to vacancies. A vacancies-only salon being told to
+ *    "assign a service to a specialist" would be onboarding for a product it
+ *    does not have.
  *
  * Kind/role awareness:
  *  - `single` partners auto-provision a location + specialist (+ default
@@ -77,6 +87,9 @@ function hasEnabledDay(schedule?: WeekSchedule | null): boolean {
 export function useProfileCompletion(): ProfileCompletion {
   const partner = usePartner()
   const isAdmin = useIsAdmin()
+  const hasProduct = useHasProduct()
+  const hasBookings = hasProduct('bookings')
+  const hasVacancies = hasProduct('vacancies')
   const isSingle = partner?.kind === 'single'
   // Re-fetch on every route change so the always-mounted sidebar nudge (and the
   // dashboard card) reflect steps completed on other pages — completing a step
@@ -92,6 +105,7 @@ export function useProfileCompletion(): ProfileCompletion {
     hasLinkedService: false,
     hasAvailability: false,
     hasAddress: false,
+    hasVacancy: false,
   })
   const [nonce, setNonce] = useState(0)
   const reload = useCallback(() => setNonce((n) => n + 1), [])
@@ -110,12 +124,17 @@ export function useProfileCompletion(): ProfileCompletion {
     // `loading` starts true and is cleared after the first fetch; we never set
     // it back to true, so route-change refetches update counts in place and the
     // sidebar nudge never flickers.
+    // Only fetch what the granted products actually need — a vacancies-only
+    // partner should not be calling the booking catalog on every route change.
     Promise.all([
       partnersService.listLocations().catch(() => []),
-      partnersService.listSpecialists().catch(() => []),
-      partnersService.listServices().catch(() => []),
+      hasBookings ? partnersService.listSpecialists().catch(() => []) : Promise.resolve([]),
+      hasBookings ? partnersService.listServices().catch(() => []) : Promise.resolve([]),
+      hasVacancies
+        ? vacanciesService.counts().catch(() => ({}) as Record<string, number>)
+        : Promise.resolve({} as Record<string, number>),
     ])
-      .then(([locations, specialists, services]) => {
+      .then(([locations, specialists, services, vacancyCounts]) => {
         if (!alive) return
         // Location hours by id → lets us treat "specialist follows location
         // hours" as valid availability (the backend intersects the two, and a
@@ -134,13 +153,14 @@ export function useProfileCompletion(): ProfileCompletion {
           // Single partners get an auto-provisioned location with a BLANK address
           // — prompt them to fill it (it's their public "find me here").
           hasAddress: locations.some((l) => l.address?.trim()),
+          hasVacancy: (vacancyCounts.all ?? 0) > 0,
         })
         setLoading(false)
       })
     return () => {
       alive = false
     }
-  }, [partner, nonce, pathname])
+  }, [partner, nonce, pathname, hasBookings, hasVacancies])
 
   const hasSlug = !!partner?.slug
 
@@ -149,16 +169,29 @@ export function useProfileCompletion(): ProfileCompletion {
   // `to` carries a `?highlight=<key>` so the destination page spotlights the
   // exact block to act on (see useSpotlight + data-spotlight attributes).
   const all: ChecklistItem[] = [
+    // ── Organization: every partner walks these, whatever they sell ──
     { id: 'slug', group: 'required', done: hasSlug, to: '/settings?highlight=slug' },
-    // Salon-only structural items (single auto-provisions these).
+    // Salon-only structural item (single auto-provisions its location).
     { id: 'location', group: 'required', done: counts.hasLocation, to: '/locations?highlight=addLocation', adminOnly: true },
-    { id: 'specialist', group: 'required', done: counts.hasSpecialist, to: '/specialists?highlight=addSpecialist' },
     // Single-only: their auto-provisioned location starts with a blank address.
     { id: 'address', group: 'required', done: counts.hasAddress, to: '/locations?highlight=addLocation', singleOnly: true },
-    { id: 'service', group: 'required', done: counts.hasService, to: '/services?highlight=addService' },
-    { id: 'linkedService', group: 'required', done: counts.hasLinkedService, to: '/specialists?highlight=addSpecialist' },
-    { id: 'availability', group: 'required', done: counts.hasAvailability, to: '/hours?highlight=setHours' },
-    // Recommended — polish, never blocks booking. (Logo lives in Settings; the
+
+    // ── Booking product ──
+    ...(hasBookings
+      ? ([
+          { id: 'specialist', group: 'required', done: counts.hasSpecialist, to: '/specialists?highlight=addSpecialist' },
+          { id: 'service', group: 'required', done: counts.hasService, to: '/services?highlight=addService' },
+          { id: 'linkedService', group: 'required', done: counts.hasLinkedService, to: '/specialists?highlight=addSpecialist' },
+          { id: 'availability', group: 'required', done: counts.hasAvailability, to: '/hours?highlight=setHours' },
+        ] as ChecklistItem[])
+      : []),
+
+    // ── Vacancies product ──
+    ...(hasVacancies
+      ? ([{ id: 'firstVacancy', group: 'required', done: counts.hasVacancy, to: '/vacancies' }] as ChecklistItem[])
+      : []),
+
+    // Recommended — polish, never blocks anything. (Logo lives in Settings; the
     // about text in Storefront.)
     { id: 'logo', group: 'recommended', done: !!partner?.presentation?.logoUrl, to: '/settings?highlight=logo', adminOnly: true },
     { id: 'about', group: 'recommended', done: !!partner?.presentation?.about?.trim(), to: '/storefront?highlight=about', adminOnly: true },

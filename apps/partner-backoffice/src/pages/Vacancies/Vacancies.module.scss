@@ -1,0 +1,135 @@
+@use 'variables' as *;
+
+/* Every page in this app owns its own frame: 28px of padding and the shared
+   `rise` entrance. Matching it is what keeps the content aligned with the
+   topbar and the other sections. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px;
+  animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+}
+
+/* ── Header ── */
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.h1 {
+  margin: 0 0 4px;
+  font-family: $font-serif;
+  font-size: 32px;
+  letter-spacing: -0.022em;
+  color: $fg-0;
+}
+
+.sub {
+  margin: 0;
+  font-size: 13px;
+  color: $fg-2;
+  line-height: 1.45;
+}
+
+@media (max-width: 768px) {
+  .page { padding: 16px; }
+  .h1 { font-size: 26px; }
+}
+
+/* On phones the action gets its own full-width row rather than being squeezed
+   beside a wrapping title. */
+@media (max-width: 560px) {
+  .head { flex-direction: column; align-items: stretch; gap: 12px; }
+  .head > button { width: 100%; justify-content: center; }
+}
+
+/* ── "Add a branch first" blocker ── */
+.blocker {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: $r-2;
+  border: 1px solid $line-2;
+  background: $warn-soft;
+  flex-wrap: wrap;
+}
+
+.blockerIcon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: $bg-2;
+  color: $fg-1;
+}
+
+.blockerTitle {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: $fg-0;
+}
+
+.blockerText {
+  margin: 3px 0 0;
+  font-size: 12.5px;
+  color: $fg-1;
+  line-height: 1.5;
+  max-width: 62ch;
+}
+
+.blockerLink {
+  margin-left: auto;
+  align-self: center;
+  padding: 8px 14px;
+  border-radius: $r-1;
+  border: 1px solid $line-strong;
+  background: $bg-2;
+  color: $fg-0;
+  font-size: 12.5px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+
+  &:hover { background: $bg-3; }
+}
+
+@media (max-width: 620px) {
+  .blockerLink { margin-left: 0; width: 100%; text-align: center; }
+}
+
+/* ── Filters ── */
+.filters {
+  /* Bleed to the page edges on phones so a partially-visible chip signals that
+     the row scrolls, instead of wrapping into two ragged lines. */
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+
+  @media (max-width: 720px) {
+    margin-inline: calc(var(--pad-x) * -1);
+    padding-inline: var(--pad-x);
+  }
+}
+
+/* ── Card grid ── */
+.grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr;
+
+  /* Explicit breakpoints rather than auto-fill: auto-fill happily creates empty
+     tracks at wide widths, which leaves two cards stranded at the left of a
+     four-column row. */
+  @media (min-width: 760px)  { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (min-width: 1240px) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (min-width: 1700px) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}

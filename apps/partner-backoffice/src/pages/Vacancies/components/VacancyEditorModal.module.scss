@@ -1,0 +1,166 @@
+@use 'variables' as *;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Matches the app's card-title scale (15/600) one step down — a section
+   heading has to be readable, not decorative. */
+.sectionTitle {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: $fg-1;
+  padding-bottom: 9px;
+  border-bottom: 1px solid $line-1;
+}
+
+/* Two columns on comfortable widths, one on phones. Fields never sit side by
+   side below 640px — a half-width number input on a phone is unusable. */
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+
+  @media (min-width: 640px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* Same as the shared Input's label, so a Select and an Input never look like
+   two different form systems sitting next to each other. */
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: $fg-1;
+}
+
+.fieldError {
+  font-size: 12px;
+  color: $danger;
+}
+
+.note {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: $r-1;
+  background: $bg-3;
+  color: $fg-2;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.blocker {
+  margin: 0;
+  padding: 11px 13px;
+  border-radius: $r-1;
+  background: $warn-soft;
+  color: $fg-0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ── Pay type cards ── */
+.payGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 9px;
+
+  @media (min-width: 560px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.payCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px;
+  border-radius: $r-2;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-0;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, background 0.15s ease;
+
+  &:hover { border-color: $line-strong; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 1px; }
+}
+
+.payCardActive {
+  border-color: $accent;
+  background: $accent-soft;
+}
+
+.payIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: $bg-3;
+  color: $fg-1;
+
+  .payCardActive & { background: $accent; color: $fg-on-accent; }
+}
+
+.payText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.payName { font-size: 13.5px; font-weight: 600; line-height: 1.3; }
+.payDesc { font-size: 12px; color: $fg-2; line-height: 1.45; }
+
+.payCheck { color: $accent-contrast; flex-shrink: 0; margin-top: 6px; }
+
+/* ── Chips (perks, apply mode) ── */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.chip {
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-1;
+  font-size: 12.5px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+
+  &:hover { border-color: $line-strong; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 1px; }
+  &:active { transform: scale(0.98); }
+}
+
+.chipOn {
+  background: $accent;
+  border-color: $accent;
+  color: $fg-on-accent;
+  font-weight: 500;
+}

@@ -1,0 +1,267 @@
+@use 'variables' as *;
+
+.wrap {
+  position: relative;
+  padding: 10px 12px;
+  border-bottom: 1px solid $line-1;
+  flex-shrink: 0;
+}
+
+/* ── Trigger ── */
+.trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 9px;
+  border-radius: $r-2;
+  border: 1px solid $line-1;
+  background: $bg-1;
+  color: $fg-0;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  &:hover { background: $bg-3; border-color: $line-2; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 1px; }
+}
+
+.triggerIcon {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: $accent-soft;
+  color: $accent-contrast;
+}
+
+.triggerName {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: $fg-0;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chev {
+  color: $fg-3;
+  flex-shrink: 0;
+}
+
+/* Collapsed sidebar — icon tile only, popover flies out to the right. */
+.collapsed {
+  padding: 10px 0;
+  display: flex;
+  justify-content: center;
+
+  .trigger {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    justify-content: center;
+  }
+  .menu {
+    left: calc(100% + 6px);
+    right: auto;
+    top: 8px;
+    width: 244px;
+  }
+}
+
+/* ── Popover ── */
+.menu {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% - 2px);
+  left: 12px;
+  right: 12px;
+  padding: 5px;
+  border-radius: $r-2;
+  border: 1px solid $line-2;
+  background: $bg-2;
+  box-shadow: $shadow-3;
+  animation: pop 0.13s ease-out;
+  /* A little air between rows, so the tinted selected row and the hovered row
+     read as separate targets instead of one continuous block. Same 2px the
+     shared Select's list uses. */
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+@keyframes pop {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu { animation: none; }
+}
+
+.option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px;
+  border: 0;
+  border-radius: $r-1;
+  background: transparent;
+  color: $fg-0;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s ease;
+
+  &:hover { background: $bg-3; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: -2px; }
+}
+
+.optionActive {
+  background: $accent-soft;
+  &:hover { background: $accent-soft; }
+}
+
+.optionIcon {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: $bg-3;
+  color: $fg-1;
+
+  .optionActive & { background: $accent; color: $fg-on-accent; }
+}
+
+.optionName {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.optionCheck {
+  color: $accent-contrast;
+  flex-shrink: 0;
+}
+
+/* ── Mobile: the product list inside the sheet ── */
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 10px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  /* Comfortably above the 44px touch-target floor. */
+  min-height: 50px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: $r-2;
+  background: transparent;
+  color: $fg-1;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.13s ease;
+
+  &:active { background: $bg-3; }
+}
+
+.rowActive {
+  background: $accent-soft;
+  color: $fg-0;
+}
+
+.rowIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: $bg-3;
+  color: $fg-1;
+
+  .rowActive & { background: $accent; color: $fg-on-accent; }
+}
+
+.rowName {
+  flex: 1;
+  min-width: 0;
+  font-size: 14.5px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowCheck { color: $accent-contrast; flex-shrink: 0; }
+
+/* ── Mobile: the context strip under the topbar ── */
+.bar {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  /* Same height as the public-link bar it sits above, so the two read as one
+     band of context rather than two competing strips. */
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 0;
+  border-bottom: 1px solid $line-1;
+  background: $bg-1;
+  color: $fg-0;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+
+  &:active { background: $bg-3; }
+}
+
+.barIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: $accent-soft;
+  color: $accent-contrast;
+}
+
+.barName {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.barChev { color: $fg-3; flex-shrink: 0; }
+
+/* Mobile chrome only — the sidebar owns the desktop switcher. */
+@media (max-width: 768px) {
+  .bar { display: flex; }
+}

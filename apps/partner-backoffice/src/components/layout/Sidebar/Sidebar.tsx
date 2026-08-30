@@ -5,7 +5,9 @@ import { useResource } from '@/store/useResource'
 import { partnersService, galleryImageUrl } from '@/services/partners.service'
 import { useIsAdmin, useScopedLocationId } from '@/store/auth.hooks'
 import { useI18n } from '@/i18n'
-import { NAV, isNavItemVisible } from '../nav.config'
+import { visibleSections } from '../nav.config'
+import { ProductSwitcher } from '../ProductSwitcher/ProductSwitcher'
+import { useActiveProduct } from '@/products/useProducts'
 import { SidebarSetupNudge } from '@/components/onboarding/SidebarSetupNudge'
 import s from './Sidebar.module.scss'
 
@@ -20,6 +22,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const partner = usePartner()
   const isAdmin = useIsAdmin()
   const scopedLocationId = useScopedLocationId()
+  const activeProduct = useActiveProduct()
   const { t, tp } = useI18n()
 
   // Only managers (scoped to a branch) need the branch name → only they fetch
@@ -55,6 +58,10 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
           )}
         </div>
 
+        {/* Product context — scopes every section below it. Renders nothing for
+            a single-product partner. */}
+        <ProductSwitcher collapsed={collapsed} />
+
         {/* Status strip — manager: locked branch chip · admin: location count */}
         {!collapsed && partner && (
           branchName ? (
@@ -75,11 +82,8 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
 
         {/* Nav */}
         <nav className={s.nav}>
-          {NAV.map(group => {
-            const items = group.items.filter(item =>
-              isNavItemVisible(item, { isAdmin, isSingle: partner?.kind === 'single', coursesEnabled: !!partner?.coursesEnabled })
-            )
-            if (items.length === 0) return null
+          {visibleSections({ isAdmin, isSingle: partner?.kind === 'single', activeProduct }).map(group => {
+            const items = group.items
             return (
             <div key={group.section}>
               {!collapsed && <div className={s.section}>{t(`nav.sections.${group.section}`)}</div>}

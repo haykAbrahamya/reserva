@@ -1,0 +1,335 @@
+@use 'variables' as *;
+
+/* The console's page frame — same padding and entrance as Partners/Staff/Visits,
+   so this section doesn't sit flush against the sidebar while they don't. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px;
+  animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+}
+
+@media (max-width: 860px) {
+  .page { padding: 20px 16px; }
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.h1 {
+  margin: 0 0 4px;
+  font-family: $font-serif;
+  font-size: 30px;
+  letter-spacing: -0.022em;
+  color: $fg-0;
+}
+
+.sub {
+  margin: 0;
+  font-size: 13px;
+  color: $fg-2;
+}
+
+@media (max-width: 560px) {
+  .head { flex-direction: column; align-items: stretch; }
+  .head > button { width: 100%; justify-content: center; }
+}
+
+/* ── Search ── */
+.searchWrap {
+  position: relative;
+  max-width: 420px;
+}
+.searchIcon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: $fg-3;
+  pointer-events: none;
+  z-index: 1;
+}
+.searchInput { padding-left: 32px; }
+
+/* ── Groups ── */
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.group {
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  background: $bg-2;
+  overflow: hidden;
+}
+
+.groupHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid $line-1;
+  background: $bg-1;
+}
+
+.groupTitle {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: $fg-0;
+}
+
+.groupNative {
+  font-size: 12px;
+  font-weight: 400;
+  color: $fg-2;
+}
+
+.groupCount {
+  font-family: $font-mono;
+  font-size: 11.5px;
+  color: $fg-3;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: $bg-3;
+}
+
+/* ── Rows ── */
+.table { display: flex; flex-direction: column; }
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.3fr) minmax(0, 0.9fr) 90px 60px 78px;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  border-top: 1px solid $line-1;
+
+  &:first-child { border-top: 0; }
+  &:hover { background: $bg-1; }
+}
+
+.rowOff { opacity: 0.6; }
+
+.cell, .cellMain { min-width: 0; }
+
+.rowName {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: $fg-0;
+  overflow-wrap: anywhere;
+}
+
+.rowRole {
+  font-size: 13px;
+  color: $fg-1;
+  overflow-wrap: anywhere;
+}
+
+.rowNative {
+  font-size: 11.5px;
+  color: $fg-2;
+  margin-top: 2px;
+  overflow-wrap: anywhere;
+}
+
+.key {
+  font-family: $font-mono;
+  font-size: 11.5px;
+  color: $fg-2;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: $bg-3;
+}
+
+.muted { font-size: 12px; color: $fg-2; }
+.usageOn { font-size: 12.5px; font-weight: 600; color: $accent-contrast; }
+
+.rowActions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.iconBtn {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $r-1;
+  border: 0;
+  background: transparent;
+  color: $fg-2;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+
+  &:hover:not(:disabled) { background: $bg-3; color: $fg-0; }
+  &:disabled { opacity: 0.3; cursor: not-allowed; }
+}
+
+.danger:hover:not(:disabled) { background: $danger-soft; color: $danger; }
+
+/* Narrow desktop: drop the columns that are reference rather than decision
+   information, keeping name, role and the actions. */
+@media (max-width: 1180px) {
+  .row { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr) 60px 78px; }
+  .cell:nth-of-type(2),  /* key */
+  .cell:nth-of-type(3) { /* aliases */
+    display: none;
+  }
+}
+
+/* Phones: stack into labelled rows. */
+@media (max-width: 700px) {
+  .row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 14px 16px;
+    position: relative;
+  }
+  .cell:nth-of-type(2),
+  .cell:nth-of-type(3) { display: block; }
+
+  .cell::before {
+    content: attr(data-label);
+    display: block;
+    font-family: $font-mono;
+    font-size: 10px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: $fg-2;
+    margin-bottom: 4px;
+  }
+
+  .rowActions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+  }
+  /* Keep the name clear of the floating action buttons. */
+  .cellMain { padding-right: 70px; }
+}
+
+/* ── Editor form ── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.formError {
+  padding: 10px 13px;
+  border-radius: $r-1;
+  background: $danger-soft;
+  color: $danger;
+  font-size: 12.5px;
+}
+
+.grid2, .grid3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 640px) {
+  .grid2 { grid-template-columns: 1fr 1fr; }
+  .grid3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.label { font-size: 12px; font-weight: 500; color: $fg-1; }
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  padding: 13px;
+  border-radius: $r-2;
+  border: 1px solid $line-1;
+  background: $bg-1;
+}
+
+.blockHead {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: $fg-0;
+}
+
+.blockHint {
+  font-size: 12px;
+  font-weight: 400;
+  color: $fg-2;
+  line-height: 1.45;
+}
+
+.aliasRow {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+
+  > :first-child { flex: 1; min-width: 0; }
+}
+
+.aliasChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.aliasChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 6px 4px 9px;
+  border-radius: 999px;
+  background: $bg-3;
+  color: $fg-1;
+  font-size: 12px;
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: $fg-3;
+    cursor: pointer;
+
+    &:hover { background: $line-2; color: $fg-0; }
+  }
+}
+
+.toggleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 13px;
+  border-radius: $r-2;
+  border: 1px solid $line-1;
+  background: $bg-1;
+}
+
+.toggleLabel { font-size: 13px; font-weight: 500; color: $fg-0; }
+.toggleDesc { font-size: 12px; color: $fg-2; line-height: 1.45; margin-top: 3px; max-width: 44ch; }

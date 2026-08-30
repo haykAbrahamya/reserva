@@ -48,6 +48,10 @@
       "about": {
         "title": "Напишите раздел «О нас»",
         "hint": "Короткое вступление, чтобы клиенты узнали вас."
+      },
+      "firstVacancy": {
+        "title": "Разместите первую вакансию",
+        "hint": "Позиция, кресло в аренду или работа за процент."
       }
     },
     "nudge": {
@@ -121,13 +125,19 @@
       }
     },
     "loading": "Загрузка…",
-    "noPhone": "Без телефона"
+    "noPhone": "Без телефона",
+    "delete": "Удалить",
+    "all": "Все",
+    "actions": "Действия"
   },
   "nav": {
     "sections": {
       "operations": "Операции",
       "catalog": "Каталог",
-      "account": "Аккаунт"
+      "account": "Аккаунт",
+      "academy": "Академия",
+      "hiring": "Найм",
+      "organization": "Организация"
     },
     "dashboard": "Главная",
     "calendar": "Календарь",
@@ -145,7 +155,8 @@
     "more": "Ещё",
     "expandSidebar": "Развернуть панель",
     "collapseSidebar": "Свернуть панель",
-    "courses": "Курсы"
+    "courses": "Курсы",
+    "vacancies": "Вакансии"
   },
   "roles": {
     "admin": "Админ",
@@ -1092,6 +1103,187 @@
     "delete": {
       "title": "Удалить курс",
       "body": "Удалить «{name}»? Его наборы и участники также будут удалены."
+    }
+  },
+  "products": {
+    "switch": "Переключить продукт",
+    "bookings": {
+      "name": "Бронирование"
+    },
+    "courses": {
+      "name": "Курсы"
+    },
+    "vacancies": {
+      "name": "Вакансии"
+    }
+  },
+  "vacancies": {
+    "title": "Вакансии",
+    "subtitle": "{count} вакансия",
+    "subtitle_plural": "{count} вакансий",
+    "subtitleEmpty": "Позиции, аренда кресла и работа за процент",
+    "new": "Новая вакансия",
+    "filterLabel": "Фильтр по статусу",
+    "pageSummary": "{shown} из {total}",
+    "emptyTitle": "Вакансий пока нет",
+    "emptyDesc": "Разместите первую позицию — работа, кресло в аренду или работа за процент.",
+    "emptyFilterTitle": "Здесь пусто",
+    "emptyFilterDesc": "По этому фильтру вакансий нет.",
+    "noBranchTitle": "Сначала добавьте филиал",
+    "noBranchText": "Каждая вакансия привязана к адресу, чтобы кандидаты знали, где работа.",
+    "noBranchCta": "Добавить филиал",
+    "seats": "{count} место",
+    "seats_plural": "{count} мест",
+    "expiresIn": "остался {count} день",
+    "expiresIn_plural": "осталось {count} дн.",
+    "expiredNote": "Истекла — продлите, чтобы снова опубликовать",
+    "deleteTitle": "Удалить эту вакансию?",
+    "deleteMessage": "Она исчезнет из списка. Уже полученные отклики сохранятся.",
+    "createdToast": "Вакансия создана",
+    "updatedToast": "Вакансия обновлена",
+    "removedToast": "Вакансия удалена",
+    "status": {
+      "draft": "Черновик",
+      "published": "Опубликована",
+      "paused": "Приостановлена",
+      "closed": "Закрыта",
+      "expired": "Истекла"
+    },
+    "statusNote": {
+      "draft": "Ещё не опубликована",
+      "published": "Опубликована",
+      "paused": "Скрыта от кандидатов",
+      "closed": "Закрыта",
+      "expired": "Истекла"
+    },
+    "actions": {
+      "publish": "Опубликовать",
+      "pause": "Приостановить",
+      "close": "Закрыть",
+      "renew": "Продлить"
+    },
+    "toast": {
+      "publish": "Вакансия опубликована",
+      "pause": "Вакансия приостановлена",
+      "close": "Вакансия закрыта",
+      "renew": "Вакансия продлена на 30 дней"
+    },
+    "pay": {
+      "percentValue": "Салон забирает {value}",
+      "rentValue": "аренда {value} / {period}",
+      "salaryValue": "{value} / {period}",
+      "negotiable": "Договорная"
+    },
+    "period": {
+      "day": "день",
+      "week": "неделя",
+      "month": "месяц"
+    },
+    "payType": {
+      "percentage": {
+        "name": "Процент",
+        "desc": "Салон забирает долю от заработка мастера"
+      },
+      "rent": {
+        "name": "Аренда кресла",
+        "desc": "Мастер платит фиксированную сумму за место"
+      },
+      "salary": {
+        "name": "Зарплата",
+        "desc": "Обычное трудоустройство с фиксированной оплатой"
+      },
+      "negotiable": {
+        "name": "Договорная",
+        "desc": "Условия обсуждаются с кандидатом"
+      }
+    },
+    "schedule": {
+      "full_time": "Полный день",
+      "part_time": "Неполный день",
+      "shift": "Сменный график",
+      "flexible": "Гибкий"
+    },
+    "experience": {
+      "any": "Любой опыт",
+      "junior": "Можно без опыта",
+      "experienced": "С опытом"
+    },
+    "applyMode": {
+      "both": "Звонки и отклики",
+      "in_app": "Только отклики",
+      "phone": "Только звонки"
+    },
+    "perks": {
+      "materials-included": "Материалы включены",
+      "tools-provided": "Инструменты предоставляются",
+      "client-base-provided": "Клиентская база предоставляется",
+      "online-booking": "Онлайн-запись включена",
+      "training-provided": "Обучение предоставляется",
+      "official-contract": "Официальное трудоустройство",
+      "flexible-schedule": "Гибкий график",
+      "uniform-provided": "Форма предоставляется",
+      "parking": "Парковка",
+      "meals": "Питание",
+      "transport": "Транспорт",
+      "own-client-base": "Своя клиентская база",
+      "own-tools": "Свои инструменты"
+    },
+    "form": {
+      "newTitle": "Новая вакансия",
+      "editTitle": "Редактировать вакансию",
+      "subtitle": "Сохраняется как черновик — опубликуйте, когда будете готовы.",
+      "create": "Создать",
+      "sectionPosition": "Позиция",
+      "sectionTerms": "Условия",
+      "sectionWork": "Работа",
+      "sectionContact": "Как откликнуться",
+      "sectionDescription": "Описание",
+      "specialty": "Категория",
+      "specialtyPlaceholder": "Выберите категорию",
+      "specialtySearch": "Поиск категорий…",
+      "noSpecialties": "Ничего не найдено",
+      "title": "Заголовок",
+      "titleRequired": "Заголовок (обязательно)",
+      "titlePlaceholder": "Например: Колорист в филиал Арабкир",
+      "titleHelp": "Оставьте пустым, чтобы использовать название категории",
+      "headlineHint": "Кандидаты увидят: {value}",
+      "branch": "Филиал",
+      "branchPlaceholder": "Выберите филиал",
+      "seats": "Количество мест",
+      "seatsHelp": "Сколько человек нужно",
+      "salonPercent": "Салон забирает, %",
+      "salonPercentHelp": "Доля салона, а не мастера",
+      "salonPercentMax": "До, %",
+      "rangeHelp": "Необязательно — для диапазона",
+      "amount": {
+        "rent": "Аренда, ֏",
+        "salary": "Зарплата, ֏"
+      },
+      "amountHelp": "Целые драмы",
+      "amountMax": "До, ֏",
+      "payPeriod": "За",
+      "negotiableNote": "В вакансии вместо суммы будет указано «Договорная».",
+      "scheduleType": "График",
+      "notSpecified": "Не указано",
+      "experience": "Опыт",
+      "scheduleNote": "Детали графика",
+      "scheduleNotePlaceholder": "Например: Пн–Сб 10:00–20:00, 2/2",
+      "perks": {
+        "offer": "Что вы предлагаете",
+        "require": "Что вы ожидаете"
+      },
+      "applyMode": "Как с вами связаться",
+      "contactPhone": "Контактный телефон",
+      "contactPhoneHelp": "Показывается в вакансии, чтобы могли позвонить",
+      "descriptionPlaceholder": "Опишите место, команду и как проходит день.",
+      "descriptionHelp": "Необязательно, но вакансии с описанием получают больше откликов",
+      "noBranches": "Добавьте филиал, прежде чем размещать вакансию.",
+      "errSpecialty": "Выберите категорию",
+      "errLocation": "Выберите филиал",
+      "errTitleOther": "Укажите название позиции",
+      "errPercent": "Укажите процент",
+      "errAmount": "Укажите сумму",
+      "errPhone": "Добавьте номер телефона"
     }
   }
 }

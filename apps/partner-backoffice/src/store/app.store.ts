@@ -1,6 +1,17 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Partner, LocalizedText } from '@/types'
+import type { ProductKey } from '@/products/products.config'
+
+/** One product grant, as the profile endpoint returns it. */
+export interface GrantedProduct {
+  key: string
+  name: string
+  status: 'active' | 'trialing' | 'suspended'
+  plan: string | null
+  trialEndsAt: string | null
+  settings: Record<string, unknown>
+}
 
 /**
  * The partner profile held in the store: identity + branding only. The catalog
@@ -28,6 +39,12 @@ export type PartnerProfile = Omit<Partner, 'locations' | 'services' | 'specialis
   defaultLocale?: 'hy' | 'en' | 'ru'
   /** Whether the Courses feature is enabled (platform-curated, read-only). */
   coursesEnabled?: boolean
+  /**
+   * The products this organization holds. Delivered with the profile the shell
+   * already loads on boot, so navigation knows which products exist before it
+   * paints — no second round trip and no flash of the wrong sections.
+   */
+  products?: GrantedProduct[]
   /** Public marketing fields edited in the Storefront section. */
   presentation?: {
     about?: string
@@ -50,12 +67,21 @@ interface AppState {
   density: 'compact' | 'default' | 'comfy'
   sidebarCollapsed: boolean
   partner: PartnerProfile | null
+  /**
+   * The product the user last chose in the switcher. Persisted so returning to
+   * the console lands where they left off. It is a PREFERENCE, not a source of
+   * truth — a stale key (product revoked, or one this partner never had) is
+   * ignored at read time rather than trusted, so it can never strand someone in
+   * a section they cannot use.
+   */
+  activeProduct: ProductKey | null
 
   setPartnerId: (id: string) => void
   setTheme: (t: 'light' | 'dark') => void
   setDensity: (d: 'compact' | 'default' | 'comfy') => void
   setSidebarCollapsed: (v: boolean) => void
   setPartner: (p: PartnerProfile | null) => void
+  setActiveProduct: (p: ProductKey | null) => void
 }
 
 export const useAppStore = create<AppState>()(
@@ -66,12 +92,14 @@ export const useAppStore = create<AppState>()(
       density: 'default',
       sidebarCollapsed: false,
       partner: null,
+      activeProduct: null,
 
       setPartnerId: (partnerId) => set({ partnerId }),
       setTheme: (theme) => set({ theme }),
       setDensity: (density) => set({ density }),
       setSidebarCollapsed: (sidebarCollapsed) => set({ sidebarCollapsed }),
       setPartner: (partner) => set({ partner }),
+      setActiveProduct: (activeProduct) => set({ activeProduct }),
     }),
     {
       name: 'reserva-bo',
@@ -81,6 +109,7 @@ export const useAppStore = create<AppState>()(
         theme: s.theme,
         density: s.density,
         sidebarCollapsed: s.sidebarCollapsed,
+        activeProduct: s.activeProduct,
       }),
     },
   ),

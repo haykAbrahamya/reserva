@@ -48,6 +48,10 @@
       "about": {
         "title": "Write an about section",
         "hint": "A short intro so clients know who you are."
+      },
+      "firstVacancy": {
+        "title": "Post your first vacancy",
+        "hint": "A position, a chair to rent, or a commission place."
       }
     },
     "nudge": {
@@ -121,13 +125,19 @@
       }
     },
     "loading": "Loading…",
-    "noPhone": "No phone"
+    "noPhone": "No phone",
+    "delete": "Delete",
+    "all": "All",
+    "actions": "Actions"
   },
   "nav": {
     "sections": {
       "operations": "Operations",
       "catalog": "Catalog",
-      "account": "Account"
+      "account": "Account",
+      "academy": "Academy",
+      "hiring": "Hiring",
+      "organization": "Organization"
     },
     "dashboard": "Dashboard",
     "calendar": "Calendar",
@@ -145,7 +155,8 @@
     "more": "More",
     "expandSidebar": "Expand sidebar",
     "collapseSidebar": "Collapse sidebar",
-    "courses": "Courses"
+    "courses": "Courses",
+    "vacancies": "Vacancies"
   },
   "roles": {
     "admin": "Admin",
@@ -1092,6 +1103,187 @@
     "delete": {
       "title": "Remove course",
       "body": "Remove “{name}”? Its runs and members will be removed too."
+    }
+  },
+  "products": {
+    "switch": "Switch product",
+    "bookings": {
+      "name": "Booking"
+    },
+    "courses": {
+      "name": "Courses"
+    },
+    "vacancies": {
+      "name": "Vacancies"
+    }
+  },
+  "vacancies": {
+    "title": "Vacancies",
+    "subtitle": "{count} listing",
+    "subtitle_plural": "{count} listings",
+    "subtitleEmpty": "Positions, chair rentals and commission places",
+    "new": "New vacancy",
+    "filterLabel": "Filter by status",
+    "pageSummary": "{shown} of {total}",
+    "emptyTitle": "No vacancies yet",
+    "emptyDesc": "Post your first position — a job, a chair to rent, or a commission place.",
+    "emptyFilterTitle": "Nothing here",
+    "emptyFilterDesc": "No vacancies match this filter.",
+    "noBranchTitle": "Add a branch first",
+    "noBranchText": "Every listing is anchored to an address, so candidates know where the work is.",
+    "noBranchCta": "Add a branch",
+    "seats": "{count} opening",
+    "seats_plural": "{count} openings",
+    "expiresIn": "{count} day left",
+    "expiresIn_plural": "{count} days left",
+    "expiredNote": "Expired — renew to make it live again",
+    "deleteTitle": "Remove this vacancy?",
+    "deleteMessage": "It disappears from your list. Applications already received are kept.",
+    "createdToast": "Vacancy created",
+    "updatedToast": "Vacancy updated",
+    "removedToast": "Vacancy removed",
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "paused": "Paused",
+      "closed": "Closed",
+      "expired": "Expired"
+    },
+    "statusNote": {
+      "draft": "Not published yet",
+      "published": "Live",
+      "paused": "Hidden from candidates",
+      "closed": "Closed",
+      "expired": "Expired"
+    },
+    "actions": {
+      "publish": "Publish",
+      "pause": "Pause",
+      "close": "Close",
+      "renew": "Renew"
+    },
+    "toast": {
+      "publish": "Vacancy published",
+      "pause": "Vacancy paused",
+      "close": "Vacancy closed",
+      "renew": "Vacancy renewed for 30 days"
+    },
+    "pay": {
+      "percentValue": "Salon keeps {value}",
+      "rentValue": "{value} / {period} rent",
+      "salaryValue": "{value} / {period}",
+      "negotiable": "By agreement"
+    },
+    "period": {
+      "day": "day",
+      "week": "week",
+      "month": "month"
+    },
+    "payType": {
+      "percentage": {
+        "name": "Percentage",
+        "desc": "The salon keeps a share of what the master earns"
+      },
+      "rent": {
+        "name": "Chair rent",
+        "desc": "The master pays a fixed amount for the place"
+      },
+      "salary": {
+        "name": "Salary",
+        "desc": "Regular employment with a fixed wage"
+      },
+      "negotiable": {
+        "name": "By agreement",
+        "desc": "Terms discussed with the candidate"
+      }
+    },
+    "schedule": {
+      "full_time": "Full-time",
+      "part_time": "Part-time",
+      "shift": "Shifts",
+      "flexible": "Flexible"
+    },
+    "experience": {
+      "any": "Any experience",
+      "junior": "Beginners welcome",
+      "experienced": "With experience"
+    },
+    "applyMode": {
+      "both": "Calls and applications",
+      "in_app": "Applications only",
+      "phone": "Calls only"
+    },
+    "perks": {
+      "materials-included": "Materials included",
+      "tools-provided": "Tools provided",
+      "client-base-provided": "Client base provided",
+      "online-booking": "Online booking included",
+      "training-provided": "Training provided",
+      "official-contract": "Official contract",
+      "flexible-schedule": "Flexible schedule",
+      "uniform-provided": "Uniform provided",
+      "parking": "Parking",
+      "meals": "Meals",
+      "transport": "Transport",
+      "own-client-base": "Own client base",
+      "own-tools": "Own tools"
+    },
+    "form": {
+      "newTitle": "New vacancy",
+      "editTitle": "Edit vacancy",
+      "subtitle": "Saves as a draft — publish it when you are ready.",
+      "create": "Create",
+      "sectionPosition": "Position",
+      "sectionTerms": "Terms",
+      "sectionWork": "The work",
+      "sectionContact": "How to apply",
+      "sectionDescription": "Description",
+      "specialty": "Category",
+      "specialtyPlaceholder": "Choose a category",
+      "specialtySearch": "Search categories…",
+      "noSpecialties": "Nothing matches",
+      "title": "Headline",
+      "titleRequired": "Headline (required)",
+      "titlePlaceholder": "e.g. Colorist for the Arabkir branch",
+      "titleHelp": "Leave empty to use the category name",
+      "headlineHint": "Candidates will see: {value}",
+      "branch": "Branch",
+      "branchPlaceholder": "Choose a branch",
+      "seats": "Openings",
+      "seatsHelp": "How many people you need",
+      "salonPercent": "Salon keeps, %",
+      "salonPercentHelp": "The share the salon takes — not the master's",
+      "salonPercentMax": "Up to, %",
+      "rangeHelp": "Optional — for a range",
+      "amount": {
+        "rent": "Rent, ֏",
+        "salary": "Salary, ֏"
+      },
+      "amountHelp": "Whole drams",
+      "amountMax": "Up to, ֏",
+      "payPeriod": "Per",
+      "negotiableNote": "The listing shows “By agreement” instead of a number.",
+      "scheduleType": "Schedule",
+      "notSpecified": "Not specified",
+      "experience": "Experience",
+      "scheduleNote": "Schedule details",
+      "scheduleNotePlaceholder": "e.g. Mon–Sat 10:00–20:00, 2/2 shifts",
+      "perks": {
+        "offer": "What you offer",
+        "require": "What you expect"
+      },
+      "applyMode": "How candidates reach you",
+      "contactPhone": "Contact phone",
+      "contactPhoneHelp": "Shown on the listing so candidates can call",
+      "descriptionPlaceholder": "Describe the place, the team, and what a day looks like.",
+      "descriptionHelp": "Optional, but listings with a description get more applications",
+      "noBranches": "Add a branch before posting a vacancy.",
+      "errSpecialty": "Choose a category",
+      "errLocation": "Choose a branch",
+      "errTitleOther": "Give the position a title",
+      "errPercent": "Set the percentage",
+      "errAmount": "Set an amount",
+      "errPhone": "Add a phone number"
     }
   }
 }

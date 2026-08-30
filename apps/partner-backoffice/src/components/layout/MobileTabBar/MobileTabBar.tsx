@@ -10,12 +10,9 @@ import { useSupport } from '@/components/support/SupportProvider'
 import { Avatar } from '@/components/ui'
 import { useNewBooking } from '@/App'
 import { useT } from '@/i18n'
-import { PRIMARY_TABS, MORE_SECTIONS, isNavItemVisible } from '../nav.config'
+import { primaryTabs, moreSections } from '../nav.config'
+import { useActiveProduct } from '@/products/useProducts'
 import s from './MobileTabBar.module.scss'
-
-// Bottom bar = the shared "primary" nav items. The dashboard tab shows the
-// shorter "Home" label on mobile.
-const TABS = PRIMARY_TABS.map(t => ({ ...t, labelKey: t.to === '/' ? 'nav.home' : t.labelKey }))
 
 export function MobileTabBar() {
   const [moreOpen, setMoreOpen] = useState(false)
@@ -28,8 +25,15 @@ export function MobileTabBar() {
   const navigate = useNavigate()
   const { unread, openChat } = useSupport()
   const openNewBooking = useNewBooking()
+  const activeProduct = useActiveProduct()
   const fabMode = partner?.supportWidget ?? 'support'
   const t = useT()
+
+  // Derived per render rather than at module scope: which tabs belong in the
+  // bar depends on the product the user is currently in.
+  const navCtx = { isAdmin, isSingle: partner?.kind === 'single', activeProduct }
+  // The dashboard tab uses the shorter "Home" label on mobile.
+  const tabs = primaryTabs(navCtx).map(i => ({ ...i, labelKey: i.to === '/' ? 'nav.home' : i.labelKey }))
 
   // Animate the sheet out before unmounting
   const closeMore = (after?: () => void) => {
@@ -65,7 +69,7 @@ export function MobileTabBar() {
 
       {/* Tab bar */}
       <nav className={s.tabbar}>
-        {TABS.map(tab => (
+        {tabs.map(tab => (
           <NavLink
             key={tab.to}
             to={tab.to}
@@ -110,11 +114,8 @@ export function MobileTabBar() {
             )}
 
             <div className={s.sheetItems}>
-              {MORE_SECTIONS.map(group => {
-                const items = group.items.filter(item =>
-                  isNavItemVisible(item, { isAdmin, isSingle: partner?.kind === 'single', coursesEnabled: !!partner?.coursesEnabled })
-                )
-                if (items.length === 0) return null
+              {moreSections(navCtx).map(group => {
+                const items = group.items
                 return (
                   <div key={group.section} className={s.sheetGroup}>
                     <div className={s.sheetGroupLabel}>{t(`nav.sections.${group.section}`)}</div>

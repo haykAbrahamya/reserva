@@ -55,7 +55,7 @@
   }
   .tag {
     font-family: $font-mono;
-    font-size: 9px;
+    font-size: 10px;
     color: $fg-2;
     margin-top: 3px;
     text-transform: uppercase;
@@ -141,10 +141,10 @@
 }
 
 .section {
-  font-size: 10px;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: $fg-3;
+  letter-spacing: 0.07em;
+  color: $fg-2;
   font-weight: 600;
   padding: 16px 16px 6px;
 }

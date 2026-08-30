@@ -1,26 +1,40 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout/AppLayout'
 import { RequireAuth } from '@/components/auth/RequireAuth'
 import { Login } from '@/pages/Login/Login'
-import { Activate } from '@/pages/Activate/Activate'
-import { Dashboard } from '@/pages/Dashboard/Dashboard'
-import { Bookings } from '@/pages/Bookings/Bookings'
-import { Services } from '@/pages/Services/Services'
-import { Courses } from '@/pages/Courses/Courses'
-import { Specialists } from '@/pages/Specialists/Specialists'
-import { Reviews } from '@/pages/Reviews/Reviews'
-import { Hours } from '@/pages/Hours/Hours'
-import { Locations } from '@/pages/Locations/Locations'
-import { Users } from '@/pages/Users/Users'
-import { CalendarPage } from '@/pages/Calendar/CalendarPage'
-import { Clients } from '@/pages/Clients/Clients'
-import { Settings as SettingsPage } from '@/pages/Settings/Settings'
-import { Storefront } from '@/pages/Storefront/Storefront'
+
+// ── Route-level code splitting ────────────────────────────────
+// One chunk per page, so the first paint downloads the shell and the landing
+// page only. This pays off most for a partner who holds a single product: a
+// vacancies-only salon never fetches the calendar, the booking grid or the
+// storefront editor at all, and adding a fourth product costs existing
+// partners nothing.
+const Activate    = lazy(() => import('@/pages/Activate/Activate').then(m => ({ default: m.Activate })))
+const Dashboard   = lazy(() => import('@/pages/Dashboard/Dashboard').then(m => ({ default: m.Dashboard })))
+const Bookings    = lazy(() => import('@/pages/Bookings/Bookings').then(m => ({ default: m.Bookings })))
+const Services    = lazy(() => import('@/pages/Services/Services').then(m => ({ default: m.Services })))
+const Courses     = lazy(() => import('@/pages/Courses/Courses').then(m => ({ default: m.Courses })))
+const Vacancies   = lazy(() => import('@/pages/Vacancies/Vacancies').then(m => ({ default: m.Vacancies })))
+const Specialists = lazy(() => import('@/pages/Specialists/Specialists').then(m => ({ default: m.Specialists })))
+const Reviews     = lazy(() => import('@/pages/Reviews/Reviews').then(m => ({ default: m.Reviews })))
+const Hours       = lazy(() => import('@/pages/Hours/Hours').then(m => ({ default: m.Hours })))
+const Locations   = lazy(() => import('@/pages/Locations/Locations').then(m => ({ default: m.Locations })))
+const Users       = lazy(() => import('@/pages/Users/Users').then(m => ({ default: m.Users })))
+const CalendarPage = lazy(() => import('@/pages/Calendar/CalendarPage').then(m => ({ default: m.CalendarPage })))
+const Clients     = lazy(() => import('@/pages/Clients/Clients').then(m => ({ default: m.Clients })))
+const SettingsPage = lazy(() => import('@/pages/Settings/Settings').then(m => ({ default: m.Settings })))
+const Storefront  = lazy(() => import('@/pages/Storefront/Storefront').then(m => ({ default: m.Storefront })))
+
+// The new-booking flow is a heavy modal mounted app-wide. Lazy AND gated on the
+// booking product below, so a partner without it never downloads the booking
+// form, the slot picker or the client search.
+const NewBookingModal = lazy(() =>
+  import('@/components/bookings/NewBookingModal/NewBookingModal').then(m => ({ default: m.NewBookingModal })),
+)
 import { RequireAdmin } from '@/components/auth/RequireAdmin'
-import { RequireCourses } from '@/components/auth/RequireCourses'
+import { RequireProduct } from '@/components/auth/RequireProduct'
 import { ToastProvider } from '@/components/ui'
-import { NewBookingModal } from '@/components/bookings/NewBookingModal/NewBookingModal'
 import { useAppStore, usePartner } from '@/store/app.store'
 import { useAuthStore } from '@/store/auth.store'
 import { partnersService } from '@/services/partners.service'
@@ -74,6 +88,8 @@ function ThemeApplier() {
 
 function GlobalModals() {
   const [open, setOpen] = useState(false)
+  const partner = usePartner()
+  const hasBookings = (partner?.products ?? []).some(p => p.key === 'bookings')
 
   useEffect(() => {
     const fn = () => setOpen(true)
@@ -81,12 +97,18 @@ function GlobalModals() {
     return () => window.removeEventListener('open-new-booking', fn)
   }, [])
 
+  // Not merely hidden — never mounted, so the chunk is never requested for a
+  // partner who cannot take bookings.
+  if (!hasBookings) return null
+
   return (
-    <NewBookingModal
-      open={open}
-      onClose={() => setOpen(false)}
-      onCreated={() => window.dispatchEvent(new CustomEvent('booking-created'))}
-    />
+    <Suspense fallback={null}>
+      <NewBookingModal
+        open={open}
+        onClose={() => setOpen(false)}
+        onCreated={() => window.dispatchEvent(new CustomEvent('booking-created'))}
+      />
+    </Suspense>
   )
 }
 
@@ -101,19 +123,25 @@ export default function App() {
           {/* Public */}
           <Route path="/login" element={<Login />} />
           {/* Self-serve signup activation (magic link from email) */}
-          <Route path="/activate" element={<Activate />} />
+          <Route path="/activate" element={<Suspense fallback={null}><Activate /></Suspense>} />
 
           {/* Protected */}
           <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
-            <Route index           element={<Dashboard />} />
-            <Route path="calendar" element={<CalendarPage />} />
-            <Route path="bookings" element={<Bookings />} />
-            <Route path="clients"  element={<Clients />} />
-            <Route path="services"    element={<Services />} />
-            <Route path="courses"     element={<RequireCourses><Courses /></RequireCourses>} />
-            <Route path="specialists" element={<Specialists />} />
-            <Route path="reviews"     element={<Reviews />} />
-            <Route path="hours"       element={<Hours />} />
+            {/* Booking product */}
+            <Route index           element={<RequireProduct product="bookings"><Dashboard /></RequireProduct>} />
+            <Route path="calendar" element={<RequireProduct product="bookings"><CalendarPage /></RequireProduct>} />
+            <Route path="bookings" element={<RequireProduct product="bookings"><Bookings /></RequireProduct>} />
+            <Route path="clients"  element={<RequireProduct product="bookings"><Clients /></RequireProduct>} />
+            <Route path="services"    element={<RequireProduct product="bookings"><Services /></RequireProduct>} />
+            <Route path="specialists" element={<RequireProduct product="bookings"><Specialists /></RequireProduct>} />
+            <Route path="reviews"     element={<RequireProduct product="bookings"><Reviews /></RequireProduct>} />
+            <Route path="hours"       element={<RequireProduct product="bookings"><Hours /></RequireProduct>} />
+
+            {/* Courses product */}
+            <Route path="courses"     element={<RequireProduct product="courses"><Courses /></RequireProduct>} />
+
+            {/* Vacancies product */}
+            <Route path="vacancies"   element={<RequireProduct product="vacancies"><Vacancies /></RequireProduct>} />
             {/* Admin-only: branches + team management */}
             <Route path="locations"   element={<RequireAdmin><Locations /></RequireAdmin>} />
             <Route path="users"       element={<RequireAdmin><Users /></RequireAdmin>} />

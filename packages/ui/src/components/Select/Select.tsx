@@ -7,6 +7,12 @@ export interface SelectOption {
   value: string
   label: string
   sub?: string
+  /**
+   * Extra terms the search matches but never renders — synonyms, translations,
+   * a parent category. Lets someone find an option by the word they know
+   * ("hairdresser", "парикмахер") without that word cluttering the list.
+   */
+  keywords?: string[]
 }
 
 interface SelectProps {
@@ -40,12 +46,14 @@ export function Select({
   // Auto-enable search for long lists; allow explicit override.
   const showSearch = searchable ?? options.length > 6
 
-  // Filter options by query (matches label + sub).
+  // Filter options by query (matches label + sub + hidden keywords).
   const filtered = useMemo(() => {
     if (!showSearch || !query.trim()) return options
     const q = query.trim().toLowerCase()
     return options.filter(o =>
-      o.label.toLowerCase().includes(q) || o.sub?.toLowerCase().includes(q)
+      o.label.toLowerCase().includes(q) ||
+      o.sub?.toLowerCase().includes(q) ||
+      o.keywords?.some(k => k.toLowerCase().includes(q))
     )
   }, [options, query, showSearch])
 
