@@ -173,6 +173,9 @@ export function PartnerDetailPage() {
 
       <PartnerProducts partnerId={id} products={partner.products ?? []} onChanged={reload} />
 
+      {/* Full width: a five-column table does not fit a half-width grid cell. */}
+      <PartnerBookings partnerId={id} />
+
       <div className={s.grid}>
         {/* Editable profile */}
         <section className={s.card}>
@@ -199,9 +202,6 @@ export function PartnerDetailPage() {
 
         {/* Users — view + manage (edit, reset password) */}
         <PartnerUsers partnerId={id} />
-
-        {/* Minimal booking feed — volume and provenance, never client PII. */}
-        <PartnerBookings partnerId={id} />
 
         {/* Visibility & booking — grouped toggles, split into Presentation vs
             Feature access so related settings sit together and are easy to scan. */}

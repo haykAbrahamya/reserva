@@ -11,10 +11,23 @@ interface Props {
 
 const PAGE_SIZE = 10
 
-const fmtDateTime = (iso: string) =>
-  new Date(iso).toLocaleString(undefined, {
-    day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
-  })
+/**
+ * Compact date + time, split so the table can stack them.
+ * `Aug 29, 2026, 04:47 PM` on one line is far too wide for a five-column table;
+ * the year is dropped unless the booking is from another year, where it matters.
+ */
+const fmtParts = (iso: string) => {
+  const d = new Date(iso)
+  const sameYear = d.getFullYear() === new Date().getFullYear()
+  return {
+    date: d.toLocaleDateString(undefined, {
+      day: 'numeric',
+      month: 'short',
+      ...(sameYear ? {} : { year: 'numeric' }),
+    }),
+    time: d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }),
+  }
+}
 
 /** Terminal states read as inactive; live ones as active. */
 const isLive = (status: PartnerBookingRow['status']) =>
@@ -70,10 +83,16 @@ export function PartnerBookings({ partnerId }: Props) {
               <div key={b.id} className={s.bkRow}>
                 {/* data-label drives the stacked mobile layout — see the SCSS. */}
                 <span className={s.bkCell} data-label="Appointment">
-                  <strong>{fmtDateTime(b.startAt)}</strong>
+                  <span className={s.bkWhen}>
+                    <strong className={s.bkTime}>{fmtParts(b.startAt).time}</strong>
+                    <span className={s.bkDate}>{fmtParts(b.startAt).date}</span>
+                  </span>
                 </span>
                 <span className={s.bkCell} data-label="Service">
-                  {b.service ? `${b.service.name} · ${b.service.duration}m` : '—'}
+                  <span className={s.bkService}>
+                    {b.service?.name ?? '—'}
+                    {b.service && <span className={s.bkDuration}>{b.service.duration}m</span>}
+                  </span>
                 </span>
                 <span className={s.bkCell} data-label="Status">
                   <Badge variant={isLive(b.status) ? 'active' : 'inactive'} label={b.status} />
@@ -85,7 +104,7 @@ export function PartnerBookings({ partnerId }: Props) {
                   </span>
                 </span>
                 <span className={[s.bkCell, s.bkMuted].join(' ')} data-label="Created">
-                  {fmtDateTime(b.createdAt)}
+                  {fmtParts(b.createdAt).date}, {fmtParts(b.createdAt).time}
                 </span>
               </div>
             ))}
