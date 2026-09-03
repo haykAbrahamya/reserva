@@ -1,0 +1,93 @@
+@use '../../../styles/vars' as *;
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+/*
+  An offered condition.
+
+  Outlined rather than filled: on a cream ground a filled beige chip reads as a
+  smudge, an outlined one reads as a tag. But the text is $fg-1, not $fg-2 —
+  muted grey inside a faint outline made every perk look DISABLED, which is
+  exactly the wrong signal for the list of things a salon is offering you. The
+  border steps up to $line-2 for the same reason.
+*/
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid $line-2;
+  border-radius: 999px;
+  background: transparent;
+  color: $fg-1;
+  font-weight: 500;
+  white-space: nowrap;
+
+  svg {
+    color: $pay-salary;
+    flex-shrink: 0;
+  }
+}
+
+/* A requirement, not a benefit. Warm and filled rather than outlined, so the
+   two never read as the same kind of fact at a glance. */
+.expected {
+  border-color: transparent;
+  background: $warn-soft;
+  color: $fg-1;
+
+  svg { color: $warn; }
+}
+
+/* "+2 more" — a number AND a translated word, so sans. */
+.more {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  color: $fg-2;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.sm {
+  font-size: 11.5px;
+
+  .chip { padding: 4px 9px; }
+  .more { padding: 4px 6px; font-size: 11px; }
+}
+
+.md {
+  font-size: 12.5px;
+
+  .chip { padding: 6px 11px; }
+  .more { padding: 6px 8px; font-size: 11.5px; }
+}
+
+/*
+  Phones: the same chips, tighter.
+
+  Armenian perk labels are long («Նյութերը՝ սրահի կողմից»), so at 11.5px with
+  9px of padding each one claimed a whole line and three perks made the card
+  half a screen tall. Shrinking the type and the padding lets the short ones
+  pair up, which is the difference between three rows and two.
+
+  Deliberately NOT solved by hiding the third chip: the "+N more" count beside
+  them would then be wrong, and a card that understates what a salon offers is
+  worse than a slightly taller card.
+*/
+@media (max-width: 620px) {
+  .sm {
+    font-size: 11px;
+    gap: 5px;
+
+    .chip { padding: 3px 8px; gap: 4px; }
+    .more { padding: 3px 4px; font-size: 10.5px; }
+  }
+}

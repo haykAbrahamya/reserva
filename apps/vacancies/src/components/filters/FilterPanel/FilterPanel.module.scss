@@ -1,0 +1,20 @@
+@use '../../../styles/vars' as *;
+
+.panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.loading { opacity: 0.5; }
+
+/* Titles are static copy, so they render before the data — the wait reads as
+   loading rather than as an empty page. */
+.skRow {
+  padding: 14px 2px;
+  border-bottom: 1px solid $line-1;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: $fg-3;
+
+  &:last-child { border-bottom: 0; }
+}

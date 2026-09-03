@@ -7,7 +7,14 @@ import { apiGet, apiPost, apiPatch, apiDelete } from './http'
 // rather than optional overrides.
 // ─────────────────────────────────────────────────────────────
 
-/** Required per-language names. `name`/`roleName` hold the English source. */
+/**
+ * Required per-language names for a PLATFORM catalog row. The English source
+ * lives in the row's base column (`name` / `roleName`); this carries the rest.
+ *
+ * Mirrors `requiredI18nSchema` on the backend. Unlike partner-authored content,
+ * these are not optional overrides — the vocabulary is rendered to every partner
+ * in their own language, so a blank locale is a validation error.
+ */
 export interface RequiredI18n {
   hy: string
   ru: string

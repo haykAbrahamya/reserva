@@ -1,0 +1,139 @@
+@use 'variables' as *;
+@use '../../styles/catalog' as c;
+
+/* Shared catalog chrome — see styles/_catalog.scss. Only the parts specific to
+   a TREE (indented children, the kind badge) are written out here. */
+.page        { @include c.page; }
+.head        { @include c.head; }
+.h1          { @include c.h1; }
+.sub         { @include c.sub; }
+.searchWrap  { @include c.search-wrap; }
+.searchIcon  { @include c.search-icon; }
+.searchInput { padding-left: 32px; }
+.groups      { @include c.groups; }
+.group       { @include c.group; }
+.groupHead   { @include c.group-head; }
+.groupTitle  { @include c.group-title; }
+.groupNative { @include c.group-native; }
+.groupCount  { @include c.group-count; }
+.rowName     { @include c.row-name; }
+.rowNative   { @include c.row-native; }
+.key         { @include c.key; }
+.iconBtn     { @include c.icon-btn; }
+
+@media (max-width: 560px) {
+  .head { flex-direction: column; align-items: stretch; }
+  .head > button { width: 100%; justify-content: center; }
+}
+
+/* A count of rows missing a translation belongs in the subtitle, but it is a
+   problem — so it reads as one. */
+.warnNote { color: $warn; }
+
+/* ── Rows ── */
+.table { display: flex; flex-direction: column; }
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) 92px minmax(0, 1fr) 92px 84px 78px;
+  @include c.row-base;
+}
+
+/* Children are indented and tinted, so "Arabkir" is visibly *inside* Yerevan.
+   Without that the tree reads as a flat list and a district name means nothing
+   on its own — there is an "Arabkir Branch" in Vanadzor. */
+.rowChild {
+  background: $bg-1;
+  padding-left: 30px;
+
+  &:hover { background: $bg-3; }
+}
+
+.childIcon {
+  color: $fg-3;
+  flex-shrink: 0;
+}
+
+.rowOff { opacity: 0.6; }
+
+.cell, .cellMain { min-width: 0; }
+
+.kind {
+  font-family: $font-mono;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: $fg-2;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: $bg-3;
+  white-space: nowrap;
+}
+
+.muted   { font-size: 12px; color: $fg-2; }
+.usageOn { font-size: 12.5px; font-weight: 600; color: $accent-contrast; }
+
+.rowActions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.danger:hover:not(:disabled) { background: $danger-soft; color: $danger; }
+
+/* Narrow desktop: drop the reference columns, keep the name, the count and the
+   actions — the three things a decision needs. */
+@media (max-width: 1180px) {
+  .row { grid-template-columns: minmax(0, 1.6fr) 92px 84px 78px; }
+  .cell:nth-of-type(2),  /* key */
+  .cell:nth-of-type(3) { /* aliases */
+    display: none;
+  }
+}
+
+/* Phones: stack into labelled rows. */
+@media (max-width: 700px) {
+  .row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 14px 16px;
+    position: relative;
+  }
+  .rowChild { padding-left: 26px; }
+  .cell:nth-of-type(2),
+  .cell:nth-of-type(3) { display: block; }
+
+  .cell::before {
+    content: attr(data-label);
+    display: block;
+    font-family: $font-mono;
+    font-size: 10px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: $fg-2;
+    margin-bottom: 4px;
+  }
+
+  .rowActions { position: absolute; top: 12px; right: 12px; }
+  /* Keep the name clear of the floating action buttons. */
+  .cellMain { padding-right: 70px; }
+}
+
+/* ── Editor modal ── */
+.form       { @include c.form; }
+.formError  { @include c.form-error; }
+.grid2      { @include c.grid(2); }
+.grid3      { @include c.grid(3); }
+.field      { @include c.field; }
+.label      { @include c.label; }
+.fieldHint  { @include c.field-hint; }
+.block      { @include c.block; }
+.blockHead  { @include c.block-head; }
+.blockHint  { @include c.block-hint; }
+.aliasRow   { @include c.alias-row; }
+.aliasChips { @include c.alias-chips; }
+.aliasChip  { @include c.alias-chip; }
+.toggleRow  { @include c.toggle-row; }
+
+.toggleLabel { font-size: 13px; font-weight: 500; color: $fg-0; }
+.toggleDesc  { font-size: 12px; color: $fg-2; line-height: 1.45; margin-top: 3px; max-width: 46ch; }

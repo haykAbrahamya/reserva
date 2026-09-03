@@ -1,0 +1,36 @@
+@use '../../../styles/vars' as *;
+
+.group {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid $line-2;
+  border-radius: 999px;
+  background: $bg-1;
+  flex-shrink: 0;
+}
+
+.pill {
+  border: 0;
+  background: none;
+  padding: 5px 9px;
+  border-radius: 999px;
+  /* The Armenian code «ՀԱ» has no mono form, so this stays in the sans face.
+     11px is the floor at which a warm grey is still text and not decoration. */
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: $fg-2;
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease;
+
+  &:hover { color: $fg-0; }
+}
+
+.on {
+  background: $accent-soft;
+  color: $accent-contrast;
+
+  &:hover { color: $accent-contrast; }
+}

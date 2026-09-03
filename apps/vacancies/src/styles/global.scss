@@ -1,0 +1,92 @@
+@use './vars' as *;
+
+/* App-wide base. Everything structural comes from @reserva/ui's tokens.css;
+   this covers only what a public page needs on top of it. */
+
+#root {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/*
+  The page ground.
+
+  Two parts, for a performance reason rather than an aesthetic one:
+
+  The GRAIN is a repeating dot pattern on `body` itself. At this opacity it is
+  felt rather than seen, and it is what makes white cards sit ON something
+  instead of floating in a void. Repeating tiles look identical scrolled or
+  fixed, so it is left to scroll — `background-attachment: fixed` on a
+  repeating layer costs a full-viewport repaint on every scroll frame and buys
+  nothing.
+
+  The BLOOMS live on a fixed pseudo-element. Two soft radial tints, anchored to
+  the viewport so they never turn into a visible seam halfway down a long board.
+  As one composited layer they cost nothing to scroll past; as two more `fixed`
+  background layers on `body` they would have tripled that repaint.
+*/
+body {
+  position: relative;
+  background-color: $bg-0;
+  background-image: radial-gradient(var(--page-grain) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1100px 620px at 8% -10%, $accent-wash, transparent 70%),
+    radial-gradient(900px 520px at 96% -6%, rgba(63, 125, 88, 0.05), transparent 68%);
+}
+
+/* The green tint reads as sludge over charcoal, so dark keeps only the violet. */
+[data-theme='dark'] body::before {
+  background-image: radial-gradient(1100px 620px at 8% -10%, $accent-wash, transparent 70%);
+}
+
+/*
+  The theme flip, in one frame.
+
+  `theme-switching` is set by useTheme for exactly two frames while the tokens
+  change. Without it, the design system's own 450ms fade on `body` plus every
+  component's hover transition all fire at once at different durations, and the
+  gradient-painted heading band — which cannot interpolate at all — snaps ahead
+  of everything else.
+
+  Deliberately also covers pseudo-elements, which is where the page ground and
+  the hero's arc layer live.
+*/
+html.theme-switching,
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: none !important;
+}
+
+/* Respect a reduced-motion preference globally rather than per component — the
+   shared keyframes are used in a dozen places and opting out one at a time is
+   how one of them gets missed. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Anchor targets clear the sticky header instead of hiding under it. */
+[id] { scroll-margin-top: calc(var(--header-h) + 16px); }
+
+/* Selection in brand colour — a small thing people notice. */
+::selection {
+  background: $accent-soft;
+  color: $fg-0;
+}

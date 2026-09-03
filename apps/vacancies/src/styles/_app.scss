@@ -1,0 +1,120 @@
+@use './vars' as *;
+
+// ─────────────────────────────────────────────────────────────
+// App-level style primitives.
+//
+// Only patterns used by three or more components live here. Anything used
+// twice stays in its own module — a mixin library that grows faster than its
+// callers is just a second, worse stylesheet.
+// ─────────────────────────────────────────────────────────────
+
+/// The page gutter. One definition, so the header, the hero and the results
+/// column can never drift out of alignment by a pixel at any breakpoint.
+@mixin page-x {
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding-inline: 28px;
+
+  @media (max-width: 900px) { padding-inline: 20px; }
+  @media (max-width: 560px) { padding-inline: 16px; }
+}
+
+/// A raised surface: card, panel, sheet.
+@mixin surface {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+}
+
+/// Editorial heading. Fraunces is the house serif; it is what stops the board
+/// reading like a generic dashboard.
+@mixin display($size: 34px) {
+  font-family: $font-serif;
+  font-size: $size;
+  font-weight: 500;
+  letter-spacing: -0.024em;
+  line-height: 1.12;
+  color: $fg-0;
+  margin: 0;
+}
+
+/// Small label — section heads inside panels, captions above a value.
+///
+/// Set in the SANS face, not mono. Geist Mono carries no Armenian and no
+/// Cyrillic, so a mono label falls back per-glyph and renders «ՀԱՆՐԱՃԱՆԱՉ» as
+/// stretched, mismatched letterforms. That single mistake is what made this
+/// board look unfinished, and it is invisible when testing in English.
+///
+/// Mono is for DIGITS only — see `numeric`.
+@mixin eyebrow {
+  font-family: $font-sans;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $fg-3;
+}
+
+/// DIGITS ONLY. Tabular, so a column of figures aligns and a changing digit
+/// never reflows the row it sits in.
+///
+/// Never apply this to a phrase that merely contains a number: mono has no
+/// Armenian or Cyrillic coverage, so "29 հայտարարություն" would render the
+/// number correctly and the word as fallback junk. Wrap the number in its own
+/// element instead.
+@mixin numeric {
+  font-family: $font-mono;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/// A PHRASE that contains a number ("29 listings").
+///
+/// Sans face with tabular figures: the digits still align and still do not
+/// reflow, without dragging the surrounding translated word into a font that
+/// cannot draw it.
+@mixin tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/// Quiet meta text (place, salon, date).
+@mixin meta {
+  font-size: 13px;
+  color: $fg-2;
+  min-width: 0;
+}
+
+/// A focusable row that behaves like a link but is a button.
+@mixin reset-button {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/// Clamp to N lines. Used for descriptions and long salon names.
+@mixin clamp-lines($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/// Visually hidden but read aloud. For the labels that carry meaning colour
+/// alone would carry otherwise.
+@mixin sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

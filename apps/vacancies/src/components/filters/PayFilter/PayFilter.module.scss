@@ -1,0 +1,36 @@
+@use '../../../styles/vars' as *;
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Matches the RangeSlider's own label, so the chips and the sliders below read
+   as one form rather than two controls that happen to be adjacent. */
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: $fg-1;
+}
+
+.ranges {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 14px;
+  border-top: 1px solid $line-1;
+}
+
+.note {
+  margin: 0;
+  font-size: 11.5px;
+  color: $fg-3;
+  line-height: 1.5;
+}

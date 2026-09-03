@@ -9,7 +9,11 @@
   flex-shrink: 0;
   border: 1px solid $line-1;
 
-  &.sm { width: 24px; height: 24px; font-size: 9px; }
+  /* 10px, not 9. Initials are a decorative redundancy — the full name is
+     always beside them and the accessible name comes from the row — but 9px
+     was small enough to read as a smudge rather than as letters in every app
+     that uses this size. */
+  &.sm { width: 24px; height: 24px; font-size: 10px; }
   &.md { width: 28px; height: 28px; font-size: 11px; }
   &.lg { width: 40px; height: 40px; font-size: 14px; }
 

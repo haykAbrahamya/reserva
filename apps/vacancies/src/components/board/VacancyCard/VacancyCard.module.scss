@@ -1,0 +1,233 @@
+@use '../../../styles/vars' as *;
+@use '../../../styles/app' as a;
+
+/*
+  Three grid regions, so one markup order can produce two reading orders:
+
+    desktop            phone
+    ┌──────────┬─────┐ ┌──────────┐
+    │ identity │     │ │ identity │
+    ├──────────┤side │ ├──────────┤
+    │ details  │     │ │   side   │
+    └──────────┴─────┘ ├──────────┤
+                       │ details  │
+                       └──────────┘
+
+  `side` spans both rows on desktop so the money can sit at the top and the
+  posted date at the bottom of the same column.
+*/
+.card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'identity side'
+    'details  side';
+  gap: 12px 24px;
+  padding: 18px 20px;
+  @include a.surface;
+  overflow: hidden;
+  box-shadow: $shadow-1;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+
+  /* A hairline in the salon's own colour, revealed on hover — identity without
+     letting fifty brands repaint the page as you scroll. */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: var(--salon-accent, #{$accent});
+    opacity: 0;
+    transition: opacity 0.16s ease;
+  }
+
+  &:hover {
+    border-color: $line-2;
+    box-shadow: $shadow-2;
+    /* A single pixel. Enough to feel responsive, too little to shift the row
+       under a cursor that is about to click it. */
+    transform: translateY(-1px);
+
+    &::before { opacity: 1; }
+
+    .title { color: $accent-contrast; }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $accent;
+    outline-offset: 2px;
+  }
+}
+
+.identity {
+  grid-area: identity;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.avatar { flex-shrink: 0; }
+
+.headings {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+/* Fraunces at card scale is the signature: it reads as an editorial listing
+   rather than as a dashboard row. */
+.title {
+  margin: 0;
+  font-family: $font-serif;
+  font-size: 17.5px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  color: $fg-0;
+  transition: color 0.16s ease;
+  @include a.clamp-lines(2);
+}
+
+.salon {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  @include a.meta;
+}
+
+.salonName {
+  font-weight: 500;
+  color: $fg-1;
+}
+
+.dot { color: $fg-3; }
+
+.place {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+
+  svg { color: $fg-3; flex-shrink: 0; }
+}
+
+.details {
+  grid-area: details;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+/*
+  The second tier of facts, tied into one line by hairline separators.
+
+  With gaps alone they read as three disconnected words; a middot would need
+  per-language punctuation rules. A 1px rule is language-neutral and reads as
+  deliberate typography.
+*/
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 0;
+}
+
+.fact {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  color: $fg-2;
+  white-space: nowrap;
+
+  svg { color: $fg-3; }
+
+  & + .fact {
+    margin-left: 11px;
+    padding-left: 12px;
+    border-left: 1px solid $line-1;
+  }
+}
+
+.side {
+  grid-area: side;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  /*
+    Wide enough for the longest real figure — "220 000 – 320 000 ֏" — so a
+    range never wraps mid-number or pushes into the title. Fixed rather than
+    auto so figures align down the page and can be compared without reading.
+  */
+  min-width: 176px;
+}
+
+.posted {
+  font-size: 11.5px;
+  color: $fg-3;
+  white-space: nowrap;
+}
+
+/* ── Dense (the "more from this salon" strip) ── */
+.dense {
+  grid-template-areas: 'identity side';
+  padding: 14px 16px;
+  gap: 14px;
+
+  .title { font-size: 15.5px; }
+  .side { min-width: 0; justify-content: center; }
+}
+
+/* ── Narrow ──
+   A full card has a details row, so the money column has nowhere to go and the
+   areas restack: identity, money, then the supporting detail. */
+@media (max-width: 620px) {
+  .card {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'identity'
+      'side'
+      'details';
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .card .side {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+  }
+
+  /*
+    A DENSE card keeps its two columns at every width.
+
+    It has no details row, so stacking it left the figure alone on its own
+    line with the whole right half of the card empty above it — which read as a
+    broken layout rather than as a compact one. Two columns is also honest about
+    what the card is: a name and a price, nothing else.
+  */
+  .dense {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'identity side';
+    gap: 12px;
+    padding: 14px;
+    align-items: center;
+  }
+
+  .dense .side {
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    justify-content: center;
+  }
+
+}

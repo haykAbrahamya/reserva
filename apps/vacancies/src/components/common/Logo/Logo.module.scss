@@ -1,0 +1,38 @@
+@use '../../../styles/vars' as *;
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+/* Matches @reserva/ui's own Logo wordmark, so the board and the rest of the
+   product set the name identically. */
+.name {
+  font-family: $font-serif;
+  font-size: 21px;
+  letter-spacing: -0.015em;
+  color: $fg-0;
+  line-height: 1;
+}
+
+/* The product name in mono on an accent wash: a label attached to the brand
+   rather than part of its name. */
+.product {
+  /* Sans, not mono: this pill holds a translated word, and Geist Mono has no
+     Armenian coverage. */
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: $accent-soft;
+  color: $accent-contrast;
+  white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+  .name { display: none; }
+}

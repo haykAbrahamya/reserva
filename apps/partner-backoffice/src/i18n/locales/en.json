@@ -632,7 +632,11 @@
       "phonePlaceholder": "+374 10 …",
       "hoursLabel": "Working hours",
       "presetEveryDay": "Every day",
-      "presetExceptSun": "Mon–Sat"
+      "presetExceptSun": "Mon–Sat",
+      "areaLabel": "City / district",
+      "areaPlaceholder": "Choose a place",
+      "areaSearch": "Search cities and districts…",
+      "areaHint": "Where this branch is. Used to filter listings by area."
     },
     "closed": "Closed",
     "delete": {

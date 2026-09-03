@@ -1,0 +1,167 @@
+@use 'variables' as *;
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Matches the shared Input's label so a slider and a text field never look
+   like two different form systems sitting next to each other. */
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: $fg-1;
+}
+
+.hint {
+  font-size: 11.5px;
+  color: $fg-2;
+  font-family: $font-mono;
+}
+
+/* ── Track ──
+   The visible rail and fill are painted here; the two native inputs sit on top
+   of them, transparent, contributing only their thumbs. */
+.track {
+  position: relative;
+  height: 22px;
+  display: flex;
+  align-items: center;
+}
+
+.rail,
+.fill {
+  position: absolute;
+  height: 4px;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.rail {
+  left: 0;
+  right: 0;
+  background: $bg-3;
+}
+
+.fill {
+  background: $accent;
+}
+
+.input {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 22px;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  /* The element covers the whole track for hit area, but must not eat clicks
+     meant for the other input — only the thumbs are interactive. */
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* When both ends sit at the maximum the thumbs coincide; raising the lower one
+   is what keeps the range reopenable. */
+.raised {
+  z-index: 3;
+}
+
+.input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  pointer-events: auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: $bg-1;
+  border: 2px solid $accent;
+  box-shadow: $shadow-1;
+  cursor: grab;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.input::-webkit-slider-thumb:hover {
+  transform: scale(1.12);
+}
+
+.input:active::-webkit-slider-thumb {
+  cursor: grabbing;
+  transform: scale(1.06);
+}
+
+.input:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px $accent-soft;
+}
+
+.input::-moz-range-thumb {
+  pointer-events: auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: $bg-1;
+  border: 2px solid $accent;
+  box-shadow: $shadow-1;
+  cursor: grab;
+}
+
+.input:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 3px $accent-soft;
+}
+
+.input::-moz-range-track {
+  background: transparent;
+}
+
+/* ── Numeric fields ──
+   Monospace and tabular so the two ends line up and a digit change doesn't
+   shift the layout. */
+.fields {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid $line-2;
+  border-radius: $r-1;
+  background: $bg-1;
+  color: $fg-0;
+  font-family: $font-mono;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+
+  &:hover:not(:disabled) { border-color: $line-strong; }
+
+  &:focus {
+    border-color: $accent;
+    box-shadow: 0 0 0 3px $accent-soft;
+  }
+}
+
+.dash {
+  width: 10px;
+  height: 1px;
+  background: $line-strong;
+  flex-shrink: 0;
+}
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}

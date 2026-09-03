@@ -1,0 +1,66 @@
+@use 'variables' as *;
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid $line-2;
+  border-radius: 999px;
+  background: $bg-1;
+  color: $fg-1;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
+
+  &:hover:not(:disabled) {
+    border-color: $line-strong;
+    color: $fg-0;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.md { padding: 7px 13px; font-size: 12.5px; }
+.sm { padding: 5px 10px; font-size: 12px; }
+
+/* Selected reads as a filled accent pill. The tick is what carries the state
+   for anyone who cannot separate the two colours. */
+.on {
+  background: $accent;
+  border-color: $accent;
+  color: $fg-on-accent;
+
+  &:hover:not(:disabled) {
+    background: $accent-strong;
+    border-color: $accent-strong;
+    color: $fg-on-accent;
+  }
+
+  .count {
+    background: rgba(255, 255, 255, 0.22);
+    color: $fg-on-accent;
+  }
+
+  .icon { color: $fg-on-accent; }
+}
+
+.tick, .icon { flex-shrink: 0; }
+.icon { color: $fg-2; }
+
+.label { min-width: 0; }
+
+.count {
+  font-family: $font-mono;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  padding: 3px 5px;
+  border-radius: 999px;
+  background: $bg-3;
+  color: $fg-2;
+}

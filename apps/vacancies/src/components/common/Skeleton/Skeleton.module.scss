@@ -1,0 +1,13 @@
+@use '../../../styles/vars' as *;
+
+.sk {
+  display: block;
+  background: linear-gradient(90deg, $bg-2 0%, $bg-3 40%, $bg-2 80%);
+  background-size: 300% 100%;
+  animation: sk-slide 1.4s ease-in-out infinite;
+}
+
+@keyframes sk-slide {
+  0%   { background-position: 120% 0; }
+  100% { background-position: -20% 0; }
+}

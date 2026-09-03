@@ -1,0 +1,140 @@
+/* ============================================================
+   Vacancies — app theme.
+
+   Layered ON TOP of @reserva/ui's tokens.css, which supplies the neutral
+   system, the type scale, the shadows and the animations. This file changes
+   three things: the accent, the script coverage of the type stacks, and the
+   depth of the page ground.
+   ============================================================ */
+
+/*
+  Armenian and Cyrillic coverage.
+
+  The house display face is Fraunces and the house mono is Geist Mono. Neither
+  carries a single Armenian glyph, and Fraunces has no Cyrillic either — so on
+  an Armenian-market product EVERY heading was being drawn by whatever generic
+  serif the browser had lying around (Georgia, in practice). That is what made
+  the headings look wrong in a way no amount of weight or size adjustment could
+  fix: they were not the typeface at all.
+
+  Browsers resolve font-family per GLYPH, so appending the Noto Armenian faces
+  keeps Latin text in Fraunces and Geist while giving Armenian text a real
+  design of its own, in the same voice — serif where we set serif, sans where we
+  set sans. Cyrillic falls to Noto Serif for the same reason.
+
+  Loaded here rather than in tokens.css so the three existing apps do not pay
+  for fonts they have not been designed against yet.
+*/
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Armenian:wght@400;500;600;700&family=Noto+Serif+Armenian:wght@400;500;600&family=Noto+Serif:wght@400;500;600&display=swap');
+
+:root {
+  /* ── Type ── */
+  --font-sans: 'Geist', 'Noto Sans Armenian', 'Inter', -apple-system, sans-serif;
+  --font-serif: 'Fraunces', 'Noto Serif Armenian', 'Noto Serif', Georgia, serif;
+  --font-mono: 'Geist Mono', 'Noto Sans Armenian', ui-monospace, monospace;
+
+  /* ── Accent ── */
+  --accent: #7c5cff;
+  /* Deep enough to pass contrast as TEXT on the light ground. The raw accent
+     at 4.0:1 is fine for a filled button, not for a 13px label. */
+  --accent-strong: #5b3fd6;
+  --accent-contrast: #5233c9;
+  --accent-soft: rgba(124, 92, 255, 0.1);
+
+  --accent-wash: rgba(124, 92, 255, 0.055);
+  --accent-line: rgba(124, 92, 255, 0.22);
+
+  /*
+    Heading-band layers, tuned separately from the page ground.
+
+    The band needs to be visibly a band; the ground behind the results needs to
+    be almost nothing. Sharing one set of values meant either a washed-out
+    heading or a noisy page, so the hero gets its own three.
+  */
+  --hero-violet: rgba(124, 92, 255, 0.30);
+  --hero-violet-soft: rgba(124, 92, 255, 0.15);
+  --hero-blue: rgba(74, 107, 138, 0.16);
+  --hero-rose: rgba(176, 118, 131, 0.15);
+  --hero-arc: rgba(91, 63, 214, 0.26);
+
+  /*
+    ── Ground ──
+
+    A touch deeper than the design system's #FAFAF7. The cards are pure white,
+    and against near-white paper they had no edge at all — the page read as one
+    flat sheet with hairlines drawn on it. Two percent of warmth is the whole
+    difference between "unstyled" and "composed", and it costs no contrast: body
+    text is still measured against the card, not the page.
+  */
+  --bg-0: #F4F2ED;
+  --page-grain: rgba(20, 17, 14, 0.022);
+
+  /*
+    The heading band is its own SURFACE, a step deeper than the page.
+
+    A hairline alone could not separate the band from the results — both were
+    the same ground, so the eye read one continuous wash with a line drawn
+    across it. A change of surface is what makes a band a band, and it does the
+    work in both themes where a single border colour cannot.
+  */
+  --hero-bg: #EDEBE4;
+  --hero-edge: rgba(255, 255, 255, 0.62);
+
+  /* ── Pay-type identity ──
+     Four muted hues that survive being read as small text and never compete
+     with the accent: the money row is information, not decoration. */
+  --pay-salary: #3f7d58;
+  --pay-salary-soft: rgba(63, 125, 88, 0.11);
+  --pay-rent: #9a6a2f;
+  --pay-rent-soft: rgba(154, 106, 47, 0.12);
+  --pay-percent: #5b3fd6;
+  --pay-percent-soft: rgba(91, 63, 214, 0.11);
+  --pay-open: #5f6b7a;
+  --pay-open-soft: rgba(95, 107, 122, 0.12);
+
+  /* ── Layout ── */
+  --rail-w: 278px;
+  --page-max: 1240px;
+  --header-h: 60px;
+}
+
+[data-theme='dark'] {
+  /* Brighter and slightly desaturated, so it reads on charcoal without
+     glowing. The light-mode value is far too dark here. */
+  --accent: #9c82ff;
+  --accent-strong: #b6a2ff;
+  --accent-contrast: #c3b2ff;
+  --accent-soft: rgba(156, 130, 255, 0.16);
+
+  --accent-wash: rgba(156, 130, 255, 0.07);
+  --accent-line: rgba(156, 130, 255, 0.26);
+
+  /* Brighter blooms on charcoal, but a fainter line: a hairline that reads as
+     delicate on paper reads as a wireframe on black. */
+  --hero-violet: rgba(156, 130, 255, 0.22);
+  --hero-violet-soft: rgba(156, 130, 255, 0.12);
+  --hero-blue: rgba(110, 151, 189, 0.14);
+  --hero-rose: rgba(201, 154, 165, 0.1);
+  --hero-arc: rgba(182, 162, 255, 0.14);
+
+  /* The same reasoning inverted: the page drops BELOW the card surface so the
+     cards read as lifted rather than as cut-outs. */
+  --bg-0: #0E0D0C;
+  --page-grain: rgba(243, 239, 231, 0.016);
+
+  /* Inverted: on dark the band LIFTS above the page instead of sinking below
+     it, which is how depth reads on a dark ground. The edge highlight drops to
+     a whisper — at light-mode strength it was a white rule across the page. */
+  --hero-bg: #171614;
+  --hero-edge: rgba(243, 239, 231, 0.05);
+
+  /* Every semantic hue lifts on dark, or it turns to mud at 12px. */
+  --pay-salary: #74a86e;
+  --pay-salary-soft: rgba(116, 168, 110, 0.16);
+  --pay-rent: #d8a85f;
+  --pay-rent-soft: rgba(216, 168, 95, 0.16);
+  --pay-percent: #b6a2ff;
+  --pay-percent-soft: rgba(182, 162, 255, 0.16);
+  --pay-open: #9aa6b5;
+  --pay-open-soft: rgba(154, 166, 181, 0.16);
+}

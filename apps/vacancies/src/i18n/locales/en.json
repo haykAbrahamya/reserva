@@ -1,0 +1,242 @@
+{
+  "app": {
+    "name": "Reserva",
+    "product": "Vacancies",
+    "tagline": "Work in beauty, across Armenia"
+  },
+  "nav": {
+    "board": "All listings",
+    "forSalons": "For salons",
+    "theme": "Switch theme",
+    "language": "Language",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "hero": {
+    "title": "Find your next chair.",
+    "subtitle": "Chair rentals, commission places and salaried positions in salons, barbershops and clinics.",
+    "countLoading": "Loading listings…",
+    "count": "{count} open listing",
+    "count_plural": "{count} open listings",
+    "acrossAreas": "in {areas} place",
+    "acrossAreas_plural": "in {areas} places",
+    "popular": "Popular",
+    "statListings": "listing",
+    "statListings_plural": "listings",
+    "statPlaces": "place",
+    "statPlaces_plural": "places",
+    "statSalons": "salon",
+    "statSalons_plural": "salons",
+    "placesTitle": "Where the work is"
+  },
+  "search": {
+    "placeholder": "Role, salon or place…",
+    "placeholderShort": "Search listings…",
+    "clear": "Clear search",
+    "suggestions": {
+      "areas": "Places",
+      "specialties": "Roles",
+      "salons": "Salons",
+      "freeText": "Search for “{q}”"
+    },
+    "noSuggestions": "Nothing matches that"
+  },
+  "filters": {
+    "title": "Filters",
+    "open": "Filters",
+    "openWithCount": "Filters · {count}",
+    "apply": "Show {count} listing",
+    "apply_plural": "Show {count} listings",
+    "applyNone": "No matches",
+    "clearAll": "Clear all",
+    "clearOne": "Remove filter",
+    "activeTitle": "Active filters",
+    "searchIn": "Search in filters",
+    "showMore": "Show {count} more",
+    "showLess": "Show less",
+    "nothingHere": "Nothing here yet",
+    "sections": {
+      "location": "Location",
+      "specialty": "Role",
+      "pay": "Payment",
+      "schedule": "Schedule",
+      "experience": "Experience",
+      "perks": "Conditions",
+      "salons": "Salons"
+    },
+    "location": {
+      "search": "City, district or nickname…",
+      "anywhereIn": "Anywhere in {city}",
+      "noMatch": "No place matches. Try a nickname like “Masiv”."
+    },
+    "specialty": {
+      "search": "Colourist, barber, nail tech…",
+      "noMatch": "No role matches that"
+    },
+    "salons": {
+      "search": "Salon name…",
+      "noMatch": "No salon matches that",
+      "hint": "Follow a salon you already know"
+    },
+    "pay": {
+      "typeLabel": "How it pays",
+      "salaryRange": "Monthly salary",
+      "rentRange": "Chair rent",
+      "percentRange": "Your share",
+      "percentHint": "Share of takings you keep",
+      "noneAvailable": "No listings advertise a figure right now",
+      "impliedNote": "Setting a range selects that payment type"
+    }
+  },
+  "sort": {
+    "label": "Sort",
+    "newest": "Newest first",
+    "pay_high": "Pay: high to low",
+    "pay_low": "Pay: low to high",
+    "note": "Sorted by the advertised figure; listings without one come last."
+  },
+  "results": {
+    "count": "{count} listing",
+    "count_plural": "{count} listings",
+    "loading": "Searching…",
+    "loadMore": "Load more",
+    "loadingMore": "Loading…",
+    "allShown": "No more listings",
+    "emptyTitle": "No listings match",
+    "emptyBody": "Try widening the place or the pay range — most listings are in Yerevan.",
+    "emptyAction": "Clear all filters",
+    "emptyBoardTitle": "No open listings yet",
+    "emptyBoardBody": "New positions are posted by salons every week. Check back soon.",
+    "errorTitle": "Could not load listings",
+    "errorBody": "Something went wrong on our side. Please try again.",
+    "retry": "Try again"
+  },
+  "card": {
+    "seats": "{count} place",
+    "seats_plural": "{count} places",
+    "posted": "{when}",
+    "morePerks": "+{count} more",
+    "requires": "Requires",
+    "view": "View listing",
+    "apply": "Apply"
+  },
+  "pay": {
+    "type": {
+      "percentage": "Commission",
+      "rent": "Chair rent",
+      "salary": "Salary",
+      "negotiable": "Negotiable"
+    },
+    "period": {
+      "day": "per day",
+      "week": "per week",
+      "month": "per month"
+    },
+    "rentCaption": "rent per month",
+    "shareCaption": "your share",
+    "salonKeeps": "Salon keeps {percent}",
+    "negotiableNote": "The salon discusses terms directly"
+  },
+  "schedule": {
+    "full_time": "Full-time",
+    "part_time": "Part-time",
+    "shift": "Shifts",
+    "flexible": "Flexible"
+  },
+  "experience": {
+    "label": "Experience",
+    "any": "Any experience",
+    "junior": "Beginner welcome",
+    "experienced": "Experienced"
+  },
+  "perks": {
+    "materials-included": "Materials included",
+    "tools-provided": "Tools provided",
+    "client-base-provided": "Clients provided",
+    "online-booking": "Online booking",
+    "training-provided": "Training provided",
+    "official-contract": "Official contract",
+    "flexible-schedule": "Flexible hours",
+    "uniform-provided": "Uniform provided",
+    "parking": "Parking",
+    "meals": "Meals",
+    "transport": "Transport",
+    "own-client-base": "Own client base",
+    "own-tools": "Own tools",
+    "offeredTitle": "What the salon offers",
+    "expectedTitle": "What you bring"
+  },
+  "detail": {
+    "back": "All listings",
+    "about": "About this place",
+    "noDescription": "The salon has not added a description. Call to ask about the details.",
+    "terms": "Terms",
+    "termsPay": "Payment",
+    "termsSchedule": "Schedule",
+    "termsExperience": "Experience",
+    "termsSeats": "Openings",
+    "where": "Where",
+    "directions": "Open in maps",
+    "salon": "The salon",
+    "salonPage": "Visit salon page",
+    "moreFromSalon": "More from this salon",
+    "expiresSoon": "Closes in {count} day",
+    "expiresSoon_plural": "Closes in {count} days",
+    "applyTitle": "Interested?",
+    "applyBody": "Send your details and the salon will call you back.",
+    "callInstead": "Call the salon",
+    "whatsapp": "WhatsApp",
+    "phoneOnlyNote": "This salon prefers a phone call.",
+    "notFoundTitle": "This listing is gone",
+    "notFoundBody": "It was filled or withdrawn. There are plenty of others.",
+    "notFoundAction": "Browse all listings",
+    "seoDescription": "{role} at {salon}, {place}. {pay}"
+  },
+  "apply": {
+    "title": "Apply",
+    "subtitle": "{role} · {salon}",
+    "name": "Your name",
+    "namePlaceholder": "Anna Petrosyan",
+    "phone": "Phone",
+    "phoneHelp": "The salon will call you on this number",
+    "email": "Email",
+    "emailOptional": "Optional",
+    "note": "Message",
+    "notePlaceholder": "A few words about your experience — years, where you have worked, whether you have your own clients.",
+    "noteOptional": "Optional, but it helps",
+    "submit": "Send application",
+    "sending": "Sending…",
+    "cancel": "Cancel",
+    "successTitle": "Sent",
+    "successBody": "{salon} has your details and will be in touch.",
+    "updatedTitle": "Application updated",
+    "updatedBody": "You had already applied to this listing, so we updated your details instead of sending a second one.",
+    "done": "Close",
+    "privacy": "Your name and number are shared only with this salon.",
+    "errors": {
+      "name": "Please enter your name",
+      "phoneRequired": "Please enter a phone number",
+      "phoneInvalid": "Enter a number like +374 XX XXX XXX",
+      "email": "That email does not look right"
+    }
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "No connection. Check your internet and try again.",
+    "rate": "Too many attempts. Please wait a minute and try again.",
+    "gone": "This listing is no longer available.",
+    "phoneOnly": "This salon asks candidates to call instead of applying online."
+  },
+  "footer": {
+    "forSalonsTitle": "Hiring?",
+    "forSalonsBody": "Post your chair or position on Reserva and reach professionals across Armenia.",
+    "forSalonsCta": "Post a listing",
+    "platform": "A Reserva product",
+    "rights": "All rights reserved."
+  },
+  "a11y": {
+    "skipToResults": "Skip to results",
+    "filterPanel": "Filter listings",
+    "results": "Search results"
+  }
+}

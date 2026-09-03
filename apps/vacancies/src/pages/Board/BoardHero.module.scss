@@ -1,0 +1,299 @@
+@use '../../styles/vars' as *;
+@use '../../styles/app' as a;
+
+/*
+  The heading band.
+
+  Built from four CSS layers, no image file — so it is weightless, scales to any
+  width, and re-themes with the tokens instead of needing a second asset:
+
+    1. `::before` — two soft blooms, violet from the left and a cool green from
+       the right. Large and low-contrast; they give the band a light source.
+    2. `::after`  — concentric hairline arcs radiating from beyond the top-right
+       corner, masked so they fade out towards the bottom-left. This is the
+       layer that makes the band read as DESIGNED rather than as a gradient:
+       arcs are structure, a blob is just colour.
+    3. a bottom fade, so the band melts into the results instead of ending on a
+       hard line.
+    4. the page grain underneath, from global.scss.
+
+  Everything is `pointer-events: none` and behind the content.
+*/
+.hero {
+  position: relative;
+  isolation: isolate;
+  /*
+    A DEFINITE edge, made of three things rather than one hairline:
+
+      · its own SURFACE — a step deeper than the page in light, a step lighter
+        in dark, so the boundary is a change of ground and not a line drawn
+        across a continuous wash
+      · a rule in $line-2
+      · a one-pixel highlight just below the rule, themed — at light-mode
+        strength on a dark ground it was a white line across the page
+
+    The earlier version faded the band's colour into the page just above the
+    border, which is the opposite of what was needed: it removed the very
+    contrast the edge depends on.
+  */
+  background: $hero-bg;
+  border-bottom: 1px solid $line-2;
+  box-shadow: 0 1px 0 $hero-edge;
+  overflow: hidden;
+}
+
+.hero::before,
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/*
+  Colour. A four-stop mesh rather than one wash.
+
+  Overlapping soft radials in related hues — violet twice from the left, a cool
+  blue at the top right and a warm rose at the bottom right — read as light
+  falling across a surface. A single gradient reads as a gradient. Values are
+  tuned for the BAND (see theme.css); the page ground behind the results uses a
+  much weaker set, because there almost-nothing is the correct amount.
+*/
+.hero::before {
+  background-image:
+    radial-gradient(620px 380px at -2% -22%, $hero-violet, transparent 66%),
+    radial-gradient(520px 340px at 34% 116%, $hero-violet-soft, transparent 62%),
+    radial-gradient(560px 360px at 84% -18%, $hero-blue, transparent 64%),
+    radial-gradient(460px 300px at 104% 96%, $hero-rose, transparent 62%);
+}
+
+/*
+  Contour arcs — one set, from beyond the top-right.
+
+  There were two, from opposite corners, and together with the motif that was
+  three competing structures in a 300px band. One is the minimal version: it
+  gives the band direction without becoming a diagram. Masked away from the
+  headline so nothing crosses the words.
+*/
+.hero::after {
+  background-image: repeating-radial-gradient(
+    circle at 94% -14%,
+    transparent 0 57px,
+    $hero-arc 57px 58px
+  );
+  mask-image: linear-gradient(214deg, rgba(0, 0, 0, 0.95) 0%, transparent 62%);
+  -webkit-mask-image: linear-gradient(214deg, rgba(0, 0, 0, 0.95) 0%, transparent 62%);
+}
+
+/* No fade to the page colour any more: the band has its own surface, so fading
+   into the page just above the border would erase the contrast the edge is
+   made of. */
+
+/* Dark: the warm rose turns to mud over charcoal, so the mesh drops to violet
+   and blue. Strength is carried by the tokens, not by an opacity override. */
+[data-theme='dark'] .hero::before {
+  background-image:
+    radial-gradient(620px 380px at -2% -22%, $hero-violet, transparent 66%),
+    radial-gradient(560px 360px at 84% -18%, $hero-blue, transparent 64%);
+}
+
+.inner {
+  @include a.page-x;
+  position: relative;
+  padding-block: 34px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  animation: rise 0.4s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+}
+
+/*
+  Two columns: the editorial line on the left, the distribution panel on the
+  right. The panel is what turned a half-empty band into a composed one, and it
+  earns the space by being useful rather than by filling it.
+*/
+.top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 268px;
+  gap: 40px;
+  /*
+    START, not end. Aligning to the bottom made the taller right-hand panel
+    push the headline down the band, opening a large void above it — the exact
+    emptiness this column was added to remove.
+  */
+  align-items: start;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.title {
+  @include a.display(40px);
+  max-width: 18ch;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 15px;
+  color: $fg-2;
+  line-height: 1.6;
+  max-width: 52ch;
+}
+
+/*
+  The three figures, divided by hairlines rather than by bullets or gaps.
+
+  A ruled row is what makes a set of numbers read as a considered summary
+  instead of as a caption — and it holds up in three languages, where a comma
+  or a bulleted list would need per-language punctuation.
+*/
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0;
+  margin: 6px 0 0;
+}
+
+.stat {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  padding-right: 20px;
+  border-right: 1px solid $line-1;
+
+  & + .stat { padding-left: 20px; }
+  &:last-child { padding-right: 0; border-right: 0; }
+}
+
+/* Digits only — the mono face has no Armenian or Cyrillic to fall back on. */
+.statValue {
+  @include a.numeric;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: $accent-contrast;
+  line-height: 1;
+}
+
+.statLabel {
+  margin: 0;
+  font-size: 13px;
+  color: $fg-2;
+  line-height: 1;
+}
+
+.statsLoading {
+  font-size: 13px;
+  color: $fg-3;
+}
+
+.quick {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.quickLabel { @include a.eyebrow; }
+
+.quickChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+@media (max-width: 1040px) {
+  /* The panel drops below the text before the rail collapses, so the hero
+     never squeezes both into a column too narrow for either. */
+  .top {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+    align-items: stretch;
+  }
+}
+
+/*
+  ── Phones: the list is the product ──
+
+  On a 390px screen the full band — headline, subtitle, distribution panel,
+  figures and a chip list wrapping to three rows — filled the entire first
+  screen and then some, so a visitor who came to look at listings had to scroll
+  past an advertisement for listings.
+
+  What survives is what cannot be got anywhere else on the page: the headline
+  (one line of identity), the three figures (is this board worth my time), and
+  the shortcuts — as a single scrolling row rather than a wrapping block.
+
+  The subtitle goes, because the headline already says it. The distribution
+  panel goes, because it is a right-hand column device: stacked, it is a
+  150px block between the reader and the first card, and the location filter
+  covers the same ground one tap away.
+*/
+@media (max-width: 860px) {
+  .inner {
+    padding-block: 22px 18px;
+    gap: 14px;
+  }
+
+  .title {
+    font-size: 26px;
+    max-width: none;
+  }
+
+  .subtitle { display: none; }
+
+  .statValue { font-size: 18px; }
+  .statLabel { font-size: 12.5px; }
+
+  .quick {
+    gap: 8px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  /*
+    One scrolling row, not a wrapping block.
+
+    Kept INSIDE the page gutter rather than bled to the screen edges: bleeding
+    it made the strip genuinely wider than its container, which is a horizontal
+    overflow waiting to escape the moment an ancestor stops clipping. The
+    partially-visible last chip is affordance enough that there is more to
+    swipe.
+  */
+  .quickChips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    width: 100%;
+
+    &::-webkit-scrollbar { display: none; }
+
+    > * { flex-shrink: 0; }
+  }
+}
+
+@media (max-width: 560px) {
+  .title { font-size: 24px; }
+
+  /* Hairlines between three items do not survive wrapping — a divider left at
+     the end of a line reads as a stray mark. Below this width the figures sit
+     in a plain row with gaps instead. */
+  .stats { gap: 6px 16px; }
+
+  .stat {
+    padding: 0;
+    border-right: 0;
+
+    & + .stat { padding-left: 0; }
+  }
+
+}

@@ -1,0 +1,127 @@
+@use '../../../styles/vars' as *;
+@use '../../../styles/app' as a;
+
+.tag {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* Default for a list: figures form a column the eye can compare down the page
+   without reading any of them. */
+.align-end {
+  align-items: flex-end;
+  text-align: right;
+}
+
+/* For a standalone panel, where the reading eye starts at the left and a
+   right-aligned figure leaves the corner conspicuously empty. */
+.align-start {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.figure {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+/*
+  The figure.
+
+  Set in the SANS face, not mono. Geist Mono at 600 renders a price as a slab
+  of even-width glyphs — heavy, wide, and closer to a terminal readout than to
+  a number anyone wants to read. Geist sans with tabular figures keeps the
+  column alignment mono was there for while looking like typography.
+
+  Slight negative tracking, because large tabular digits carry more built-in
+  side-bearing than they need at this size.
+*/
+.digits {
+  @include a.tabular;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--tone);
+}
+
+/*
+  The dram sign, deliberately quieter than the number — but not invisible.
+
+  Sized per size-class rather than in `em`. `.unit` is a SIBLING of `.digits`,
+  not a child, so `0.66em` resolved against the inherited 14px body size and
+  rendered the sign at 9.2px: small enough to disappear, which is not "quieter",
+  it is missing.
+*/
+.unit {
+  font-weight: 500;
+  color: var(--tone);
+  opacity: 0.7;
+}
+
+/*
+  A percent sign sits tight against its figure; a currency sign trails it with
+  a space. "65 %" reads as two things, "65%" as one number — while "180000֏"
+  would read as a part number.
+*/
+.unitTight { margin-left: -2px; }
+
+.caption {
+  font-size: 11.5px;
+  color: $fg-2;
+  white-space: nowrap;
+}
+
+.sub {
+  font-size: 11px;
+  color: $fg-3;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+/* A negotiable listing states the fact rather than leaving a gap where every
+   other card carries a number. Named distinctly from the `.open` TONE class so
+   the two can never land on one element. */
+.negotiablePill {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--tone);
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--tone-soft);
+  white-space: nowrap;
+}
+
+/* A secondary listing in a strip — smaller, because it is not the subject of
+   the page it appears on. */
+.sm .digits { font-size: 16px; }
+.sm .unit   { font-size: 11px; }
+.sm .caption { font-size: 11px; }
+
+.md .digits { font-size: 20px; }
+.md .unit   { font-size: 13px; }
+
+.lg .digits { font-size: 29px; }
+.lg .unit   { font-size: 18px; }
+.lg .caption { font-size: 12.5px; }
+
+/* Tone per pay type, set as local custom properties so the figure, the sign,
+   the pill and anything added later stay in one family without repeating the
+   mapping. */
+.salary  { --tone: #{$pay-salary};  --tone-soft: #{$pay-salary-soft}; }
+.rent    { --tone: #{$pay-rent};    --tone-soft: #{$pay-rent-soft}; }
+.percent { --tone: #{$pay-percent}; --tone-soft: #{$pay-percent-soft}; }
+.open    { --tone: #{$pay-open};    --tone-soft: #{$pay-open-soft}; }
+
+@media (max-width: 620px) {
+  /* A stacked full card has no money column, so its figure starts at the left
+     with everything else. A dense card keeps its column (and its alignment),
+     which is why this targets the size rather than every `.align-end`. */
+  .md.align-end { align-items: flex-start; text-align: left; }
+  .md .digits { font-size: 19px; }
+  .md .unit   { font-size: 12.5px; }
+  .lg .digits { font-size: 25px; }
+  .lg .unit   { font-size: 16px; }
+}

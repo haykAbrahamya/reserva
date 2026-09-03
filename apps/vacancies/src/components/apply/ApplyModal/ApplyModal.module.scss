@@ -1,0 +1,62 @@
+@use '../../../styles/vars' as *;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.failure {
+  margin: 0;
+  padding: 10px 13px;
+  border-radius: $r-1;
+  background: $danger-soft;
+  color: $danger;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.privacy {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: $fg-2;
+  line-height: 1.5;
+
+  svg {
+    color: $pay-salary;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0 4px;
+  text-align: center;
+}
+
+.successIcon { color: $pay-salary; }
+
+.successBody {
+  margin: 0;
+  font-size: 13.5px;
+  color: $fg-1;
+  line-height: 1.6;
+  max-width: 42ch;
+}
+
+@media (max-width: 560px) {
+  .footer > button { flex: 1; justify-content: center; }
+}

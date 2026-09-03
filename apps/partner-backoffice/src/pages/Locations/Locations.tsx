@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { MapPin, Plus, Pencil, Trash2, Phone, Clock } from 'lucide-react'
+import { useMemo } from 'react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
-import { Button, Modal, Input, Empty, TimePicker, Toggle, useToast } from '@/components/ui'
+import { Button, Modal, Input, Select, Empty, TimePicker, Toggle, useToast } from '@/components/ui'
 import { partnersService } from '@/services/partners.service'
+import { areasService } from '@/services/areas.service'
 import { errorMessage } from '@/utils/errors'
 import {
   DAY_KEYS, DEFAULT_LOCATION_HOURS, everyDaySchedule, exceptSundaySchedule,
@@ -13,6 +15,7 @@ import { MapPicker } from '@/components/maps/MapPicker/MapPicker'
 import { mapsEnabled } from '@/lib/googleMaps'
 import { I18nField } from '@/components/i18n/I18nField/I18nField'
 import { useI18n } from '@/i18n'
+import { useLocalized } from '@/i18n/useLocalized'
 import { useSpotlight } from '@/components/onboarding/useSpotlight'
 import { notifyProfileUpdated } from '@/components/onboarding/useProfileCompletion'
 import type { Location, LocalizedText, WeekSchedule, WorkingDay } from '@/types'
@@ -27,15 +30,21 @@ interface LocationForm {
   hours: WeekSchedule
   lat: number | null
   lng: number | null
+  /** Structured place from the platform catalog; '' = not set yet. */
+  areaKey: string
 }
 const EMPTY_FORM: LocationForm = {
-  name: '', nameI18n: null, address: '', phone: '', hours: DEFAULT_LOCATION_HOURS as WeekSchedule, lat: null, lng: null,
+  name: '', nameI18n: null, address: '', phone: '', hours: DEFAULT_LOCATION_HOURS as WeekSchedule,
+  lat: null, lng: null, areaKey: '',
 }
 
 export function Locations() {
   const partner     = usePartner()
   const toast       = useToast()
   const { t, tp }   = useI18n()
+  // Resolves a catalog name for the current UI language (shared helper, also
+  // used by the vacancies pages).
+  const loc = useLocalized()
   useSpotlight()
 
   // Branches are few per partner — load them all as cards, no pagination.
@@ -44,6 +53,9 @@ export function Locations() {
     [],
     [],
   )
+
+  // The area catalog: small, changes rarely, and needed only by this modal.
+  const { data: areaTree } = useResource(() => areasService.catalog(), [], [])
 
   const [modalOpen,   setModalOpen]   = useState(false)
   const [editing,     setEditing]     = useState<Location | null>(null)
@@ -60,6 +72,34 @@ export function Locations() {
   // address" rather than a branch list.
   const isSingle = partner.kind === 'single'
 
+  /**
+   * Selectable places, flattened from the tree.
+   *
+   * A region is a grouping, not an address — you cannot put a chair in
+   * "Shirak" — so only cities and districts are offered, each labelled with its
+   * parent so "Arabkir" is unambiguous (there is an "Arabkir Branch" in
+   * Vanadzor). Aliases ride along as hidden `keywords`, so typing «Դավթաշեն»,
+   * «Давташен» or even "leninakan" finds the right row.
+   */
+  const areaOptions = useMemo(
+    () =>
+      areaTree.flatMap((top) => {
+        const rows = top.children.length > 0 ? top.children : [top]
+        return rows.map((a) => ({
+          value: a.key,
+          label: loc(a.name, a.nameI18n),
+          sub: a.key === top.key ? undefined : loc(top.name, top.nameI18n),
+          keywords: [
+            a.key, a.name, top.name,
+            a.nameI18n?.hy, a.nameI18n?.ru, a.nameI18n?.en,
+            top.nameI18n?.hy, top.nameI18n?.ru, top.nameI18n?.en,
+            ...a.aliases,
+          ].filter((v): v is string => !!v),
+        }))
+      }),
+    [areaTree, loc],
+  )
+
   const openNew = () => { setEditing(null); setForm(EMPTY_FORM); setErrs({}); setModalOpen(true) }
   const openEdit = (loc: Location) => {
     setEditing(loc)
@@ -68,6 +108,7 @@ export function Locations() {
       name: loc.name, nameI18n: loc.nameI18n ?? null, address: loc.address, phone: loc.phone,
       hours: loc.hours ?? DEFAULT_LOCATION_HOURS,
       lat: loc.lat ?? null, lng: loc.lng ?? null,
+      areaKey: loc.areaKey ?? '',
     })
     setModalOpen(true)
   }
@@ -80,12 +121,14 @@ export function Locations() {
     const e: Record<string, string> = {}
     if (!form.name.trim()) e.name = t('errors.required')
     if (!form.address.trim()) e.address = t('errors.required')
+    if (!editing && !form.areaKey) e.areaKey = t('errors.required')
     setErrs(e)
     if (Object.keys(e).length) { toast(t('errors.fixFields')); return }
     setSaving(true)
     try {
-      if (editing) await partnersService.updateLocation(editing.id, form)
-      else await partnersService.createLocation(form)
+      const payload = { ...form, areaKey: form.areaKey || null }
+      if (editing) await partnersService.updateLocation(editing.id, payload)
+      else await partnersService.createLocation(payload)
       await reload()
       notifyProfileUpdated()
       toast(editing ? t('locations.toast.updated') : t('locations.toast.added'))
@@ -240,6 +283,21 @@ export function Locations() {
               error={errs.address || undefined}
             />
           )}
+
+          <div className={s.areaField}>
+            <label className={s.areaLabel}>{t('locations.modal.areaLabel')}</label>
+            <Select
+              value={form.areaKey}
+              onChange={(v) => { setForm(f => ({ ...f, areaKey: v })); setErrs(x => ({ ...x, areaKey: '' })) }}
+              options={areaOptions}
+              placeholder={t('locations.modal.areaPlaceholder')}
+              searchable
+              searchPlaceholder={t('locations.modal.areaSearch')}
+            />
+            {errs.areaKey
+              ? <span className={s.areaError}>{errs.areaKey}</span>
+              : <span className={s.areaHint}>{t('locations.modal.areaHint')}</span>}
+          </div>
 
           <Input
             label={t('locations.modal.phoneLabel')}

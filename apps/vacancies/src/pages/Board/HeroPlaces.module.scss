@@ -1,0 +1,101 @@
+@use '../../styles/vars' as *;
+@use '../../styles/app' as a;
+
+.panel {
+  @include a.surface;
+  padding: 14px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  /* Slightly translucent over the hero bloom, so the band reads as one surface
+     rather than a card dropped onto it. */
+  background: color-mix(in srgb, var(--bg-1) 82%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+@supports not (background: color-mix(in srgb, red 50%, blue)) {
+  .panel { background: $bg-1; }
+}
+
+.title {
+  @include a.eyebrow;
+  margin: 0;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/*
+  Three columns and a bar that spans the full width underneath, so the name and
+  the figure stay aligned down the column while the bar still reads as
+  proportional.
+*/
+.row {
+  @include a.reset-button;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 3px 10px;
+  padding: 5px 6px;
+  border-radius: $r-1;
+  transition: background 0.14s ease;
+
+  &:hover { background: $bg-2; }
+}
+
+.name {
+  font-size: 13px;
+  font-weight: 500;
+  color: $fg-1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.count {
+  @include a.numeric;
+  font-size: 12px;
+  color: $fg-2;
+}
+
+.bar {
+  grid-column: 1 / -1;
+  height: 3px;
+  border-radius: 999px;
+  background: $bg-3;
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: $accent;
+  opacity: 0.55;
+  transition: width 0.3s cubic-bezier(0.2, 0.7, 0.1, 1), opacity 0.14s ease;
+}
+
+.row:hover .fill { opacity: 0.8; }
+
+.on {
+  background: $accent-soft;
+
+  .name { color: $accent-contrast; font-weight: 600; }
+  .fill { opacity: 1; }
+
+  &:hover { background: $accent-soft; }
+}
+
+/* See BoardHero's phone block: the location filter covers the same ground one
+   tap away, and the list is what people came for. */
+@media (max-width: 860px) {
+  .panel { display: none; }
+}

@@ -1,0 +1,138 @@
+@use '../../../styles/vars' as *;
+
+/*
+  Groups are separated by a rule ABOVE each one rather than below.
+
+  Same lines, but the last section no longer ends on a stray divider hanging
+  over the panel's own bottom edge — which was part of why the sections read as
+  one undivided list instead of seven collapsible blocks.
+*/
+.section {
+  border-top: 1px solid $line-1;
+
+  &:first-child { border-top: 0; }
+}
+
+.heading {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+/*
+  The whole row is the target, and it behaves like one: full width, generous
+  height, and visible feedback on hover and press. A 44px-tall row is also the
+  minimum a thumb should be asked to hit, which matters because on a phone this
+  panel IS the filter UI.
+*/
+.trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 2px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  color: $fg-0;
+  transition: color 0.14s ease;
+
+  &:hover {
+    color: $accent-contrast;
+
+    .chevronBox {
+      border-color: $accent-line;
+      background: $accent-soft;
+    }
+
+    .chevron { color: $accent-contrast; }
+  }
+
+  &:active .chevronBox { transform: scale(0.92); }
+
+  &:focus-visible {
+    outline: 2px solid $accent;
+    outline-offset: 2px;
+    border-radius: $r-1;
+  }
+}
+
+/*
+  Heavier and larger than before.
+
+  At 13px/600 the header sat at the same visual weight as the option rows
+  beneath it, so nothing marked where one group ended and the next began. The
+  serif is deliberate: it matches the panel's own title and separates "group
+  heading" from "option" by typeface rather than by size alone.
+*/
+.title {
+  flex: 1;
+  min-width: 0;
+  font-family: $font-serif;
+  font-size: 15.5px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* A closed section that is filtering has to say so on its header, or the board
+   looks broken. */
+.badge {
+  font-family: $font-mono;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  min-width: 18px;
+  padding: 4px 5px;
+  border-radius: 999px;
+  background: $accent;
+  color: $fg-on-accent;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/*
+  The affordance.
+
+  A loose 15px chevron in $fg-3 at the far right of a plain label is
+  indistinguishable from an ornament — which is exactly how it was read. Inside
+  a bordered, filled chip it is unmistakably a control, and it is the same
+  gesture language as every other round control in the app.
+*/
+.chevronBox {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid $line-2;
+  border-radius: 50%;
+  background: $bg-2;
+  transition:
+    background 0.14s ease,
+    border-color 0.14s ease,
+    transform 0.14s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+
+/* Open reads as accent-tinted, so the state is carried by more than the
+   arrow's direction. */
+.chevronBoxOpen {
+  border-color: $accent-line;
+  background: $accent-soft;
+
+  .chevron { color: $accent-contrast; }
+}
+
+.chevron {
+  color: $fg-2;
+  transition: transform 0.22s cubic-bezier(0.2, 0.7, 0.1, 1), color 0.14s ease;
+}
+
+.chevronBoxOpen .chevron { transform: rotate(180deg); }
+
+.body {
+  padding: 0 2px 18px;
+
+  &[hidden] { display: none; }
+}

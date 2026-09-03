@@ -1,0 +1,48 @@
+// ─────────────────────────────────────────────────────────────
+// This app's SCSS token surface.
+//
+// Forwards the whole design-system alias set from @reserva/ui, then adds the
+// aliases for the tokens THIS app introduces in theme.css (the accent washes
+// and the pay-type hues).
+//
+// One import instead of two, for a reason that is not tidiness: with
+// `@use 'variables'` in every module, an app-level token has no SCSS alias, so
+// it gets written as a raw `var(--pay-rent)` in some files and forgotten
+// entirely in others — and a typo in a `var()` name fails silently at runtime
+// instead of loudly at build time. Here, `$pay-rent` either exists or the build
+// stops.
+//
+// Every module in this app should `@use '.../styles/vars' as *`, never
+// `@use 'variables'` directly.
+// ─────────────────────────────────────────────────────────────
+
+@forward 'variables';
+
+// Decorative accent surfaces — see styles/theme.css.
+$accent-wash: var(--accent-wash);
+$accent-line: var(--accent-line);
+
+// Heading-band surface and layers, tuned independently of the page ground.
+$hero-bg: var(--hero-bg);
+$hero-edge: var(--hero-edge);
+$hero-violet: var(--hero-violet);
+$hero-violet-soft: var(--hero-violet-soft);
+$hero-blue: var(--hero-blue);
+$hero-rose: var(--hero-rose);
+$hero-arc: var(--hero-arc);
+
+// Pay-type identity. Four muted hues that stay legible as small text and never
+// compete with the accent: the money row is information, not decoration.
+$pay-salary: var(--pay-salary);
+$pay-salary-soft: var(--pay-salary-soft);
+$pay-rent: var(--pay-rent);
+$pay-rent-soft: var(--pay-rent-soft);
+$pay-percent: var(--pay-percent);
+$pay-percent-soft: var(--pay-percent-soft);
+$pay-open: var(--pay-open);
+$pay-open-soft: var(--pay-open-soft);
+
+// Layout metrics.
+$rail-w: var(--rail-w);
+$page-max: var(--page-max);
+$header-h: var(--header-h);

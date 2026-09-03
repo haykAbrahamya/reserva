@@ -8,9 +8,11 @@
     "dev:partner": "pnpm --filter @reserva/partner-backoffice dev",
     "dev:internal": "pnpm --filter @reserva/internal-backoffice dev",
     "dev:client": "pnpm --filter @reserva/client dev",
+    "dev:vacancies": "pnpm --filter @reserva/vacancies dev",
     "build:partner": "pnpm --filter @reserva/partner-backoffice build",
     "build:internal": "pnpm --filter @reserva/internal-backoffice build",
     "build:client": "pnpm --filter @reserva/client build",
+    "build:vacancies": "pnpm --filter @reserva/vacancies build",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck"

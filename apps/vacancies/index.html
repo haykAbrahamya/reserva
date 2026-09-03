@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="hy">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- Matches --bg-0 in both themes so the browser chrome never flashes the
+         wrong colour on load. -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAFAF7" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121110" />
+
+    <title>Աշխատանք գեղեցկության ոլորտում — Reserva</title>
+    <meta
+      name="description"
+      content="Վարսավիրի աթոռ վարձով, տոկոսով աշխատանք, հաստիքներ գեղեցկության սրահներում և կլինիկաներում։ Փնտրեք ըստ վայրի, մասնագիտության և վարձատրության։"
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+    <!--
+      canonical and hreflang are set at RUNTIME by useSeo(), never here.
+      This is one HTML shell served for every route, so a static canonical would
+      make every crawled listing declare the board as its canonical — which is
+      how a job board ends up with a single indexed page.
+    -->
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Reserva" />
+    <meta property="og:locale" content="hy_AM" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale:alternate" content="ru_RU" />
+    <meta property="og:title" content="Աշխատանք գեղեցկության ոլորտում — Reserva" />
+    <meta
+      property="og:description"
+      content="Աթոռ վարձով, տոկոսով աշխատանք և հաստիքներ գեղեցկության ոլորտում ամբողջ Հայաստանում։"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

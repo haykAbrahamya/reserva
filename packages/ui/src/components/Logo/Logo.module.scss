@@ -1,0 +1,42 @@
+@use 'variables' as *;
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Wrapper is now transparent — the SVG paints its own tile (filled or outline). */
+.mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.markSvg { display: block; width: 100%; height: 100%; }
+
+/* ── Theme-aware Petal R ──
+   Light mode → filled tile (accent), white R.
+   Dark mode  → outline tile (accent stroke), accent R. */
+
+.tileFill    { fill: $accent; }
+.tileOutline { fill: none; stroke: $accent; }
+.rStroke     { stroke: #fff; }
+
+/* Light (default): show filled, hide outline */
+.tileOutline { display: none; }
+
+/* Dark: swap to outline, recolor R to accent */
+:global([data-theme='dark']) {
+  .tileFill    { display: none; }
+  .tileOutline { display: inline; }
+  .rStroke     { stroke: $accent; }
+}
+
+.name {
+  font-family: $font-serif;
+  font-size: 21px;
+  letter-spacing: -0.015em;
+  color: $fg-0;
+  line-height: 1;
+}

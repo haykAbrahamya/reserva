@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import { Modal, Button, Input, Select, Toggle } from '@/components/ui'
+import { I18nField, CATALOG_LOCALES, type CatalogLocale } from '@/components/i18n/I18nField'
 import type { Specialty, SpecialtyGroup, SpecialtyInput } from '@/services/specialties.service'
 import s from './Specialties.module.scss'
 
@@ -38,12 +39,18 @@ export function SpecialtyEditorModal({ open, editing, groups, saving, onClose, o
   const [form, setForm] = useState(() => empty(groups[0]?.key ?? ''))
   const [aliasDraft, setAliasDraft] = useState('')
   const [error, setError] = useState<string | null>(null)
+  /** Which locale is missing, per field — drives the warning dot on the pills. */
+  const [invalid, setInvalid] = useState<{
+    name: Partial<Record<CatalogLocale, boolean>>
+    roleName: Partial<Record<CatalogLocale, boolean>>
+  }>({ name: {}, roleName: {} })
 
   useEffect(() => {
     if (!open) return
     setForm(editing ? { ...editing } : empty(groups[0]?.key ?? ''))
     setAliasDraft('')
     setError(null)
+    setInvalid({ name: {}, roleName: {} })
   }, [open, editing, groups])
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
@@ -62,13 +69,23 @@ export function SpecialtyEditorModal({ open, editing, groups, saving, onClose, o
     if (!editing && !/^[a-z][a-z0-9-]*$/.test(form.key)) {
       return setError('Key must be lowercase letters, digits and hyphens')
     }
-    for (const [label, value] of [
-      ['English name', form.name], ['Armenian name', form.nameI18n.hy], ['Russian name', form.nameI18n.ru],
-      ['English role', form.roleName], ['Armenian role', form.roleNameI18n.hy], ['Russian role', form.roleNameI18n.ru],
-    ] as const) {
-      if (!value.trim()) return setError(`${label} is required`)
+    // Every locale of both names is required: this vocabulary is rendered to
+    // every partner in their own language, so a blank one reaches production UI.
+    const nameMissing: Partial<Record<CatalogLocale, boolean>> = {
+      en: !form.name.trim(), hy: !form.nameI18n.hy.trim(), ru: !form.nameI18n.ru.trim(),
+    }
+    const roleMissing: Partial<Record<CatalogLocale, boolean>> = {
+      en: !form.roleName.trim(), hy: !form.roleNameI18n.hy.trim(), ru: !form.roleNameI18n.ru.trim(),
+    }
+    const gaps = CATALOG_LOCALES.filter((l) => nameMissing[l] || roleMissing[l])
+    if (gaps.length) {
+      setInvalid({ name: nameMissing, roleName: roleMissing })
+      return setError(
+        `Both names are required in ${gaps.map((l) => l.toUpperCase()).join(', ')} — every partner reads this in their own language`,
+      )
     }
     setError(null)
+    setInvalid({ name: {}, roleName: {} })
     const { key, ...rest } = form
     onSave(rest, editing ? editing.key : key)
   }
@@ -116,19 +133,15 @@ export function SpecialtyEditorModal({ open, editing, groups, saving, onClose, o
             Field of work
             <span className={s.blockHint}>Labels the work: “Hair styling”. Used for categories and filters.</span>
           </div>
-          <div className={s.grid3}>
-            <Input label="English" value={form.name} onChange={(e) => set('name', e.target.value)} />
-            <Input
-              label="Հայերեն"
-              value={form.nameI18n.hy}
-              onChange={(e) => set('nameI18n', { ...form.nameI18n, hy: e.target.value })}
-            />
-            <Input
-              label="Русский"
-              value={form.nameI18n.ru}
-              onChange={(e) => set('nameI18n', { ...form.nameI18n, ru: e.target.value })}
-            />
-          </div>
+          <I18nField
+            label="Name"
+            en={form.name}
+            onEnChange={(v) => set('name', v)}
+            i18n={form.nameI18n}
+            onI18nChange={(next) => set('nameI18n', next)}
+            placeholder="Hair styling"
+            invalid={invalid.name}
+          />
         </div>
 
         <div className={s.block}>
@@ -136,19 +149,15 @@ export function SpecialtyEditorModal({ open, editing, groups, saving, onClose, o
             Practitioner
             <span className={s.blockHint}>Labels the person: “Hair stylist”. Used for vacancies and titles.</span>
           </div>
-          <div className={s.grid3}>
-            <Input label="English" value={form.roleName} onChange={(e) => set('roleName', e.target.value)} />
-            <Input
-              label="Հայերեն"
-              value={form.roleNameI18n.hy}
-              onChange={(e) => set('roleNameI18n', { ...form.roleNameI18n, hy: e.target.value })}
-            />
-            <Input
-              label="Русский"
-              value={form.roleNameI18n.ru}
-              onChange={(e) => set('roleNameI18n', { ...form.roleNameI18n, ru: e.target.value })}
-            />
-          </div>
+          <I18nField
+            label="Role name"
+            en={form.roleName}
+            onEnChange={(v) => set('roleName', v)}
+            i18n={form.roleNameI18n}
+            onI18nChange={(next) => set('roleNameI18n', next)}
+            placeholder="Hair stylist"
+            invalid={invalid.roleName}
+          />
         </div>
 
         <div className={s.block}>

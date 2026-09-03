@@ -1,0 +1,54 @@
+@use '../../../styles/vars' as *;
+
+.wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.icon {
+  position: absolute;
+  left: 10px;
+  color: $fg-3;
+  pointer-events: none;
+}
+
+.input {
+  width: 100%;
+  height: 34px;
+  padding: 0 30px 0 29px;
+  border: 1px solid $line-2;
+  border-radius: $r-1;
+  background: $bg-1;
+  color: $fg-0;
+  font-size: 12.5px;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease;
+
+  &::placeholder { color: $fg-3; }
+
+  &:focus {
+    border-color: $accent;
+    box-shadow: 0 0 0 3px $accent-soft;
+  }
+
+  /* Safari draws its own clear button on type=search; ours is themed. */
+  &::-webkit-search-cancel-button { display: none; }
+}
+
+.clear {
+  position: absolute;
+  right: 7px;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: $bg-3;
+  color: $fg-2;
+  cursor: pointer;
+
+  &:hover { background: $line-2; color: $fg-0; }
+}

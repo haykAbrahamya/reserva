@@ -1,0 +1,242 @@
+{
+  "app": {
+    "name": "Reserva",
+    "product": "Вакансии",
+    "tagline": "Работа в сфере красоты по всей Армении"
+  },
+  "nav": {
+    "board": "Все вакансии",
+    "forSalons": "Для салонов",
+    "theme": "Сменить тему",
+    "language": "Язык",
+    "openMenu": "Открыть меню",
+    "closeMenu": "Закрыть меню"
+  },
+  "hero": {
+    "title": "Найдите своё кресло.",
+    "subtitle": "Аренда кресла, работа за процент и вакансии с окладом в салонах, барбершопах и клиниках.",
+    "countLoading": "Загрузка…",
+    "count": "{count} открытая вакансия",
+    "count_plural": "{count} открытых вакансий",
+    "acrossAreas": "в {areas} районе",
+    "acrossAreas_plural": "в {areas} районах",
+    "popular": "Часто ищут",
+    "statListings": "вакансия",
+    "statListings_plural": "вакансий",
+    "statPlaces": "район",
+    "statPlaces_plural": "районов",
+    "statSalons": "салон",
+    "statSalons_plural": "салонов",
+    "placesTitle": "Где есть работа"
+  },
+  "search": {
+    "placeholder": "Специализация, салон или район…",
+    "placeholderShort": "Поиск…",
+    "clear": "Очистить поиск",
+    "suggestions": {
+      "areas": "Районы",
+      "specialties": "Специализации",
+      "salons": "Салоны",
+      "freeText": "Искать «{q}»"
+    },
+    "noSuggestions": "Ничего не найдено"
+  },
+  "filters": {
+    "title": "Фильтры",
+    "open": "Фильтры",
+    "openWithCount": "Фильтры · {count}",
+    "apply": "Показать {count} вакансию",
+    "apply_plural": "Показать {count} вакансий",
+    "applyNone": "Ничего не найдено",
+    "clearAll": "Сбросить всё",
+    "clearOne": "Убрать фильтр",
+    "activeTitle": "Активные фильтры",
+    "searchIn": "Поиск по фильтрам",
+    "showMore": "Ещё {count}",
+    "showLess": "Свернуть",
+    "nothingHere": "Пока ничего нет",
+    "sections": {
+      "location": "Локация",
+      "specialty": "Специализация",
+      "pay": "Оплата",
+      "schedule": "График",
+      "experience": "Опыт",
+      "perks": "Условия",
+      "salons": "Салоны"
+    },
+    "location": {
+      "search": "Город или район…",
+      "anywhereIn": "Весь {city}",
+      "noMatch": "Не найдено. Попробуйте «Масив» или «Бангладеш»."
+    },
+    "specialty": {
+      "search": "Колорист, барбер, мастер маникюра…",
+      "noMatch": "Специализация не найдена"
+    },
+    "salons": {
+      "search": "Название салона…",
+      "noMatch": "Салон не найден",
+      "hint": "Выберите салон, который вы уже знаете"
+    },
+    "pay": {
+      "typeLabel": "Как оплачивается",
+      "salaryRange": "Оклад в месяц",
+      "rentRange": "Аренда кресла",
+      "percentRange": "Ваша доля",
+      "percentHint": "Процент, который остаётся вам",
+      "noneAvailable": "Сейчас нет вакансий с указанной суммой",
+      "impliedNote": "Выбор диапазона включает и тип оплаты"
+    }
+  },
+  "sort": {
+    "label": "Сортировка",
+    "newest": "Сначала новые",
+    "pay_high": "Оплата: по убыванию",
+    "pay_low": "Оплата: по возрастанию",
+    "note": "Сортировка по указанной сумме; вакансии без суммы — в конце."
+  },
+  "results": {
+    "count": "{count} вакансия",
+    "count_plural": "{count} вакансий",
+    "loading": "Поиск…",
+    "loadMore": "Показать ещё",
+    "loadingMore": "Загрузка…",
+    "allShown": "Больше вакансий нет",
+    "emptyTitle": "Подходящих вакансий нет",
+    "emptyBody": "Попробуйте расширить район или диапазон оплаты — большинство вакансий в Ереване.",
+    "emptyAction": "Сбросить все фильтры",
+    "emptyBoardTitle": "Пока нет открытых вакансий",
+    "emptyBoardBody": "Салоны публикуют новые места каждую неделю. Заходите позже.",
+    "errorTitle": "Не удалось загрузить",
+    "errorBody": "Что-то пошло не так на нашей стороне. Попробуйте ещё раз.",
+    "retry": "Повторить"
+  },
+  "card": {
+    "seats": "{count} место",
+    "seats_plural": "{count} мест",
+    "posted": "{when}",
+    "morePerks": "+{count} ещё",
+    "requires": "Требуется",
+    "view": "Смотреть",
+    "apply": "Откликнуться"
+  },
+  "pay": {
+    "type": {
+      "percentage": "Процент",
+      "rent": "Аренда кресла",
+      "salary": "Оклад",
+      "negotiable": "По договорённости"
+    },
+    "period": {
+      "day": "в день",
+      "week": "в неделю",
+      "month": "в месяц"
+    },
+    "rentCaption": "аренда в месяц",
+    "shareCaption": "ваша доля",
+    "salonKeeps": "Салону — {percent}",
+    "negotiableNote": "Салон обсуждает условия лично"
+  },
+  "schedule": {
+    "full_time": "Полный день",
+    "part_time": "Неполный день",
+    "shift": "Смены",
+    "flexible": "Гибкий"
+  },
+  "experience": {
+    "label": "Опыт",
+    "any": "Любой опыт",
+    "junior": "Можно без опыта",
+    "experienced": "С опытом"
+  },
+  "perks": {
+    "materials-included": "Материалы салона",
+    "tools-provided": "Инструменты салона",
+    "client-base-provided": "База клиентов",
+    "online-booking": "Онлайн-запись",
+    "training-provided": "Обучение",
+    "official-contract": "Официальное оформление",
+    "flexible-schedule": "Гибкий график",
+    "uniform-provided": "Форма",
+    "parking": "Парковка",
+    "meals": "Питание",
+    "transport": "Транспорт",
+    "own-client-base": "Своя база клиентов",
+    "own-tools": "Свои инструменты",
+    "offeredTitle": "Что предлагает салон",
+    "expectedTitle": "Что нужно от вас"
+  },
+  "detail": {
+    "back": "Все вакансии",
+    "about": "Об этом месте",
+    "noDescription": "Салон не добавил описание. Позвоните, чтобы узнать детали.",
+    "terms": "Условия",
+    "termsPay": "Оплата",
+    "termsSchedule": "График",
+    "termsExperience": "Опыт",
+    "termsSeats": "Свободных мест",
+    "where": "Где",
+    "directions": "Открыть на карте",
+    "salon": "Салон",
+    "salonPage": "Перейти на страницу салона",
+    "moreFromSalon": "Другие вакансии этого салона",
+    "expiresSoon": "Закрывается через {count} день",
+    "expiresSoon_plural": "Закрывается через {count} дней",
+    "applyTitle": "Заинтересовало?",
+    "applyBody": "Оставьте свои данные, и салон перезвонит вам.",
+    "callInstead": "Позвонить в салон",
+    "whatsapp": "WhatsApp",
+    "phoneOnlyNote": "Этот салон предпочитает звонок.",
+    "notFoundTitle": "Вакансии больше нет",
+    "notFoundBody": "Место занято или объявление снято. Есть много других.",
+    "notFoundAction": "Смотреть все вакансии",
+    "seoDescription": "{role} — {salon}, {place}. {pay}"
+  },
+  "apply": {
+    "title": "Откликнуться",
+    "subtitle": "{role} · {salon}",
+    "name": "Ваше имя",
+    "namePlaceholder": "Анна Петросян",
+    "phone": "Телефон",
+    "phoneHelp": "Салон позвонит на этот номер",
+    "email": "Эл. почта",
+    "emailOptional": "Необязательно",
+    "note": "Сообщение",
+    "notePlaceholder": "Пара слов об опыте — сколько лет, где работали, есть ли своя база клиентов.",
+    "noteOptional": "Необязательно, но помогает",
+    "submit": "Отправить",
+    "sending": "Отправка…",
+    "cancel": "Отмена",
+    "successTitle": "Отправлено",
+    "successBody": "{salon} получил ваши данные и свяжется с вами.",
+    "updatedTitle": "Отклик обновлён",
+    "updatedBody": "Вы уже откликались на эту вакансию, поэтому мы обновили ваши данные, а не отправили второй отклик.",
+    "done": "Закрыть",
+    "privacy": "Ваше имя и номер передаются только этому салону.",
+    "errors": {
+      "name": "Укажите ваше имя",
+      "phoneRequired": "Укажите номер телефона",
+      "phoneInvalid": "Введите номер в формате +374 XX XXX XXX",
+      "email": "Похоже, адрес указан неверно"
+    }
+  },
+  "errors": {
+    "generic": "Что-то пошло не так. Попробуйте ещё раз.",
+    "network": "Нет соединения. Проверьте интернет и попробуйте снова.",
+    "rate": "Слишком много попыток. Подождите минуту и повторите.",
+    "gone": "Эта вакансия больше не доступна.",
+    "phoneOnly": "Этот салон просит звонить, а не откликаться онлайн."
+  },
+  "footer": {
+    "forSalonsTitle": "Ищете мастера?",
+    "forSalonsBody": "Разместите кресло или вакансию на Reserva и найдите специалистов по всей Армении.",
+    "forSalonsCta": "Разместить вакансию",
+    "platform": "Продукт Reserva",
+    "rights": "Все права защищены."
+  },
+  "a11y": {
+    "skipToResults": "Перейти к результатам",
+    "filterPanel": "Фильтр вакансий",
+    "results": "Результаты поиска"
+  }
+}

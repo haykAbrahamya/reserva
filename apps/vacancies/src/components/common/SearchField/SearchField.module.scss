@@ -1,0 +1,59 @@
+@use '../../../styles/vars' as *;
+
+.wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 380px;
+  min-width: 0;
+}
+
+.block { max-width: none; }
+
+.icon {
+  position: absolute;
+  left: 12px;
+  color: $fg-3;
+  pointer-events: none;
+}
+
+.input {
+  width: 100%;
+  height: 38px;
+  padding: 0 34px 0 34px;
+  border: 1px solid $line-2;
+  border-radius: 999px;
+  background: $bg-1;
+  color: $fg-0;
+  font-size: 13.5px;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+
+  &::placeholder { color: $fg-3; }
+
+  &:hover { border-color: $line-strong; }
+
+  &:focus {
+    border-color: $accent;
+    box-shadow: 0 0 0 3px $accent-soft;
+  }
+
+  &::-webkit-search-cancel-button { display: none; }
+}
+
+.clear {
+  position: absolute;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: $bg-3;
+  color: $fg-2;
+  cursor: pointer;
+
+  &:hover { background: $line-2; color: $fg-0; }
+}

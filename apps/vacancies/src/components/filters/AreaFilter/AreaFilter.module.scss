@@ -1,0 +1,32 @@
+@use '../../../styles/vars' as *;
+
+.tree {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  /* Tall enough to show Yerevan plus a few districts without the panel itself
+     becoming a scrolling page. */
+  /* No inner scroller. The panel around this one scrolls, and two scrollbars
+     side by side in a 278px column is the single least premium thing a filter
+     can do. Long lists make the panel longer, which is what the panel is for. */
+}
+
+.city + .city { margin-top: 4px; }
+
+.districts {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  /* A hairline rail ties districts to their city, so an indented row is
+     visibly INSIDE something rather than just further right. */
+  margin-left: 15px;
+  padding-left: 8px;
+  border-left: 1px solid $accent-line;
+}
+
+.empty {
+  margin: 0;
+  font-size: 12px;
+  color: $fg-3;
+  line-height: 1.5;
+}

@@ -1,0 +1,39 @@
+@use '../../../styles/vars' as *;
+@use '../../../styles/app' as a;
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  /* No inner scroller. The panel around this one scrolls, and two scrollbars
+     side by side in a 278px column is the single least premium thing a filter
+     can do. Long lists make the panel longer, which is what the panel is for. */
+}
+
+.group + .group { margin-top: 8px; }
+
+/* The group is a heading AND selectable — clicking "Hair" filters to the whole
+   group, which is the broad first cut most people want. */
+.groupHead { display: flex; }
+
+.groupLabel {
+  @include a.eyebrow;
+  display: block;
+  padding: 6px 8px 3px;
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-left: 15px;
+  padding-left: 8px;
+  border-left: 1px solid $accent-line;
+}
+
+.empty {
+  margin: 0;
+  font-size: 12px;
+  color: $fg-3;
+  line-height: 1.5;
+}

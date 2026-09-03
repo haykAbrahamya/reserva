@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
-  LayoutDashboard, Building2, Users, ShieldCheck, LogOut, Menu, X, KeyRound, Inbox, BarChart3, UserPlus, LifeBuoy, Tags,
+  LayoutDashboard, Building2, Users, ShieldCheck, LogOut, Menu, X, KeyRound, Inbox, BarChart3, UserPlus, LifeBuoy, Tags, MapPin,
 } from 'lucide-react'
 import { Avatar } from '@/components/ui'
 import { ReservaMark } from '@/components/ReservaMark'
@@ -30,6 +30,7 @@ const NAV: NavItem[] = [
   // Platform-owned vocabulary shared by every product, so it belongs to the
   // console rather than to any one partner.
   { to: '/specialties', label: 'Specialties', icon: Tags },
+  { to: '/areas', label: 'Areas', icon: MapPin },
   { to: '/staff', label: 'Staff', icon: Users, ownerOnly: true },
 ]
 

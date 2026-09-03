@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 48 48" fill="none">
+  <!-- The shared Petal R, in the vacancies product violet (#7c5cff). Same
+       geometry as every other Reserva favicon; only the tile colour differs,
+       so the family reads as one product with a distinct member. -->
+  <rect x="2" y="2" width="44" height="44" rx="14" fill="#7c5cff"/>
+  <path d="M17 36V12" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/>
+  <path d="M17 12c10 0 16 4 16 11s-7 8-16 8" stroke="#fff" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+  <path d="M24 31l10 5" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/>
+</svg>

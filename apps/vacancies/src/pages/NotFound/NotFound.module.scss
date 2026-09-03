@@ -1,0 +1,6 @@
+@use '../../styles/app' as a;
+
+.page {
+  @include a.page-x;
+  padding-block: 64px 48px;
+}

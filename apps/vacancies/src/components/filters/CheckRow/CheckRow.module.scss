@@ -1,0 +1,95 @@
+@use '../../../styles/vars' as *;
+
+.row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: $r-1;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  color: $fg-1;
+  transition: background 0.12s ease, color 0.12s ease;
+
+  /* Accent-tinted, not grey. A grey hover on a grey-bordered row is the
+     difference between a control that feels alive and one that feels printed. */
+  &:hover {
+    background: $accent-soft;
+    color: $accent-contrast;
+  }
+}
+
+.indented { padding-left: 26px; }
+
+.box {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* A softer, thinner box on a squarer radius. The 1.5px hard grey outline was
+     the heaviest mark in the panel, so a list of twenty read as a form to fill
+     in rather than as options to pick. */
+  border: 1.5px solid $line-2;
+  border-radius: 5px;
+  background: $bg-1;
+  color: transparent;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.row:hover .box { border-color: $accent; }
+
+.on .box {
+  background: $accent;
+  border-color: $accent;
+  color: $fg-on-accent;
+}
+
+/* A partly-chosen city: filled but marked with a dash, so "three districts of
+   Yerevan" is distinguishable from "all of Yerevan" at a glance. */
+.partial .box {
+  background: $accent-soft;
+  border-color: $accent;
+  color: $accent-contrast;
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.on .label { font-weight: 500; color: $fg-0; }
+
+/* In a pill, so a column of figures reads as data rather than as trailing
+   punctuation. */
+.count {
+  font-family: $font-mono;
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 999px;
+  background: $bg-2;
+  color: $fg-2;
+  flex-shrink: 0;
+}
+
+.on .count,
+.partial .count {
+  background: $accent-soft;
+  color: $accent-contrast;
+}
+
+.zero {
+  opacity: 0.45;
+
+  &:hover { background: none; }
+}

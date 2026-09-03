@@ -1,0 +1,82 @@
+@use '../../styles/vars' as *;
+
+/*
+  The motif field spans the whole band and sits behind everything. Shapes are
+  placed by percentage so the constellation keeps its arrangement at any width
+  rather than clustering against one edge.
+*/
+.field {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.item {
+  position: absolute;
+  color: $accent;
+  opacity: 0.13;
+}
+
+/*
+  Placements, hand-tuned around two no-go regions.
+
+  The HEADLINE occupies roughly the left half, and the DISTRIBUTION PANEL sits
+  at 74-93% horizontally over the top two thirds. Everything below lives in the
+  gap between them, in the strip under the panel, or bled past the right edge —
+  never over either. The first version put a large pair of shears beside the
+  title, which is what made it read as a mistake instead of a pattern.
+
+  Small and many: 30-58px, nine of them. Angles are all different and none is a
+  multiple of another, so the set never resolves into a rhythm.
+*/
+.n1 { top: -6%;  left: 53.5%; width: 56px; height: 56px; transform: rotate(-14deg); opacity: 0.15; }
+.n2 { top: 30%;  left: 62%;   width: 42px; height: 42px; transform: rotate(19deg); }
+.n3 { top: 62%;  left: 56%;   width: 34px; height: 34px; transform: rotate(-7deg);  opacity: 0.11; }
+.n4 { top: 7%;   left: 68.5%; width: 48px; height: 48px; transform: rotate(27deg);  opacity: 0.1; }
+.n5 { top: 74%;  left: 66%;   width: 38px; height: 38px; transform: rotate(-23deg); }
+.n6 { top: 45%;  left: 73%;   width: 30px; height: 30px; transform: rotate(11deg);  opacity: 0.1; }
+.n7 { top: 18%;  left: 95.5%; width: 44px; height: 44px; transform: rotate(-19deg); opacity: 0.12; }
+.n8 { top: 80%;  left: 84%;   width: 44px; height: 44px; transform: rotate(13deg);  opacity: 0.12; }
+.n9 { top: 88%;  left: 76%;   width: 32px; height: 32px; transform: rotate(-31deg); opacity: 0.09; }
+
+/* Dark: a brighter hue to register against charcoal, at lower opacity so the
+   lines do not glow. */
+:global([data-theme='dark']) .item {
+  color: $accent-strong;
+  opacity: 0.085;
+}
+
+:global([data-theme='dark']) {
+  .n1 { opacity: 0.1; }
+  .n3, .n6, .n9 { opacity: 0.065; }
+}
+
+/*
+  Below the rail breakpoint the panel is gone, so the whole right half opens up
+  and the set spreads into it.
+*/
+@media (max-width: 1040px) {
+  .n1 { left: 56%;   top: -8%; }
+  .n2 { left: 66%;   top: 34%; }
+  .n3 { left: 60%;   top: 70%; }
+  .n4 { left: 74%;   top: 6%; }
+  .n5 { left: 71%;   top: 76%; }
+  .n6 { left: 80%;   top: 44%; }
+  .n7 { left: 90%;   top: 14%; }
+  .n8 { left: 95%;   top: 66%; }
+  .n9 { display: none; }
+}
+
+/*
+  Phones: the band is 170px tall and every pixel belongs to the content, so the
+  set thins to the three shapes that still read at this size — clear of the
+  headline, hugging the right edge.
+*/
+@media (max-width: 700px) {
+  .n1 { left: 70%; top: -12%; width: 62px; height: 62px; opacity: 0.12; }
+  .n4 { left: 88%; top: 38%;  width: 44px; height: 44px; opacity: 0.1; }
+  .n5 { left: 74%; top: 74%;  width: 30px; height: 30px; opacity: 0.09; }
+  .n2, .n3, .n6, .n7, .n8, .n9 { display: none; }
+}

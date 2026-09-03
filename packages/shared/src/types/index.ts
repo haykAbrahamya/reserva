@@ -50,6 +50,12 @@ export interface Location {
   /** Geo coordinates from the map picker. Null/absent until an owner sets a pin. */
   lat?: number | null
   lng?: number | null
+  /**
+   * Structured place from the platform area catalog ("yerevan-arabkir"), used
+   * for filtering and facets. Null until set — the free-text `address` stays as
+   * the human-readable street line, and the two are complementary.
+   */
+  areaKey?: string | null
 }
 
 export interface Specialist {

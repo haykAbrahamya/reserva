@@ -632,7 +632,11 @@
       "phonePlaceholder": "+374 10 …",
       "hoursLabel": "Աշխատանքային ժամեր",
       "presetEveryDay": "Ամեն օր",
-      "presetExceptSun": "Երկ–Շբթ"
+      "presetExceptSun": "Երկ–Շբթ",
+      "areaLabel": "Քաղաք / վարչական շրջան",
+      "areaPlaceholder": "Ընտրեք վայրը",
+      "areaSearch": "Փնտրել քաղաքներ և շրջաններ…",
+      "areaHint": "Որտեղ է այս մասնաճյուղը։ Օգտագործվում է ըստ տարածքի ֆիլտրելու համար։"
     },
     "closed": "Փակ է",
     "delete": {

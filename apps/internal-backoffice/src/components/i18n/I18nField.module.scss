@@ -1,0 +1,79 @@
+@use 'variables' as *;
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Same 12px/500 as the shared Input's own label, so a translatable field and a
+   plain one never look like two different form systems. */
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: $fg-1;
+}
+
+.pills {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 999px;
+  background: $bg-3;
+}
+
+.pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: $fg-2;
+  font-family: $font-mono;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.13s ease, color 0.13s ease;
+
+  &:hover { color: $fg-0; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 1px; }
+}
+
+.pillActive {
+  background: $bg-1;
+  color: $fg-0;
+  box-shadow: $shadow-1;
+}
+
+/* A locale that is empty or rejected. Colour alone would be invisible to a
+   colour-blind operator, so the dot carries the signal too. */
+.pillMissing {
+  color: $warn;
+}
+
+.warn {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: $warn;
+  flex-shrink: 0;
+}
+
+.hint {
+  font-size: 12px;
+  color: $fg-2;
+  line-height: 1.45;
+}

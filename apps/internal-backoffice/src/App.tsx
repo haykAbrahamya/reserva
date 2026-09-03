@@ -16,6 +16,7 @@ import { DemoRequests } from '@/pages/DemoRequests/DemoRequests'
 import { PendingRegistrations } from '@/pages/PendingRegistrations/PendingRegistrations'
 import { Visits } from '@/pages/Visits/Visits'
 import { Specialties } from '@/pages/Specialties/Specialties'
+import { Areas } from '@/pages/Areas/Areas'
 import { Support } from '@/pages/Support/Support'
 
 /** Apply the platform theme once on mount. The accent is intentionally NOT
@@ -59,6 +60,7 @@ export default function App() {
             <Route path="pending-registrations" element={<PendingRegistrations />} />
             <Route path="visits" element={<Visits />} />
             <Route path="specialties" element={<Specialties />} />
+            <Route path="areas" element={<Areas />} />
             <Route path="staff" element={<RequireOwner><Staff /></RequireOwner>} />
           </Route>
 

@@ -1,0 +1,113 @@
+@use '../../../styles/vars' as *;
+
+.wrap {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+/*
+  An active filter, as a two-part chip.
+
+  Reworked from a flat violet wash with tracked uppercase and a 12px cross.
+  Three things were wrong with that: the wash flattened the label and the value
+  into one blur, small tracked uppercase is the least legible setting there is,
+  and the cross was too small and too pale to read as a button at all.
+
+  Now it is a card, not a stain: white surface, accent hairline, a real
+  separator between the two halves, and a dismiss target you can actually see
+  and hit.
+*/
+.chip {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0;
+  border: 1px solid $accent-line;
+  border-radius: 999px;
+  background: $bg-1;
+  box-shadow: $shadow-1;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/*
+  The filter's own name — sentence case, not tracked uppercase.
+
+  A lone chip reading "Yerevan" does not say what kind of thing it is, so the
+  name has to be here; but at this size uppercase with letter-spacing is
+  decoration that costs legibility, and 10px grey capitals were the least
+  readable text on the page.
+*/
+.kind {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 9px 6px 13px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: $fg-3;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.text {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 4px 6px 9px;
+  /* A hairline between the two halves does the work the tracking was trying
+     to: it separates the label from the value without shrinking either. */
+  border-left: 1px solid $line-1;
+  font-size: 13px;
+  font-weight: 600;
+  color: $fg-0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+  The dismiss target.
+
+  22px, full contrast, and it fills with the danger tint on hover so it is
+  obvious what the click does. The old 18px transparent version at 65% opacity
+  was invisible against the violet wash it sat on.
+*/
+.remove {
+  width: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-left: 1px solid $line-1;
+  background: transparent;
+  color: $fg-2;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.14s ease, color 0.14s ease;
+
+  &:hover {
+    background: $danger-soft;
+    color: $danger;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $accent;
+    outline-offset: -2px;
+  }
+}
+
+.clear {
+  border: 0;
+  background: none;
+  padding: 6px 4px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: $fg-2;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover { color: $fg-0; text-decoration: underline; }
+}

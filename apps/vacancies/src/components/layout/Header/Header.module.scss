@@ -1,0 +1,56 @@
+@use '../../../styles/vars' as *;
+@use '../../../styles/app' as a;
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: color-mix(in srgb, var(--bg-0) 92%, transparent);
+  backdrop-filter: blur(12px) saturate(1.4);
+  border-bottom: 1px solid $line-1;
+}
+
+/* Fallback for browsers without color-mix: an opaque bar is correct, just less
+   pretty. Without this the sticky header would be transparent and text would
+   scroll through it. */
+@supports not (background: color-mix(in srgb, red 50%, blue)) {
+  .header { background: $bg-0; }
+}
+
+.inner {
+  @include a.page-x;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+/* Desktop: search between the logo and the controls, taking the slack. */
+.searchWide {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Narrow: search drops to its own full-width row. Same React node, so the two
+   positions can never hold different values. */
+.searchNarrow {
+  display: none;
+  @include a.page-x;
+  padding-bottom: 12px;
+}
+
+@media (max-width: 860px) {
+  .searchWide { display: none; }
+  .searchNarrow { display: block; }
+  .inner { gap: 12px; }
+}

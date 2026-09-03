@@ -632,7 +632,11 @@
       "phonePlaceholder": "+374 10 …",
       "hoursLabel": "Часы работы",
       "presetEveryDay": "Каждый день",
-      "presetExceptSun": "Пн–Сб"
+      "presetExceptSun": "Пн–Сб",
+      "areaLabel": "Город / район",
+      "areaPlaceholder": "Выберите место",
+      "areaSearch": "Поиск городов и районов…",
+      "areaHint": "Где находится этот филиал. Используется для фильтрации по району."
     },
     "closed": "Закрыто",
     "delete": {

@@ -1,0 +1,290 @@
+@use 'variables' as *;
+
+// ─────────────────────────────────────────────────────────────
+// Shared look for the platform CATALOG screens (Specialties, Areas, and
+// whatever comes next).
+//
+// They are the same pattern — a searchable, grouped, translated table of
+// platform vocabulary with an editor modal — so the look lives here once as
+// mixins rather than being copy-pasted per page. Each page keeps its own
+// .module.scss for the parts that genuinely differ (an area indents its
+// children; a specialty carries a second name column).
+// ─────────────────────────────────────────────────────────────
+
+/// The console's page frame — same padding and entrance as Partners/Staff/Visits.
+@mixin page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px;
+  animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+
+  @media (max-width: 860px) { padding: 20px 16px; }
+}
+
+@mixin head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+@mixin h1 {
+  margin: 0 0 4px;
+  font-family: $font-serif;
+  font-size: 30px;
+  letter-spacing: -0.022em;
+  color: $fg-0;
+}
+
+@mixin sub {
+  margin: 0;
+  font-size: 13px;
+  color: $fg-2;
+  line-height: 1.5;
+}
+
+@mixin search-wrap {
+  position: relative;
+  max-width: 420px;
+}
+
+@mixin search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: $fg-3;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@mixin groups {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@mixin group {
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  background: $bg-2;
+  overflow: hidden;
+}
+
+@mixin group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid $line-1;
+  background: $bg-1;
+}
+
+@mixin group-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: $fg-0;
+}
+
+@mixin group-native {
+  font-size: 12px;
+  font-weight: 400;
+  color: $fg-2;
+}
+
+@mixin group-count {
+  font-family: $font-mono;
+  font-size: 11.5px;
+  color: $fg-3;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: $bg-3;
+  white-space: nowrap;
+}
+
+@mixin row-base {
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  border-top: 1px solid $line-1;
+
+  &:first-child { border-top: 0; }
+  &:hover { background: $bg-1; }
+}
+
+@mixin row-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: $fg-0;
+  overflow-wrap: anywhere;
+}
+
+/// The hy · ru line under a name. Never below 11.5px — anything smaller is
+/// unreadable, and this is the text staff scan to spot a bad translation.
+@mixin row-native {
+  font-size: 11.5px;
+  color: $fg-2;
+  margin-top: 2px;
+  overflow-wrap: anywhere;
+}
+
+@mixin key {
+  font-family: $font-mono;
+  font-size: 11.5px;
+  color: $fg-2;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: $bg-3;
+}
+
+@mixin icon-btn {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $r-1;
+  border: 0;
+  background: transparent;
+  color: $fg-2;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+
+  &:hover:not(:disabled) { background: $bg-3; color: $fg-0; }
+  &:disabled { opacity: 0.3; cursor: not-allowed; }
+}
+
+// ── Editor modal ────────────────────────────────────────────
+
+@mixin form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+@mixin form-error {
+  padding: 10px 13px;
+  border-radius: $r-1;
+  background: $danger-soft;
+  color: $danger;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+@mixin grid($cols) {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat($cols, minmax(0, 1fr));
+  }
+}
+
+@mixin field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/// Matches the shared Input's own label, so a Select and an Input never look
+/// like two different form systems sitting next to each other.
+@mixin label {
+  font-size: 12px;
+  font-weight: 500;
+  color: $fg-1;
+}
+
+@mixin field-hint {
+  font-size: 12px;
+  color: $fg-2;
+  line-height: 1.45;
+}
+
+@mixin block {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  padding: 13px;
+  border-radius: $r-2;
+  border: 1px solid $line-1;
+  background: $bg-1;
+}
+
+@mixin block-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: $fg-0;
+}
+
+@mixin block-hint {
+  font-size: 12px;
+  font-weight: 400;
+  color: $fg-2;
+  line-height: 1.45;
+}
+
+@mixin alias-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+
+  > :first-child { flex: 1; min-width: 0; }
+}
+
+@mixin alias-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+@mixin alias-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 6px 4px 9px;
+  border-radius: 999px;
+  background: $bg-3;
+  color: $fg-1;
+  font-size: 12px;
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: $fg-3;
+    cursor: pointer;
+
+    &:hover { background: $line-2; color: $fg-0; }
+  }
+}
+
+@mixin toggle-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 13px;
+  border-radius: $r-2;
+  border: 1px solid $line-1;
+  background: $bg-1;
+}
