@@ -1,0 +1,296 @@
+@use '../../styles/variables' as *;
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* The trigger and its inline clear share one anchor, so the panel lines up with
+   the pair rather than with the button alone. */
+.triggerWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.trigger {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  background: $bg-1;
+  border: 1px solid $line-2;
+  border-radius: $r-1;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  font-family: $font-sans;
+  font-size: $text-md;
+  color: $fg-3;
+  min-height: $row-h;
+  padding: 0 $pad-x;
+
+  &:hover { border-color: $line-strong; }
+
+  &.open {
+    border-color: $accent;
+    box-shadow: 0 0 0 3px $accent-soft;
+  }
+
+  /*
+    A filled state that is legible at a glance.
+
+    This control is a filter, and a filter that is ON while looking identical to
+    one that is OFF is how someone concludes the page has lost their bookings.
+    Accent text on a tinted ground says "narrowed" without shouting.
+  */
+  &.filled {
+    color: $accent-strong;
+    border-color: $accent-soft;
+    background: $accent-soft;
+    font-weight: 500;
+
+    .icon { color: $accent; }
+  }
+}
+
+.icon {
+  flex-shrink: 0;
+  color: $fg-2;
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: $fg-2;
+  transition: transform 0.18s;
+
+  &.rotated { transform: rotate(180deg); }
+}
+
+/*
+  Clear, sitting inside the trigger next to the chevron.
+
+  Three things were wrong with it at 20px. It was too small to hit reliably with
+  a thumb; it was too small to READ as a button rather than a mark; and it sat
+  close enough to the chevron that the two glyphs merged into one ambiguous
+  ornament, so it was not obvious either could be pressed separately.
+
+  So: a visible 26px disc, a hit area extended past it by a pseudo-element (no
+  layout cost, and vertically restrained so it cannot poach clicks from the
+  controls stacked above and below in the filter bar), and a hairline that
+  separates it from the chevron.
+*/
+.clearInline {
+  position: absolute;
+  right: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: $accent-strong;
+  cursor: pointer;
+  transition: background 0.14s, transform 0.14s cubic-bezier(0.2, 0.7, 0.1, 1);
+  -webkit-tap-highlight-color: transparent;
+
+  /* ~42x36 of actual target from a 26px control. */
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -5px -8px;
+  }
+
+  /* Two adjacent glyphs need a boundary to read as two controls. */
+  &::before {
+    content: '';
+    position: absolute;
+    right: -5px;
+    top: 6px;
+    bottom: 6px;
+    width: 1px;
+    background: $line-2;
+  }
+
+  &:hover { background: $bg-1; }
+  &:active { transform: scale(0.9); }
+
+  &:focus-visible {
+    outline: 2px solid $accent;
+    outline-offset: 1px;
+  }
+}
+
+/*
+  Room for it, reserved on the LABEL rather than the trigger.
+
+  Padding on the trigger would push the chevron inward too, and the chevron
+  belongs at the edge — it is the affordance for the whole control. Only the
+  text needs to stop early, and only while a clear button exists to stop for.
+*/
+.trigger.filled .text { padding-right: 30px; }
+
+/* Positioned by useAnchoredDropdown (fixed, portalled to body). */
+.dropdown {
+  background: $bg-1;
+  border: 1px solid $line-2;
+  border-radius: $r-2;
+  box-shadow: $shadow-3;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  /* The height cap itself comes from useAnchoredDropdown, which knows how
+     much room the chosen side actually has; this only has to be able to
+     scroll once that cap bites. */
+  overflow-y: auto;
+  animation: pop 0.14s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/*
+  Group headings, not separators.
+
+  Nine flat options is a wall to read. Upcoming/past is the distinction a salon
+  owner is actually navigating by — "who is coming" versus "who came" — so it
+  gets to be the structure rather than a comment.
+*/
+.groupLabel {
+  padding: 7px 10px 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $fg-3;
+}
+
+.option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 0;
+  background: none;
+  border-radius: 7px;
+  cursor: pointer;
+  text-align: left;
+  color: $fg-0;
+  transition: background 0.12s, color 0.12s;
+
+  &:hover { background: $bg-2; }
+
+  &.selected {
+    background: $accent-soft;
+
+    .optLabel { font-weight: 600; color: $accent-strong; }
+    .optIcon { color: $accent; }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $accent;
+    outline-offset: -2px;
+  }
+}
+
+.optLabel {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.optIcon {
+  flex-shrink: 0;
+  color: $fg-2;
+}
+
+.check {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: $accent;
+}
+
+.sep {
+  height: 1px;
+  margin: 5px 4px;
+  background: $line-1;
+}
+
+/* â”€â”€ Custom range fields â”€â”€ */
+.fields {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  animation: pop 0.16s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+}
+
+.field {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.fieldLabel {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: $fg-2;
+  padding-left: 2px;
+}
+
+/*
+  The dash now has labels above it, so it aligns to the FIELDS rather than to
+  the middle of the pair — centring it would float it up beside the captions.
+*/
+.dash {
+  flex-shrink: 0;
+  align-self: flex-end;
+  height: $row-h;
+  display: inline-flex;
+  align-items: center;
+  color: $fg-3;
+  font-size: 13px;
+}
+
+/*
+  Phones: stack.
+
+  Two date fields and a dash sharing a 375px row leaves each about 150px, which
+  is too narrow for "12 September 2026" and was half of why this area felt
+  broken. A range is two decisions anyway, so each gets its own full-width row
+  and the dash — pure decoration once they are stacked — goes away.
+*/
+@media (max-width: 560px) {
+  .fields {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .dash { display: none; }
+}

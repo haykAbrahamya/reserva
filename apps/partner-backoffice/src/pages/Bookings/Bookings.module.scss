@@ -82,15 +82,13 @@
 
 .spSelect { width: 190px; flex-shrink: 0; }
 
-/* Compact date range — sized to content, not stretched */
-.dateRange {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-.dateInput { width: 150px; }
-.dateDash { color: $fg-3; }
+/*
+  The date range is now ONE control (presets, with calendars on request), so it
+  needs a single width rather than a row of two. Wide enough for the longest
+  preset label in any of the three locales — "Следующие 7 дней" is the one that
+  sets it — because a truncated period is worse than no label at all.
+*/
+.dateRange { width: 224px; flex-shrink: 0; }
 
 .clearBtn {
   display: inline-flex;
@@ -112,6 +110,17 @@
 }
 
 /* Status filter chips */
+/*
+  The status chips scroll sideways, and the scrollbar is hidden — which left the
+  last chip sliced off at the edge with nothing to say more existed. A chip cut
+  cleanly by the viewport reads as a rendering fault; the same chip fading out
+  reads as "there is more this way".
+
+  Masked rather than overlaid with a gradient, so it works on any background and
+  in both themes without hard-coding a colour to fade to. Only below the
+  breakpoint where the row actually overflows: on a desktop every chip fits, and
+  fading the last one there would be a lie.
+*/
 .filters {
   display: flex;
   gap: 6px;
@@ -120,8 +129,16 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   padding-bottom: 2px;
+  scroll-snap-type: x proximity;
   &::-webkit-scrollbar { display: none; }
+
+  @media (max-width: 768px) {
+    mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 28px), transparent 100%);
+  }
 }
+
+/* Snap points, so a flick lands on a chip boundary instead of mid-label. */
+.filterChip { scroll-snap-align: start; }
 
 .filterChip {
   flex-shrink: 0;
@@ -145,8 +162,9 @@
 @media (max-width: 768px) {
   .searchWrap { flex: 1 1 100%; max-width: none; min-width: 0; order: -1; }
   .spSelect { flex: 1; width: auto; min-width: 140px; }
-  .dateRange { flex: 1 1 100%; }
-  .dateInput { flex: 1; width: auto; }
+  /* Full width: the trigger shares the row with nothing, and the custom
+     fields it reveals stack (handled inside the component). */
+  .dateRange { flex: 1 1 100%; width: auto; }
   .clearBtn { width: 100%; justify-content: center; }
 }
 

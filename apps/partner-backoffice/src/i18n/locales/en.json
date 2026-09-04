@@ -83,6 +83,23 @@
     "dash": "—",
     "more": "+{count} more",
     "search": "Search…",
+    "dateRange": {
+      "allDates": "All dates",
+      "upcoming": "Upcoming",
+      "past": "Past",
+      "custom": "Custom range",
+      "presets": {
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "next7": "Next 7 days",
+        "thisWeek": "This week",
+        "thisMonth": "This month",
+        "yesterday": "Yesterday",
+        "last7": "Last 7 days",
+        "last30": "Last 30 days",
+        "lastMonth": "Last month"
+      }
+    },
     "datePicker": {
       "today": "Today",
       "clear": "Clear",
@@ -1136,6 +1153,9 @@
     "noBranchTitle": "Add a branch first",
     "noBranchText": "Every listing is anchored to an address, so candidates know where the work is.",
     "noBranchCta": "Add a branch",
+    "noAreaTitle": "Some branches have no area set",
+    "noAreaText": "Published listings at {branches} are hidden from the public board. Candidates search by city and district, so a listing without one cannot be found. Set the area to make them visible.",
+    "noAreaCta": "Set the area",
     "seats": "{count} opening",
     "seats_plural": "{count} openings",
     "expiresIn": "{count} day left",

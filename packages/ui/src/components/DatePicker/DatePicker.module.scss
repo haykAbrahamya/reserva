@@ -73,6 +73,10 @@
   box-shadow: $shadow-3;
   padding: 12px;
   animation: datepicker-in 0.16s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+  /* The panel is height-capped to the viewport by useAnchoredDropdown, so on
+     a short screen (landscape phone) it has to scroll rather than clip the
+     last week of the month out of existence. */
+  overflow-y: auto;
   user-select: none;
 }
 

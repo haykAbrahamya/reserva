@@ -9,10 +9,13 @@
 // ─────────────────────────────────────────────────────────────
 
 /*
- * Absolute in production (baked at build time), RELATIVE in development, where
- * the vite proxy forwards /api to the backend. A relative default is also the
- * safer failure mode: a deploy that forgets VITE_API_URL hits its own origin
- * and fails visibly, rather than pointing real users at localhost.
+ * Absolute in production, baked at build time from .env.production; RELATIVE in
+ * development, where the vite proxy forwards /api to the backend.
+ *
+ * The relative fallback is for development only. A production build cannot
+ * reach it: `requireEnv` in vite.config.ts fails the build when VITE_API_URL is
+ * missing or not absolute — because this app is served from a different host
+ * than the API, and that host answers 200 for every unknown path.
  */
 export const API_URL = import.meta.env.VITE_API_URL || '/api/v1'
 
@@ -66,9 +69,11 @@ function unwrap<T>(payload: unknown): T {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const url = `${API_URL}${path}`
+
   let res: Response
   try {
-    res = await fetch(`${API_URL}${path}`, {
+    res = await fetch(url, {
       ...init,
       headers: { 'Content-Type': 'application/json', ...init?.headers },
     })
@@ -92,6 +97,31 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       // status is what matters and we already have it.
     }
     throw new ApiError(code, message, res.status)
+  }
+
+  /*
+   * A 200 is not proof that the API answered.
+   *
+   * When this app first went live it had no baked VITE_API_URL, so it asked its
+   * OWN origin for /api/v1/board/meta — and nginx's SPA fallback served
+   * index.html with HTTP 200. Devtools showed two green requests while the page
+   * reported a load failure, and the misleading part was the network panel, not
+   * the page: 200 text/html is indistinguishable from a working API until
+   * something tries to parse it.
+   *
+   * So the content type is checked, and the failure names the URL that was
+   * actually reached. Whoever sees this next gets the answer instead of a
+   * SyntaxError about an unexpected '<'.
+   */
+  const contentType = res.headers.get('content-type') ?? ''
+  if (!/\bapplication\/json\b/i.test(contentType)) {
+    throw new ApiError(
+      'NOT_JSON',
+      `Expected JSON from ${url} but the server sent "${contentType || 'no content-type'}". ` +
+        `This usually means the request never reached the API — check that ` +
+        `VITE_API_URL was baked into this build.`,
+      res.status,
+    )
   }
 
   return unwrap<T>(await res.json())

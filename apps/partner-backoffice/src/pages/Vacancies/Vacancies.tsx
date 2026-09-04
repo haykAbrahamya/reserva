@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Briefcase, Plus, MapPin } from 'lucide-react'
+import { Briefcase, Plus, MapPin, EyeOff } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button, Empty, ConfirmDialog, SegmentedFilter, Pagination, useToast } from '@/components/ui'
 import { useResource } from '@/store/useResource'
@@ -112,6 +112,19 @@ export function Vacancies() {
   const hasAny = (counts.all ?? 0) > 0
   const noBranches = locations.length === 0
 
+  /*
+   * Branches with no area — a silent failure worth shouting about.
+   *
+   * A listing is public only while its branch has a structured area: the board
+   * filters by city and district, so a listing no filter can reach can only be
+   * stumbled into. Publishing checks for one, but a listing published BEFORE
+   * areas existed never met that check, so this page could show five green
+   * "Published" badges while the public board showed nothing at all. That is
+   * exactly what happened on the day the board went live, and nothing in this
+   * UI said why.
+   */
+  const branchesWithoutArea = locations.filter((l) => !l.areaKey)
+
   return (
     <div className={s.page}>
       <div className={s.head}>
@@ -137,6 +150,24 @@ export function Vacancies() {
             <p className={s.blockerText}>{t('vacancies.noBranchText')}</p>
           </div>
           <Link to="/locations" className={s.blockerLink}>{t('vacancies.noBranchCta')}</Link>
+        </div>
+      )}
+
+      {/* "Published" in here while invisible out there is the one state a
+          partner cannot diagnose alone, so it is named, the branches are
+          listed, and the fix is one click away. */}
+      {!noBranches && branchesWithoutArea.length > 0 && (
+        <div className={s.blocker}>
+          <span className={s.blockerIcon}><EyeOff size={16} /></span>
+          <div>
+            <div className={s.blockerTitle}>{t('vacancies.noAreaTitle')}</div>
+            <p className={s.blockerText}>
+              {t('vacancies.noAreaText', {
+                branches: branchesWithoutArea.map((l) => l.name).join(', '),
+              })}
+            </p>
+          </div>
+          <Link to="/locations" className={s.blockerLink}>{t('vacancies.noAreaCta')}</Link>
         </div>
       )}
 

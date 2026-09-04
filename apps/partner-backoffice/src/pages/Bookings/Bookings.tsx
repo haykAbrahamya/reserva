@@ -3,14 +3,14 @@ import { useSearchParams } from 'react-router-dom'
 import { Plus, Calendar, X, Search } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
-import { Button, Table, Th, Td, Tr, BookingBadge, Avatar, Empty, Select, DatePicker, Pagination } from '@/components/ui'
+import { Button, Table, Th, Td, Tr, BookingBadge, Avatar, Empty, Select, DateRangePicker, Pagination } from '@/components/ui'
 import { fmtAMD, fmtServicePrice, fmtDateTime, fmtDuration, fmtTime, fmtDateInput } from '@/utils/format'
 import { bookingsService } from '@/services/bookings.service'
 import { partnersService } from '@/services/partners.service'
 import { useNewBooking } from '@/App'
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
 import { useScopedLocationId } from '@/store/auth.hooks'
-import { useI18n, useDateLocale, useDatePickerLabels } from '@/i18n'
+import { useI18n, useDateLocale, useDateRangeLabels } from '@/i18n'
 import type { Booking } from '@/types'
 import s from './Bookings.module.scss'
 
@@ -42,7 +42,7 @@ export function Bookings() {
   const scopedLocationId = useScopedLocationId()
   const { t, tp }      = useI18n()
   const dateLocale     = useDateLocale()
-  const dateLabels     = useDatePickerLabels()
+  const rangeLabels    = useDateRangeLabels()
 
   const [statusFilter, setStatusFilter] = useState('all')
   const [selectedId,   setSelectedId]   = useState<string | null>(null)
@@ -178,11 +178,17 @@ export function Bookings() {
             ]}
           />
 
-          <div className={s.dateRange}>
-            <DatePicker className={s.dateInput} value={fromFilter} onChange={v => patchParams({ from: v })} placeholder={t('bookings.dateFrom')} labels={dateLabels} />
-            <span className={s.dateDash}>–</span>
-            <DatePicker className={s.dateInput} value={toFilter} min={fromFilter || undefined} onChange={v => patchParams({ to: v })} placeholder={t('bookings.dateTo')} labels={dateLabels} />
-          </div>
+          {/* One control instead of two calendars. The named ranges cover
+              what this page is mostly asked — today, tomorrow, the week ahead —
+              and both ends still travel in the URL, so the time-off conflict
+              dialog keeps deep-linking straight into a filtered view. */}
+          <DateRangePicker
+            className={s.dateRange}
+            from={fromFilter}
+            to={toFilter}
+            onChange={({ from, to }) => patchParams({ from, to })}
+            labels={rangeLabels}
+          />
 
           {hasExtraFilters && (
             <button type="button" className={s.clearBtn} onClick={clearFilters}>
