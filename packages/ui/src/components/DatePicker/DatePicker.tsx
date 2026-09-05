@@ -36,6 +36,12 @@ interface DatePickerProps {
    * floating calendar panel.
    */
   variant?: 'field' | 'link'
+  /**
+   * Accessible name for the trigger. A filled picker shows only a date, so
+   * its own text cannot say WHICH date it is — which end of a range, for
+   * instance. Needed wherever the visible caption lives outside the button.
+   */
+  ariaLabel?: string
   /** Localized calendar strings; English fallbacks when omitted. */
   labels?: DatePickerLabels
 }
@@ -60,7 +66,7 @@ function buildCalendar(year: number, month: number): (Date | null)[] {
   return cells
 }
 
-export function DatePicker({ value, onChange, min, max, label, placeholder = 'Select date', className = '', variant = 'field', labels }: DatePickerProps) {
+export function DatePicker({ value, onChange, min, max, label, ariaLabel, placeholder = 'Select date', className = '', variant = 'field', labels }: DatePickerProps) {
   const selected = parseDate(value)
   const today    = new Date(); today.setHours(0,0,0,0)
 
@@ -116,6 +122,7 @@ export function DatePicker({ value, onChange, min, max, label, placeholder = 'Se
           type="button"
           className={[s.linkTrigger, open ? s.open : ''].filter(Boolean).join(' ')}
           onClick={() => setOpen(o => !o)}
+          aria-label={ariaLabel}
         >
           <CalendarDays size={15} className={s.linkIcon} />
           <span>{displayValue || placeholder}</span>
@@ -126,6 +133,7 @@ export function DatePicker({ value, onChange, min, max, label, placeholder = 'Se
           type="button"
           className={[s.trigger, open ? s.open : '', !displayValue ? s.placeholder : ''].filter(Boolean).join(' ')}
           onClick={() => setOpen(o => !o)}
+          aria-label={ariaLabel}
         >
           <span>{displayValue || placeholder}</span>
           <CalendarDays size={15} className={s.calIcon} />

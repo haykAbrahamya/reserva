@@ -25,9 +25,18 @@
   margin-bottom: 18px;
 }
 
+/*
+  Top-aligned, not centre-aligned.
+
+  Everything here is one $row-h tall, so this is invisible today — and that is
+  the point. Centring is what turned the date range into a broken-looking row
+  the moment it got taller than its neighbours (its trigger floated 36px above
+  the search field), and any control that ever grows will do the same again.
+  Top alignment pins them all to the same line whatever their height.
+*/
 .controls {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   flex-wrap: wrap;
 }
@@ -83,12 +92,26 @@
 .spSelect { width: 190px; flex-shrink: 0; }
 
 /*
-  The date range is now ONE control (presets, with calendars on request), so it
-  needs a single width rather than a row of two. Wide enough for the longest
-  preset label in any of the three locales — "Следующие 7 дней" is the one that
-  sets it — because a truncated period is worse than no label at all.
+  No fixed width: the control sizes itself.
+
+  It is one trigger at rest and a trigger plus two date fields while a custom
+  range is being picked, so a width pinned here would force the fields to wrap
+  underneath — which is exactly the layout this replaced. The component owns
+  its own minimums instead.
 */
-.dateRange { width: 224px; flex-shrink: 0; }
+.dateRange { flex: 0 1 auto; }
+
+/*
+  While a custom range is open, the control takes a ROW OF ITS OWN.
+
+  Squeezed in beside the search and specialist filters there is not enough width
+  left for a trigger plus two date fields, so the fields wrapped underneath and
+  sat in a pocket of empty space with the whole left half of the row blank —
+  which is what read as broken. Given the full width they line up from the left
+  edge like every other row on the page, and the toolbar simply gets one line
+  taller for as long as it is being used.
+*/
+.dateRange[data-custom] { flex: 1 1 100%; }
 
 .clearBtn {
   display: inline-flex;
@@ -162,9 +185,9 @@
 @media (max-width: 768px) {
   .searchWrap { flex: 1 1 100%; max-width: none; min-width: 0; order: -1; }
   .spSelect { flex: 1; width: auto; min-width: 140px; }
-  /* Full width: the trigger shares the row with nothing, and the custom
-     fields it reveals stack (handled inside the component). */
-  .dateRange { flex: 1 1 100%; width: auto; }
+  /* Full width: the trigger gets its own row, and the two custom fields wrap
+     onto the next one side by side (the component's own flex-wrap). */
+  .dateRange { flex: 1 1 100%; }
   .clearBtn { width: 100%; justify-content: center; }
 }
 

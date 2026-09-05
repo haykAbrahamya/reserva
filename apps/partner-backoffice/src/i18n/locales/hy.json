@@ -69,6 +69,7 @@
     "perPage": "Մեկ էջում"
   },
   "common": {
+    "now": "Հիմա",
     "cancel": "Չեղարկել",
     "save": "Պահպանել",
     "saveChanges": "Պահպանել փոփոխությունները",
@@ -689,6 +690,7 @@
     "specialistPlaceholder": "Ընտրեք մասնագետին…",
     "dateLabel": "Ամսաթիվ",
     "timeLabel": "Ժամ",
+    "pastTimes": "Օրվա անցած ժամերը",
     "slotsHint": "Ընտրեք մասնագետ և ամսաթիվ՝ հասանելի ժամերը տեսնելու համար։",
     "clientNameLabel": "Հաճախորդի անունը",
     "clientNamePlaceholder": "Աննա Կարապետյան",

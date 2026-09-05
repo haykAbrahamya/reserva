@@ -9,6 +9,7 @@ import { partnersService } from '@/services/partners.service'
 import { fmtDateInput } from '@/utils/format'
 import { errorMessage } from '@/utils/errors'
 import { useT, useDateLocale, useDatePickerLabels } from '@/i18n'
+import { SlotPicker } from '../SlotPicker/SlotPicker'
 import s from './NewBookingModal.module.scss'
 
 interface Props {
@@ -88,6 +89,10 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
             locationId,
             ...(isFacility ? {} : { specialistId }),
             date,
+            // Staff may book the past, so the picker has to be offered it.
+            // SlotPicker folds already-passed times away for today, and the
+            // public app calls a different endpoint that never returns them.
+            includePast: true,
           })
         : Promise.resolve([]),
     [open, date, locationId, serviceId, specialistId, isFacility, slotsReady],
@@ -266,7 +271,11 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
         )}
 
         <div>
-          <DatePicker label={t('newBooking.dateLabel')} value={date} min={today} onChange={handleDateSelect} labels={dateLabels} />
+          {/* No `min`: staff record visits that already happened (a walk-in
+              served this morning, a session someone forgot to enter last week).
+              The public booking flow keeps its floor — the server refuses a
+              past time for anything whose source is not the backoffice. */}
+          <DatePicker label={t('newBooking.dateLabel')} value={date} onChange={handleDateSelect} labels={dateLabels} />
         </div>
 
         <div className={s.full}>
@@ -284,18 +293,12 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
                 <span>{t('newBooking.noSlots')}</span>
               </div>
             ) : (
-              <div className={s.slotGrid}>
-                {slots.map(sl => (
-                  <button
-                    key={sl}
-                    type="button"
-                    onClick={() => { setTime(sl); clearErr('time') }}
-                    className={[s.slot, time === sl ? s.selected : ''].filter(Boolean).join(' ')}
-                  >
-                    {sl}
-                  </button>
-                ))}
-              </div>
+              <SlotPicker
+                slots={slots}
+                date={date}
+                value={time}
+                onChange={sl => { setTime(sl); clearErr('time') }}
+              />
             )
           ) : (
             <div className={s.infoBox}>

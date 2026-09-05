@@ -145,7 +145,16 @@ export function DateRangePicker({ from, to, onChange, labels, className = '' }: 
   )
 
   return (
-    <div className={[s.wrap, className].filter(Boolean).join(' ')}>
+    /*
+      `data-custom` reports the mode OUTWARD, so the page that owns the toolbar
+      can give this control its own row while the two date fields are showing.
+      The component cannot know what it sits next to; the toolbar cannot know
+      when the fields appear. This is the seam between those two facts.
+    */
+    <div
+      className={[s.wrap, className].filter(Boolean).join(' ')}
+      data-custom={custom || undefined}
+    >
       <div ref={triggerRef} className={s.triggerWrap}>
         <button
           type="button"
@@ -199,45 +208,42 @@ export function DateRangePicker({ from, to, onChange, labels, className = '' }: 
       )}
 
       {/*
-        The calendars, revealed only when they are the answer. Each takes a full
-        row on a phone: side-by-side is what made them cramped, and a range is
-        two decisions anyway, so stacking costs nothing.
+        The calendars, revealed only when they are the answer — and revealed
+        BESIDE the trigger, not beneath it.
+
+        Stacked underneath, the control grew to three rows inside a one-row
+        toolbar. Every neighbour stays 44px tall, so the tall column either
+        floated against them or left a hole beside itself, and it pushed the
+        status chips further down the page every time someone opened it.
+        Growing sideways keeps the whole toolbar on one line, and `.wrap` drops
+        the two fields onto their own line only when the width really runs out.
+
+        No captions on them: side by side with a dash between, left-is-start is
+        the universal reading, and the accessible name is carried by
+        `ariaLabel` — which costs no height.
       */}
       {custom && (
-        <div className={s.fields}>
-          {/*
-            Both ends are LABELLED, not just placeheld.
-
-            A placeholder is the one piece of guidance that disappears exactly
-            when it is needed: fill both fields and you get two identical-looking
-            boxes reading "15 Sep 2026" and "15 Sep 2026", with nothing left to
-            say which is the start. Stacked on a phone, where the dash between
-            them is gone too, there is then no cue at all.
-          */}
-          <label className={s.field}>
-            <span className={s.fieldLabel}>{labels?.from ?? 'From'}</span>
-            <DatePicker
-              value={from}
-              max={to || undefined}
-              onChange={(v) => onChange({ from: v, to })}
-              placeholder={labels?.from ?? 'From'}
-              labels={labels?.datePicker}
-            />
-          </label>
-
+        <>
+          <DatePicker
+            className={s.field}
+            value={from}
+            max={to || undefined}
+            onChange={(v) => onChange({ from: v, to })}
+            placeholder={labels?.from ?? 'From'}
+            ariaLabel={labels?.from ?? 'From'}
+            labels={labels?.datePicker}
+          />
           <span className={s.dash} aria-hidden="true">–</span>
-
-          <label className={s.field}>
-            <span className={s.fieldLabel}>{labels?.to ?? 'To'}</span>
-            <DatePicker
-              value={to}
-              min={from || undefined}
-              onChange={(v) => onChange({ from, to: v })}
-              placeholder={labels?.to ?? 'To'}
-              labels={labels?.datePicker}
-            />
-          </label>
-        </div>
+          <DatePicker
+            className={s.field}
+            value={to}
+            min={from || undefined}
+            onChange={(v) => onChange({ from, to: v })}
+            placeholder={labels?.to ?? 'To'}
+            ariaLabel={labels?.to ?? 'To'}
+            labels={labels?.datePicker}
+          />
+        </>
       )}
     </div>
   )

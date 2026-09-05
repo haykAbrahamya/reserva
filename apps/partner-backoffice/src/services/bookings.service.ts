@@ -114,6 +114,13 @@ export const bookingsService = {
     specialistId?: string
     date: string
     excludeBookingId?: string
+    /**
+     * Also return start times that have already passed, so staff can record a
+     * visit that already happened. Safe to send from here: this is the
+     * authenticated backoffice endpoint, and the public app has its own that
+     * never returns past times regardless of what it asks for.
+     */
+    includePast?: boolean
   }): Promise<string[]> {
     return apiGet<string[]>('/bookings/slots', { params })
   },

@@ -1,0 +1,174 @@
+@use 'variables' as *;
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+/* Matches the modal's original slot exactly — this is a move, not a redesign. */
+.slot {
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $r-1;
+  font-size: 12px;
+  font-family: $font-mono;
+  font-weight: 500;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-1;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+
+  &:hover:not(.selected) { background: $bg-2; border-color: $line-strong; }
+  &.selected { background: $accent; border-color: $accent; color: #fff; }
+
+  &:focus-visible {
+    outline: 2px solid $accent;
+    outline-offset: 1px;
+  }
+}
+
+/*
+  A past time is still perfectly pickable — it is the whole point — so it is
+  quieted, not disabled. Dashed, because that is the one border treatment not
+  already spoken for here (solid = bookable, strikethrough = taken), and it
+  reads as "not the normal case" without reading as "unavailable".
+*/
+.pastSlot {
+  border-style: dashed;
+  background: transparent;
+  color: $fg-2;
+
+  &.selected {
+    border-style: solid;
+    color: #fff;
+  }
+}
+
+/* â”€â”€ The collapsed-past header â”€â”€ */
+.pastToggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px dashed $line-2;
+  border-radius: $r-1;
+  background: transparent;
+  color: $fg-2;
+  cursor: pointer;
+  font-family: $font-sans;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+
+  &:hover {
+    background: $bg-2;
+    border-color: $line-strong;
+    color: $fg-1;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $accent;
+    outline-offset: 1px;
+  }
+}
+
+.pastToggleOpen {
+  border-style: solid;
+  color: $fg-1;
+
+  .pastChevron { transform: rotate(180deg); }
+}
+
+/* Same row, minus the affordance — it explains, it does not do anything. */
+.pastCaption {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 26px;
+  padding: 0 2px;
+  color: $fg-2;
+}
+
+.pastIcon { flex-shrink: 0; }
+
+.pastLabel {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The count is the reason to open it, so it is the one thing set in the
+   numeric face. */
+.pastCount {
+  flex-shrink: 0;
+  font-family: $font-mono;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: $bg-2;
+  color: $fg-2;
+}
+
+.pastChevron {
+  flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+
+/* â”€â”€ The "now" boundary â”€â”€ */
+.nowRule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* Breathing room on both sides: butted straight against the grids it would
+     read as another row rather than as the line between them. */
+  margin: 4px 0 2px;
+}
+
+.nowLine {
+  flex: 1;
+  height: 1px;
+  background: $accent;
+  /* Fades toward the edges so it reads as a marker on the list rather than a
+     hard divider cutting the panel in two. */
+  opacity: 0.45;
+}
+
+.nowPill {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid $accent-soft;
+  background: $accent-soft;
+  color: $accent-strong;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  /* Tabular so the digits do not shuffle the pill's width as the clock moves. */
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}

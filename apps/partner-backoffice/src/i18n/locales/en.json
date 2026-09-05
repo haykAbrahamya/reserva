@@ -69,6 +69,7 @@
     "perPage": "Per page"
   },
   "common": {
+    "now": "Now",
     "cancel": "Cancel",
     "save": "Save",
     "saveChanges": "Save changes",
@@ -689,6 +690,7 @@
     "specialistPlaceholder": "Select specialist…",
     "dateLabel": "Date",
     "timeLabel": "Time",
+    "pastTimes": "Earlier today",
     "slotsHint": "Select a specialist and date to see available slots.",
     "clientNameLabel": "Client name",
     "clientNamePlaceholder": "Anna Karapetyan",

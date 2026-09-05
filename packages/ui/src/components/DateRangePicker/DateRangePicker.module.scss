@@ -1,8 +1,20 @@
 @use '../../styles/variables' as *;
 
+/*
+  A ROW, not a column.
+
+  This control lives in a filter toolbar whose every other member is one
+  $row-h tall. Laid out as a column it grew downward when the custom fields
+  appeared, which left it either floating against its neighbours or sitting
+  beside a hole — and shifted everything below it down the page. As a row it
+  keeps the toolbar's height constant, and `flex-wrap` moves the two fields to
+  their own line only when the width actually runs out (which is what happens
+  on a phone, where the control already spans the row).
+*/
 .wrap {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
   min-width: 0;
 }
@@ -13,7 +25,21 @@
   position: relative;
   display: flex;
   align-items: center;
-  min-width: 0;
+  /* Fills a full-width parent (mobile), never shrinks below a readable preset
+     label. */
+  flex: 1 1 208px;
+  min-width: 170px;
+}
+
+/*
+  Capped on desktop only.
+
+  Uncapped, the trigger absorbs the whole row and elbows the two date fields
+  onto a second line — the very wrap this layout exists to avoid. On a phone
+  there is nothing beside it to make room for, so it keeps filling the row.
+*/
+@media (min-width: 769px) {
+  .triggerWrap { max-width: 240px; }
 }
 
 .trigger {
@@ -238,59 +264,29 @@
   background: $line-1;
 }
 
-/* â”€â”€ Custom range fields â”€â”€ */
-.fields {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
+/*
+  â”€â”€ Custom range fields â”€â”€
+
+  Sized for a formatted date, not for a share of the trigger.
+
+  When these were laid out inside a 224px control they got about 100px each,
+  which truncates "31 Aug 2026" into uselessness. As siblings of the trigger in
+  the toolbar row they get a basis that actually fits a date, and a max so two
+  of them plus the trigger still share one line.
+*/
+.field {
+  flex: 1 1 150px;
+  min-width: 130px;
+  max-width: 190px;
   animation: pop 0.16s cubic-bezier(0.2, 0.7, 0.1, 1) both;
 }
 
-.field {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.fieldLabel {
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  color: $fg-2;
-  padding-left: 2px;
-}
-
-/*
-  The dash now has labels above it, so it aligns to the FIELDS rather than to
-  the middle of the pair — centring it would float it up beside the captions.
-*/
+/* Carries the from/to meaning now that the fields have no captions: left is the
+   start, right is the end, which is how a range reads everywhere. */
 .dash {
   flex-shrink: 0;
-  align-self: flex-end;
-  height: $row-h;
-  display: inline-flex;
-  align-items: center;
   color: $fg-3;
   font-size: 13px;
+  line-height: 1;
 }
 
-/*
-  Phones: stack.
-
-  Two date fields and a dash sharing a 375px row leaves each about 150px, which
-  is too narrow for "12 September 2026" and was half of why this area felt
-  broken. A range is two decisions anyway, so each gets its own full-width row
-  and the dash — pure decoration once they are stacked — goes away.
-*/
-@media (max-width: 560px) {
-  .fields {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
-  }
-
-  .dash { display: none; }
-}
