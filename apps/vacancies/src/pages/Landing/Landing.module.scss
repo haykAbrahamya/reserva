@@ -1,0 +1,128 @@
+@use '../../styles/vars' as *;
+@use '../../styles/app' as a;
+
+.page {
+  @include a.page-x;
+  padding-block: 20px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: $fg-3;
+
+  a {
+    color: $fg-2;
+    text-decoration: none;
+    &:hover { color: $accent; }
+  }
+
+  span[aria-current] {
+    color: $fg-1;
+    /* The trail must never push the listings down a line on a narrow phone —
+       the current page is already the <h1> immediately below it. */
+    @include a.clamp-lines(1);
+  }
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.title {
+  @include a.display(32px);
+  max-width: 22ch;
+
+  @media (max-width: 560px) { font-size: 26px; }
+}
+
+.intro {
+  margin: 0;
+  max-width: 58ch;
+  font-size: 15px;
+  line-height: 1.55;
+  color: $fg-2;
+}
+
+.headMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 6px;
+  border-top: 1px solid $line-1;
+}
+
+.count {
+  font-size: 13px;
+  color: $fg-2;
+}
+
+.refine {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: $fg-2;
+  text-decoration: none;
+  padding: 5px 10px;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+
+  &:hover { color: $accent; border-color: $accent-line; background: $accent-soft; }
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.more {
+  display: flex;
+  justify-content: center;
+  padding-block: 6px 2px;
+}
+
+/* The page's own prose. On a surface rather than bare on the page, so it reads
+   as an aside to the listings instead of as a listing that lost its card. */
+.about {
+  @include a.surface;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.aboutTitle {
+  @include a.eyebrow;
+  margin: 0;
+}
+
+.aboutBody {
+  margin: 0;
+  max-width: 72ch;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: $fg-2;
+}
+
+.related {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 6px;
+  border-top: 1px solid $line-1;
+}
+
+.relatedTitle {
+  @include a.display(20px);
+}

@@ -1,0 +1,68 @@
+@use '../../../styles/vars' as *;
+@use '../../../styles/app' as a;
+
+.wrap {
+  @include a.page-x;
+  padding-block: 34px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Inside a landing page the block sits under the listings rather than at the
+   foot of the whole document, so it drops the page gutter (the column already
+   has one) and its own heading. */
+.compact {
+  padding-inline: 0;
+  max-width: none;
+  padding-block: 0;
+}
+
+.title {
+  @include a.display(20px);
+}
+
+.groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 20px 28px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+}
+
+.groupTitle {
+  @include a.eyebrow;
+  margin: 0;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/*
+ * Deliberately a plain text link rather than a chip.
+ *
+ * These are the page's keyword anchors, and anchor TEXT is what a crawler
+ * weighs — dressing them as pills tempts a future edit to shorten them to
+ * "Barber", which throws away the half of the phrase that names the thing
+ * ("job"). Kept as sentences, they read as a directory, which is what they are.
+ */
+.link {
+  color: $fg-1;
+  font-size: 13.5px;
+  line-height: 1.4;
+  text-decoration: none;
+
+  &:hover { color: $accent; text-decoration: underline; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; border-radius: 3px; }
+}

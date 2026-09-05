@@ -106,3 +106,149 @@ export function jobPostingJsonLd(
   // "datePosted": null is invalid markup, not a missing field.
   return Object.fromEntries(Object.entries(json).filter(([, value]) => value !== undefined))
 }
+
+// ─────────────────────────────────────────────────────────────
+// The other three shapes this site emits.
+//
+// A JobPosting describes ONE listing. A landing page is a collection, a
+// listing sits inside a hierarchy, and the site as a whole is an entity — and
+// Google reads each of those as a different type. Building them here keeps
+// every `@context` in one file, so a page can never ship half a graph.
+// ─────────────────────────────────────────────────────────────
+
+/** Absolute URL for a path on this origin. */
+const abs = (path: string): string =>
+  typeof window === 'undefined' ? path : `${window.location.origin}${path}`
+
+export interface Crumb {
+  name: string
+  path: string
+}
+
+/**
+ * BreadcrumbList.
+ *
+ * Worth the few lines because Google renders it IN the result, replacing the
+ * raw URL with "Reserva › Chair rental › …". On a job board, where a searcher
+ * is scanning a page of near-identical blue links, that trail is often the only
+ * thing distinguishing one result from the next.
+ */
+export function breadcrumbJsonLd(crumbs: Crumb[]): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: crumbs.map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: c.name,
+      item: abs(c.path),
+    })),
+  }
+}
+
+/**
+ * A landing page: CollectionPage wrapping an ItemList of the listings on it,
+ * plus its breadcrumb.
+ *
+ * The items carry a URL and a name only. A full JobPosting per card would
+ * duplicate what the listing page itself declares, and duplicated postings
+ * across two URLs is exactly what Google's job guidelines warn against.
+ */
+export function collectionJsonLd(input: {
+  name: string
+  description: string
+  path: string
+  crumbs: Crumb[]
+  items: Array<{ id: string; title: string }>
+}): Record<string, unknown> {
+  const { name, description, path, crumbs, items } = input
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name,
+    description,
+    url: abs(path),
+    breadcrumb: {
+      '@type': 'BreadcrumbList',
+      itemListElement: crumbs.map((c, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: c.name,
+        item: abs(c.path),
+      })),
+    },
+    ...(items.length
+      ? {
+          mainEntity: {
+            '@type': 'ItemList',
+            numberOfItems: items.length,
+            itemListElement: items.slice(0, 20).map((v, i) => ({
+              '@type': 'ListItem',
+              position: i + 1,
+              url: abs(`/v/${v.id}`),
+              name: v.title,
+            })),
+          },
+        }
+      : {}),
+  }
+}
+
+/**
+ * WebSite + Organization for the board itself.
+ *
+ * `potentialAction` declares the search endpoint, which is what lets Google
+ * offer a search box for the site directly in its results. It points at the
+ * board's own `?q=` — the same parameter the address bar uses — so the feature
+ * cannot drift from the app.
+ */
+export function siteJsonLd(name: string, description: string): Record<string, unknown> {
+  const site = abs('/')
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        '@id': `${site}#website`,
+        url: site,
+        name,
+        description,
+        inLanguage: ['hy', 'en', 'ru'],
+        publisher: { '@id': `${site}#organization` },
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: { '@type': 'EntryPoint', urlTemplate: `${site}?q={search_term_string}` },
+          'query-input': 'required name=search_term_string',
+        },
+      },
+      {
+        '@type': 'Organization',
+        '@id': `${site}#organization`,
+        name: 'Reserva',
+        url: 'https://reserva.am',
+        logo: 'https://reserva.am/icon-512.png',
+        areaServed: { '@type': 'Country', name: 'Armenia' },
+      },
+    ],
+  }
+}
+
+/**
+ * Combine several nodes into one @graph.
+ *
+ * Each builder above returns a standalone, valid document with its own
+ * `@context`, because most pages emit exactly one. When a page emits two — a
+ * listing declares both what it is and how you got to it — nesting those
+ * documents would repeat `@context` inside the graph. Harmless, but it makes
+ * the markup read as two pasted-together fragments rather than one statement
+ * about one page, so the key is lifted to the top and dropped from the nodes.
+ */
+export function graph(...nodes: Array<Record<string, unknown> | null>): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@graph': nodes.filter((n): n is Record<string, unknown> => n !== null).map((n) => {
+      const { '@context': _dropped, ...rest } = n
+      return rest
+    }),
+  }
+}

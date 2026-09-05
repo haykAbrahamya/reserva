@@ -12,7 +12,7 @@
     <title>Աշխատանք գեղեցկության ոլորտում — Reserva</title>
     <meta
       name="description"
-      content="Վարսավիրի աթոռ վարձով, տոկոսով աշխատանք, հաստիքներ գեղեցկության սրահներում և կլինիկաներում։ Փնտրեք ըստ վայրի, մասնագիտության և վարձատրության։"
+      content="Վարսավիրի աթոռ վարձով, տոկոսով աշխատանք, հաստիքներ գեղեցկության սրահներում և կլինիկաներում։ Փնտրեք ըստ տարածքի, մասնագիտության և վարձատրության։"
     />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
 
@@ -28,15 +28,41 @@
     <meta property="og:locale" content="hy_AM" />
     <meta property="og:locale:alternate" content="en_US" />
     <meta property="og:locale:alternate" content="ru_RU" />
+    <!-- og:url is rewritten per route by the prerender and again at runtime by
+         useSeo. It must EXIST here for either to have a tag to replace. -->
+    <meta property="og:url" content="https://vacancies.reserva.am/" />
     <meta property="og:title" content="Աշխատանք գեղեցկության ոլորտում — Reserva" />
     <meta
       property="og:description"
       content="Աթոռ վարձով, տոկոսով աշխատանք և հաստիքներ գեղեցկության ոլորտում ամբողջ Հայաստանում։"
     />
+    <!-- Present, not absent, so the build-time prerender has a tag to rewrite
+         per route. The board has no artwork of its own; it shares the
+         platform's, which is the same brand. -->
+    <meta property="og:image" content="https://reserva.am/og-image.png" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://reserva.am/og-image.png" />
   </head>
   <body>
     <div id="root"></div>
+
+    <!--
+      The one thing a visitor with no JavaScript can act on.
+
+      Not an SEO device — the crawlable text is baked into the body by
+      scripts/prerender.mjs, and duplicating it here would put the same words on
+      the page twice. This is for the person, not the robot: without it they get
+      a blank page and no way to reach anyone.
+    -->
+    <noscript>
+      <div style="padding: 24px; font-family: system-ui, sans-serif; line-height: 1.6">
+        <h1 style="font-size: 20px">Աշխատանք գեղեցկության ոլորտում</h1>
+        <p>
+          Հայտարարությունները դիտելու համար միացրեք JavaScript-ը, կամ գրեք մեզ՝
+          <a href="https://reserva.am">reserva.am</a>։
+        </p>
+      </div>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

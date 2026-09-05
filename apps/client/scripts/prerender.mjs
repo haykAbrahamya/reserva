@@ -18,9 +18,21 @@
  * untouched SPA shell, so the deployable is always produced. If the API is
  * unreachable at build time, partner prerender is skipped (statics still build).
  */
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { fileURLToPath } from 'node:url'
+// The mechanics (head rewriting, the crawlable block, writing dist/<route>) are
+// shared with the vacancies board; only the routes, copy and structured data
+// below are this app's.
+import {
+  esc,
+  injectBody,
+  injectHead as injectHeadTags,
+  loadRender,
+  sanitizeTemplate,
+  seoBlock,
+  writePage,
+} from '../../../tools/prerender/inject.mjs'
 
 // Curated SEO category landing pages — the SAME list the client route uses
 // (src/lib/categories.ts imports this JSON too). Single source of truth.
@@ -83,8 +95,6 @@ const API_BASE =
   process.env.PRERENDER_API_URL ||
   process.env.VITE_API_URL ||
   'https://api.reserva.am/api/v1'
-
-const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
 /** Armenian partner title/description, mirroring src/i18n/locales/hy.json seo.partner. */
 function partnerMeta(salon) {
@@ -171,13 +181,11 @@ function partnerSeoBody(salon) {
     .filter((l) => l.address)
     .map((l) => `<li>${esc(l.address)}</li>`)
     .join('')
-  return (
-    `<div id="seo-content" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">` +
+  return seoBlock(
     `<h1>${esc(salon.name)}</h1>` +
-    (salon.tagline ? `<p>${esc(salon.tagline)}</p>` : '') +
-    (cats ? `<h2>Ծառայություններ</h2><ul>${cats}</ul>` : '') +
-    (addrs ? `<h2>Հասցե</h2><ul>${addrs}</ul>` : '') +
-    `</div>`
+      (salon.tagline ? `<p>${esc(salon.tagline)}</p>` : '') +
+      (cats ? `<h2>Ծառայություններ</h2><ul>${cats}</ul>` : '') +
+      (addrs ? `<h2>Հասցե</h2><ul>${addrs}</ul>` : ''),
   )
 }
 
@@ -258,11 +266,8 @@ function categorySeoBody(cat, salons) {
   const items = matching
     .map((s) => `<li><a href="${SITE}/p/${encodeURIComponent(s.slug)}">${esc(s.name)}</a></li>`)
     .join('')
-  return (
-    `<div id="seo-content" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">` +
-    `<h1>${esc(cat.h1)}</h1><p>${esc(cat.intro)}</p>` +
-    (items ? `<ul>${items}</ul>` : '') +
-    `</div>`
+  return seoBlock(
+    `<h1>${esc(cat.h1)}</h1><p>${esc(cat.intro)}</p>` + (items ? `<ul>${items}</ul>` : ''),
   )
 }
 
@@ -284,58 +289,34 @@ async function fetchListedSalons() {
 }
 
 /**
- * Replace the title + key meta/canonical/OG tags in the HTML template.
- * `canonical` defaults to the trailing-slash form of `url` (matches what nginx
- * serves after the /route → /route/ redirect); pass one explicitly for partner
- * pages. Optional `jsonLd` is appended before </head>; optional `image` sets OG.
+ * Per-route <head>, with this app's canonical convention.
+ *
+ * `canonical` defaults to the TRAILING-SLASH form of `url` — that is what nginx
+ * serves after its /route -> /route/ redirect, and a sitemap or canonical that
+ * disagrees with the served URL is reported as "Alternate page with proper
+ * canonical tag". Partner and category pages pass their own.
  */
 function injectHead(html, url, meta, { canonical, jsonLd, image } = {}) {
-  const href = canonical ?? `${SITE}${url === '/' ? '/' : `${url}/`}`
-  // Tolerant of whitespace/newlines between attributes (the template formats
-  // some <meta> tags across multiple lines).
-  let out = html
-    .replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(meta.title)}</title>`)
-    .replace(/<meta\s+name="description"\s+content="[\s\S]*?"\s*\/>/, `<meta name="description" content="${esc(meta.description)}" />`)
-    .replace(/<meta\s+property="og:title"\s+content="[\s\S]*?"\s*\/>/, `<meta property="og:title" content="${esc(meta.title)}" />`)
-    .replace(/<meta\s+property="og:description"\s+content="[\s\S]*?"\s*\/>/, `<meta property="og:description" content="${esc(meta.description)}" />`)
-    .replace(/<meta\s+property="og:url"\s+content="[^"]*"\s*\/>/, `<meta property="og:url" content="${href}" />`)
-  if (image) {
-    out = out
-      .replace(/<meta\s+property="og:image"\s+content="[^"]*"\s*\/>/, `<meta property="og:image" content="${esc(image)}" />`)
-      .replace(/<meta\s+name="twitter:image"\s+content="[^"]*"\s*\/>/, `<meta name="twitter:image" content="${esc(image)}" />`)
-  }
-
-  // The template intentionally ships NO static canonical/hreflang (a single
-  // hardcoded canonical on every route caused "Alternate page" errors). But a
-  // PRERENDERED page has its own real URL, so we inject a correct SELF-referential
-  // canonical + hreflang here — each baked page points at itself, which is
-  // exactly what Google wants. Runtime useSeo() re-affirms the same values.
-  const HREFLANGS = ['hy', 'en', 'ru', 'x-default']
-  const alternates = HREFLANGS.map(
-    (l) => `    <link rel="alternate" hreflang="${l}" href="${href}" data-seo-hreflang />`,
-  ).join('\n')
-  const headTags =
-    `\n    <link rel="canonical" href="${href}" />\n${alternates}\n` +
-    (jsonLd ? `    <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>\n` : '') +
-    `  `
-  out = out.replace('</head>', `${headTags}</head>`)
-  return out
+  return injectHeadTags(html, {
+    canonical: canonical ?? `${SITE}${url === '/' ? '/' : `${url}/`}`,
+    title: meta.title,
+    description: meta.description,
+    image,
+    jsonLd,
+  })
 }
 
 async function main() {
-  if (!existsSync(ssrEntry)) {
+  const render = await loadRender(ssrEntry)
+  if (!render) {
     console.warn('[prerender] SSR bundle missing — skipping prerender (SPA shell kept).')
     return
   }
-  const template = readFileSync(resolve(distDir, 'index.html'), 'utf-8')
-  if (!template.includes('<div id="root"></div>')) {
-    // A fresh `vite build` always emits an empty root; a filled one means this is
-    // a re-run over an already-prerendered dist. Body injection would no-op, but
-    // the <head> + </body> SEO block (the parts Google actually reads) still work.
-    console.warn('[prerender] note: template root is not empty (re-run over prerendered dist).')
-  }
-  const { render } = await import(pathToFileURL(ssrEntry).href)
-
+  // Reset the shell first. Every injection below ADDS, so a re-run over an
+  // already-prerendered dist used to leave the page with two canonicals, eight
+  // hreflang alternates and the previous route's JSON-LD. On a fresh
+  // `vite build` this is a no-op. See sanitizeTemplate.
+  const template = sanitizeTemplate(readFileSync(resolve(distDir, 'index.html'), 'utf-8'))
   // Fetch the listed salons up front — used for partner pages, category pages,
   // AND the /salons directory's CollectionPage + ItemList structured data.
   const salons = await fetchListedSalons()
@@ -357,16 +338,9 @@ async function main() {
         const ld = faqJsonLd()
         if (ld) html = html.replace('</head>', `${ld}</head>`)
       }
-      if (bodyHtml) {
-        html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`)
-      }
+      html = injectBody(html, bodyHtml)
 
-      const outPath =
-        url === '/'
-          ? resolve(distDir, 'index.html')
-          : resolve(distDir, `.${url}/index.html`)
-      mkdirSync(dirname(outPath), { recursive: true })
-      writeFileSync(outPath, html)
+      const outPath = writePage(distDir, url, html)
       console.log(`[prerender] ✓ ${url} → ${outPath.replace(distDir, 'dist')}`)
     } catch (err) {
       console.warn(`[prerender] skipped ${url}:`, err?.message)
@@ -394,18 +368,13 @@ async function main() {
         jsonLd: partnerJsonLd(salon),
         image: salon.logoUrl ? absoluteUrl(salon.logoUrl) : undefined,
       })
-      if (bodyHtml) {
-        html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`)
-      }
+      html = injectBody(html, bodyHtml)
       // Bake a crawlable text summary (name + services + address) right before
       // </body> so Google indexes the salon regardless of whether the SPA body
       // rendered — injected at a fixed anchor, not the mutable root marker.
-      const seoBody = partnerSeoBody(salon)
-      html = html.replace('</body>', `${seoBody}</body>`)
+      html = html.replace('</body>', `${partnerSeoBody(salon)}</body>`)
 
-      const outPath = resolve(distDir, `p/${salon.slug}/index.html`)
-      mkdirSync(dirname(outPath), { recursive: true })
-      writeFileSync(outPath, html)
+      writePage(distDir, `/p/${salon.slug}`, html)
       ok++
     } catch (err) {
       console.warn(`[prerender] skipped ${url}:`, err?.message)
@@ -433,14 +402,10 @@ async function main() {
         canonical,
         jsonLd: categoryJsonLd(cat, salons),
       })
-      if (bodyHtml) {
-        html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`)
-      }
+      html = injectBody(html, bodyHtml)
       html = html.replace('</body>', `${categorySeoBody(cat, salons)}</body>`)
 
-      const outPath = resolve(distDir, `salons/c/${cat.slug}/index.html`)
-      mkdirSync(dirname(outPath), { recursive: true })
-      writeFileSync(outPath, html)
+      writePage(distDir, `/salons/c/${cat.slug}`, html)
       catOk++
     } catch (err) {
       console.warn(`[prerender] skipped ${url}:`, err?.message)

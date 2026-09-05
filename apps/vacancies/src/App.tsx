@@ -1,8 +1,11 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import { Footer } from '@/components/layout/Footer/Footer'
 import { NotFound } from '@/pages/NotFound/NotFound'
 import { Board } from '@/pages/Board/Board'
+import { useT } from '@/i18n'
+import { siteJsonLd } from '@/lib/jsonLd'
+import { LANDING_PREFIX } from '@/lib/landings'
 import { useScrollRestoration } from '@/lib/useScrollRestoration'
 import s from './App.module.scss'
 
@@ -15,6 +18,38 @@ import s from './App.module.scss'
  * the phone validation and the JSON-LD builder, none of which the board needs.
  */
 const Detail = lazy(() => import('@/pages/Detail/Detail').then((m) => ({ default: m.Detail })))
+
+/**
+ * Landing pages are code-split for the same reason the listing page is: nobody
+ * who loads the board needs them, and a visitor who arrives on one straight
+ * from a search result pays for exactly the chunk they are reading.
+ */
+const Landing = lazy(() => import('@/pages/Landing/Landing').then((m) => ({ default: m.Landing })))
+
+const SITE_JSONLD_ID = 'site-jsonld'
+
+/**
+ * WebSite + Organization, attached once for the whole app.
+ *
+ * Deliberately NOT in useSeo: that hook owns the tags a ROUTE replaces, and
+ * this graph is the same on every route. Putting it there would mean each
+ * navigation tearing down and rebuilding an identical script, and any page that
+ * forgot to pass it would silently drop the site's identity from the markup.
+ */
+function useSiteJsonLd() {
+  const t = useT()
+  useEffect(() => {
+    if (document.getElementById(SITE_JSONLD_ID)) return
+    const el = document.createElement('script')
+    el.id = SITE_JSONLD_ID
+    el.type = 'application/ld+json'
+    el.textContent = JSON.stringify(
+      siteJsonLd(`${t('app.name')} ${t('app.product')}`, t('hero.subtitle')),
+    )
+    document.head.appendChild(el)
+    return () => el.remove()
+  }, [t])
+}
 
 /**
  * Routes and the page frame.
@@ -34,6 +69,7 @@ export default function App() {
    * at all. See the hook for the full matrix.
    */
   useScrollRestoration()
+  useSiteJsonLd()
 
   return (
     <div className={s.shell}>
@@ -46,6 +82,10 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Board />} />
             <Route path="/v/:id" element={<Detail />} />
+            {/* Keyword landing pages — see lib/landings.ts. The prefix comes
+                from there so the route and the links it generates cannot
+                disagree about what these URLs are. */}
+            <Route path={`${LANDING_PREFIX}/:slug`} element={<Landing />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

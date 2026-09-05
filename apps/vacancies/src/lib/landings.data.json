@@ -1,0 +1,450 @@
+[
+  {
+    "slug": "varsavir",
+    "kind": "role",
+    "query": "specialty=hair-styling,barbering",
+    "copy": {
+      "hy": {
+        "h1": "Վարսավիրի աշխատանք",
+        "title": "Վարսավիրի աշխատանք Երևանում և Հայաստանում",
+        "description": "Վարսավիրի և վարսահարդարի աշխատանք՝ աթոռ վարձով, տոկոսով կամ հաստատուն վարձատրությամբ։ Տեսեք պայմանները և դիմեք ուղիղ սրահին։",
+        "intro": "Վարսավիրանոցների և բարբերշոփերի հայտարարությունները՝ մեկ էջում։",
+        "body": "Վարսավիրի աշխատանքն այս ոլորտում երեք տարբեր պայմանավորվածություն է նշանակում՝ աթոռի վարձակալություն, եկամտի տոկոսային բաժանում կամ հաստատուն աշխատավարձ։ Ամեն հայտարարության մեջ նշված են վարձատրությունը, գրաֆիկը, փորձի պահանջը և սրահի հասցեն, այնպես որ պայմանները պարզ են դեռ զանգից առաջ։ Դիմելու համար հաշիվ գրանցել պետք չէ։"
+      },
+      "en": {
+        "h1": "Hairdresser jobs",
+        "title": "Hairdresser and hair stylist jobs in Armenia",
+        "description": "Hairdresser and hair stylist positions on chair rent, commission or a fixed salary. See the terms and apply directly to the salon.",
+        "intro": "Openings from hair salons and barbershops, in one place.",
+        "body": "Hairdressing work here comes in three shapes: renting a chair, splitting revenue with the salon, or a fixed salary. Every listing states the pay, the schedule, the experience expected and the salon address, so the terms are clear before you call. No account is needed to apply."
+      },
+      "ru": {
+        "h1": "Работа парикмахером",
+        "title": "Работа парикмахером в Ереване и по Армении",
+        "description": "Вакансии парикмахера и стилиста по волосам: аренда кресла, процент или фиксированная зарплата. Смотрите условия и откликайтесь напрямую салону.",
+        "intro": "Объявления парикмахерских и барбершопов — на одной странице.",
+        "body": "Работа парикмахера здесь оформляется тремя способами: аренда кресла, процент от выручки или фиксированная зарплата. В каждом объявлении указаны оплата, график, требуемый опыт и адрес салона, поэтому условия понятны ещё до звонка. Для отклика регистрация не нужна."
+      }
+    }
+  },
+  {
+    "slug": "barber",
+    "kind": "role",
+    "query": "specialty=barbering",
+    "copy": {
+      "hy": {
+        "h1": "Բարբերի աշխատանք",
+        "title": "Բարբերի աշխատանք — բարբերշոփերի հայտարարություններ",
+        "description": "Բարբերի աշխատանք Երևանում և մարզերում՝ աթոռ վարձով կամ տոկոսով։ Տեսեք բարբերշոփերի պայմանները և դիմեք առանց գրանցման։",
+        "intro": "Բարբերշոփերի հայտարարությունները՝ պայմաններով և հասցեներով։",
+        "body": "Բարբերշոփերի մեծ մասն աշխատում է աթոռի վարձակալությամբ կամ տոկոսային պայմանով, և տարբերությունը եկամտի վրա էական է։ Այստեղ երկուսն էլ նշված են բացահայտ՝ վարձի չափը կամ բաժանման տոկոսը, գրաֆիկը և այն, թե գործիքներն ու նյութերը ում հաշվին են։"
+      },
+      "en": {
+        "h1": "Barber jobs",
+        "title": "Barber jobs — openings at barbershops",
+        "description": "Barber positions in Yerevan and the regions, on chair rent or commission. See what each barbershop offers and apply without signing up.",
+        "intro": "Barbershop listings, with their terms and addresses.",
+        "body": "Most barbershops work on either a rented chair or a commission split, and the difference to your income is substantial. Both are stated plainly here: the rent or the split, the schedule, and whose account tools and products come out of."
+      },
+      "ru": {
+        "h1": "Работа барбером",
+        "title": "Работа барбером — вакансии барбершопов",
+        "description": "Вакансии барбера в Ереване и регионах: аренда кресла или процент. Смотрите условия барбершопов и откликайтесь без регистрации.",
+        "intro": "Объявления барбершопов — с условиями и адресами.",
+        "body": "Большинство барбершопов работает по аренде кресла или по проценту, и разница в доходе существенная. Здесь указано и то, и другое: размер аренды или процент, график и то, за чей счёт инструменты и материалы."
+      }
+    }
+  },
+  {
+    "slug": "manikyur",
+    "kind": "role",
+    "query": "specialty=manicure,pedicure,nail-extensions,nail-art",
+    "copy": {
+      "hy": {
+        "h1": "Մատնահարդարի աշխատանք",
+        "title": "Մատնահարդարի աշխատանք — մանիկյուրի վարպետի հայտարարություններ",
+        "description": "Մատնահարդարի և ոտնահարդարի աշխատանք գեղեցկության սրահներում՝ աթոռ վարձով, տոկոսով կամ աշխատավարձով։ Դիմեք ուղիղ սրահին։",
+        "intro": "Մատնահարդարման և ոտնահարդարման բոլոր հայտարարությունները։",
+        "body": "Մատնահարդարի հայտարարություններում ամենակարևոր տողը նյութերի մասին է՝ դրանք սրահի հաշվին են, թե վարպետի։ Այստեղ դա նշվում է առանձին, ինչպես նաև աշխատատեղի վարձը, տոկոսային պայմանը և գրաֆիկը՝ լրիվ դրույք, մասնակի կամ ազատ։"
+      },
+      "en": {
+        "h1": "Manicurist jobs",
+        "title": "Manicurist jobs — nail technician openings",
+        "description": "Manicure and pedicure positions in beauty salons, on chair rent, commission or a salary. Apply directly to the salon.",
+        "intro": "Every manicure and pedicure listing on the board.",
+        "body": "The line that matters most in a nail listing is who pays for materials — the salon or the master. That is stated separately here, alongside the station rent, the commission split and the schedule: full time, part time or flexible."
+      },
+      "ru": {
+        "h1": "Работа мастером маникюра",
+        "title": "Работа мастером маникюра — вакансии в салонах",
+        "description": "Вакансии мастера маникюра и педикюра в салонах красоты: аренда места, процент или зарплата. Откликайтесь напрямую салону.",
+        "intro": "Все объявления по маникюру и педикюру.",
+        "body": "Самая важная строка в объявлении для мастера ногтевого сервиса — за чей счёт материалы: салона или мастера. Здесь это указано отдельно, вместе с арендой места, процентом и графиком: полная занятость, частичная или свободная."
+      }
+    }
+  },
+  {
+    "slug": "kosmetolog",
+    "kind": "role",
+    "query": "specialty=cosmetology,facials,chemical-peels,laser-cosmetology",
+    "copy": {
+      "hy": {
+        "h1": "Կոսմետոլոգի աշխատանք",
+        "title": "Կոսմետոլոգի աշխատանք — սրահներ և կլինիկաներ",
+        "description": "Կոսմետոլոգի և դեմքի խնամքի մասնագետի աշխատանք գեղեցկության սրահներում ու կլինիկաներում։ Տեսեք վարձատրությունը և դիմեք։",
+        "intro": "Կոսմետոլոգիայի և դեմքի խնամքի հայտարարությունները։",
+        "body": "Կոսմետոլոգի հայտարարությունները գալիս են և՛ գեղեցկության սրահներից, և՛ կլինիկաներից, և պայմանները տարբեր են՝ կլինիկան սովորաբար առաջարկում է աշխատավարձ, սրահը՝ տոկոս կամ կաբինետի վարձ։ Ապարատուրայի և ընթացիկ նյութերի հարցը նշված է ամեն հայտարարության մեջ։"
+      },
+      "en": {
+        "h1": "Cosmetologist jobs",
+        "title": "Cosmetologist jobs — salon and clinic openings",
+        "description": "Cosmetologist and skincare specialist positions in beauty salons and clinics. See the pay and apply directly.",
+        "intro": "Cosmetology and facial care listings.",
+        "body": "Cosmetology listings come from both salons and clinics, and the terms differ: a clinic usually offers a salary, a salon a commission or a rented room. What equipment and consumables are provided is stated in each listing."
+      },
+      "ru": {
+        "h1": "Работа косметологом",
+        "title": "Работа косметологом — вакансии салонов и клиник",
+        "description": "Вакансии косметолога и специалиста по уходу за лицом в салонах красоты и клиниках. Смотрите оплату и откликайтесь.",
+        "intro": "Объявления по косметологии и уходу за лицом.",
+        "body": "Объявления для косметологов приходят и от салонов, и от клиник, и условия разные: клиника обычно предлагает зарплату, салон — процент или аренду кабинета. Вопрос аппаратуры и расходных материалов указан в каждом объявлении."
+      }
+    }
+  },
+  {
+    "slug": "dimahardar",
+    "kind": "role",
+    "query": "specialty=makeup,bridal-makeup,permanent-makeup",
+    "copy": {
+      "hy": {
+        "h1": "Դիմահարդարի աշխատանք",
+        "title": "Դիմահարդարի աշխատանք — մակիյաժի վարպետի հայտարարություններ",
+        "description": "Դիմահարդարի, հարսի դիմահարդարի և պերմանենտ մակիյաժի մասնագետի աշխատանք։ Տեսեք պայմանները և դիմեք ուղիղ սրահին։",
+        "intro": "Դիմահարդարման բոլոր ուղղությունների հայտարարությունները։",
+        "body": "Դիմահարդարի աշխատանքը հազվադեպ է լրիվ դրույքով՝ սրահների մեծ մասն առաջարկում է տոկոսային պայման կամ աշխատատեղի վարձակալություն ազատ գրաֆիկով։ Հարսի և պերմանենտ մակիյաժի հայտարարությունները նույնպես այստեղ են՝ առանձին մասնագիտություններով։"
+      },
+      "en": {
+        "h1": "Makeup artist jobs",
+        "title": "Makeup artist jobs — salon and studio openings",
+        "description": "Makeup artist, bridal makeup and permanent makeup positions. See the terms and apply directly to the salon.",
+        "intro": "Listings across every kind of makeup work.",
+        "body": "Makeup work is rarely full time — most salons offer a commission split or a rented station on a flexible schedule. Bridal and permanent makeup listings are here too, filed under their own specialties."
+      },
+      "ru": {
+        "h1": "Работа визажистом",
+        "title": "Работа визажистом — вакансии салонов и студий",
+        "description": "Вакансии визажиста, свадебного визажиста и мастера перманентного макияжа. Смотрите условия и откликайтесь напрямую.",
+        "intro": "Объявления по всем направлениям макияжа.",
+        "body": "Работа визажиста редко бывает полной занятостью — большинство салонов предлагает процент или аренду места со свободным графиком. Объявления по свадебному и перманентному макияжу тоже здесь, под своими специальностями."
+      }
+    }
+  },
+  {
+    "slug": "tartichner",
+    "kind": "role",
+    "query": "specialty=lash-extensions,lash-lift",
+    "copy": {
+      "hy": {
+        "h1": "Թարթիչների մասնագետի աշխատանք",
+        "title": "Թարթիչների մասնագետի աշխատանք — երկարացում և լամինացիա",
+        "description": "Թարթիչների երկարացման և լամինացիայի մասնագետի աշխատանք սրահներում՝ տոկոսով կամ աշխատատեղի վարձով։ Դիմեք ուղիղ սրահին։",
+        "intro": "Թարթիչների երկարացման և լամինացիայի հայտարարությունները։",
+        "body": "Թարթիչների վարպետը սովորաբար աշխատում է առանձին կաբինետում կամ աշխատատեղում, ուստի հայտարարություններում կարևորն այն է, թե ինչ պայմաններով է տրվում տեղը և ում հաշվին են նյութերը։ Սեփական հաճախորդների բազայի պահանջը, եթե կա, նշված է առանձին։"
+      },
+      "en": {
+        "h1": "Lash technician jobs",
+        "title": "Lash technician jobs — extensions and lash lift",
+        "description": "Lash extension and lamination specialist positions in salons, on commission or a rented station. Apply directly to the salon.",
+        "intro": "Lash extension and lamination listings.",
+        "body": "A lash technician usually works from a separate room or station, so what matters in a listing is the terms that station comes on and who pays for supplies. Where an existing client base is expected, that is stated separately."
+      },
+      "ru": {
+        "h1": "Работа лешмейкером",
+        "title": "Работа лешмейкером — наращивание и ламинирование ресниц",
+        "description": "Вакансии мастера по наращиванию и ламинированию ресниц в салонах: процент или аренда места. Откликайтесь напрямую салону.",
+        "intro": "Объявления по наращиванию и ламинированию ресниц.",
+        "body": "Лешмейкер обычно работает в отдельном кабинете или на своём месте, поэтому в объявлении важны условия аренды места и то, за чей счёт материалы. Требование собственной клиентской базы, если оно есть, указано отдельно."
+      }
+    }
+  },
+  {
+    "slug": "honqer",
+    "kind": "role",
+    "query": "specialty=brow-design,brow-lash-tinting",
+    "copy": {
+      "hy": {
+        "h1": "Հոնքերի մասնագետի աշխատանք",
+        "title": "Հոնքերի մասնագետի աշխատանք — ձևավորում և ներկում",
+        "description": "Հոնքերի ձևավորման և ներկման մասնագետի աշխատանք գեղեցկության սրահներում։ Տեսեք վարձատրությունը, գրաֆիկը և դիմեք։",
+        "intro": "Հոնքերի ձևավորման և ներկման հայտարարությունները։",
+        "body": "Հոնքերի ուղղությունը հաճախ զուգակցվում է թարթիչների հետ, և սրահների մի մասը փնտրում է մեկ վարպետ երկուսի համար։ Հայտարարություններում նշված է, թե որ ծառայություններն են ակնկալվում և ինչ պայմաններով՝ տոկոս, աշխատավարձ կամ աշխատատեղի վարձ։"
+      },
+      "en": {
+        "h1": "Brow artist jobs",
+        "title": "Brow artist jobs — shaping and tinting",
+        "description": "Brow shaping and tinting specialist positions in beauty salons. See the pay and the schedule, then apply.",
+        "intro": "Brow shaping and tinting listings.",
+        "body": "Brow work often pairs with lashes, and some salons are looking for one person to cover both. Listings state which services are expected and on what terms: commission, salary or a rented station."
+      },
+      "ru": {
+        "h1": "Работа бровистом",
+        "title": "Работа бровистом — оформление и окрашивание бровей",
+        "description": "Вакансии мастера по оформлению и окрашиванию бровей в салонах красоты. Смотрите оплату и график, затем откликайтесь.",
+        "intro": "Объявления по оформлению и окрашиванию бровей.",
+        "body": "Направление бровей часто совмещается с ресницами, и часть салонов ищет одного мастера на оба. В объявлениях указано, какие услуги ожидаются и на каких условиях: процент, зарплата или аренда места."
+      }
+    }
+  },
+  {
+    "slug": "kolorist",
+    "kind": "role",
+    "query": "specialty=hair-coloring",
+    "copy": {
+      "hy": {
+        "h1": "Կոլորիստի աշխատանք",
+        "title": "Կոլորիստի աշխատանք — մազերի ներկման վարպետի հայտարարություններ",
+        "description": "Կոլորիստի աշխատանք վարսավիրանոցներում՝ տոկոսով, աթոռ վարձով կամ աշխատավարձով։ Տեսեք ներկերի պայմանը և դիմեք։",
+        "intro": "Մազերի ներկման և կոլորիստիկայի հայտարարությունները։",
+        "body": "Կոլորիստի համար որոշիչը ներկերի հարցն է՝ սրահի՞ հաշվին են, թե վարպետի, քանի որ դա ուղղակիորեն փոխում է տոկոսի իրական արժեքը։ Հայտարարություններում այս պայմանը նշված է առանձին՝ վարձատրության և գրաֆիկի կողքին։"
+      },
+      "en": {
+        "h1": "Colourist jobs",
+        "title": "Colourist jobs — hair colouring openings",
+        "description": "Colourist positions in hair salons, on commission, chair rent or a salary. See who pays for colour, then apply.",
+        "intro": "Hair colouring and colourist listings.",
+        "body": "For a colourist the deciding term is who buys the colour — the salon or you — because it changes what a commission split is actually worth. That condition is stated separately in each listing, next to the pay and the schedule."
+      },
+      "ru": {
+        "h1": "Работа колористом",
+        "title": "Работа колористом — вакансии по окрашиванию волос",
+        "description": "Вакансии колориста в парикмахерских: процент, аренда кресла или зарплата. Смотрите, за чей счёт красители, и откликайтесь.",
+        "intro": "Объявления по окрашиванию волос и колористике.",
+        "body": "Для колориста решающее условие — за чей счёт красители: салона или мастера, потому что это напрямую меняет реальную ценность процента. В объявлениях это условие указано отдельно, рядом с оплатой и графиком."
+      }
+    }
+  },
+  {
+    "slug": "mersum",
+    "kind": "role",
+    "query": "specialty=massage,spa-therapy",
+    "copy": {
+      "hy": {
+        "h1": "Մերսողի աշխատանք",
+        "title": "Մերսողի աշխատանք — սպա և կլինիկաներ",
+        "description": "Մերսողի և սպա մասնագետի աշխատանք սրահներում, սպա կենտրոններում և կլինիկաներում։ Տեսեք գրաֆիկը և վարձատրությունը։",
+        "intro": "Մերսման և սպա ուղղության հայտարարությունները։",
+        "body": "Մերսման հայտարարությունները գալիս են սպա կենտրոններից, հյուրանոցներից և վերականգնողական կլինիկաներից, ուստի գրաֆիկները շատ տարբեր են՝ հերթափոխից մինչև ազատ ժամեր։ Ամեն հայտարարության մեջ նշված է և՛ գրաֆիկը, և՛ վարձատրության ձևը։"
+      },
+      "en": {
+        "h1": "Massage therapist jobs",
+        "title": "Massage therapist jobs — spa and clinic openings",
+        "description": "Massage therapist and spa specialist positions in salons, spas and clinics. See the schedule and the pay.",
+        "intro": "Massage and spa listings.",
+        "body": "Massage listings come from spas, hotels and rehabilitation clinics, so the schedules vary widely — from fixed shifts to hours you choose. Each listing states both the schedule and how the work is paid."
+      },
+      "ru": {
+        "h1": "Работа массажистом",
+        "title": "Работа массажистом — вакансии спа и клиник",
+        "description": "Вакансии массажиста и спа-специалиста в салонах, спа-центрах и клиниках. Смотрите график и оплату.",
+        "intro": "Объявления по массажу и спа.",
+        "body": "Объявления по массажу приходят из спа-центров, отелей и реабилитационных клиник, поэтому графики очень разные — от сменного до свободного. В каждом объявлении указаны и график, и форма оплаты."
+      }
+    }
+  },
+  {
+    "slug": "mazaheracum",
+    "kind": "role",
+    "query": "specialty=waxing-sugaring,laser-hair-removal",
+    "copy": {
+      "hy": {
+        "h1": "Մազահեռացման մասնագետի աշխատանք",
+        "title": "Մազահեռացման մասնագետի աշխատանք — շաքարով, մոմով և լազերային",
+        "description": "Շուգարինգի, մոմով և լազերային մազահեռացման մասնագետի աշխատանք սրահներում ու կլինիկաներում։ Տեսեք պայմանները և դիմեք։",
+        "intro": "Մազահեռացման բոլոր ուղղությունների հայտարարությունները։",
+        "body": "Լազերային մազահեռացումը պահանջում է ապարատ, ուստի այդ հայտարարությունները գրեթե միշտ սրահի սարքավորմամբ են և հաստատուն գրաֆիկով։ Շաքարով և մոմով աշխատանքն ավելի հաճախ տոկոսային է կամ աշխատատեղի վարձով։"
+      },
+      "en": {
+        "h1": "Hair removal specialist jobs",
+        "title": "Hair removal specialist jobs — sugaring, waxing and laser",
+        "description": "Sugaring, waxing and laser hair removal positions in salons and clinics. See the terms and apply.",
+        "intro": "Listings across every kind of hair removal work.",
+        "body": "Laser hair removal needs a machine, so those listings almost always come with the salon's equipment and a fixed schedule. Sugaring and waxing work is more often on commission or a rented station."
+      },
+      "ru": {
+        "h1": "Работа мастером депиляции",
+        "title": "Работа мастером депиляции — шугаринг, воск и лазер",
+        "description": "Вакансии мастера шугаринга, восковой депиляции и лазерной эпиляции в салонах и клиниках. Смотрите условия и откликайтесь.",
+        "intro": "Объявления по всем видам депиляции и эпиляции.",
+        "body": "Лазерная эпиляция требует аппарата, поэтому такие объявления почти всегда идут с оборудованием салона и фиксированным графиком. Шугаринг и воск чаще оформляются по проценту или с арендой места."
+      }
+    }
+  },
+  {
+    "slug": "administrator",
+    "kind": "role",
+    "query": "specialty=administration,management",
+    "copy": {
+      "hy": {
+        "h1": "Ադմինիստրատորի աշխատանք գեղեցկության սրահում",
+        "title": "Ադմինիստրատորի աշխատանք գեղեցկության սրահում և սպա կենտրոնում",
+        "description": "Ադմինիստրատորի և կառավարչի աշխատանք գեղեցկության սրահներում՝ հաստատուն աշխատավարձով և հստակ գրաֆիկով։ Դիմեք ուղիղ սրահին։",
+        "intro": "Ադմինիստրացիայի և կառավարման հայտարարությունները։",
+        "body": "Սա այն քիչ ուղղություններից է, որտեղ վարձատրությունը գրեթե միշտ հաստատուն աշխատավարձ է, ոչ թե տոկոս։ Հայտարարություններում նշված են գրաֆիկը՝ հերթափոխով թե լրիվ դրույքով, և այն, թե ինչ փորձ է ակնկալվում ամրագրումների ու հաճախորդների հետ աշխատանքում։"
+      },
+      "en": {
+        "h1": "Salon administrator jobs",
+        "title": "Salon administrator and manager jobs",
+        "description": "Administrator and manager positions in beauty salons and spas, on a fixed salary and a clear schedule. Apply directly to the salon.",
+        "intro": "Administration and management listings.",
+        "body": "This is one of the few areas where the pay is almost always a fixed salary rather than a commission. Listings state the schedule — shifts or full time — and what experience with bookings and clients is expected."
+      },
+      "ru": {
+        "h1": "Работа администратором салона",
+        "title": "Работа администратором и управляющим салона красоты",
+        "description": "Вакансии администратора и управляющего в салонах красоты и спа: фиксированная зарплата и понятный график. Откликайтесь напрямую.",
+        "intro": "Объявления по администрированию и управлению.",
+        "body": "Это одно из немногих направлений, где оплата почти всегда фиксированная зарплата, а не процент. В объявлениях указан график — сменный или полный день — и какой опыт работы с записью и клиентами ожидается."
+      }
+    }
+  },
+  {
+    "slug": "ator-vardzov",
+    "kind": "terms",
+    "query": "payType=rent",
+    "copy": {
+      "hy": {
+        "h1": "Աթոռ վարձով",
+        "title": "Աթոռ վարձով՝ վարձակալության հայտարարություններ",
+        "description": "Աթոռ և աշխատատեղ վարձով վարսավիրանոցներում, բարբերշոփերում և սրահներում։ Տեսեք վարձի չափը, հասցեն և պայմանները։",
+        "intro": "Բոլոր հայտարարությունները, որտեղ վարձատրության ձևը վարձակալությունն է։",
+        "body": "Աթոռի վարձակալությունը նշանակում է, որ եկամուտն ամբողջությամբ ձերն է, իսկ սրահին վճարում եք ֆիքսված գումար՝ օրական, շաբաթական կամ ամսական։ Այս էջում հավաքված են բոլոր այն հայտարարությունները, որտեղ պայմանը հենց դա է, և ամեն մեկում նշված է վարձի չափը՝ առանց զանգելու։"
+      },
+      "en": {
+        "h1": "Chair rental",
+        "title": "Chair and station rental in salons and barbershops",
+        "description": "Chairs and stations to rent in hair salons, barbershops and beauty studios. See the rent, the address and the terms.",
+        "intro": "Every listing where the arrangement is a rental.",
+        "body": "Renting a chair means the income is entirely yours and you pay the salon a fixed amount — by day, week or month. This page collects every listing on those terms, and each one states the rent up front, without a phone call."
+      },
+      "ru": {
+        "h1": "Аренда кресла",
+        "title": "Аренда кресла и рабочего места в салонах и барбершопах",
+        "description": "Кресла и рабочие места в аренду в парикмахерских, барбершопах и салонах красоты. Смотрите размер аренды, адрес и условия.",
+        "intro": "Все объявления, где формат — аренда.",
+        "body": "Аренда кресла означает, что доход полностью ваш, а салону вы платите фиксированную сумму — за день, неделю или месяц. На этой странице собраны все объявления с такими условиями, и в каждом размер аренды указан сразу, без звонка."
+      }
+    }
+  },
+  {
+    "slug": "tokosov",
+    "kind": "terms",
+    "query": "payType=percentage",
+    "copy": {
+      "hy": {
+        "h1": "Տոկոսով աշխատանք",
+        "title": "Տոկոսով աշխատանք գեղեցկության ոլորտում",
+        "description": "Տոկոսային պայմանով աշխատանք սրահներում՝ 40/60-ից մինչև 60/40։ Տեսեք բաժանման տոկոսը և նյութերի պայմանը ամեն հայտարարության մեջ։",
+        "intro": "Բոլոր հայտարարությունները, որտեղ վարձատրությունը եկամտի տոկոս է։",
+        "body": "Տոկոսային պայմանում սրահը վերցնում է եկամտի մի մասը, դուք՝ մնացածը, և առանց նյութերի հարցի պատասխանի այդ թիվն ինքնին ոչինչ չի ասում։ Այս էջում ամեն հայտարարության մոտ նշված է սրահի բաժինը՝ 40/60, 50/50 կամ այլ, և առանձին՝ ում հաշվին են նյութերը։"
+      },
+      "en": {
+        "h1": "Commission work",
+        "title": "Commission-based work in the beauty industry",
+        "description": "Commission positions in salons, from 40/60 to 60/40. See the split and who pays for materials in every listing.",
+        "intro": "Every listing where the pay is a share of revenue.",
+        "body": "On a commission split the salon takes a share of revenue and you take the rest — and without knowing who buys the materials, that number alone tells you nothing. Every listing here states the salon's share (40/60, 50/50 or otherwise) and, separately, whose account supplies come out of."
+      },
+      "ru": {
+        "h1": "Работа за процент",
+        "title": "Работа за процент в индустрии красоты",
+        "description": "Вакансии с процентом в салонах: от 40/60 до 60/40. Смотрите процент и условия по материалам в каждом объявлении.",
+        "intro": "Все объявления, где оплата — доля от выручки.",
+        "body": "При работе за процент салон берёт часть выручки, а вы остальное — и без ответа на вопрос о материалах эта цифра сама по себе ни о чём не говорит. В каждом объявлении здесь указана доля салона (40/60, 50/50 или иная) и отдельно — за чей счёт материалы."
+      }
+    }
+  },
+  {
+    "slug": "yerevan",
+    "kind": "place",
+    "query": "area=yerevan",
+    "copy": {
+      "hy": {
+        "h1": "Աշխատանք Երևանում՝ գեղեցկության ոլորտում",
+        "title": "Աշխատանք Երևանում — գեղեցկության սրահների հայտարարություններ",
+        "description": "Գեղեցկության ոլորտի աշխատանք Երևանում՝ վարսավիրանոցներում, սրահներում և կլինիկաներում։ Փնտրեք ըստ վարձատրության և տարածքի։",
+        "intro": "Երևանի բոլոր հայտարարությունները՝ ըստ վարչական շրջանների։",
+        "body": "Երևանում հայտարարությունների մեծ մասը Կենտրոնից, Արաբկիրից և Շենգավիթից է, բայց ընտրությունը կարող եք նեղացնել մինչև առանձին վարչական շրջան, որպեսզի աշխատանքը ձեր տան մոտ լինի։ Ամեն հայտարարության մեջ նշված է սրահի ճշգրիտ հասցեն։"
+      },
+      "en": {
+        "h1": "Beauty industry jobs in Yerevan",
+        "title": "Jobs in Yerevan — beauty salon openings",
+        "description": "Beauty industry work in Yerevan: hair salons, beauty studios and clinics. Search by pay and by district.",
+        "intro": "Every Yerevan listing, by administrative district.",
+        "body": "Most Yerevan listings come from Kentron, Arabkir and Shengavit, but you can narrow the board down to a single district so the work is near where you live. Every listing carries the salon's exact address."
+      },
+      "ru": {
+        "h1": "Работа в Ереване в индустрии красоты",
+        "title": "Работа в Ереване — вакансии салонов красоты",
+        "description": "Работа в индустрии красоты в Ереване: парикмахерские, салоны и клиники. Ищите по оплате и по району.",
+        "intro": "Все объявления по Еревану — по административным районам.",
+        "body": "Большинство ереванских объявлений приходится на Кентрон, Арабкир и Шенгавит, но список можно сузить до одного района, чтобы работа была рядом с домом. В каждом объявлении указан точный адрес салона."
+      }
+    }
+  },
+  {
+    "slug": "gyumri",
+    "kind": "place",
+    "query": "area=gyumri",
+    "copy": {
+      "hy": {
+        "h1": "Աշխատանք Գյումրիում՝ գեղեցկության ոլորտում",
+        "title": "Աշխատանք Գյումրիում — գեղեցկության սրահների հայտարարություններ",
+        "description": "Գեղեցկության ոլորտի աշխատանք Գյումրիում՝ վարսավիրանոցներում և սրահներում։ Տեսեք վարձատրությունը, գրաֆիկը և հասցեն։",
+        "intro": "Գյումրիի հայտարարությունները՝ մեկ էջում։",
+        "body": "Մարզերում հայտարարությունների թիվն ավելի քիչ է, քան Երևանում, բայց պայմանները հաճախ ավելի ճկուն են՝ մասնակի դրույք և ազատ գրաֆիկ։ Այս էջը միայն Գյումրիի հայտարարություններն է ցույց տալիս, առանց մայրաքաղաքի արդյունքների միջով անցնելու։"
+      },
+      "en": {
+        "h1": "Beauty industry jobs in Gyumri",
+        "title": "Jobs in Gyumri — beauty salon openings",
+        "description": "Beauty industry work in Gyumri: hair salons and beauty studios. See the pay, the schedule and the address.",
+        "intro": "Gyumri listings, in one place.",
+        "body": "There are fewer listings outside Yerevan, but the terms are often more flexible — part-time hours and schedules you set. This page shows only Gyumri, without scrolling past the capital's results."
+      },
+      "ru": {
+        "h1": "Работа в Гюмри в индустрии красоты",
+        "title": "Работа в Гюмри — вакансии салонов красоты",
+        "description": "Работа в индустрии красоты в Гюмри: парикмахерские и салоны. Смотрите оплату, график и адрес.",
+        "intro": "Объявления по Гюмри — на одной странице.",
+        "body": "В регионах объявлений меньше, чем в Ереване, но условия часто гибче — частичная занятость и свободный график. Эта страница показывает только Гюмри, без результатов столицы."
+      }
+    }
+  },
+  {
+    "slug": "vanadzor",
+    "kind": "place",
+    "query": "area=vanadzor",
+    "copy": {
+      "hy": {
+        "h1": "Աշխատանք Վանաձորում՝ գեղեցկության ոլորտում",
+        "title": "Աշխատանք Վանաձորում — գեղեցկության սրահների հայտարարություններ",
+        "description": "Գեղեցկության ոլորտի աշխատանք Վանաձորում՝ սրահներում և վարսավիրանոցներում։ Տեսեք պայմանները և դիմեք ուղիղ սրահին։",
+        "intro": "Վանաձորի հայտարարությունները՝ մեկ էջում։",
+        "body": "Վանաձորի սրահները հաճախ փնտրում են մեկ վարպետ մի քանի ուղղության համար, և հայտարարություններում նշված է, թե կոնկրետ ինչ ծառայություններ են ակնկալվում։ Վարձատրության ձևը՝ տոկոս, աշխատավարձ կամ աթոռի վարձ, նշված է ամեն մեկում։"
+      },
+      "en": {
+        "h1": "Beauty industry jobs in Vanadzor",
+        "title": "Jobs in Vanadzor — beauty salon openings",
+        "description": "Beauty industry work in Vanadzor: salons and hairdressers. See the terms and apply directly to the salon.",
+        "intro": "Vanadzor listings, in one place.",
+        "body": "Salons in Vanadzor often look for one person to cover several services, and the listings say exactly which ones are expected. How the work is paid — commission, salary or chair rent — is stated in each."
+      },
+      "ru": {
+        "h1": "Работа в Ванадзоре в индустрии красоты",
+        "title": "Работа в Ванадзоре — вакансии салонов красоты",
+        "description": "Работа в индустрии красоты в Ванадзоре: салоны и парикмахерские. Смотрите условия и откликайтесь напрямую салону.",
+        "intro": "Объявления по Ванадзору — на одной странице.",
+        "body": "Салоны в Ванадзоре часто ищут одного мастера на несколько направлений, и в объявлениях указано, какие именно услуги ожидаются. Форма оплаты — процент, зарплата или аренда кресла — указана в каждом."
+      }
+    }
+  }
+]

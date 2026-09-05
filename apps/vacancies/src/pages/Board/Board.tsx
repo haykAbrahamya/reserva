@@ -1,17 +1,18 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { AlertTriangle, SearchX, SlidersHorizontal } from 'lucide-react'
 import { Button, Empty, Modal, Select } from '@reserva/ui'
-import { fetchMeta, fetchVacancies } from '@/api/board.api'
-import type { VacancyCard as Card } from '@/api/types'
+import { fetchMeta } from '@/api/board.api'
 import { ActiveFilters } from '@/components/filters/ActiveFilters/ActiveFilters'
 import { FilterPanel } from '@/components/filters/FilterPanel/FilterPanel'
 import { VacancyList, VacancyListSkeleton } from '@/components/board/VacancyList/VacancyList'
 import { SearchField } from '@/components/common/SearchField/SearchField'
+import { BrowseLinks } from '@/components/layout/BrowseLinks/BrowseLinks'
 import { Header } from '@/components/layout/Header/Header'
 import { useLocalized, useT } from '@/i18n'
 import { describeFilters } from '@/lib/describeFilters'
-import { SORTS, toSearchParams, type SortKey } from '@/lib/filters'
+import { SORTS, type SortKey } from '@/lib/filters'
 import { useAsync } from '@/lib/useAsync'
+import { useBoardResults } from '@/lib/useBoardResults'
 import { useFilters } from '@/lib/useFilters'
 import { useSeo } from '@/lib/useSeo'
 import { BoardHero } from './BoardHero'
@@ -41,31 +42,7 @@ export function Board() {
   const control = useFilters()
   const { filters, activeCount, patch, clear } = control
 
-  const [page, setPage] = useState(1)
-  const [accumulated, setAccumulated] = useState<Card[]>([])
   const [sheetOpen, setSheetOpen] = useState(false)
-
-  // The identity of the current query. Anything that changes it starts the
-  // results over.
-  const queryKey = useMemo(() => toSearchParams(filters).toString(), [filters])
-
-  /*
-   * A new query resets the PAGE but deliberately does NOT clear the results.
-   *
-   * This was the cause of the page lurching on every filter click. Emptying the
-   * list here produced one render with nothing in it, so the results column
-   * collapsed to its minimum height and the browser clamped the scroll
-   * position — then the response arrived, the column grew back, and the whole
-   * page appeared to jump.
-   *
-   * Leaving the previous results in place means the swap happens in a single
-   * render: the old list stays visible (dimmed by `refreshing`) and is replaced
-   * by the new one, which the append effect below does whenever it receives
-   * page 1. The height barely moves and the reader keeps their place.
-   */
-  useEffect(() => {
-    setPage(1)
-  }, [queryKey])
 
   /*
    * Nothing scrolls the page on a filter change, deliberately.
@@ -84,35 +61,17 @@ export function Board() {
 
   const meta = useAsync((signal) => fetchMeta(signal), [], { keepPrevious: true })
 
-  const results = useAsync(
-    (signal) => fetchVacancies(filters, page, PAGE_SIZE, signal),
-    [queryKey, page],
-    { keepPrevious: true },
-  )
-
-  // Append each page as it lands. Guarded against duplicate ids because a
-  // listing published between two page fetches shifts the offset window, and an
-  // unguarded append would render the same card twice.
-  useEffect(() => {
-    const data = results.data
-    if (!data) return
-    setAccumulated((prev) => {
-      if (data.page === 1) return data.items
-      const seen = new Set(prev.map((v) => v.id))
-      return [...prev, ...data.items.filter((v) => !seen.has(v.id))]
-    })
-  }, [results.data])
+  // Paging and accumulation live in the hook, shared with the landing pages —
+  // both show the same list of the same listings, differing only in where the
+  // filters come from.
+  const results = useBoardResults(filters, PAGE_SIZE)
 
   const chips = useMemo(
     () => describeFilters({ filters, meta: meta.data, loc, t, patch }),
     [filters, meta.data, loc, t, patch],
   )
 
-  const total = results.data?.total ?? 0
-  const hasMore = accumulated.length < total
-  const coldLoading = results.loading && accumulated.length === 0
-
-  const loadMore = useCallback(() => setPage((p) => p + 1), [])
+  const { items, total, hasMore, coldLoading, loadMore } = results
 
   const sortOptions = SORTS.map((key) => ({ value: key, label: t(`sort.${key}`) }))
 
@@ -122,22 +81,30 @@ export function Board() {
    * them would spend on duplicates the budget the listing pages need. The bare
    * board is indexed.
    */
+  /*
+   * The <title> is NOT the <h1>.
+   *
+   * The heading addresses whoever is already here — "Your next job in the
+   * beauty industry" — and reads as a promise. A title tag addresses someone
+   * scanning ten blue links who has typed a noun, so it leads with the noun.
+   * Same page, two audiences, and conflating them costs the search one.
+   */
   useSeo({
-    title: `${t('hero.title')} — ${t('app.name')} ${t('app.product')}`,
-    description: t('hero.subtitle'),
+    title: t('seo.boardTitle'),
+    description: t('seo.boardDescription'),
     canonicalPath: '/',
     noIndex: activeCount > 0,
   })
 
   const resultsBody = () => {
-    if (results.error && accumulated.length === 0) {
+    if (results.error && items.length === 0) {
       return (
         <Empty
           icon={AlertTriangle}
           title={t('results.errorTitle')}
           description={t('results.errorBody')}
           action={
-            <Button variant="accent" onClick={() => setPage(1)}>
+            <Button variant="accent" onClick={results.retry}>
               {t('results.retry')}
             </Button>
           }
@@ -147,7 +114,7 @@ export function Board() {
 
     if (coldLoading) return <VacancyListSkeleton />
 
-    if (accumulated.length === 0) {
+    if (items.length === 0) {
       // Two different empties. "Nothing matches your filters" is actionable;
       // "no listings yet" is not, and offering to clear filters that are not
       // set would be nonsense.
@@ -170,7 +137,7 @@ export function Board() {
 
     return (
       <>
-        <VacancyList items={accumulated} refreshing={results.loading} />
+        <VacancyList items={items} refreshing={results.loading} />
         {hasMore ? (
           <div className={s.more}>
             <Button onClick={loadMore} disabled={results.loading}>
@@ -178,7 +145,7 @@ export function Board() {
             </Button>
           </div>
         ) : (
-          accumulated.length > PAGE_SIZE && <p className={s.allShown}>{t('results.allShown')}</p>
+          items.length > PAGE_SIZE && <p className={s.allShown}>{t('results.allShown')}</p>
         )}
       </>
     )
@@ -220,7 +187,7 @@ export function Board() {
         <main className={s.results} id="results" aria-label={t('a11y.results')}>
           <div className={s.toolbar}>
             <div className={s.count}>
-              {results.loading && accumulated.length === 0
+              {coldLoading
                 ? t('results.loading')
                 : t('results.count', { count: total })}
             </div>
@@ -260,6 +227,13 @@ export function Board() {
           {resultsBody()}
         </main>
       </div>
+
+      {/* Crawlable links to the keyword landing pages.
+          A category page that nothing links to is a page in the sitemap and
+          nowhere else — the filter panel is buttons, so this row is the only
+          real <a href> path from the board into them. It is also a shortcut
+          for a first-time visitor who does not want to build a filter. */}
+      <BrowseLinks />
 
       {/* The shared Modal becomes a bottom sheet at 768px and under, so the
           mobile filter experience is the platform's own sheet rather than a

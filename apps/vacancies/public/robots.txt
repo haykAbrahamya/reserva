@@ -1,0 +1,16 @@
+# Reserva Vacancies — https://vacancies.reserva.am
+User-agent: *
+Allow: /
+
+# Filtered board URLs are noindexed at runtime (every filter combination is a
+# near-duplicate of the same page), but they stay CRAWLABLE on purpose: a
+# crawler has to fetch a page to read the noindex on it, and blocking them here
+# would also block the links out of them.
+
+# Two sitemaps, each owned by whatever knows the answer.
+#   - this host's own file: the board and the keyword landing pages, written by
+#     the build (scripts/prerender.mjs), stable between deploys
+#   - the API's: every live listing, generated per request, so it can never
+#     advertise a position that has already closed
+Sitemap: https://vacancies.reserva.am/sitemap.xml
+Sitemap: https://api.reserva.am/api/v1/board/sitemap.xml

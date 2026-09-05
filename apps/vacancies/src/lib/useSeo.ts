@@ -34,6 +34,35 @@ function setLink(rel: string, href: string) {
   el.href = href
 }
 
+/**
+ * The locales this page is available in.
+ *
+ * All three are served from the SAME URL — the locale is a client-side
+ * preference, not part of the path — so every alternate points at this route's
+ * own canonical rather than at a translated address that does not exist. That
+ * is what tells Google the three renderings are one document; pointing them at
+ * the home page instead is the mistake that produces "Alternate page with
+ * proper canonical tag" across a whole site.
+ *
+ * Marked with data-seo-hreflang so a route change can clear the ones it wrote
+ * without touching anything the prerender baked in under the same rel.
+ */
+const HREFLANGS = ['hy', 'en', 'ru', 'x-default']
+
+function setHreflang(href: string) {
+  document.head
+    .querySelectorAll('link[rel="alternate"][data-seo-hreflang]')
+    .forEach((el) => el.remove())
+  for (const lang of HREFLANGS) {
+    const el = document.createElement('link')
+    el.setAttribute('rel', 'alternate')
+    el.setAttribute('hreflang', lang)
+    el.setAttribute('href', href)
+    el.setAttribute('data-seo-hreflang', '')
+    document.head.appendChild(el)
+  }
+}
+
 export interface SeoInput {
   title: string
   description?: string
@@ -44,6 +73,15 @@ export interface SeoInput {
   /** Keep a page out of the index — a filtered board, an error page. */
   noIndex?: boolean
 }
+
+/**
+ * The share image.
+ *
+ * The board has no artwork of its own, so it borrows the platform's — the
+ * brand is the same one, and a link that unfurls with nothing at all is worse
+ * than a link that unfurls with the company logo.
+ */
+const OG_IMAGE = 'https://reserva.am/og-image.png'
 
 export function useSeo({ title, description, canonicalPath, jsonLd, noIndex }: SeoInput) {
   useEffect(() => {
@@ -59,7 +97,10 @@ export function useSeo({ title, description, canonicalPath, jsonLd, noIndex }: S
 
     const url = `${window.location.origin}${canonicalPath ?? window.location.pathname}`
     setLink('canonical', url)
+    setHreflang(url)
     setMeta('meta[property="og:url"]', 'property', 'og:url', url)
+    setMeta('meta[property="og:image"]', 'property', 'og:image', OG_IMAGE)
+    setMeta('meta[name="twitter:image"]', 'name', 'twitter:image', OG_IMAGE)
 
     /*
      * A filtered board is deliberately not indexed. Every filter combination is

@@ -23,7 +23,8 @@ import { Skeleton } from '@/components/common/Skeleton/Skeleton'
 import { Header } from '@/components/layout/Header/Header'
 import { useI18n, useLocalized, useT } from '@/i18n'
 import { daysUntil, relativeTime } from '@/lib/dates'
-import { jobPostingJsonLd } from '@/lib/jsonLd'
+import { breadcrumbJsonLd, graph, jobPostingJsonLd } from '@/lib/jsonLd'
+import { landingCopy, landingPath, landingsForVacancy } from '@/lib/landings'
 import { paySummary, placeLabel, roleTitle, splitPerks } from '@/lib/vacancy'
 import { useAsync } from '@/lib/useAsync'
 import { useSeo } from '@/lib/useSeo'
@@ -72,6 +73,27 @@ export function Detail() {
     }
   }, [vacancy, loc, t])
 
+  /*
+   * The category pages this listing belongs to.
+   *
+   * Both a reader's next click and, more importantly, a link UP: a listing
+   * that ranks passes some of that to the landing page, which is the page that
+   * has to rank for "վարսավիրի աշխատանք". Without these the landing pages are
+   * linked from the board and from nowhere deeper.
+   */
+  const related = useMemo(() => {
+    if (!vacancy) return []
+    const area = vacancy.branch.area
+    return landingsForVacancy({
+      specialtyKey: vacancy.specialty.key,
+      areaKeys: [area?.key, area?.parent?.key].filter((k): k is string => Boolean(k)),
+      payType: vacancy.payType,
+    })
+  }, [vacancy])
+
+  // The first match is this listing's primary category, and so its breadcrumb.
+  const category = related[0] ?? null
+
   useSeo({
     title: view ? `${view.title} — ${view.salon} | ${t('app.name')}` : t('app.product'),
     description: view
@@ -83,7 +105,27 @@ export function Detail() {
         })
       : undefined,
     canonicalPath: `/v/${id}`,
-    jsonLd: vacancy && view ? jobPostingJsonLd(vacancy, view.title, view.salon) : null,
+    /*
+     * The posting AND the trail that leads to it, in one @graph.
+     *
+     * Two separate <script> blocks would work, but a single graph is what lets
+     * Google tie the breadcrumb to this page rather than treat it as a loose
+     * assertion — and the trail is what replaces the bare URL in the result
+     * with "Vacancies > Hairdresser jobs > this listing".
+     */
+    jsonLd:
+      vacancy && view
+        ? graph(
+            jobPostingJsonLd(vacancy, view.title, view.salon),
+            category
+              ? breadcrumbJsonLd([
+                  { name: t('app.product'), path: '/' },
+                  { name: landingCopy(category, locale).h1, path: landingPath(category.slug) },
+                  { name: view.title, path: `/v/${id}` },
+                ])
+              : null,
+          )
+        : null,
     // A listing that could not be loaded must not be indexed as a real page.
     noIndex: Boolean(error),
   })
@@ -424,6 +466,21 @@ export function Detail() {
           <div className={s.moreList}>
             {data.moreFromSalon.map((v) => (
               <VacancyCard key={v.id} vacancy={v} dense />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Category links. Real anchors with the keyword as their text — the
+          phrase someone searched is the phrase that should lead back up. */}
+      {related.length > 0 && (
+        <section className={s.related}>
+          <h2 className={s.relatedTitle}>{t('browse.title')}</h2>
+          <div className={s.relatedLinks}>
+            {related.map((l) => (
+              <Link key={l.slug} className={s.relatedLink} to={landingPath(l.slug)}>
+                {landingCopy(l, locale).h1}
+              </Link>
             ))}
           </div>
         </section>

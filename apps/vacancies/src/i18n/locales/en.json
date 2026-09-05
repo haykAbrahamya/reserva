@@ -237,6 +237,24 @@
   "a11y": {
     "skipToResults": "Skip to results",
     "filterPanel": "Filter listings",
-    "results": "Search results"
+    "results": "Search results",
+    "breadcrumb": "Breadcrumb"
+  },
+  "browse": {
+    "title": "Browse by category",
+    "role": "By profession",
+    "terms": "By arrangement",
+    "place": "By region"
+  },
+  "landing": {
+    "refine": "Add filters",
+    "aboutTitle": "About this work",
+    "emptyTitle": "Nothing open right now",
+    "emptyBody": "Listings in this category appear regularly. See the whole board, or come back a little later.",
+    "emptyAction": "See every listing"
+  },
+  "seo": {
+    "boardTitle": "Beauty industry jobs in Armenia — Reserva Vacancies",
+    "boardDescription": "Chair rentals, commission places and salaried positions in salons, barbershops and clinics. Search by region, profession and pay."
   }
 }

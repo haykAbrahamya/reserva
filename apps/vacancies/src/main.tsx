@@ -25,6 +25,22 @@ import { initialTheme } from '@/theme/useTheme'
  */
 document.documentElement.setAttribute('data-theme', initialTheme())
 
+/**
+ * Drop the pre-JS SEO block once React is about to take over.
+ *
+ * scripts/prerender.mjs bakes a hidden copy of the page's text and links into
+ * every static page, so a crawler that does not run JavaScript still reads the
+ * heading, the copy and the way into the other pages. The moment this app
+ * mounts, that block is a SECOND, stale copy of a page React is now rendering
+ * properly — it survives client-side navigation, so after one click it
+ * describes a page the visitor has already left, and it leaves the document
+ * with two <h1> elements.
+ *
+ * Removing it costs nothing: a renderer that executes this line is a renderer
+ * that will read the real DOM instead.
+ */
+document.getElementById('seo-content')?.remove()
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <I18nProvider>

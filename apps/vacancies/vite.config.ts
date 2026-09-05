@@ -8,7 +8,7 @@ import { requireEnv } from '../../tools/vite/require-env.mjs'
 // arrangement as the other three apps.
 const uiStyles = fileURLToPath(new URL('../../packages/ui/src/styles', import.meta.url))
 
-export default defineConfig({
+export default defineConfig(({ isSsrBuild }) => ({
   // A production build without an absolute VITE_API_URL is a broken deploy, so
   // it fails here instead of in a visitor's browser. See tools/vite/require-env.mjs.
   plugins: [react(), requireEnv(['VITE_API_URL'])],
@@ -59,15 +59,25 @@ export default defineConfig({
          * Split the vendor code that never changes away from ours, so a copy
          * tweak does not invalidate 150kB of React for every returning
          * visitor. The board is a page people come back to.
+         *
+         * Browser build ONLY. In the SSR build (`build:ssr`, which feeds the
+         * prerender) React is an EXTERNAL — it comes from node_modules at
+         * render time rather than being bundled — and naming an external in
+         * manualChunks is a hard rollup error, not a warning. Splitting a
+         * bundle that runs once in the build to produce a string would be
+         * pointless anyway.
          */
-        manualChunks: {
-          // 'react-dom/client' explicitly: the entry imports that subpath, and
-          // without naming it react-dom landed in the app chunk instead — so a
-          // copy change invalidated 130kB of vendor code for every visitor.
-          react: ['react', 'react-dom', 'react-dom/client', 'react-router-dom'],
-          icons: ['lucide-react'],
-        },
+        manualChunks: isSsrBuild
+          ? undefined
+          : {
+              // 'react-dom/client' explicitly: the entry imports that subpath,
+              // and without naming it react-dom landed in the app chunk instead
+              // — so a copy change invalidated 130kB of vendor code for every
+              // visitor.
+              react: ['react', 'react-dom', 'react-dom/client', 'react-router-dom'],
+              icons: ['lucide-react'],
+            },
       },
     },
   },
-})
+}))
