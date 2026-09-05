@@ -1,209 +1,6 @@
 @use '../../styles/vars' as *;
 @use '../../styles/app' as a;
 
-/*
- * Two columns: a brand panel that says why, and the form that asks what.
- *
- * The same arrangement as the marketing site's signup, on purpose — a salon
- * that has seen one should recognise the other — but built from THIS app's
- * tokens, so it is the board's palette and the board's type rather than the
- * booking product's. Nothing is imported from that page; only the shape is
- * shared, and a shape is not worth a shared component.
- */
-.page {
-  min-height: 100vh;
-  min-height: 100dvh;
-  display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
-  background: $bg-0;
-
-  /* Below the split, the panel is a header rather than a column — it still
-     carries the pitch, but stops taking half the screen from the form. */
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ── Brand panel ─────────────────────────────────────────── */
-
-.panel {
-  position: relative;
-  overflow: hidden;
-  /* Fills whatever height the form column ends up at — otherwise a form grown
-     by error messages leaves the panel's background stopping mid-page. */
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 32px;
-  padding: 34px 38px;
-  background: $hero-bg;
-  border-right: 1px solid $line-1;
-
-  @media (max-width: 900px) {
-    display: none;
-  }
-}
-
-.panelGrid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient($hero-edge 1px, transparent 1px),
-    linear-gradient(90deg, $hero-edge 1px, transparent 1px);
-  background-size: 34px 34px;
-  opacity: 0.5;
-  mask-image: radial-gradient(120% 90% at 20% 15%, #000, transparent 72%);
-}
-
-.panelOrb {
-  position: absolute;
-  width: 420px;
-  height: 420px;
-  right: -140px;
-  bottom: -160px;
-  border-radius: 50%;
-  background: radial-gradient(circle, $hero-violet, transparent 68%);
-  filter: blur(6px);
-}
-
-.panelLogo {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 11px;
-  text-decoration: none;
-  color: $fg-0;
-  width: fit-content;
-}
-
-.panelLogoMark {
-  display: grid;
-  place-items: center;
-  color: $accent;
-}
-
-.panelLogoName {
-  display: block;
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-
-.panelLogoTag {
-  display: block;
-  font-size: 11.5px;
-  color: $fg-3;
-}
-
-.panelMid {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 26px;
-}
-
-.panelQuote {
-  @include a.display(29px);
-  max-width: 17ch;
-}
-
-.points {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.point {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.pointIcon {
-  flex: 0 0 auto;
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
-  background: $accent-soft;
-  border: 1px solid $accent-line;
-  color: $accent;
-}
-
-.pointTitle {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: $fg-1;
-}
-
-.pointDesc {
-  display: block;
-  font-size: 13px;
-  line-height: 1.5;
-  color: $fg-3;
-  max-width: 34ch;
-}
-
-.panelBy {
-  position: relative;
-  margin: 0;
-  font-size: 12px;
-  color: $fg-3;
-}
-
-/* ── Form column ─────────────────────────────────────────── */
-
-/*
- * Centred by AUTO MARGINS, not by justify-content.
- *
- * `justify-content: center` on a flex column centres the child and then clips
- * whatever overflows the TOP — which is exactly what happened here the moment
- * validation errors made the form taller than the viewport: the step indicator
- * and the heading went above the scrollable area and could not be reached. Auto
- * margins centre while there is room and collapse to zero when there is not, so
- * a form that outgrows the screen scrolls instead of losing its top.
- */
-.main {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 68px 24px 44px;
-
-  @media (max-width: 560px) {
-    padding: 62px 16px 32px;
-  }
-
-  > * { margin-block: auto; }
-}
-
-.corner {
-  position: absolute;
-  top: 18px;
-  right: 20px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.mobileLogo {
-  display: none;
-  align-items: center;
-  gap: 9px;
-  margin-bottom: 22px;
-  color: $fg-0;
-  text-decoration: none;
-  font-size: 16px;
-  font-weight: 600;
-
-  @media (max-width: 900px) {
-    display: inline-flex;
-  }
-}
-
 .form {
   width: 100%;
   max-width: 430px;
@@ -562,3 +359,42 @@
 
   &:hover { color: $accent; }
 }
+
+/* ── Tag pickers (specialties, experience) ───────────────────
+   A checkbox list would be sixty rows tall; pills fit the same choice into a
+   glance, and the count of chosen ones stays readable at a distance. */
+
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  /* Sixty specialties is a wall on a phone. Capped and scrolled, so the step
+     below stays reachable without a long swipe past options nobody chose. */
+  max-height: 216px;
+  overflow-y: auto;
+}
+
+.tag {
+  @include a.reset-button;
+  padding: 6px 12px;
+  border: 1px solid $line-1;
+  border-radius: 999px;
+  background: $bg-2;
+  color: $fg-2;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: border-color 0.14s ease, background 0.14s ease, color 0.14s ease;
+
+  &:hover { border-color: $line-2; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+}
+
+.tagOn {
+  border-color: $accent-line;
+  background: $accent-soft;
+  color: $accent;
+  font-weight: 600;
+}
+
+/* A year count is two digits; a full-width field would suggest otherwise. */
+.yearsInput { max-width: 160px; }

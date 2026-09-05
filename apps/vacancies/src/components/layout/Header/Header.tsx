@@ -1,4 +1,8 @@
 import type { ReactNode } from 'react'
+import { Link } from 'react-router-dom'
+import { UserRound } from 'lucide-react'
+import { useProfessionalAuth } from '@/auth/ProfessionalAuth'
+import { useT } from '@/i18n'
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher/LanguageSwitcher'
 import { BoardLogo } from '@/components/common/Logo/Logo'
 import { ThemeToggle } from '@/components/common/ThemeToggle/ThemeToggle'
@@ -26,6 +30,8 @@ interface Props {
  */
 export function Header({ search }: Props) {
   const { isDark, toggle } = useThemeContext()
+  const t = useT()
+  const { signedIn, loading } = useProfessionalAuth()
 
   return (
     <header className={s.header}>
@@ -37,6 +43,32 @@ export function Header({ search }: Props) {
         <div className={s.actions}>
           <LanguageSwitcher />
           <ThemeToggle isDark={isDark} onToggle={toggle} />
+
+          {/*
+            One entry point, two audiences — /login asks which, once, and
+            remembers. It says "sign in" rather than naming either of them,
+            because at this moment nobody knows who is clicking.
+
+            Last in the row, and the same 34px circle as the theme toggle below
+            860px: as a bordered pill wedged between the brand and the language
+            switcher it read as a stray control rather than as part of the set.
+
+            Hidden while the stored session resolves — flashing "sign in" at
+            someone who IS signed in, for the length of one request, is the kind
+            of flicker that makes a site feel broken.
+          */}
+          {!loading &&
+            (signedIn ? (
+              <Link className={s.accountLink} to="/account" title={t('nav.account')}>
+                <UserRound size={15} />
+                <span className={s.accountLabel}>{t('nav.account')}</span>
+              </Link>
+            ) : (
+              <Link className={s.accountLink} to="/login" title={t('nav.login')}>
+                <UserRound size={15} />
+                <span className={s.accountLabel}>{t('nav.login')}</span>
+              </Link>
+            ))}
         </div>
       </div>
 

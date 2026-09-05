@@ -1,0 +1,115 @@
+@use '../../../styles/vars' as *;
+@use '../../../styles/app' as a;
+
+/* The fork's own styles, shared by /signup and /login — see AccountChoice.tsx. */
+
+/* Same column width as the forms it stands in for, so choosing a door does not
+   change the width of the thing under the cursor. */
+.wrap {
+  width: 100%;
+  max-width: 430px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.title {
+  @include a.display(26px);
+}
+
+.subtitle {
+  margin: -8px 0 4px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: $fg-2;
+}
+
+/* ── Which side of the market ────────────────────────────────
+   A fork, not a field: each card LEADS somewhere, so they are stacked and
+   sized like destinations rather than like a pair of radio buttons. */
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.choice {
+  @include a.reset-button;
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas:
+    'icon title arrow'
+    'icon desc  arrow';
+  align-items: center;
+  column-gap: 13px;
+  row-gap: 2px;
+  padding: 16px 16px 16px 15px;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  background: $bg-1;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.14s ease, background 0.14s ease, transform 0.14s ease;
+
+  &:hover {
+    border-color: $accent-line;
+    background: $accent-soft;
+
+    .choiceArrow { transform: translateX(2px); color: $accent; }
+  }
+
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+}
+
+.choiceIcon {
+  grid-area: icon;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: $accent-soft;
+  border: 1px solid $accent-line;
+  color: $accent;
+}
+
+.choiceTitle {
+  grid-area: title;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: $fg-0;
+}
+
+.choiceDesc {
+  grid-area: desc;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: $fg-3;
+}
+
+/* "Soon". Stated on the card rather than behind the click, so nobody picks a
+   branch only to be told it does not exist yet. */
+.choiceBadge {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: $bg-3;
+  border: 1px solid $line-1;
+  color: $fg-3;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.choiceArrow {
+  grid-area: arrow;
+  color: $fg-3;
+  transition: transform 0.14s ease, color 0.14s ease;
+}
+

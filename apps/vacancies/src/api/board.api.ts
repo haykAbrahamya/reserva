@@ -46,6 +46,22 @@ export function fetchVacancy(id: string, signal?: AbortSignal): Promise<VacancyD
   return apiGet<VacancyDetailResponse>(`/board/vacancies/${encodeURIComponent(id)}`, signal)
 }
 
-export function applyToVacancy(id: string, input: ApplyInput): Promise<ApplyResult> {
-  return apiPost<ApplyResult>(`/board/vacancies/${encodeURIComponent(id)}/apply`, input)
+/**
+ * Apply to a listing.
+ *
+ * `authed` is optional and the endpoint is public either way. Passing it does
+ * one thing: the server files the application under the signed-in account, so
+ * it appears in that person's own history. Applying without an account has
+ * always worked and still does — a salon reads exactly the same fields.
+ */
+export function applyToVacancy(
+  id: string,
+  input: ApplyInput,
+  authed?: <T>(path: string, init?: RequestInit) => Promise<T>,
+): Promise<ApplyResult> {
+  const path = `/board/vacancies/${encodeURIComponent(id)}/apply`
+  const body = JSON.stringify(input)
+  return authed
+    ? authed<ApplyResult>(path, { method: 'POST', body })
+    : apiPost<ApplyResult>(path, input)
 }

@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AtSign, Eye, EyeOff, AlertCircle, CalendarClock, Users, TrendingUp } from 'lucide-react'
+import { AtSign, Eye, EyeOff, AlertCircle, LayoutGrid, Users, Smartphone } from 'lucide-react'
 import { useAuthStore } from '@/store/auth.store'
 import { authService } from '@/services/auth.service'
 import { errorMessage } from '@/utils/errors'
@@ -8,10 +8,24 @@ import { useT } from '@/i18n'
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher/LanguageSwitcher'
 import s from './Login.module.scss'
 
+/**
+ * What the panel says while someone types their password.
+ *
+ * Product-AGNOSTIC, deliberately. This page used to pitch bookings — "clients
+ * book around the clock", "track every booking and its revenue" — which stopped
+ * being true the day a salon could hold vacancies and no booking product at
+ * all. Such a salon signs up on a purple job board, lands here, and reads an
+ * advert for something it did not buy.
+ *
+ * The deeper point is that a login page has no business selling anything: the
+ * person reading it is already a customer. So these three say what is true of
+ * the ACCOUNT rather than of any one product, which also means they never need
+ * revisiting when a fourth product ships.
+ */
 const FEATURES = [
-  { icon: CalendarClock, key: 'bookings' },
-  { icon: Users,         key: 'team' },
-  { icon: TrendingUp,    key: 'revenue' },
+  { icon: LayoutGrid, key: 'oneDashboard' },
+  { icon: Users,      key: 'team' },
+  { icon: Smartphone, key: 'anywhere' },
 ]
 
 // Reserva "Petal R" mark — strokes only, painted in a single color so it reads

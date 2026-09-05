@@ -1,0 +1,185 @@
+@use '../../../styles/vars' as *;
+@use '../../../styles/app' as a;
+
+.root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* What you chose, above the control that changes it. Reading order matches
+   importance: the answer first, the way to edit it second. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 6px 5px 11px;
+  border: 1px solid $accent-line;
+  border-radius: 999px;
+  background: $accent-soft;
+  color: $accent;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.chipRemove {
+  @include a.reset-button;
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.7;
+
+  &:hover { opacity: 1; background: $accent-line; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 1px; }
+}
+
+.trigger {
+  @include a.reset-button;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px dashed $line-2;
+  border-radius: $r-2;
+  background: transparent;
+  color: $fg-2;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: border-color 0.14s ease, color 0.14s ease, background 0.14s ease;
+
+  &:hover:not(:disabled) { border-color: $accent-line; color: $accent; background: $accent-soft; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+  &:disabled { opacity: 0.6; cursor: default; }
+}
+
+/* Dashed, and only ever "add" — it is an action, not a field showing a value.
+   A solid input-looking box would suggest the chips above were somewhere else. */
+.triggerLabel { text-align: left; }
+
+.chevron { flex: 0 0 auto; transition: transform 0.16s ease; }
+.chevronOpen { transform: rotate(180deg); }
+
+.panel {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 320px;
+  border: 1px solid $line-2;
+  border-radius: $r-3;
+  background: $bg-1;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+  overflow: hidden;
+}
+
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid $line-1;
+  color: $fg-3;
+  flex: 0 0 auto;
+}
+
+.search {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: $fg-0;
+  font: inherit;
+  font-size: 13.5px;
+  outline: none;
+
+  &::placeholder { color: $fg-3; }
+}
+
+.searchClear {
+  @include a.reset-button;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: $fg-3;
+  cursor: pointer;
+
+  &:hover { color: $fg-1; background: $bg-3; }
+}
+
+.list {
+  overflow-y: auto;
+  padding: 6px;
+}
+
+.group + .group { margin-top: 4px; }
+
+.groupTitle {
+  @include a.eyebrow;
+  padding: 8px 8px 4px;
+}
+
+.option {
+  @include a.reset-button;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 8px;
+  border-radius: $r-1;
+  color: $fg-1;
+  font-size: 13.5px;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover:not(:disabled) { background: $bg-2; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: -2px; }
+  &:disabled { opacity: 0.4; cursor: default; }
+}
+
+.optionOn { color: $accent; font-weight: 600; }
+
+.box {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  border: 1px solid $line-2;
+  border-radius: 5px;
+  color: #fff;
+
+  .optionOn & { background: $accent; border-color: $accent; }
+}
+
+.empty,
+.capped {
+  margin: 0;
+  padding: 12px;
+  font-size: 12.5px;
+  color: $fg-3;
+  text-align: center;
+}
+
+.capped {
+  border-top: 1px solid $line-1;
+  flex: 0 0 auto;
+}

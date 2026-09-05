@@ -3,6 +3,7 @@ import { CheckCircle2, Send, ShieldCheck } from 'lucide-react'
 import { Button, Input, Modal, Textarea } from '@reserva/ui'
 import { isValidPhone, normalizePhoneInput } from '@reserva/shared'
 import { applyToVacancy } from '@/api/board.api'
+import { useProfessionalAuth } from '@/auth/ProfessionalAuth'
 import { ApiError } from '@/api/client'
 import { useI18n, useT } from '@/i18n'
 import s from './ApplyModal.module.scss'
@@ -41,9 +42,20 @@ export function ApplyModal({ open, onClose, vacancyId, role, salon }: Props) {
   const t = useT()
   const { locale } = useI18n()
 
-  const [name, setName] = useState('')
-  const [phone, setPhone] = useState('')
-  const [email, setEmail] = useState('')
+  /*
+   * A signed-in professional does not retype what they already told us.
+   *
+   * Seeded from the profile ONCE, as the initial state rather than in an
+   * effect: re-seeding on every render of a changing profile would overwrite
+   * whatever they are editing in the form. They can still change any of it —
+   * this is a prefill, not a lock, because someone may well apply with a
+   * different number than the one they registered with.
+   */
+  const { professional, signedIn, authed } = useProfessionalAuth()
+
+  const [name, setName] = useState(professional?.name ?? '')
+  const [phone, setPhone] = useState(professional?.phone ?? '')
+  const [email, setEmail] = useState(professional?.email ?? '')
   const [note, setNote] = useState('')
 
   const [errors, setErrors] = useState<Errors>({})
@@ -92,13 +104,20 @@ export function ApplyModal({ open, onClose, vacancyId, role, salon }: Props) {
     setSending(true)
     setFailure(null)
     try {
-      const result = await applyToVacancy(vacancyId, {
-        name: name.trim(),
-        phone: normalizePhoneInput(phone),
-        email: email.trim(),
-        note: note.trim(),
-        locale,
-      })
+      const result = await applyToVacancy(
+        vacancyId,
+        {
+          name: name.trim(),
+          phone: normalizePhoneInput(phone),
+          email: email.trim(),
+          note: note.trim(),
+          locale,
+        },
+        // Signed in? File it under their account so it shows in their own
+        // history. Signed out is not a lesser application — the salon receives
+        // exactly the same fields.
+        signedIn ? authed : undefined,
+      )
       setSent({ updated: result.updated })
     } catch (err) {
       // The backend's message is developer-facing English, so the CODE is what

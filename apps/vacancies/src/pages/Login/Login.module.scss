@@ -1,0 +1,157 @@
+@use '../../styles/vars' as *;
+@use '../../styles/app' as a;
+
+.form {
+  width: 100%;
+  max-width: 430px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.title {
+  @include a.display(26px);
+}
+
+.subtitle {
+  margin: -8px 0 4px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: $fg-2;
+}
+
+.error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: $r-2;
+  border: 1px solid $danger;
+  background: $danger-soft;
+  color: $danger;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.pwWrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  input { padding-right: 40px; }
+}
+
+.pwToggle {
+  @include a.reset-button;
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  color: $fg-3;
+  cursor: pointer;
+
+  &:hover { color: $fg-1; }
+}
+
+.submit {
+  margin-top: 4px;
+  justify-content: center;
+}
+
+.altAction {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: $fg-3;
+  text-align: center;
+
+  a {
+    color: $accent;
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
+  }
+}
+
+/* The way back to the fork. Quiet, because it is an escape hatch for the rare
+   visitor whose remembered choice was wrong — not a second call to action. */
+.backLink {
+  @include a.reset-button;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  font-size: 12.5px;
+  color: $fg-3;
+  cursor: pointer;
+
+  &:hover { color: $accent; }
+}
+
+/* ── The salon door ──────────────────────────────────────────
+   A hand-off rather than a form: their session lives on another host. */
+
+.door {
+  width: 100%;
+  max-width: 430px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.doorIcon {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: $accent-soft;
+  border: 1px solid $accent-line;
+  color: $accent;
+  margin-bottom: 2px;
+}
+
+.doorTitle {
+  @include a.display(23px);
+}
+
+.doorBody {
+  margin: 0;
+  max-width: 40ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: $fg-2;
+}
+
+.doorCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 11px 20px;
+  border-radius: 999px;
+  background: $accent;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover { filter: brightness(1.06); }
+}
+
+.doorAlt {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: $fg-3;
+
+  a {
+    color: $accent;
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
+  }
+}

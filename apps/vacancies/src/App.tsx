@@ -33,6 +33,11 @@ const Landing = lazy(() => import('@/pages/Landing/Landing').then((m) => ({ defa
  */
 const SignUp = lazy(() => import('@/pages/SignUp/SignUp').then((m) => ({ default: m.SignUp })))
 
+/** Sign-in, and the professional's own page. Both are edges of the board: a
+ *  visitor who never signs in pays for neither. */
+const Login = lazy(() => import('@/pages/Login/Login').then((m) => ({ default: m.Login })))
+const Account = lazy(() => import('@/pages/Account/Account').then((m) => ({ default: m.Account })))
+
 const SITE_JSONLD_ID = 'site-jsonld'
 
 /**
@@ -89,7 +94,9 @@ export default function App() {
    * fold, because the panel stopped at 100dvh and the footer started.
    */
   const { pathname } = useLocation()
-  const standalone = pathname === '/signup' || pathname.startsWith('/signup/')
+  const standalone = ['/signup', '/login'].some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
+  )
 
   return (
     <div className={s.shell}>
@@ -110,6 +117,8 @@ export default function App() {
                 Its own page rather than a link to reserva.am/signup, which is
                 written entirely around the booking product. */}
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/account" element={<Account />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

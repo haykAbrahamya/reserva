@@ -54,3 +54,48 @@
   .searchNarrow { display: block; }
   .inner { gap: 12px; }
 }
+
+/* ── Account entry ───────────────────────────────────────────
+   Quiet on purpose: the board's job is the listings, and most visitors never
+   need an account at all. It reads as available, not as a call to action. */
+
+.accountLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 13px;
+  border: 1px solid $line-2;
+  border-radius: 999px;
+  background: $bg-1;
+  color: $fg-1;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: border-color 0.14s ease, color 0.14s ease, background 0.14s ease;
+
+  &:hover { color: $accent; border-color: $accent-line; background: $accent-soft; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+}
+
+/*
+ * Below the wide layout it becomes the SAME 34px circle as the theme toggle.
+ *
+ * Not a shrunken pill: at that width the bar is a row of three icon controls,
+ * and one of them being a bordered capsule with a word in it is what made the
+ * header look broken. Matching the toggle exactly makes them read as a set.
+ * The accessible name survives in `title` and the link text is only visually
+ * hidden, never removed.
+ */
+@media (max-width: 860px) {
+  .accountLink {
+    width: 34px;
+    padding: 0;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .accountLabel { @include a.sr-only; }
+}

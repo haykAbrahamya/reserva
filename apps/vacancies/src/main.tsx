@@ -11,6 +11,7 @@ import '@/styles/theme.css'
 import '@/styles/global.scss'
 
 import App from './App'
+import { ProfessionalAuthProvider } from '@/auth/ProfessionalAuth'
 import { I18nProvider } from '@/i18n'
 import { ThemeProvider } from '@/theme/ThemeProvider'
 import { initialTheme } from '@/theme/useTheme'
@@ -47,7 +48,12 @@ createRoot(document.getElementById('root')!).render(
       <ThemeProvider>
         <ToastProvider>
           <BrowserRouter>
-            <App />
+            {/* Inside the router: the provider navigates on sign-out and its
+                consumers are routes. Outside I18nProvider it would lose the
+                locale it registers new accounts with. */}
+            <ProfessionalAuthProvider>
+              <App />
+            </ProfessionalAuthProvider>
           </BrowserRouter>
         </ToastProvider>
       </ThemeProvider>

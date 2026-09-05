@@ -68,7 +68,16 @@ function unwrap<T>(payload: unknown): T {
   return payload as T
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+/**
+ * The one request path.
+ *
+ * Exported so the professional-session layer can add a bearer token and a
+ * refresh retry ON TOP of it rather than beside it — everything below (the
+ * envelope unwrap, the abort handling, and especially the NOT_JSON guard that
+ * caught the missing VITE_API_URL) has to apply to authenticated calls too, and
+ * a second copy of it would drift.
+ */
+export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
   const url = `${API_URL}${path}`
 
   let res: Response
@@ -128,11 +137,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export function apiGet<T>(path: string, signal?: AbortSignal): Promise<T> {
-  return request<T>(path, { signal })
+  return apiRequest<T>(path, { signal })
 }
 
 export function apiPost<T>(path: string, body: unknown, signal?: AbortSignal): Promise<T> {
-  return request<T>(path, { method: 'POST', body: JSON.stringify(body), signal })
+  return apiRequest<T>(path, { method: 'POST', body: JSON.stringify(body), signal })
 }
 
 /** True for the abort every in-flight-request cleanup produces. */

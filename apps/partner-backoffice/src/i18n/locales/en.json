@@ -267,21 +267,21 @@
   },
   "login": {
     "features": {
-      "bookings": {
-        "title": "Bookings around the clock",
-        "desc": "Clients book online, day or night"
+      "oneDashboard": {
+        "title": "Everything in one dashboard",
+        "desc": "Bookings, courses and job listings in the same place"
       },
       "team": {
-        "title": "Your whole team, organized",
-        "desc": "Specialists, services & schedules"
+        "title": "Your team, under control",
+        "desc": "Specialists, branches and access rights"
       },
-      "revenue": {
-        "title": "Revenue at a glance",
-        "desc": "Track every booking and earning"
+      "anywhere": {
+        "title": "Available anywhere",
+        "desc": "From a computer or a phone, nothing to install"
       }
     },
-    "quote": "Your salon, beautifully managed.",
-    "tagline": "Reserva · Booking platform for Armenian salons",
+    "quote": "Your business, beautifully run.",
+    "tagline": "Reserva · A platform for Armenian beauty salons",
     "welcomeBack": "Welcome back",
     "subtitle": "Sign in to your backoffice dashboard",
     "emailLabel": "Email address",

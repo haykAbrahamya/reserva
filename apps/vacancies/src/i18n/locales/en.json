@@ -10,7 +10,9 @@
     "theme": "Switch theme",
     "language": "Language",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "login": "Sign in",
+    "account": "My account"
   },
   "hero": {
     "title": "Your next job in the beauty industry",
@@ -306,7 +308,7 @@
       "title": "Check your email",
       "body": "We sent an activation link to {email}. It works for 24 hours.",
       "step1": "Open the email and follow the activation link",
-      "step2": "Your account is created and you are signed in automatically",
+      "step2": "Your account is created and you are signed in to the Reserva dashboard at backoffice.reserva.am",
       "step3": "Post your first listing",
       "backToBoard": "Back to the listings"
     },
@@ -322,24 +324,112 @@
       "phoneTaken": "An account with this number already exists. Try signing in.",
       "closed": "Registration is not open at the moment. Please get in touch.",
       "generic": "We could not create the account. Please try again."
-    },
-    "type": {
-      "title": "What brings you here?",
-      "subtitle": "Choose how you will be using Reserva Vacancies.",
+    }
+  },
+  "auth": {
+    "panelTitle": "Welcome back",
+    "points": {
       "salon": {
-        "title": "I am hiring",
-        "desc": "A salon or employer posting listings"
+        "title": "For salons",
+        "desc": "Your listings and applications live in the Reserva dashboard"
       },
       "specialist": {
-        "title": "I am looking for work",
-        "desc": "A specialist applying to listings",
-        "badge": "Soon"
+        "title": "For specialists",
+        "desc": "Your details and the applications you have sent, right here"
       }
     },
-    "specialist": {
-      "title": "Specialist accounts are coming",
-      "body": "They are not ready yet — and you do not need one today. You can apply to any listing directly by leaving your name and phone number.",
-      "browse": "Browse the listings"
+    "signup": {
+      "title": "What brings you here?",
+      "subtitle": "Choose how you will be using Reserva Vacancies."
+    },
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Which kind of account do you have?",
+      "seoTitle": "Sign in — Reserva Vacancies",
+      "seoDescription": "Sign in to your account, as a salon or as a specialist."
+    },
+    "role": {
+      "salon": {
+        "title": "Salon",
+        "signupDesc": "I am posting a listing",
+        "loginDesc": "I manage my listings"
+      },
+      "specialist": {
+        "title": "Specialist",
+        "signupDesc": "I am looking for work",
+        "loginDesc": "I apply to listings"
+      }
+    },
+    "salonDoor": {
+      "title": "Continue in the dashboard",
+      "body": "Salon accounts live in the Reserva dashboard at backoffice.reserva.am. That is where you post listings and read the applications.",
+      "cta": "Open the dashboard",
+      "noAccount": "No account yet?",
+      "signUp": "Sign up"
+    },
+    "specialistLogin": {
+      "title": "Sign in",
+      "subtitle": "Your account, for your details and your applications."
+    },
+    "identifier": "Phone or email",
+    "identifierPlaceholder": "+374 XX XXXXXX",
+    "signIn": "Sign in",
+    "signingIn": "Signing in…",
+    "noAccount": "No account?",
+    "createOne": "Create one",
+    "notYou": "Not you?",
+    "errors": {
+      "missing": "Fill in both fields",
+      "invalid": "Those details did not match. Check your phone or email and your password.",
+      "generic": "Could not sign in. Please try again."
+    }
+  },
+  "specialist": {
+    "stepYou": "You",
+    "stepWork": "Your work",
+    "youTitle": "Create your account",
+    "youSubtitle": "Your phone number is how a salon will reach you.",
+    "name": "Full name",
+    "namePlaceholder": "e.g. Ani Hakobyan",
+    "phone": "Phone",
+    "phoneHint": "This is what you will sign in with.",
+    "email": "Email",
+    "emailPlaceholder": "Optional",
+    "workTitle": "What do you do?",
+    "workSubtitle": "You can skip any of this and fill it in later.",
+    "specialties": "Specialties",
+    "specialtiesHint": "Pick the kinds of work you do.",
+    "about": "About you",
+    "aboutPlaceholder": "A few sentences about your experience and how you work.",
+    "errors": {
+      "name": "Enter your full name",
+      "phone": "Enter a valid phone number",
+      "email": "Enter a valid email or leave it empty"
+    },
+    "years": "Experience (years)",
+    "yearsPlaceholder": "e.g. 5",
+    "yearsHint": "You can leave this empty.",
+    "pickSpecialties": "Choose a specialty",
+    "addMore": "Add another",
+    "searchSpecialties": "Search…",
+    "remove": "Remove",
+    "maxReached": "Up to {max} specialties"
+  },
+  "account": {
+    "title": "My account",
+    "logout": "Sign out",
+    "profile": "Your details",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "applications": "Your applications",
+    "noApplicationsTitle": "No applications yet",
+    "noApplicationsBody": "Once you apply to a listing it will appear here.",
+    "status": {
+      "new": "Sent",
+      "contacted": "They got in touch",
+      "shortlisted": "Shortlisted",
+      "rejected": "Not this time"
     }
   }
 }
