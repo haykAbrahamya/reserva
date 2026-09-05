@@ -32,8 +32,16 @@ interface Props {
  * failure being a filter that exists on desktop and quietly does not on a
  * phone, where most of the traffic is.
  *
- * Location, role and pay open by default because they are what people filter
- * on first; the rest stay shut so the panel is scannable rather than endless.
+ * Role comes FIRST, then location, then pay.
+ *
+ * This is a job board, and the question a visitor arrives with is "is there
+ * work for a barber", not "is there work in Arabkir". People identify by their
+ * craft — it is the one filter almost everyone sets, and the one that makes the
+ * rest of the panel worth reading. Location is the second cut, applied to a
+ * list that already only contains work you can do.
+ *
+ * Those three open by default; the rest stay shut so the panel is scannable
+ * rather than endless.
  */
 export function FilterPanel({ meta, control }: Props) {
   const t = useT()
@@ -71,19 +79,6 @@ export function FilterPanel({ meta, control }: Props) {
   return (
     <div className={s.panel}>
       <FilterSection
-        title={t('filters.sections.location')}
-        activeCount={filters.area.length}
-        defaultOpen
-      >
-        <AreaFilter
-          tree={meta.areaTree}
-          counts={meta.areas}
-          selected={filters.area}
-          onChange={(area) => patch({ area })}
-        />
-      </FilterSection>
-
-      <FilterSection
         title={t('filters.sections.specialty')}
         activeCount={filters.specialty.length + filters.group.length}
         defaultOpen
@@ -96,6 +91,19 @@ export function FilterPanel({ meta, control }: Props) {
           selectedGroups={filters.group}
           onChangeSpecialties={(specialty) => patch({ specialty })}
           onChangeGroups={(group) => patch({ group })}
+        />
+      </FilterSection>
+
+      <FilterSection
+        title={t('filters.sections.location')}
+        activeCount={filters.area.length}
+        defaultOpen
+      >
+        <AreaFilter
+          tree={meta.areaTree}
+          counts={meta.areas}
+          selected={filters.area}
+          onChange={(area) => patch({ area })}
         />
       </FilterSection>
 
@@ -167,8 +175,8 @@ export function FilterPanel({ meta, control }: Props) {
 function PanelSkeleton() {
   const t = useT()
   const titles = [
-    'filters.sections.location',
     'filters.sections.specialty',
+    'filters.sections.location',
     'filters.sections.pay',
     'filters.sections.schedule',
     'filters.sections.experience',

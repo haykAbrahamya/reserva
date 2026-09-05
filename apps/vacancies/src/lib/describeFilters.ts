@@ -59,28 +59,6 @@ export function describeFilters({ filters, meta, loc, t, patch }: Ctx): FilterCh
     })
   }
 
-  // ── Places. Resolved through the tree so a district shows its city.
-  for (const key of filters.area) {
-    let label = key
-    for (const node of meta?.areaTree ?? []) {
-      if (node.key === key) {
-        label = loc(node.name, node.nameI18n)
-        break
-      }
-      const child = node.children.find((c) => c.key === key)
-      if (child) {
-        label = `${loc(child.name, child.nameI18n)}, ${loc(node.name, node.nameI18n)}`
-        break
-      }
-    }
-    chips.push({
-      id: `area:${key}`,
-      kind: t('filters.sections.location'),
-      label,
-      remove: () => patch(without(filters, 'area', key)),
-    })
-  }
-
   // ── Whole specialty groups, then individual roles.
   for (const key of filters.group) {
     const group = meta?.specialtyGroups.find((g) => g.key === key)
@@ -101,6 +79,28 @@ export function describeFilters({ filters, meta, loc, t, patch }: Ctx): FilterCh
       kind: t('filters.sections.specialty'),
       label: found ? loc(found.roleName, found.roleNameI18n) : key,
       remove: () => patch(without(filters, 'specialty', key)),
+    })
+  }
+
+  // ── Places. Resolved through the tree so a district shows its city.
+  for (const key of filters.area) {
+    let label = key
+    for (const node of meta?.areaTree ?? []) {
+      if (node.key === key) {
+        label = loc(node.name, node.nameI18n)
+        break
+      }
+      const child = node.children.find((c) => c.key === key)
+      if (child) {
+        label = `${loc(child.name, child.nameI18n)}, ${loc(node.name, node.nameI18n)}`
+        break
+      }
+    }
+    chips.push({
+      id: `area:${key}`,
+      kind: t('filters.sections.location'),
+      label,
+      remove: () => patch(without(filters, 'area', key)),
     })
   }
 
