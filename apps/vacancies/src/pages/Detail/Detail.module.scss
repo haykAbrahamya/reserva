@@ -380,15 +380,59 @@
   line-height: 1.55;
 }
 
+/*
+  The salon block — an IDENTITY card, and it has to look like one.
+
+  It used to be a bordered row with a small avatar, which is the same shape as
+  every listing row beneath it; three of those in a column and the eye reads one
+  undifferentiated pile instead of "here is the salon, and here are its other
+  jobs". It is now the only bordered object in the area (the listings share one
+  grouped list), on a faint wash of the salon's own accent, with a larger mark
+  and the name set in the display face rather than the UI one.
+*/
+/*
+  The salon block — a THIRD weight, deliberately.
+
+  This corner of the page holds three different kinds of thing, and they were
+  rendering as two: the apply card (accent wash, the primary action), the salon
+  (a link out to whoever is hiring), and the salon's other openings. The salon
+  used to be a bordered white card, which is the same object as a listing card —
+  so with three of those stacked, nothing said which was which.
+
+  It is now a quiet FILLED row: no border of its own, so it cannot be confused
+  with the bordered list below it, and no accent, so it cannot be confused with
+  the apply card above it. Between them in weight, which is exactly where a
+  secondary link belongs.
+*/
 .salonCard {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   padding: 14px 16px;
-  @include a.surface;
-  transition: border-color 0.14s ease, box-shadow 0.14s ease;
+  border-radius: $r-3;
+  /*
+    $bg-3, not $bg-2. On this app's warm page ground (#F4F2ED) the muted slab
+    (#F2F0EA) differs by two values per channel — it read as no panel at all.
+    $bg-3 is the first neutral that actually separates from the page while
+    staying quieter than the white cards around it.
+  */
+  background: $bg-3;
+  border: 1px solid transparent;
+  transition: background 0.14s ease, border-color 0.14s ease;
 
-  &:hover { border-color: $line-2; box-shadow: $shadow-2; }
+  &:hover {
+    /* Toward the product accent rather than a darker grey — there is no neutral
+       past $bg-3 in light mode ($bg-4 is a highlight, i.e. lighter). */
+    background: $accent-soft;
+    border-color: $accent-line;
+
+    .salonCardCta { gap: 7px; }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $accent;
+    outline-offset: 2px;
+  }
 }
 
 .salonCardText {
@@ -401,9 +445,7 @@
 .salonCardLabel { @include a.eyebrow; }
 
 .salonCardName {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: $fg-0;
+  @include a.display(16px);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -412,9 +454,14 @@
 .salonCardCta {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
+  margin-top: 2px;
   font-size: 12px;
+  font-weight: 500;
   color: $accent-contrast;
+  transition: gap 0.14s ease;
+
+  svg { flex-shrink: 0; }
 }
 
 /* ── More from this salon ── */
@@ -427,12 +474,45 @@
   border-top: 1px solid $line-1;
 }
 
-.moreTitle { @include a.display(20px); }
+.moreTitle {
+  @include a.display(20px);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
 
+/* Digits only, so the numeric face is safe here — a phrase in this face would
+   render Armenian as stretched fallback letterforms. */
+.moreCount {
+  @include a.numeric;
+  font-size: 11.5px;
+  line-height: 1;
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: $accent-soft;
+  color: $accent-contrast;
+}
+
+/*
+  ONE grouped surface, not a scatter of cards.
+
+  Side by side in an auto-fit grid, each listing carried its own border and
+  shadow — so under an equally-bordered salon card the whole area read as four
+  interchangeable objects rather than "a salon, and its other jobs". Collecting
+  the rows into a single bordered list with hairlines between them makes the
+  grouping structural: one card = the salon, one list = its openings.
+
+  A single column, too. These are scanned as a short list of roles, and two
+  columns make the eye zig-zag over three items for no gain.
+*/
 .moreList {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  @include a.surface;
+  /* Clips the rows' hover tint to the rounded corners. */
+  overflow: hidden;
+
+  > * + * { border-top: 1px solid $line-1; }
 }
 
 /* ── Mobile action bar ──
@@ -476,8 +556,5 @@
 
   .mobileBar { display: flex; }
 
-  /* Clear the fixed bar so the last section stays reachable. */
-  .page { padding-bottom: 84px; }
 
-  .moreList { grid-template-columns: minmax(0, 1fr); }
 }

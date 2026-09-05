@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   ArrowLeft,
@@ -87,6 +87,24 @@ export function Detail() {
     // A listing that could not be loaded must not be indexed as a real page.
     noIndex: Boolean(error),
   })
+
+  /*
+   * Tell the DOCUMENT that a fixed bar is occupying the bottom of the viewport.
+   *
+   * The bar is rendered here but it is not this page's to clear: padding the
+   * page moved the page's own content up and left the footer — a sibling of the
+   * page in the app shell — still underneath it. The body reserves the height
+   * instead (see global.scss), which lifts everything, footer included.
+   *
+   * Above this hook so it sits with the others: the early returns below would
+   * otherwise make it conditional.
+   */
+  const showsActionBar = Boolean(vacancy?.acceptsApplications)
+  useEffect(() => {
+    if (!showsActionBar) return
+    document.body.classList.add('has-action-bar')
+    return () => document.body.classList.remove('has-action-bar')
+  }, [showsActionBar])
 
   if (loading && !vacancy) {
     return (
@@ -374,11 +392,13 @@ export function Detail() {
 
           {salonUrl && (
             <a href={salonUrl} target="_blank" rel="noopener noreferrer" className={s.salonCard}>
+              {/* Larger than a listing row's mark: this block is ABOUT the
+                  salon, where a listing row merely belongs to one. */}
               <Avatar
                 name={view.salon}
                 src={resolveImageUrl(vacancy.salon.logoUrl) ?? undefined}
                 color={vacancy.salon.accent}
-                size="md"
+                size="lg"
               />
               <div className={s.salonCardText}>
                 <span className={s.salonCardLabel}>{t('detail.salon')}</span>
@@ -395,7 +415,12 @@ export function Detail() {
 
       {data && data.moreFromSalon.length > 0 && (
         <section className={s.more}>
-          <h2 className={s.moreTitle}>{t('detail.moreFromSalon')}</h2>
+          <h2 className={s.moreTitle}>
+            {t('detail.moreFromSalon')}
+            {/* The count turns a heading into a label for the list under it —
+                and tells someone whether it is worth scrolling before they do. */}
+            <span className={s.moreCount}>{data.moreFromSalon.length}</span>
+          </h2>
           <div className={s.moreList}>
             {data.moreFromSalon.map((v) => (
               <VacancyCard key={v.id} vacancy={v} dense />

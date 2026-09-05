@@ -126,14 +126,25 @@
   padding: 22px;
 }
 
+/*
+  Actions wrap rather than overflow.
+
+  A row of nowrap buttons pinned to flex-end cannot shrink — a flex item will
+  not go below its content min-width — so a long label in one locale pushed the
+  primary action straight out of the dialog. Wrapping gives it somewhere to go,
+  and min-width:0 lets a button narrow before that becomes necessary.
+*/
 .footer {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 8px;
   padding: 14px 22px;
   border-top: 1px solid $line-1;
   flex-shrink: 0;
+
+  > button { min-width: 0; }
 }
 
 @media (max-width: 768px) {

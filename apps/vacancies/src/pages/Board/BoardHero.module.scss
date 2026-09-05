@@ -135,7 +135,13 @@
 
 .title {
   @include a.display(40px);
-  max-width: 18ch;
+  /*
+    18ch was measured against "Find your next chair." and is too tight for any
+    heading that actually names the industry — the Armenian ran to three lines
+    while the band beside it sat empty. 24ch keeps a comfortable measure and
+    still stops well short of the regions panel.
+  */
+  max-width: 24ch;
 }
 
 .subtitle {

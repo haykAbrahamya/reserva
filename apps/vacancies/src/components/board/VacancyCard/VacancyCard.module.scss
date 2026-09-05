@@ -177,13 +177,54 @@
 }
 
 /* ── Dense (the "more from this salon" strip) ── */
+/*
+  The "more from this salon" row.
+
+  FLAT — no border, no radius, no shadow of its own. Three separately-bordered
+  cards under a bordered salon card is four objects of identical weight, which
+  is exactly why the section read as one undifferentiated pile. These rows are
+  grouped by their container instead, hairline-separated, so they read as a LIST
+  of jobs while the salon block above stays a single distinct card.
+
+  The accent bar on hover is kept: in a flat list it is the whole affordance,
+  and on a phone the pressed background stands in for it.
+*/
 .dense {
   grid-template-areas: 'identity side';
-  padding: 14px 16px;
+  padding: 13px 16px;
   gap: 14px;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 
-  .title { font-size: 15.5px; }
+  /*
+    The UI face here, not the display serif.
+
+    Fraunces is a display face and Armenian resolves it to Noto Serif Armenian,
+    which at list-row size reads heavy and slightly archaic — fine for the page
+    title it was designed for, wrong for a compact row of links. The serif is
+    reserved for headings; this is an index entry.
+  */
+  .title {
+    font-family: $font-sans;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+
   .side { min-width: 0; justify-content: center; }
+
+  &:hover {
+    background: $bg-2;
+    border: 0;
+    box-shadow: none;
+    /* No lift: a row inside a grouped list has nothing to lift away from, and
+       nudging one row shifts the hairlines around it. */
+    transform: none;
+  }
+
+  &:active { background: $bg-3; }
 }
 
 /* ── Narrow ──

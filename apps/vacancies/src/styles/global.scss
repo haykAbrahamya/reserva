@@ -90,3 +90,30 @@ html.theme-switching *::after {
   background: $accent-soft;
   color: $fg-0;
 }
+
+/*
+  Room for the fixed apply bar.
+
+  The detail page used to pad its own bottom, which cleared the bar for the page
+  content and left the FOOTER — a sibling of the page, further down the shell —
+  sitting underneath it.
+
+  Two false starts are worth recording, because both looked right:
+
+  <body> padding does nothing — the base reset sets html, body and #root to
+  height:100%, so the body box is exactly one viewport tall and its bottom
+  padding sits behind the content that overflows it.
+
+  A margin on the footer does nothing either, and that one measures as applied:
+  a last child's bottom MARGIN is not counted in the scrollable overflow, so
+  the page stays exactly as tall as it was. Padding is part of the box, so it
+  is — which is why this is padding on the last in-flow element and nothing
+  else would do.
+
+  Toggled by a class the page sets while the bar is mounted, and scoped to the
+  breakpoint where the bar appears, so no page ever reserves room for a bar that
+  is not there.
+*/
+@media (max-width: 700px) {
+  body.has-action-bar footer { padding-bottom: var(--action-bar-h); }
+}

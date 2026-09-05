@@ -268,8 +268,14 @@ export function Board() {
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         title={t('filters.title')}
+        /* Buttons handed to the Modal's own footer slot rather than wrapped in
+           a flex row of our own. The wrapper was the bug: below 768px the Modal
+           footer becomes a column and sizes each BUTTON to full width, but our
+           div sat between them as a single shrink-to-fit item, so the buttons
+           had no width to divide and the long Armenian label pushed the whole
+           row past both edges of the sheet. */
         footer={
-          <div className={s.sheetFooter}>
+          <>
             {activeCount > 0 && (
               <Button variant="ghost" onClick={clear}>
                 {t('filters.clearAll')}
@@ -278,7 +284,7 @@ export function Board() {
             <Button variant="accent" onClick={() => setSheetOpen(false)}>
               {total > 0 ? t('filters.apply', { count: total }) : t('filters.applyNone')}
             </Button>
-          </div>
+          </>
         }
       >
         <FilterPanel meta={meta.data} control={control} />

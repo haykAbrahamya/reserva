@@ -12,7 +12,16 @@ import s from './VacancyCard.module.scss'
 
 interface Props {
   vacancy: Card
-  /** Compact form for the "more from this salon" strip on a detail page. */
+  /**
+   * Compact form for the "more from this salon" strip on a detail page.
+   *
+   * It also drops the salon's avatar and name, which is the point rather than a
+   * side effect: that strip sits under a heading that already says whose
+   * listings these are, so repeating the same logo and the same name on every
+   * row said nothing and made each row look like the salon card directly above
+   * it. Without them the rows lead with the ROLE — the only thing that differs
+   * between them, and the only reason to open one.
+   */
   dense?: boolean
 }
 
@@ -58,18 +67,24 @@ export function VacancyCard({ vacancy, dense = false }: Props) {
       style={{ ['--salon-accent' as string]: vacancy.salon.accent }}
     >
       <div className={s.identity}>
-        <Avatar
-          name={salonName}
-          src={resolveImageUrl(vacancy.salon.logoUrl) ?? undefined}
-          color={vacancy.salon.accent}
-          size={dense ? 'sm' : 'md'}
-          className={s.avatar}
-        />
+        {!dense && (
+          <Avatar
+            name={salonName}
+            src={resolveImageUrl(vacancy.salon.logoUrl) ?? undefined}
+            color={vacancy.salon.accent}
+            size="md"
+            className={s.avatar}
+          />
+        )}
         <div className={s.headings}>
           <h3 className={s.title}>{title}</h3>
           <p className={s.salon}>
-            <span className={s.salonName}>{salonName}</span>
-            <span className={s.dot} aria-hidden="true">·</span>
+            {!dense && (
+              <>
+                <span className={s.salonName}>{salonName}</span>
+                <span className={s.dot} aria-hidden="true">·</span>
+              </>
+            )}
             <span className={s.place}>
               <MapPin size={12} aria-hidden="true" />
               {place}

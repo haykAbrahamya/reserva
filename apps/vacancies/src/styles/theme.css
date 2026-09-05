@@ -42,6 +42,12 @@
   --accent-soft: rgba(124, 92, 255, 0.1);
 
   --accent-wash: rgba(124, 92, 255, 0.055);
+
+  /* Height of the fixed apply bar on phones. Declared once because TWO
+     things need it: the bar itself, and the footer that has to reserve
+     room so it is not left underneath it. Measured bar height is ~71px; the
+     extra is deliberate breathing room, not slack. */
+  --action-bar-h: calc(84px + env(safe-area-inset-bottom));
   --accent-line: rgba(124, 92, 255, 0.22);
 
   /*
