@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import { Footer } from '@/components/layout/Footer/Footer'
 import { NotFound } from '@/pages/NotFound/NotFound'
 import { Board } from '@/pages/Board/Board'
@@ -25,6 +25,13 @@ const Detail = lazy(() => import('@/pages/Detail/Detail').then((m) => ({ default
  * from a search result pays for exactly the chunk they are reading.
  */
 const Landing = lazy(() => import('@/pages/Landing/Landing').then((m) => ({ default: m.Landing })))
+
+/**
+ * Salon signup. Code-split hardest of all — it is the one page on this site
+ * that a job seeker never opens, and it carries a whole form, its validation
+ * and the phone helpers with it.
+ */
+const SignUp = lazy(() => import('@/pages/SignUp/SignUp').then((m) => ({ default: m.SignUp })))
 
 const SITE_JSONLD_ID = 'site-jsonld'
 
@@ -71,6 +78,19 @@ export default function App() {
   useScrollRestoration()
   useSiteJsonLd()
 
+  /*
+   * Signup is a STANDALONE screen, not a page inside the board.
+   *
+   * It owns the whole viewport — brand panel on one side, form on the other —
+   * so the shell's footer underneath it is wrong twice over: it appends a
+   * second page's worth of chrome below a full-height layout, and its call to
+   * action links to /signup, which is the page you are already on. It also made
+   * the form look broken the moment a validation error grew the page past the
+   * fold, because the panel stopped at 100dvh and the footer started.
+   */
+  const { pathname } = useLocation()
+  const standalone = pathname === '/signup' || pathname.startsWith('/signup/')
+
   return (
     <div className={s.shell}>
       <div className={s.content}>
@@ -86,12 +106,16 @@ export default function App() {
                 from there so the route and the links it generates cannot
                 disagree about what these URLs are. */}
             <Route path={`${LANDING_PREFIX}/:slug`} element={<Landing />} />
+            {/* The other side of this market: a salon that came here to hire.
+                Its own page rather than a link to reserva.am/signup, which is
+                written entirely around the booking product. */}
+            <Route path="/signup" element={<SignUp />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </div>
 
-      <Footer />
+      {!standalone && <Footer />}
     </div>
   )
 }

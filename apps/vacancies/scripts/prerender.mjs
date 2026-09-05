@@ -261,6 +261,10 @@ function writeSitemap() {
   const today = new Date().toISOString().slice(0, 10)
   const urls = [
     { loc: `${SITE}/`, changefreq: 'daily', priority: '1.0' },
+    // The salon-facing half of the board. Lower priority than a landing page:
+    // it converts a much smaller audience, but it is the only page on the site
+    // that speaks to them at all.
+    { loc: `${SITE}/signup/`, changefreq: 'monthly', priority: '0.7' },
     ...LANDINGS.map((l) => ({
       loc: `${SITE}${routeFor(l.slug)}`,
       changefreq: 'daily',
@@ -319,6 +323,36 @@ async function main() {
     console.log('[prerender] ✓ / → dist/index.html')
   } catch (err) {
     console.warn('[prerender] skipped /:', err?.message)
+  }
+
+  // ── Salon signup ──
+  // Prerendered like the rest: it is a page a salon can arrive at from a search
+  // ("post a job Armenia"), so it needs a title and a description of its own
+  // rather than the board's.
+  try {
+    let bodyHtml = ''
+    try {
+      bodyHtml = render('/signup')
+    } catch {
+      /* SPA shell is fine — the injected block carries the crawlable text */
+    }
+    let html = injectHead(template, {
+      canonical: canonicalOf('/signup/'),
+      title: hy.signup.seoTitle,
+      description: hy.signup.seoDescription,
+    })
+    html = injectBody(html, bodyHtml)
+    html = html.replace(
+      '</body>',
+      `${seoBlock(
+        `<h1>${esc(hy.signup.salonTitle)}</h1><p>${esc(hy.signup.seoDescription)}</p>` +
+          `<h2>${esc(hy.browse.title)}</h2><ul>${landingLinks()}</ul>`,
+      )}</body>`,
+    )
+    writePage(distDir, '/signup/', html)
+    console.log('[prerender] ✓ /signup/ → dist/signup/index.html')
+  } catch (err) {
+    console.warn('[prerender] skipped /signup/:', err?.message)
   }
 
   // ── Keyword landing pages ──

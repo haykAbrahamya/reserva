@@ -256,5 +256,90 @@
   "seo": {
     "boardTitle": "Beauty industry jobs in Armenia — Reserva Vacancies",
     "boardDescription": "Chair rentals, commission places and salaried positions in salons, barbershops and clinics. Search by region, profession and pay."
+  },
+  "signup": {
+    "seoTitle": "Post a job — Reserva Vacancies",
+    "seoDescription": "Register your salon and post job listings on the Reserva vacancies board. Free to join, no card required.",
+    "panelTitle": "Find your next specialist",
+    "panelBy": "Reserva · Booking platform for Armenian salons",
+    "points": {
+      "reach": {
+        "title": "Seen across Armenia",
+        "desc": "Your listing reaches beauty professionals searching by profession and by region."
+      },
+      "applicants": {
+        "title": "Applications in one place",
+        "desc": "Name, phone and message land straight in your dashboard — no queue of missed calls."
+      },
+      "free": {
+        "title": "Free to join",
+        "desc": "No card needed. You can post your first listing the same day."
+      }
+    },
+    "stepSalon": "Salon",
+    "stepAccount": "Account",
+    "salonTitle": "Tell us about your salon",
+    "salonSubtitle": "This is what appears on your listings.",
+    "companyName": "Name",
+    "companyNamePlaceholder": "e.g. Antheris",
+    "companyType": "Type of business",
+    "companyTypePlaceholder": "e.g. Beauty salon",
+    "continue": "Continue",
+    "haveAccount": "Already have an account?",
+    "signIn": "Sign in",
+    "accountTitle": "Create your account",
+    "accountSubtitle": "These are the details you will sign in with.",
+    "adminName": "Full name",
+    "adminNamePlaceholder": "e.g. Ani Hakobyan",
+    "adminEmail": "Email",
+    "adminPhone": "Phone",
+    "password": "Password",
+    "passwordPlaceholder": "At least {min} characters",
+    "confirm": "Repeat password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "back": "Back",
+    "createAccount": "Create account",
+    "submitting": "Sending…",
+    "terms": "By creating an account you agree to the Reserva terms of use.",
+    "success": {
+      "title": "Check your email",
+      "body": "We sent an activation link to {email}. It works for 24 hours.",
+      "step1": "Open the email and follow the activation link",
+      "step2": "Your account is created and you are signed in automatically",
+      "step3": "Post your first listing",
+      "backToBoard": "Back to the listings"
+    },
+    "errors": {
+      "companyName": "Enter your salon name",
+      "companyType": "Enter the type of business",
+      "adminName": "Enter your full name",
+      "adminEmail": "Enter a valid email address",
+      "adminPhone": "Enter a valid phone number",
+      "password": "The password must be at least {min} characters",
+      "confirm": "The passwords do not match",
+      "emailTaken": "An account with this email already exists. Try signing in.",
+      "phoneTaken": "An account with this number already exists. Try signing in.",
+      "closed": "Registration is not open at the moment. Please get in touch.",
+      "generic": "We could not create the account. Please try again."
+    },
+    "type": {
+      "title": "What brings you here?",
+      "subtitle": "Choose how you will be using Reserva Vacancies.",
+      "salon": {
+        "title": "I am hiring",
+        "desc": "A salon or employer posting listings"
+      },
+      "specialist": {
+        "title": "I am looking for work",
+        "desc": "A specialist applying to listings",
+        "badge": "Soon"
+      }
+    },
+    "specialist": {
+      "title": "Specialist accounts are coming",
+      "body": "They are not ready yet — and you do not need one today. You can apply to any listing directly by leaving your name and phone number.",
+      "browse": "Browse the listings"
+    }
   }
 }

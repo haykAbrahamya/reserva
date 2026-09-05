@@ -1,10 +1,9 @@
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { LogoMark } from '@reserva/ui'
 import { useT } from '@/i18n'
 import s from './Footer.module.scss'
 
-/** Where a salon goes to post a listing — the partner backoffice. */
-const PARTNER_URL = import.meta.env.VITE_PARTNER_URL || 'https://partner.reserva.am'
 const PLATFORM_URL = import.meta.env.VITE_PLATFORM_URL || 'https://reserva.am'
 
 /**
@@ -28,10 +27,17 @@ export function Footer() {
             <h2 className={s.ctaTitle}>{t('footer.forSalonsTitle')}</h2>
             <p className={s.ctaBody}>{t('footer.forSalonsBody')}</p>
           </div>
-          <a className={s.ctaButton} href={PARTNER_URL} target="_blank" rel="noopener noreferrer">
+          {/*
+            Signup, not the backoffice login.
+            A salon reading this has, by definition, not got an account yet —
+            sending them to a login screen asks them to remember a password they
+            have never set. The signup page carries the sign-in link for the
+            ones who do.
+          */}
+          <Link className={s.ctaButton} to="/signup">
             {t('footer.forSalonsCta')}
-            <ArrowUpRight size={15} />
-          </a>
+            <ArrowRight size={15} />
+          </Link>
         </div>
 
         <div className={s.base}>
