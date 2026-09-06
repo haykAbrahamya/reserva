@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Megaphone, ShieldCheck, Users } from 'lucide-react'
 import { AccountChoice, rememberedRole, type AccountRole } from '@/components/auth/AccountChoice/AccountChoice'
 import { AuthLayout } from '@/components/auth/AuthLayout/AuthLayout'
@@ -22,7 +23,24 @@ import { SpecialistSignUp } from './SpecialistSignUp'
  */
 export function SignUp() {
   const t = useT()
-  const [role, setRole] = useState<AccountRole | null>(rememberedRole)
+  /*
+   * `?as=salon` opens salon registration directly.
+   *
+   * For links that already know the answer — the footer's "post a listing", the
+   * sign-in page's salon door. Asking someone who just clicked "post a listing"
+   * whether they are hiring is asking them to repeat themselves.
+   *
+   * It also beats the remembered choice on purpose: an explicit link is a
+   * statement about THIS visit, and letting a stale preference override it
+   * would send a salon into the specialist form from a button that said the
+   * opposite.
+   */
+  const [params] = useSearchParams()
+  const asked = params.get('as')
+  const forced: AccountRole | null =
+    asked === 'salon' || asked === 'specialist' ? asked : null
+
+  const [role, setRole] = useState<AccountRole | null>(forced ?? rememberedRole)
 
   useSeo({
     title: t('signup.seoTitle'),

@@ -11,7 +11,9 @@ import type { AreaCatalogItem, AreaNode, Facet, SpecialtyGroup } from '@/api/typ
 // query behind it.
 // ─────────────────────────────────────────────────────────────
 
-type Localizer = (base: string, i18n?: LocalizedText | null) => string
+/** What `useLocalized()` returns. Exported so callers can type against the
+ *  real thing rather than restating its shape and drifting from it. */
+export type Localizer = (base: string, i18n?: LocalizedText | null) => string
 
 /** Every selectable key under a node: the node itself plus its children. */
 export function keysUnder(node: AreaNode): string[] {

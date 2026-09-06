@@ -147,18 +147,6 @@ export interface PartnerSettingsPatch {
   presentation?: PartnerPresentationFields
 }
 
-// Gallery URLs may come back as same-origin paths ("/uploads/..") relative to
-// the API ORIGIN (not /api/v1). Resolve those for <img> display in the UI.
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1'
-const API_ORIGIN = (() => {
-  try { return new URL(API_URL).origin } catch { return '' }
-})()
-export function galleryImageUrl(url?: string): string {
-  if (!url) return ''
-  if (/^https?:\/\//i.test(url)) return url
-  return `${API_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`
-}
-
 export const partnersService = {
   // ── Partner profile (identity + branding + lightweight counts) ──
   async getOwn(): Promise<PartnerProfileResponse> {

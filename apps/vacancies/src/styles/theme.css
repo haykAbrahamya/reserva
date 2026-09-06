@@ -77,6 +77,25 @@
   --rail-w: 278px;
   --page-max: 1240px;
   --header-h: 60px;
+
+  /*
+    The page gutter, as a token rather than three numbers repeated in a mixin.
+
+    Anything that needs to BLEED to the page edge — a strip that scrolls past
+    the margin, a full-width band inside a padded column — has to know the
+    current gutter, and a hardcoded 16px silently misaligns at every width
+    where it is not 16px. That has already happened once, on the board's
+    browse links.
+  */
+  --page-gutter: 28px;
+}
+
+@media (max-width: 900px) {
+  :root { --page-gutter: 20px; }
+}
+
+@media (max-width: 560px) {
+  :root { --page-gutter: 16px; }
 }
 
 [data-theme='dark'] {

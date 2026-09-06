@@ -13,6 +13,26 @@ export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/ap
  *  WebSocket client, which connects to the server root + a namespace. */
 export const API_ORIGIN = API_URL.replace(/\/api\/v\d+\/?$/, '')
 
+/**
+ * Resolve a stored upload path for display.
+ *
+ * Images come back either as absolute URLs or as same-origin paths
+ * ("/uploads/..") relative to the API ORIGIN — which is a different host from
+ * this app. Dropping such a path straight into an `<img src>` asks the
+ * BACKOFFICE for it and gets a 404 and a broken-image icon; that is exactly how
+ * applicant avatars broke.
+ *
+ * Lives here because this file already derives the origin. It used to be
+ * `galleryImageUrl` in partners.service, which re-derived it and was named for
+ * one of the four things that use it — nobody adding an avatar was going to
+ * look there.
+ */
+export function uploadUrl(url?: string | null): string {
+  if (!url) return ''
+  if (/^https?:\/\//i.test(url)) return url
+  return `${API_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`
+}
+
 const ACCESS_KEY = 'reserva-access'
 const REFRESH_KEY = 'reserva-refresh'
 

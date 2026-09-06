@@ -80,11 +80,25 @@ function unwrap<T>(payload: unknown): T {
 export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
   const url = `${API_URL}${path}`
 
+  /*
+   * A multipart upload must NOT carry our JSON content type.
+   *
+   * `fetch` sets `multipart/form-data; boundary=…` itself when the body is a
+   * FormData, and the boundary is the part that matters — overriding the header
+   * strips it, and the server then parses the whole body as one field and sees
+   * no file at all. So the default applies to everything EXCEPT FormData, and
+   * an explicit header from the caller still wins over both.
+   */
+  const isForm = init?.body instanceof FormData
+
   let res: Response
   try {
     res = await fetch(url, {
       ...init,
-      headers: { 'Content-Type': 'application/json', ...init?.headers },
+      headers: {
+        ...(isForm ? {} : { 'Content-Type': 'application/json' }),
+        ...init?.headers,
+      },
     })
   } catch (err) {
     // An aborted request is a normal part of a filter panel's life (the visitor

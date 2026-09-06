@@ -1,206 +1,360 @@
 @use '../../styles/vars' as *;
 @use '../../styles/app' as a;
 
+/* ─────────────────────────────────────────────────────────────
+   Mobile-first, because this area is used on a phone.
+
+   Phone rules come first and desktop lives in `min-width` queries, so the
+   phone layout is the one that cannot be an afterthought.
+   ───────────────────────────────────────────────────────────── */
+
 .page {
   @include a.page-x;
-  padding-block: 22px 44px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  max-width: 760px;
-}
-
-.head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.title {
-  @include a.display(28px);
-}
-
-.subtitle {
-  margin: 4px 0 0;
-  font-size: 13.5px;
-  color: $fg-3;
-}
-
-.logout {
-  @include a.reset-button;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 8px 14px;
-  border: 1px solid $line-1;
-  border-radius: 999px;
-  background: $bg-1;
-  color: $fg-2;
-  font-size: 13px;
-  cursor: pointer;
-
-  &:hover { color: $danger; border-color: $danger; }
-}
-
-.card {
-  @include a.surface;
-  padding: 20px 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.cardTitle {
-  @include a.eyebrow;
-  margin: 0;
-}
-
-.grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: 1fr;
   gap: 14px;
-}
+  padding-top: 14px;
+  /*
+    Room for the fixed tab bar, plus the home-indicator inset on an iPhone.
+    Without this the last card sits under the bar and cannot be scrolled clear
+    of it — the classic way a bottom bar ruins the page it belongs to.
+  */
+  padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px));
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-
-.label {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: $fg-1;
-}
-
-.tagList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-}
-
-.tag {
-  @include a.reset-button;
-  padding: 6px 12px;
-  border: 1px solid $line-1;
-  border-radius: 999px;
-  background: $bg-2;
-  color: $fg-2;
-  font-size: 12.5px;
-  cursor: pointer;
-  transition: border-color 0.14s ease, background 0.14s ease, color 0.14s ease;
-
-  &:hover { border-color: $line-2; }
-  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
-}
-
-.tagOn {
-  border-color: $accent-line;
-  background: $accent-soft;
-  color: $accent;
-  font-weight: 600;
-}
-
-.saveRow {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
-.saved {
-  font-size: 12.5px;
-  color: $fg-3;
-}
-
-.muted {
-  margin: 0;
-  font-size: 13px;
-  color: $fg-3;
-}
-
-/* ── Applications ────────────────────────────────────────── */
-
-.appList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-
-  > * + * { border-top: 1px solid $line-1; }
-}
-
-.appRow {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-areas:
-    'role   status'
-    'salon  when';
-  gap: 2px 12px;
-  padding: 12px 2px;
-  text-decoration: none;
-  color: inherit;
-
-  &:hover .appRole { color: $accent; }
-
-  @media (max-width: 520px) {
-    grid-template-areas:
-      'role   status'
-      'salon  salon'
-      'when   when';
+  @media (min-width: 941px) {
+    grid-template-columns: 268px minmax(0, 1fr);
+    gap: 22px;
+    padding-top: 26px;
+    padding-bottom: 64px;
+    align-items: start;
   }
 }
 
-.appRole {
-  grid-area: role;
-  font-size: 14.5px;
-  font-weight: 600;
-  color: $fg-0;
+/* ── Identity ──────────────────────────────────────────────── */
+
+.rail {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  @media (min-width: 941px) {
+    gap: 18px;
+    /* Sticks under the header so the nav stays reachable through a long
+       applications list. `--header-h` is the single definition of that offset. */
+    position: sticky;
+    top: calc(#{$header-h} + 14px);
+  }
 }
 
-.appSalon {
-  grid-area: salon;
-  font-size: 12.5px;
-  color: $fg-3;
+/*
+ * Centred at EVERY width.
+ *
+ * A row of avatar-then-text needs about 320px to breathe; the rail is 268px and
+ * a phone is 390px, so the row version squeezed the name into a gutter where
+ * two specialty chips stacked into a column. Centred, the name gets the full
+ * width at both sizes and the block reads as a profile rather than as a table
+ * row — which is the actual difference between this and a settings screen.
+ */
+.identity {
+  @include a.surface;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 24px 18px 20px;
+  /* A whisper of the brand behind the portrait, so the top of the page has a
+     surface of its own rather than being the same flat card as everything
+     below it. */
+  background:
+    radial-gradient(130% 120% at 50% -25%, $accent-soft 0%, transparent 64%),
+    $bg-1;
+
+  @media (min-width: 941px) { padding: 22px 16px 18px; }
 }
 
-.appWhen {
-  grid-area: when;
-  align-self: center;
-  justify-self: end;
-  font-size: 12px;
-  color: $fg-3;
+/*
+ * The completeness ring.
+ *
+ * `conic-gradient` on the padding box with the photo sitting inside it: no
+ * extra element, no SVG, and it animates the way a bar would. A separate
+ * progress bar under the name was a second thing competing for the same glance;
+ * drawn around the portrait it is read at the same moment as the face, and it
+ * makes an unfinished profile FEEL unfinished rather than report a number.
+ *
+ * `--pct` is set inline because it is data, not design.
+ */
+.ring {
+  --pct: 0;
+  position: relative;
+  flex-shrink: 0;
+  padding: 3px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from -90deg,
+    $accent 0%,
+    $accent-strong calc(var(--pct) * 1%),
+    $line-2 calc(var(--pct) * 1%),
+    $line-2 100%
+  );
+  transition: background 0.45s ease;
+
+  @media (prefers-reduced-motion: reduce) { transition: none; }
 }
 
-.appStatus {
-  grid-area: status;
-  align-self: start;
-  justify-self: end;
-  padding: 3px 9px;
-  border-radius: 999px;
-  border: 1px solid $line-1;
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  /* Ringed in the card's own background so the progress arc reads as a ring
+     rather than as a coloured edge painted on the photo. */
+  border: 3px solid $bg-1;
   background: $bg-2;
-  color: $fg-3;
+
+  @media (min-width: 941px) { width: 84px; height: 84px; }
+}
+
+.avatarEmpty {
+  background: $accent;
+  color: #fff;
+  font-family: $font-serif;
+  font-size: 36px;
+  line-height: 1;
+
+  @media (min-width: 941px) { font-size: 32px; }
+}
+
+.identityText {
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.name {
+  margin: 0;
+  font-family: $font-serif;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: $fg-0;
+  line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @media (min-width: 941px) { font-size: 19px; }
+}
+
+.role {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: $accent-contrast;
+  line-height: 1.4;
+  max-width: 100%;
+
+  @media (min-width: 941px) { font-size: 12.5px; }
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 14px;
+  margin-top: 2px;
+}
+
+.fact {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 11.5px;
-  font-weight: 600;
+  color: $fg-3;
   white-space: nowrap;
 }
 
-/* Only the two outcomes worth colouring. "Sent" and "seen" stay neutral —
-   colouring every state would make an ordinary inbox look like a verdict. */
-.status_shortlisted {
-  border-color: $accent-line;
-  background: $accent-soft;
-  color: $accent;
-}
-
-.status_rejected {
+/* The number beside the word, not a second bar: the ring already drew it. */
+.meterLabel {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: $bg-2;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: $fg-3;
-  opacity: 0.75;
 }
 
-/* A year count is two digits; a full-width field would suggest otherwise. */
-.yearsInput { max-width: 160px; }
+.meterValue {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: $accent-contrast;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Navigation ────────────────────────────────────────────────
+   A fixed bottom bar on a phone; a plain list in the rail on a desktop.
+
+   The bar replaced a horizontally scrolling strip of chips, which was wrong on
+   two counts: the fourth destination lived off the right edge with nothing to
+   say it was there, and reaching it meant a horizontal swipe inside a
+   vertically scrolling page — the one gesture combination people reliably get
+   wrong. Four fixed destinations fit a phone exactly, so nothing needs to
+   scroll and nothing needs to hide. It also puts them in the thumb's reach
+   instead of at the top of a long page.
+   ──────────────────────────────────────────────────────────── */
+
+.nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 2px;
+  padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid $line-1;
+  background: color-mix(in srgb, var(--bg-0) 88%, transparent);
+  backdrop-filter: blur(16px) saturate(1.4);
+
+  @media (min-width: 941px) {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px;
+    border-top: 0;
+    background: none;
+    backdrop-filter: none;
+    @include a.surface;
+  }
+}
+
+/* Fallback for browsers without color-mix: opaque is correct, just less
+   pretty. Without it the bar would be transparent and content would scroll
+   through it. */
+@supports not (background: color-mix(in srgb, red 50%, blue)) {
+  .nav { background: $bg-0; }
+}
+
+.navLink {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+  padding: 7px 4px 6px;
+  border-radius: $r-2;
+  color: $fg-3;
+  text-decoration: none;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  transition: color 0.14s, background 0.14s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:focus-visible { outline: 2px solid $accent; outline-offset: -2px; }
+
+  @media (min-width: 941px) {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 10px 11px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: $fg-2;
+    letter-spacing: 0;
+
+    &:hover { background: $bg-2; color: $fg-0; }
+  }
+}
+
+.navOn {
+  color: $accent-contrast;
+
+  .navIcon { color: $accent; }
+
+  @media (min-width: 941px) {
+    background: $accent-soft;
+    font-weight: 600;
+    &:hover { background: $accent-soft; color: $accent-contrast; }
+  }
+}
+
+.navIcon {
+  flex-shrink: 0;
+  color: currentColor;
+  transition: transform 0.16s cubic-bezier(0.2, 0.7, 0.1, 1);
+
+  .navOn & { transform: translateY(-1px); }
+
+  @media (min-width: 941px) {
+    color: $fg-3;
+    .navOn & { transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { transition: none; }
+}
+
+.navLabel {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @media (min-width: 941px) { flex: 1; }
+}
+
+/* The short form is for the bar; the full one for the rail. Exactly one of the
+   two is ever in the accessibility tree, so nothing is announced twice. */
+.navShort { @media (min-width: 941px) { display: none; } }
+.navFull { @media (max-width: 940px) { display: none; } }
+
+.navCount {
+  position: absolute;
+  top: 4px;
+  right: calc(50% - 22px);
+  min-width: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: $accent;
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+
+  @media (min-width: 941px) {
+    position: static;
+    background: $bg-3;
+    color: $fg-3;
+    font-size: 11px;
+    line-height: 18px;
+    padding: 0 7px;
+  }
+}
+
+/* The badge is positioned against the link on a phone. */
+.navLink { position: relative; }
+
+.section {
+  min-width: 0;
+}

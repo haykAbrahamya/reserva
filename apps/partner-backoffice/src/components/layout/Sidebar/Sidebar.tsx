@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 import { MapPin, ChevronLeft, ChevronRight, ShieldCheck } from 'lucide-react'
 import { useAppStore, usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
-import { partnersService, galleryImageUrl } from '@/services/partners.service'
+import { partnersService } from '@/services/partners.service'
 import { useIsAdmin, useScopedLocationId } from '@/store/auth.hooks'
 import { useI18n } from '@/i18n'
 import { visibleSections } from '../nav.config'
@@ -10,6 +10,7 @@ import { ProductSwitcher } from '../ProductSwitcher/ProductSwitcher'
 import { useActiveProduct } from '@/products/useProducts'
 import { SidebarSetupNudge } from '@/components/onboarding/SidebarSetupNudge'
 import s from './Sidebar.module.scss'
+import { uploadUrl } from '@/services/http'
 
 interface SidebarProps {
   mobileOpen?: boolean
@@ -47,7 +48,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         <div className={s.logo}>
           <div className={s.logoIcon}>
             {partner?.presentation?.logoUrl
-              ? <img src={galleryImageUrl(partner.presentation.logoUrl)} alt="" className={s.logoImg} />
+              ? <img src={uploadUrl(partner.presentation.logoUrl)} alt="" className={s.logoImg} />
               : (partner?.name?.trim()?.[0] ?? 'R').toUpperCase()}
           </div>
           {!collapsed && (

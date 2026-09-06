@@ -38,6 +38,41 @@ const SignUp = lazy(() => import('@/pages/SignUp/SignUp').then((m) => ({ default
 const Login = lazy(() => import('@/pages/Login/Login').then((m) => ({ default: m.Login })))
 const Account = lazy(() => import('@/pages/Account/Account').then((m) => ({ default: m.Account })))
 
+/*
+ * The account's sections.
+ *
+ * Split apart from the shell rather than with it: three of the four are only
+ * reached by someone who deliberately went there, and the portfolio section in
+ * particular carries the upload path. Someone signing in to check whether a
+ * salon replied loads the shell, the profile and nothing else.
+ */
+const ProfileSection = lazy(() =>
+  import('@/pages/Account/sections/ProfileSection').then((m) => ({ default: m.ProfileSection })),
+)
+const PortfolioSection = lazy(() =>
+  import('@/pages/Account/sections/PortfolioSection').then((m) => ({ default: m.PortfolioSection })),
+)
+const ApplicationsSection = lazy(() =>
+  import('@/pages/Account/sections/ApplicationsSection').then((m) => ({ default: m.ApplicationsSection })),
+)
+const SettingsSection = lazy(() =>
+  import('@/pages/Account/sections/SettingsSection').then((m) => ({ default: m.SettingsSection })),
+)
+
+/*
+ * The specialist directory — the salon-facing half of the market.
+ *
+ * Code-split for the same reason the signup is: a job seeker who came from a
+ * search for "barber vacancy Yerevan" never opens it, and it carries its own
+ * filter panel and card grid.
+ */
+const Specialists = lazy(() =>
+  import('@/pages/Specialists/Specialists').then((m) => ({ default: m.Specialists })),
+)
+const SpecialistProfile = lazy(() =>
+  import('@/pages/SpecialistProfile/SpecialistProfile').then((m) => ({ default: m.SpecialistProfile })),
+)
+
 const SITE_JSONLD_ID = 'site-jsonld'
 
 /**
@@ -94,7 +129,24 @@ export default function App() {
    * fold, because the panel stopped at 100dvh and the footer started.
    */
   const { pathname } = useLocation()
-  const standalone = ['/signup', '/login'].some(
+
+  /*
+   * Routes that own their whole viewport, and get no footer.
+   *
+   * Two different reasons, one rule:
+   *
+   *  · `/signup` and `/login` are full-height panels. A footer under one made
+   *    the form look broken the moment a validation error grew the page past
+   *    the fold, because the panel stopped at 100dvh and the footer started.
+   *
+   *  · `/account` is a private app area with its OWN bottom navigation. A
+   *    marketing footer there is both wrong in kind — "looking to hire?" is not
+   *    addressed to the person whose profile it is — and broken in practice:
+   *    the fixed tab bar sits over its last row, and on a short section the
+   *    reserved space for that bar shows up as a band of empty page between the
+   *    content and a footer nobody wanted.
+   */
+  const standalone = ['/signup', '/login', '/account'].some(
     (route) => pathname === route || pathname.startsWith(`${route}/`),
   )
 
@@ -118,7 +170,22 @@ export default function App() {
                 written entirely around the booking product. */}
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/account" element={<Account />} />
+
+            {/* The directory and one profile in it. `/specialists` is the
+                user-facing word; the API calls this principal a professional,
+                because `Specialist` already means a salon's own staff member.
+                See api/directory.api.ts. */}
+            <Route path="/specialists" element={<Specialists />} />
+            <Route path="/specialists/:id" element={<SpecialistProfile />} />
+
+            {/* Sections are nested routes, not tabs: /account/portfolio is a
+                place you can link to, bookmark and reach with the back button. */}
+            <Route path="/account" element={<Account />}>
+              <Route index element={<ProfileSection />} />
+              <Route path="portfolio" element={<PortfolioSection />} />
+              <Route path="applications" element={<ApplicationsSection />} />
+              <Route path="settings" element={<SettingsSection />} />
+            </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

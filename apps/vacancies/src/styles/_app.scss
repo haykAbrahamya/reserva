@@ -14,10 +14,173 @@
   width: 100%;
   max-width: var(--page-max);
   margin: 0 auto;
-  padding-inline: 28px;
+  /* One definition, in theme.css, so a bleeding child can read the same value
+     rather than re-deriving it from three hardcoded breakpoints. */
+  padding-inline: var(--page-gutter);
+}
 
-  @media (max-width: 900px) { padding-inline: 20px; }
-  @media (max-width: 560px) { padding-inline: 16px; }
+/// The heading band's background.
+///
+/// Layers of CSS, no image file — weightless, scales to any width, and
+/// re-themes from the tokens instead of needing a second asset.
+///
+///   1. `::before` — a soft colour mesh. Overlapping radials in related hues
+///      read as light falling across a surface; a single gradient reads as a
+///      gradient.
+///   2. `::after`  — concentric hairline arcs from beyond one corner, masked so
+///      they fade across the band. This is the layer that makes it read as
+///      DESIGNED rather than as a blob: arcs are structure, colour is not.
+///   3. a definite bottom edge, made of three things rather than one hairline —
+///      its own surface (a step off the page ground), a rule, and a themed
+///      one-pixel highlight below it.
+///   4. the page grain underneath, from global.scss.
+///
+/// `$arc-x` / `$mask-angle` shift the arc origin, so two pages can be the same
+/// design without being the same picture.
+///
+/// `$aurora` adds presence for a band that has to carry a page on its own.
+/// The board's band sits above a dense grid of listings and is tuned to stay
+/// out of its way; the directory's sits above a filter rail and a short row of
+/// cards, where the same values read as an almost-black strip. Rather than
+/// turning the shared tokens up — which would repaint the board — the richer
+/// version ADDS layers: two accent blooms mixed live from `--accent`, a fine
+/// dot matrix for texture, and a top highlight. Composition, not opacity.
+@mixin hero-band($arc-x: 94%, $arc-y: -14%, $mask-angle: 214deg, $aurora: false) {
+  position: relative;
+  isolation: isolate;
+  background: $hero-bg;
+  border-bottom: 1px solid $line-2;
+  box-shadow: 0 1px 0 $hero-edge;
+  overflow: hidden;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Violet twice from the left, a cool blue top-right, a warm rose
+     bottom-right. Values are tuned for the BAND in theme.css; the page ground
+     behind the results uses a much weaker set, because there almost-nothing is
+     the correct amount. */
+  &::before {
+    background-image:
+      radial-gradient(620px 380px at -2% -22%, $hero-violet, transparent 66%),
+      radial-gradient(520px 340px at 34% 116%, $hero-violet-soft, transparent 62%),
+      radial-gradient(560px 360px at 84% -18%, $hero-blue, transparent 64%),
+      radial-gradient(460px 300px at 104% 96%, $hero-rose, transparent 62%);
+  }
+
+  /* One set of arcs, not two. Two from opposite corners plus a motif was three
+     competing structures in a 300px band. Masked away from the headline so
+     nothing crosses the words. */
+  &::after {
+    background-image: repeating-radial-gradient(
+      circle at #{$arc-x} #{$arc-y},
+      transparent 0 57px,
+      $hero-arc 57px 58px
+    );
+    mask-image: linear-gradient($mask-angle, rgba(0, 0, 0, 0.95) 0%, transparent 62%);
+    -webkit-mask-image: linear-gradient($mask-angle, rgba(0, 0, 0, 0.95) 0%, transparent 62%);
+  }
+
+  /* Dark: the warm rose turns to mud over charcoal, so the mesh drops to violet
+     and blue. Strength is carried by the tokens, not by an opacity override. */
+  :global([data-theme='dark']) &::before {
+    background-image:
+      radial-gradient(620px 380px at -2% -22%, $hero-violet, transparent 66%),
+      radial-gradient(560px 360px at 84% -18%, $hero-blue, transparent 64%);
+  }
+
+  @if $aurora {
+    /*
+      Two accent blooms, mixed live from `--accent` so they follow the product
+      colour rather than freezing a violet into a stylesheet. Mixed with
+      `transparent` rather than set with an alpha, so a theme that changes the
+      accent's own opacity still composes correctly.
+
+      Bigger and softer than the mesh below them: at 900px across they are a
+      light source rather than a shape, which is the difference between "there
+      is a glow behind this heading" and "there is a purple circle here".
+    */
+    &::before {
+      background-image:
+        radial-gradient(
+          900px 520px at 12% -30%,
+          color-mix(in srgb, var(--accent) 26%, transparent),
+          transparent 68%
+        ),
+        radial-gradient(
+          760px 460px at 88% 118%,
+          color-mix(in srgb, var(--accent) 15%, transparent),
+          transparent 66%
+        ),
+        radial-gradient(560px 360px at 84% -18%, $hero-blue, transparent 64%),
+        radial-gradient(460px 300px at 104% 96%, $hero-rose, transparent 62%);
+    }
+
+    /*
+      A dot matrix over the arcs.
+
+      One pixel every 22, at a few percent — invisible as dots and clearly felt
+      as texture, the way a good paper stock is. It is what stops a large soft
+      gradient reading as an empty area: the eye wants something to focus on at
+      close range, and the arcs alone only work at the corner they radiate from.
+
+      Faded from the top-left so it never sits behind the headline's counters.
+    */
+    &::after {
+      background-image:
+        radial-gradient(circle at center, $hero-arc 1px, transparent 1.2px),
+        repeating-radial-gradient(
+          circle at #{$arc-x} #{$arc-y},
+          transparent 0 57px,
+          $hero-arc 57px 58px
+        );
+      background-size: 22px 22px, auto;
+      mask-image: linear-gradient(#{$mask-angle}, rgba(0, 0, 0, 0.9) 0%, transparent 74%);
+      -webkit-mask-image: linear-gradient(#{$mask-angle}, rgba(0, 0, 0, 0.9) 0%, transparent 74%);
+    }
+
+    /*
+      A hairline of light along the top edge.
+      Real surfaces catch light where they meet the thing above them; without it
+      the band starts on nothing and the header floats over a void.
+    */
+    &::before {
+      box-shadow: inset 0 1px 0 color-mix(in srgb, var(--accent) 22%, transparent);
+    }
+
+    :global([data-theme='dark']) &::before {
+      background-image:
+        radial-gradient(
+          900px 520px at 12% -30%,
+          color-mix(in srgb, var(--accent) 30%, transparent),
+          transparent 68%
+        ),
+        radial-gradient(
+          760px 460px at 88% 118%,
+          color-mix(in srgb, var(--accent) 17%, transparent),
+          transparent 66%
+        ),
+        radial-gradient(560px 360px at 84% -18%, $hero-blue, transparent 64%);
+    }
+
+    /* Without color-mix the blooms would vanish entirely, so the token mesh
+       stands in — less rich, never broken. */
+    @supports not (background: color-mix(in srgb, red 50%, blue)) {
+      &::before {
+        background-image:
+          radial-gradient(900px 520px at 12% -30%, $hero-violet, transparent 68%),
+          radial-gradient(760px 460px at 88% 118%, $hero-violet-soft, transparent 66%),
+          radial-gradient(560px 360px at 84% -18%, $hero-blue, transparent 64%);
+        box-shadow: none;
+      }
+    }
+  }
 }
 
 /// A raised surface: card, panel, sheet.

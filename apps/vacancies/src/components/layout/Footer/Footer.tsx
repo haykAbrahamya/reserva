@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, UserRoundSearch } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { LogoMark } from '@reserva/ui'
 import { useT } from '@/i18n'
@@ -34,10 +34,23 @@ export function Footer() {
             have never set. The signup page carries the sign-in link for the
             ones who do.
           */}
-          <Link className={s.ctaButton} to="/signup">
-            {t('footer.forSalonsCta')}
-            <ArrowRight size={15} />
-          </Link>
+          {/*
+            Two actions, because a salon that has noticed this board wants one
+            of two things and they are not the same errand: post a listing and
+            wait, or go and look at who is available right now. The directory is
+            the second, and it is the only entry point to it a signed-out
+            visitor gets — so it sits beside the signup rather than under it.
+          */}
+          <div className={s.ctaActions}>
+            <Link className={s.ctaButton} to="/signup?as=salon">
+              {t('footer.forSalonsCta')}
+              <ArrowRight size={15} />
+            </Link>
+            <Link className={s.ctaSecondary} to="/specialists">
+              <UserRoundSearch size={15} />
+              {t('footer.browseSpecialists')}
+            </Link>
+          </div>
         </div>
 
         <div className={s.base}>

@@ -1,4 +1,4 @@
-@use 'variables' as *;
+@use '../../styles/variables' as *;
 
 .overlay {
   position: fixed;
@@ -11,8 +11,8 @@
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   /* Backdrop blur + fade eases in; a touch longer for a softer entrance. */
-  animation: lb-fade 0.28s ease both;
-  &.closing { animation: lb-fade-out 0.2s ease both; }
+  animation: rlb-fade 0.28s ease both;
+  &.closing { animation: rlb-fade-out 0.2s ease both; }
 }
 
 /* ── Top bar ── */
@@ -50,6 +50,7 @@
   transition: background 0.15s, transform 0.1s;
   &:hover { background: rgba(255, 255, 255, 0.22); }
   &:active { transform: scale(0.94); }
+  &:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 }
 
 /* ── Image stage ── */
@@ -61,8 +62,8 @@
   flex-direction: column;
   align-items: center;
   /* Gentle, slightly slower entrance so the first open reads as smooth, not snappy. */
-  animation: lb-pop 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
-  .closing & { animation: lb-pop-out 0.2s ease both; }
+  animation: rlb-pop 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+  .closing & { animation: rlb-pop-out 0.2s ease both; }
 }
 .image {
   max-width: 92vw;
@@ -74,12 +75,12 @@
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
 }
 /* Directional slide+fade when navigating between photos. */
-.fromRight { animation: lb-slide-right 0.38s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.fromLeft  { animation: lb-slide-left  0.38s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.fromRight { animation: rlb-slide-right 0.38s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.fromLeft  { animation: rlb-slide-left  0.38s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
 /* Respect reduced-motion: keep a gentle fade, drop the slide/scale transforms. */
 @media (prefers-reduced-motion: reduce) {
-  .stage, .fromRight, .fromLeft { animation: lb-fade 0.2s ease both; }
+  .stage, .fromRight, .fromLeft { animation: rlb-fade 0.2s ease both; }
 }
 .caption {
   margin-top: 14px;
@@ -89,7 +90,9 @@
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* ── Nav arrows ── */
+/* ── Nav arrows ──
+   Focus rings matter more here than anywhere else in the app: the overlay is
+   pure black and these are the only two controls in it. */
 .nav {
   position: absolute;
   top: 50%;
@@ -107,6 +110,7 @@
   transition: background 0.15s, transform 0.1s;
   &:hover { background: rgba(255, 255, 255, 0.22); }
   &:active { transform: translateY(-50%) scale(0.92); }
+  &:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 }
 .prev { left: 18px; }
 .next { right: 18px; }
@@ -129,22 +133,22 @@
 }
 
 :global {
-  @keyframes lb-fade { from { opacity: 0 } to { opacity: 1 } }
-  @keyframes lb-fade-out { from { opacity: 1 } to { opacity: 0 } }
-  @keyframes lb-pop {
+  @keyframes rlb-fade { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes rlb-fade-out { from { opacity: 1 } to { opacity: 0 } }
+  @keyframes rlb-pop {
     from { opacity: 0; transform: scale(0.96) translateY(10px) }
     to   { opacity: 1; transform: none }
   }
-  @keyframes lb-pop-out {
+  @keyframes rlb-pop-out {
     from { opacity: 1; transform: none }
     to   { opacity: 0; transform: scale(0.96) translateY(8px) }
   }
   /* Directional photo transitions — slide in + fade from the chosen side. */
-  @keyframes lb-slide-right {
+  @keyframes rlb-slide-right {
     from { opacity: 0; transform: translateX(32px) scale(0.985) }
     to   { opacity: 1; transform: none }
   }
-  @keyframes lb-slide-left {
+  @keyframes rlb-slide-left {
     from { opacity: 0; transform: translateX(-32px) scale(0.985) }
     to   { opacity: 1; transform: none }
   }

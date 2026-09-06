@@ -1,0 +1,353 @@
+@use 'variables' as *;
+
+/*
+ * The page gutter comes from the PAGE, not the layout.
+ *
+ * `AppLayout` gives its main area no padding — every screen supplies its own,
+ * and the vacancies list uses 28px. This one shipped with none, so the hero and
+ * the columns ran flush into the sidebar on one side and the window edge on the
+ * other. Matching the list is what makes moving between the two feel like one
+ * app rather than two.
+ */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px 28px 44px;
+
+  @media (max-width: 900px) { padding: 20px 18px 40px; }
+  @media (max-width: 600px) { padding: 16px 14px 36px; }
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  align-self: flex-start;
+  font-size: 13px;
+  color: $fg-2;
+  text-decoration: none;
+  transition: color 0.13s;
+
+  &:hover { color: $accent; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 3px; border-radius: 4px; }
+}
+
+/* ── Hero ──────────────────────────────────────────────────── */
+
+.hero {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  background: $bg-2;
+  overflow: hidden;
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+    gap: 16px;
+    padding: 18px;
+  }
+}
+
+/* The same status rail the card carries, so a listing looks like itself in
+   both places. */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 3px;
+  background: $line-2;
+}
+
+.status_published::before { background: $success; }
+.status_draft::before     { background: $line-strong; }
+.status_paused::before    { background: $info; }
+.status_expired::before   { background: $warn; }
+.status_closed::before    { background: $line-2; }
+
+.heroMain {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.heroTop {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12.5px;
+  color: $fg-2;
+}
+
+.craft { color: $fg-2; }
+
+.dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: $line-strong;
+  flex-shrink: 0;
+}
+
+.branch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: $fg-0;
+  overflow-wrap: anywhere;
+
+  @media (max-width: 600px) { font-size: 21px; }
+}
+
+.pay {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: $accent;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-shrink: 0;
+
+  /* On a phone the verbs go full width and stack — they are the reason someone
+     opened this page from a notification. */
+  @media (max-width: 900px) {
+    width: 100%;
+    > * { flex: 1 1 auto; justify-content: center; }
+  }
+}
+
+/* ── Facts ─────────────────────────────────────────────────── */
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr));
+  gap: 10px;
+}
+
+.fact {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 14px;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  background: $bg-2;
+  min-width: 0;
+}
+
+.factIcon {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: $bg-3;
+  color: $fg-2;
+}
+
+.factText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.factLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: $fg-3;
+}
+
+.factValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: $fg-0;
+  overflow-wrap: anywhere;
+}
+
+/* Amber, not red: a listing about to lapse is a deadline, not a fault. */
+.factWarn { color: $warn; }
+
+.factNote {
+  font-size: 12px;
+  color: $fg-2;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+/* ── Columns ───────────────────────────────────────────────── */
+
+/*
+ * The listing on the left, the people on the right.
+ *
+ * Applicants get their own column rather than a section below, because reading
+ * them is what a partner returns to a published listing FOR — and next to the
+ * terms, not underneath them, is what lets someone check a claim against a
+ * candidate without scrolling between the two.
+ */
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+
+  @media (max-width: 1100px) { grid-template-columns: minmax(0, 1fr); }
+}
+
+.col {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel {
+  padding: 20px;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  background: $bg-2;
+  min-width: 0;
+
+  @media (max-width: 600px) { padding: 16px; }
+}
+
+/* Tall lists get their own scroll rather than stretching the page past the
+   listing it belongs to. */
+.applicantsPanel {
+  max-height: 780px;
+  overflow-y: auto;
+}
+
+.panelTitle {
+  margin: 0 0 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $fg-3;
+}
+
+.description {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: $fg-1;
+  /* Honour the line breaks the partner typed. */
+  white-space: pre-line;
+  max-width: 68ch;
+}
+
+/* An unfilled field said plainly. Not an error — nothing is wrong. */
+.missing {
+  margin: 0;
+  font-size: 13px;
+  color: $fg-3;
+  font-style: italic;
+}
+
+.perks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.perk {
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: $bg-3;
+  color: $fg-1;
+  font-size: 12.5px;
+}
+
+.applyMode {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: $fg-1;
+  line-height: 1.55;
+}
+
+.contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  color: $fg-0;
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+
+  &:hover { color: $accent; text-decoration: underline; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+}
+
+/* ── Delete ────────────────────────────────────────────────── */
+
+/* Alone at the bottom, quiet, and nowhere near the lifecycle buttons: closing a
+   listing and deleting one are a keystroke apart in meaning and permanent
+   apart in consequence. */
+.dangerRow {
+  display: flex;
+  justify-content: flex-start;
+  padding-top: 4px;
+}
+
+.deleteBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 13px;
+  border: 1px solid transparent;
+  border-radius: $r-1;
+  background: none;
+  color: $fg-3;
+  font-family: $font-sans;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: background 0.13s, color 0.13s;
+
+  &:hover { background: $danger-soft; color: $danger; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.skeleton {
+  height: 320px;
+  border-radius: $r-2;
+  background: linear-gradient(90deg, $bg-2 25%, $bg-3 50%, $bg-2 75%);
+  background-size: 200% 100%;
+  animation: vd-shimmer 1.3s linear infinite;
+
+  @media (prefers-reduced-motion: reduce) { animation: none; }
+}
+
+:global {
+  @keyframes vd-shimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+  }
+}

@@ -1,0 +1,111 @@
+@use '../../../styles/vars' as *;
+@use './section' as sec;
+
+.panel { @include sec.panel; }
+.head { @include sec.head; }
+.heading { @include sec.heading; }
+.sub { @include sec.sub; }
+.error { @include sec.error; }
+.note { @include sec.note; }
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+.tile {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: $r-2;
+  overflow: hidden;
+  background: $bg-3;
+  border: 1px solid $line-1;
+
+  /* Portrait, because that is the shape these photos are: a person's work in
+     this trade is photographed on a phone, held upright. Forcing a square would
+     crop the top of every hairstyle in the grid. */
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Says which tile is doing the most work — the one the directory card shows. */
+.coverBadge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/*
+ * The controls sit on the tile permanently on touch and appear on hover on a
+ * desktop.
+ *
+ * `@media (hover: hover)` rather than a width query: the question is whether
+ * this device HAS a hover state, not how wide it is. A hidden-until-hover
+ * control on a tablet is a control that cannot be reached at all, at any width.
+ */
+.tileBar {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: flex;
+  gap: 6px;
+}
+
+@media (hover: hover) {
+  .tileBar {
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+  .tile:hover .tileBar,
+  .tile:focus-within .tileBar {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.tileBtn {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.13s, opacity 0.13s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover:not(:disabled) { background: rgba(0, 0, 0, 0.8); }
+  &:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+  &:disabled { opacity: 0.3; cursor: not-allowed; }
+}
+
+.tileDanger:hover:not(:disabled) {
+  background: $danger;
+}

@@ -1,0 +1,79 @@
+@use '../../../styles/vars' as *;
+@use '../../../styles/app' as a;
+
+// ─────────────────────────────────────────────────────────────
+// The shell every account section wears.
+//
+// Four sections sit in the same slot beside the same rail, so the panel, the
+// heading row and the failure line have to be pixel-identical between them —
+// switching sections must move the content, not the frame around it. Mixins
+// rather than a shared class because CSS modules hash per file, and `composes`
+// across files couples the build order of two stylesheets to their content.
+// ─────────────────────────────────────────────────────────────
+
+@mixin panel {
+  @include a.surface;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+
+  @media (max-width: 600px) {
+    padding: 16px;
+    gap: 18px;
+  }
+}
+
+/// Title row: heading on the left, actions on the right, wrapping on a phone.
+@mixin head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+@mixin heading {
+  @include a.display(23px);
+  margin: 0;
+
+  @media (max-width: 600px) { font-size: 20px; }
+}
+
+@mixin sub {
+  margin: 5px 0 0;
+  font-size: 13px;
+  color: $fg-2;
+  line-height: 1.5;
+  max-width: 52ch;
+}
+
+/// A failure the person can do something about. Never a toast: these follow a
+/// button they just pressed, and a message that disappears on its own is one
+/// they may not have finished reading.
+@mixin error {
+  margin: 0;
+  padding: 10px 13px;
+  border-radius: $r-2;
+  background: $danger-soft;
+  color: $danger;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/// Quieter than an error: a fact about the current state, not a problem.
+@mixin note {
+  margin: 0;
+  padding: 10px 13px;
+  border-radius: $r-2;
+  background: $bg-2;
+  color: $fg-2;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+/// A section heading INSIDE a panel — "About", "Contact".
+@mixin block-title {
+  margin: 0 0 10px;
+  @include a.eyebrow;
+}

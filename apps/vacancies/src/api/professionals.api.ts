@@ -9,6 +9,12 @@ import { ApiError, apiRequest } from './client'
 // reach a salon's data, by construction rather than by check.
 // ─────────────────────────────────────────────────────────────
 
+/** One portfolio tile. */
+export interface ProfilePhoto {
+  url: string
+  label?: string
+}
+
 export interface Professional {
   id: string
   name: string
@@ -19,7 +25,14 @@ export interface Professional {
   areaKeys: string[]
   experienceYears: number | null
   about: string
+  /** Empty = no photo; the UI falls back to the name initial. */
+  avatarUrl: string
+  photos: ProfilePhoto[]
   cvUrl: string
+  /** Whether the profile is reachable at /specialists/:id. */
+  publicProfile: boolean
+  /** Whether that page shows the phone number. A separate decision. */
+  showContact: boolean
   locale: string
 }
 
@@ -49,6 +62,8 @@ export interface ProfileInput {
   areaKeys?: string[]
   experienceYears?: number | null
   about?: string
+  publicProfile?: boolean
+  showContact?: boolean
   locale?: string
 }
 
@@ -105,6 +120,47 @@ export function updateMe(authed: Authed, input: ProfileInput): Promise<Professio
   return authed<Professional>('/professionals/me', {
     method: 'PATCH',
     body: JSON.stringify(input),
+  })
+}
+
+/*
+ * Media.
+ *
+ * Every one of these returns the WHOLE updated profile rather than just the
+ * url that changed, which is what lets the caller do `setProfessional(result)`
+ * and be done. A fragment would make each call site responsible for merging
+ * correctly, and a portfolio that has drifted from the server is worse than one
+ * extra object on the wire.
+ */
+
+export function uploadAvatar(authed: Authed, file: File): Promise<Professional> {
+  const body = new FormData()
+  body.append('file', file)
+  return authed<Professional>('/professionals/me/avatar', { method: 'POST', body })
+}
+
+export function removeAvatar(authed: Authed): Promise<Professional> {
+  return authed<Professional>('/professionals/me/avatar', { method: 'DELETE' })
+}
+
+export function uploadPhoto(authed: Authed, file: File, label = ''): Promise<Professional> {
+  const body = new FormData()
+  body.append('file', file)
+  if (label) body.append('label', label)
+  return authed<Professional>('/professionals/me/photos', { method: 'POST', body })
+}
+
+export function removePhoto(authed: Authed, url: string): Promise<Professional> {
+  return authed<Professional>('/professionals/me/photos', {
+    method: 'DELETE',
+    body: JSON.stringify({ url }),
+  })
+}
+
+export function reorderPhotos(authed: Authed, urls: string[]): Promise<Professional> {
+  return authed<Professional>('/professionals/me/photos', {
+    method: 'PATCH',
+    body: JSON.stringify({ urls }),
   })
 }
 

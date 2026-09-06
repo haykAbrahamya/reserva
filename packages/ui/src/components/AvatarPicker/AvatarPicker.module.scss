@@ -1,4 +1,4 @@
-@use 'variables' as *;
+@use '../../styles/variables' as *;
 
 /* Framed "profile photo" zone so the control reads as an intentional section
    rather than a stray avatar + button floating in space. */
@@ -32,6 +32,7 @@
   &:hover { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18); }
   &:hover .overlay { opacity: 1; }
   &:active { transform: scale(0.97); }
+  &:disabled { cursor: wait; }
 }
 
 .img {
@@ -103,6 +104,8 @@
   transition: background 0.13s, border-color 0.13s, color 0.13s;
   -webkit-tap-highlight-color: transparent;
 
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+
   &:hover { background: $bg-2; border-color: $line-strong; color: $fg-0; }
 
   /* Primary "upload/change" — accent-tinted so it invites a click. */
@@ -118,6 +121,13 @@
     color: $fg-2;
     &:hover { background: $danger-soft; border-color: transparent; color: $danger; }
   }
+}
+
+/* Slot under the actions: an upload progress line, or an error. */
+.footer {
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: $fg-2;
 }
 
 @media (max-width: 520px) {

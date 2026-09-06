@@ -1,18 +1,64 @@
 @use 'variables' as *;
 
+/*
+ * One listing.
+ *
+ * `height: 100%` is the load-bearing line. The grid stretches its cells, so
+ * every card in a row now ends level and the footers line up across the page —
+ * before this each card stopped wherever its content did, and a row of four
+ * read as four unrelated boxes rather than one list.
+ */
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 16px;
+  height: 100%;
+  padding: 16px 16px 14px;
   border-radius: $r-2;
   border: 1px solid $line-1;
   background: $bg-2;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  overflow: hidden;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
   min-width: 0;
+  cursor: pointer;
 
-  &:hover { border-color: $line-2; box-shadow: $shadow-1; }
+  &:hover {
+    border-color: $line-2;
+    box-shadow: $shadow-2;
+    /* One pixel. These are rows in a list, and a card that leaps makes a page
+       of twelve feel unstable to read down. */
+    transform: translateY(-1px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: border-color 0.16s ease, box-shadow 0.16s ease;
+    &:hover { transform: none; }
+  }
 }
+
+/*
+ * A status rail down the leading edge.
+ *
+ * The badge already names the status, but a badge has to be READ. A two-pixel
+ * edge is scanned: a column of cards tells you at a glance which are live,
+ * which are drafts and which have lapsed, without your eye stopping on any of
+ * them. Logical inset so it stays on the leading edge in any direction.
+ */
+.card::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 3px;
+  background: $line-2;
+}
+
+.status_published::before { background: $success; }
+.status_draft::before     { background: $line-strong; }
+.status_paused::before    { background: $info; }
+.status_expired::before   { background: $warn; }
+.status_closed::before    { background: $line-2; }
 
 .busy { opacity: 0.55; pointer-events: none; }
 
@@ -24,6 +70,56 @@
 }
 
 .titleWrap { min-width: 0; flex: 1; }
+
+/*
+ * The heading IS the link into the listing, and its ::after stretches over the
+ * whole card so the entire surface opens it.
+ *
+ * The "stretched link" pattern, and the reason for it: a card that is itself a
+ * <button> or <a> cannot legally contain the menu, the primary action and the
+ * applicants count — nesting interactive elements is invalid HTML and breaks
+ * keyboard navigation. This way there is exactly ONE tab stop and one
+ * accessible name for "open this listing", the whole card is clickable, and the
+ * three real controls sit above the overlay and keep working.
+ *
+ * The trade: the overlay swallows text selection inside the card. Worth it for
+ * a summary card whose text is repeated in full on the page it opens.
+ */
+.roleBtn {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  &:hover { color: $accent; text-decoration: underline; text-underline-offset: 2px; }
+
+  /* The focus ring belongs to the whole card, since that is the click target. */
+  &:focus-visible::after {
+    outline: 2px solid $accent;
+    outline-offset: -3px;
+    border-radius: $r-2;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+}
+
+/* Everything genuinely interactive sits above the overlay. Without this the
+   menu, the publish button and the applicants count would all just open the
+   listing. */
+.headRight,
+.primaryAction,
+.applicants {
+  position: relative;
+  z-index: 1;
+}
 
 .role {
   margin: 0;
@@ -129,13 +225,25 @@
   &:hover { background: $danger-soft; color: $danger; }
 }
 
-/* ── Money ── */
+/* ── Money ──
+   Its own block so it is read before the chips, not with them. */
+.payBlock {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .pay {
-  font-size: 15px;
-  font-weight: 600;
-  color: $accent-contrast;
-  line-height: 1.3;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: $fg-0;
+  line-height: 1.25;
   overflow-wrap: anywhere;
+  /* Figures line up between cards in a column — the whole point of scanning a
+     list of pay rates. */
+  font-variant-numeric: tabular-nums;
 }
 
 /* ── Meta + perks ── */
@@ -162,10 +270,19 @@
   white-space: nowrap;
 }
 
+/*
+ * Perks read one step quieter than the meta chips above them: those are facts
+ * about the JOB, these are what the salon is offering.
+ *
+ * No dashed border. A dashed outline is the web's convention for "empty",
+ * "drop here" or "not finished" — on a filled-in selling point it made every
+ * card look half-built.
+ */
 .perk {
   padding: 4px 9px;
   border-radius: 999px;
-  border: 1px dashed $line-2;
+  border: 1px solid transparent;
+  background: $bg-3;
   color: $fg-2;
   font-size: 11.5px;
   line-height: 1.5;
@@ -203,6 +320,19 @@
   overflow-wrap: anywhere;
 }
 
+/*
+ * "Expires in 3 days" said in amber rather than in grey.
+ *
+ * The card already promotes a Renew button at this point, but the sentence
+ * explaining WHY it appeared was the same colour as "published 2 weeks ago" —
+ * so the button looked arbitrary. Amber rather than red: a listing about to
+ * lapse is a deadline, not a fault.
+ */
+.ageWarn {
+  color: $warn;
+  font-weight: 500;
+}
+
 .primaryAction {
   display: inline-flex;
   align-items: center;
@@ -237,4 +367,53 @@
     gap: 9px;
   }
   .primaryAction { justify-content: center; }
+}
+
+/* ── Applicants ────────────────────────────────────────────────
+   Quiet until there is something unread, then it carries the accent. It is a
+   count and a door in one control: the number is the reason to press it. */
+
+.applicants {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 11px;
+  margin-left: auto;
+  border: 1px solid $line-2;
+  border-radius: 999px;
+  background: $bg-1;
+  color: $fg-2;
+  font-family: $font-sans;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.13s, color 0.13s, background 0.13s;
+
+  &:hover { border-color: $accent; color: $accent; background: $accent-soft; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+}
+
+.applicantsNew {
+  border-color: transparent;
+  background: $accent-soft;
+  color: $accent;
+  font-weight: 600;
+
+  &:hover { border-color: transparent; }
+}
+
+.applicantsDot {
+  min-width: 17px;
+  height: 17px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: $accent;
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 17px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
 }

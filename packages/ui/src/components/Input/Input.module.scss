@@ -60,3 +60,48 @@
 
   svg { flex-shrink: 0; margin-top: 1px; }
 }
+
+/* ── Trailing control ──────────────────────────────────────────
+   Wraps the input alone, so anything anchored to it is centred on the BOX
+   rather than on the label-input-error stack around it. */
+
+.control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.trailing {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  /* The input keeps the click; only the control inside takes it back. */
+  pointer-events: none;
+
+  > * { pointer-events: auto; }
+}
+
+/* Room for it, so a long value never runs under the button. */
+.hasTrailing {
+  padding-right: 40px;
+}
+
+.reveal {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--fg-3);
+  cursor: pointer;
+  transition: color 0.13s, background 0.13s;
+
+  &:hover { color: var(--fg-1); background: var(--bg-2); }
+  &:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+}

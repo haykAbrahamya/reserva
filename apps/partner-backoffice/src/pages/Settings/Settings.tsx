@@ -5,12 +5,13 @@ import { CheckCircle2, Lock, Globe, ExternalLink, Download, Share, CheckCircle, 
 import { Toggle, Button, Input, SegmentedFilter, useToast } from '@/components/ui'
 import { useAppStore } from '@/store/app.store'
 import { useIsAdmin } from '@/store/auth.hooks'
-import { partnersService, galleryImageUrl, type PartnerProfileResponse } from '@/services/partners.service'
+import { partnersService, type PartnerProfileResponse } from '@/services/partners.service'
 import { useResource } from '@/store/useResource'
 import { useInstallPrompt } from '@/hooks/useInstallPrompt'
 import { errorMessage } from '@/utils/errors'
 import { useT } from '@/i18n'
 import s from './Settings.module.scss'
+import { uploadUrl } from '@/services/http'
 
 // Live input sanitizer: lowercase, spaces/invalid chars → hyphen. Crucially we
 // do NOT strip trailing hyphens here — doing so on every keystroke made it
@@ -263,7 +264,7 @@ export function Settings() {
           <div className={s.logoRow}>
             <div className={s.logoPreview}>
               {logoUrl
-                ? <img src={galleryImageUrl(logoUrl)} alt="" />
+                ? <img src={uploadUrl(logoUrl)} alt="" />
                 : <span className={s.logoFallback}>{(profile.name?.trim()?.[0] ?? 'R').toUpperCase()}</span>}
             </div>
             <div className={s.logoActions}>

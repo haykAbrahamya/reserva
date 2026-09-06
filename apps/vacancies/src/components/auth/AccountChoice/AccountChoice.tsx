@@ -43,6 +43,14 @@ interface Props {
 /**
  * The fork: which side of this market are you on?
  *
+ * The card titles are the ACTION in the first person — "I am hiring" / "I am
+ * looking for work" — and they change with the mode. An earlier version titled
+ * them with the noun ("Salon" / "Specialist") under a heading that asked what
+ * you were LOOKING FOR, which inverted the answer for the person it mattered
+ * most to: a specialist looking for a salon would read "what are you looking
+ * for?", pick "Salon", and land in salon registration. Whoever you are, the
+ * sentence on the card you pick has to be true of YOU.
+ *
  * A job board has two audiences with nothing in common — one is hiring, one is
  * looking — and no form fits both. Asking once, up front, in the words people
  * would use about themselves, is cheaper than a salon getting three fields into
@@ -70,7 +78,7 @@ export function AccountChoice({ mode, onChoose }: Props) {
           <span className={s.choiceIcon}>
             <Building2 size={20} />
           </span>
-          <span className={s.choiceTitle}>{t('auth.role.salon.title')}</span>
+          <span className={s.choiceTitle}>{t(`auth.role.salon.${mode}Title`)}</span>
           <span className={s.choiceDesc}>{t(`auth.role.salon.${mode}Desc`)}</span>
           <ArrowRight className={s.choiceArrow} size={16} />
         </button>
@@ -79,7 +87,7 @@ export function AccountChoice({ mode, onChoose }: Props) {
           <span className={s.choiceIcon}>
             <User size={20} />
           </span>
-          <span className={s.choiceTitle}>{t('auth.role.specialist.title')}</span>
+          <span className={s.choiceTitle}>{t(`auth.role.specialist.${mode}Title`)}</span>
           <span className={s.choiceDesc}>{t(`auth.role.specialist.${mode}Desc`)}</span>
           <ArrowRight className={s.choiceArrow} size={16} />
         </button>

@@ -1,0 +1,148 @@
+@use '../../../styles/vars' as *;
+@use '../../../styles/app' as a;
+
+.panel {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Experience chips ──────────────────────────────────────── */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 13px;
+  border-radius: 999px;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-2;
+  font-family: $font-sans;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  transition: border-color 0.13s, color 0.13s, background 0.13s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover { border-color: $line-strong; color: $fg-0; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+}
+
+.chipOn {
+  background: $accent-soft;
+  border-color: transparent;
+  color: $accent-contrast;
+  font-weight: 600;
+
+  &:hover { color: $accent-contrast; border-color: transparent; }
+}
+
+/* ── The one switch ────────────────────────────────────────── */
+
+/*
+ * A grid, not a flex line.
+ *
+ * The rail is 278px wide. Laid out as icon | text | switch, the text column got
+ * about 180px of it, so a two-word title wrapped and its description ran to
+ * four lines in a column narrower than the icon beside it. On the grid the
+ * description spans the full width underneath, and the row reads as one thing.
+ * The same shape the account settings rows use, for the same reason.
+ */
+.switchRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    'icon title switch'
+    'body body  body';
+  align-items: center;
+  column-gap: 11px;
+  row-gap: 5px;
+  padding: 14px 2px 4px;
+  border-top: 1px solid $line-1;
+  cursor: pointer;
+}
+
+.switchIcon {
+  grid-area: icon;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: $bg-2;
+  color: $fg-2;
+}
+
+/* `display: contents` so the two children land in their own grid areas —
+   wrapping them in a box would put them back in one cell. */
+.switchText {
+  display: contents;
+}
+
+.switchRow > [role='switch'] {
+  grid-area: switch;
+}
+
+.switchTitle {
+  grid-area: title;
+  font-size: 13px;
+  font-weight: 600;
+  color: $fg-0;
+}
+
+.switchBody {
+  grid-area: body;
+  font-size: 11.5px;
+  color: $fg-3;
+  line-height: 1.4;
+}
+
+/* ── Active filter chips, above the results ────────────────── */
+
+.active {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.activeChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 8px 0 12px;
+  border-radius: 999px;
+  border: 1px solid $accent-line;
+  background: $accent-soft;
+  color: $accent-contrast;
+  font-family: $font-sans;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  max-width: 100%;
+  transition: background 0.13s, border-color 0.13s;
+
+  &:hover {
+    background: $accent-wash;
+    border-color: $accent;
+    .activeX { color: $danger; }
+  }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+}
+
+.activeX {
+  font-size: 16px;
+  line-height: 1;
+  color: $fg-3;
+  transition: color 0.13s;
+}
+
+.srOnly { @include a.sr-only; }

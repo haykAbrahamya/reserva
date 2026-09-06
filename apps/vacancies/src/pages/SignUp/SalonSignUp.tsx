@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, Check, CheckCircle2, Eye, EyeOff, Mail, Megaphone, ShieldCheck } from 'lucide-react'
-import { Button, Input } from '@reserva/ui'
+import { ArrowLeft, ArrowRight, Check, CheckCircle2, Mail, Megaphone, ShieldCheck } from 'lucide-react'
+import { Button, Input, PasswordInput } from '@reserva/ui'
 import { isValidPhone, normalizePhoneInput } from '@reserva/shared'
 import { ApiError } from '@/api/client'
 import { startSalonSignup } from '@/api/signup.api'
@@ -49,7 +49,6 @@ export function SalonSignUp({ onBack }: { onBack: () => void }) {
   const [step, setStep] = useState<Step>('salon')
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
-  const [showPw, setShowPw] = useState(false)
 
   // Errors appear only after an attempt to move on, so a form nobody has filled
   // in yet is not already shouting at them.
@@ -228,33 +227,30 @@ export function SalonSignUp({ onBack }: { onBack: () => void }) {
             error={touched && !phoneValid ? t('signup.errors.adminPhone') : undefined}
           />
 
-          <div className={s.pwWrap}>
-            <Input
-              label={t('signup.password')}
-              type={showPw ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={t('signup.passwordPlaceholder', { min: MIN_PW })}
-              autoComplete="new-password"
-              error={touched && !pwValid ? t('signup.errors.password', { min: MIN_PW }) : undefined}
-            />
-            <button
-              type="button"
-              className={s.pwToggle}
-              onClick={() => setShowPw((v) => !v)}
-              aria-label={showPw ? t('signup.hidePassword') : t('signup.showPassword')}
-            >
-              {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
-            </button>
-          </div>
+          <PasswordInput
+            label={t('signup.password')}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder={t('signup.passwordPlaceholder', { min: MIN_PW })}
+            autoComplete="new-password"
+            error={touched && !pwValid ? t('signup.errors.password', { min: MIN_PW }) : undefined}
+            showLabel={t('signup.showPassword')}
+            hideLabel={t('signup.hidePassword')}
+          />
 
-          <Input
+          {/* The confirm field gets its own toggle. It had none, which is
+              backwards: this is the field people most need to read back,
+              because unlike the first one there is nothing to compare it
+              against. */}
+          <PasswordInput
             label={t('signup.confirm')}
-            type={showPw ? 'text' : 'password'}
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
+            placeholder={t('signup.confirmPlaceholder')}
             autoComplete="new-password"
             error={touched && !matchValid ? t('signup.errors.confirm') : undefined}
+            showLabel={t('signup.showPassword')}
+            hideLabel={t('signup.hidePassword')}
           />
 
           {submitError && <p className={s.submitError}>{submitError}</p>}

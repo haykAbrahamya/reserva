@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Eye, EyeOff } from 'lucide-react'
-import { Button, Input, Textarea } from '@reserva/ui'
+import { ArrowLeft } from 'lucide-react'
+import { Button, Input, PasswordInput, Textarea } from '@reserva/ui'
 import { isValidPhone, normalizePhoneInput } from '@reserva/shared'
 import { fetchMeta } from '@/api/board.api'
 import { SpecialtyPicker } from '@/components/common/SpecialtyPicker/SpecialtyPicker'
@@ -47,7 +47,6 @@ export function SpecialistSignUp({ onBack }: { onBack: () => void }) {
   const [step, setStep] = useState<Step>('you')
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
-  const [showPw, setShowPw] = useState(false)
   const [touched, setTouched] = useState(false)
 
   const [name, setName] = useState('')
@@ -155,25 +154,16 @@ export function SpecialistSignUp({ onBack }: { onBack: () => void }) {
             error={touched && !emailValid ? t('specialist.errors.email') : undefined}
           />
 
-          <div className={s.pwWrap}>
-            <Input
-              label={t('signup.password')}
-              type={showPw ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={t('signup.passwordPlaceholder', { min: MIN_PW })}
-              autoComplete="new-password"
-              error={touched && !pwValid ? t('signup.errors.password', { min: MIN_PW }) : undefined}
-            />
-            <button
-              type="button"
-              className={s.pwToggle}
-              onClick={() => setShowPw((v) => !v)}
-              aria-label={showPw ? t('signup.hidePassword') : t('signup.showPassword')}
-            >
-              {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
-            </button>
-          </div>
+          <PasswordInput
+            label={t('signup.password')}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder={t('signup.passwordPlaceholder', { min: MIN_PW })}
+            autoComplete="new-password"
+            error={touched && !pwValid ? t('signup.errors.password', { min: MIN_PW }) : undefined}
+            showLabel={t('signup.showPassword')}
+            hideLabel={t('signup.hidePassword')}
+          />
 
           <div className={s.actions}>
             <Button variant="ghost" onClick={onBack}>

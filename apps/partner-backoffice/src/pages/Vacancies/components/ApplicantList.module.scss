@@ -1,0 +1,234 @@
+@use 'variables' as *;
+
+.error {
+  margin: 0 0 14px;
+  padding: 10px 13px;
+  border-radius: $r-2;
+  background: $danger-soft;
+  color: $danger;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: $fg-2;
+}
+
+/* Only when there is something unread. A "0 new" chip beside every listing is
+   noise pretending to be information. */
+.unseenPill {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: $accent-soft;
+  color: $accent;
+  font-size: 11.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  padding: 15px;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  background: $bg-0;
+}
+
+/*
+ * Untriaged applications carry a left edge in the accent.
+ *
+ * A whole tinted card would make an inbox of ten unread ones a wall of colour;
+ * an edge marks each row without changing what the card is made of, and it
+ * disappears the moment somebody makes a decision — which is exactly when it
+ * has done its job.
+ */
+.cardNew {
+  border-left: 3px solid $accent;
+  padding-left: 13px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.who {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: $fg-0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.when {
+  margin: 2px 0 0;
+  font-size: 11.5px;
+  color: $fg-3;
+  font-variant-numeric: tabular-nums;
+}
+
+.status {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* "New" is the quietest of the four: it is the state every application starts
+   in, so colouring it would light up the whole list on day one. */
+.status_new        { background: $bg-2; color: $fg-2; }
+.status_contacted  { background: $info-soft; color: $info; }
+.status_shortlisted { background: $accent-soft; color: $accent; }
+/* Muted, not red. A rejection is a decision already made, not a problem the
+   reader has to act on. */
+.status_rejected   { background: $bg-2; color: $fg-3; }
+
+.note {
+  margin: 0;
+  padding: 11px 13px;
+  border-radius: $r-1;
+  background: $bg-2;
+  font-size: 13px;
+  line-height: 1.6;
+  color: $fg-1;
+  /* Honour the line breaks they typed. */
+  white-space: pre-line;
+}
+
+.contacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: $fg-1;
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+
+  &:hover { color: $accent; text-decoration: underline; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+}
+
+/* ── Profile ───────────────────────────────────────────────── */
+
+.profileLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  align-self: flex-start;
+  height: 32px;
+  padding: 0 13px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: $accent-soft;
+  color: $accent;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.13s, border-color 0.13s;
+
+  &:hover { border-color: $accent; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+}
+
+.profileIcon { opacity: 0.7; }
+
+/* Said plainly rather than shown as a disabled button: nothing is broken, the
+   applicant simply has not published their page. */
+.noProfile {
+  margin: 0;
+  font-size: 11.5px;
+  color: $fg-3;
+  font-style: italic;
+}
+
+/* ── Triage ────────────────────────────────────────────────── */
+
+.triage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding-top: 11px;
+  border-top: 1px solid $line-1;
+}
+
+.triageBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid $line-2;
+  border-radius: 999px;
+  background: $bg-1;
+  color: $fg-2;
+  font-family: $font-sans;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.13s, color 0.13s, background 0.13s;
+
+  &:hover:not(:disabled) { border-color: $line-strong; color: $fg-0; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+  &:disabled { opacity: 0.55; cursor: progress; }
+}
+
+.triageOn {
+  background: $accent-soft;
+  border-color: transparent;
+  color: $accent;
+  font-weight: 600;
+
+  &:hover:not(:disabled) { border-color: transparent; color: $accent; }
+}
+
+/* ── States ────────────────────────────────────────────────── */
+
+.skeleton {
+  height: 148px;
+  border-style: dashed;
+  background: linear-gradient(90deg, $bg-0 25%, $bg-2 50%, $bg-0 75%);
+  background-size: 200% 100%;
+  animation: applicant-shimmer 1.3s linear infinite;
+
+  @media (prefers-reduced-motion: reduce) { animation: none; }
+}
+
+:global {
+  @keyframes applicant-shimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+  }
+}

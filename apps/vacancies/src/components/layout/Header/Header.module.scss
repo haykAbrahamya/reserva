@@ -23,9 +23,24 @@
   display: flex;
   align-items: center;
   gap: 18px;
+
+  @media (max-width: 1000px) { gap: 12px; }
 }
 
-/* Desktop: search between the logo and the controls, taking the slack. */
+/*
+ * The market switch. Wide screens only.
+ *
+ * Below 1000px it is the first thing in the menu instead — see the note in
+ * Header.tsx for the measurement that decides this.
+ */
+.navWide {
+  display: flex;
+  flex-shrink: 0;
+
+  @media (max-width: 1000px) { display: none; }
+}
+
+/* Desktop: search between the nav and the controls, taking the slack. */
 .searchWide {
   flex: 1;
   display: flex;
@@ -41,6 +56,17 @@
   flex-shrink: 0;
 }
 
+/* Language and theme are PREFERENCES, not navigation, so they are the first
+   things to give up their place in a crowded bar. In the drawer each gets a
+   written label, which is more than a 34px circle ever said. */
+.prefsWide {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  @media (max-width: 1000px) { display: none; }
+}
+
 /* Narrow: search drops to its own full-width row. Same React node, so the two
    positions can never hold different values. */
 .searchNarrow {
@@ -52,7 +78,6 @@
 @media (max-width: 860px) {
   .searchWide { display: none; }
   .searchNarrow { display: block; }
-  .inner { gap: 12px; }
 }
 
 /* ── Account entry ───────────────────────────────────────────
@@ -81,13 +106,12 @@
 }
 
 /*
- * Below the wide layout it becomes the SAME 34px circle as the theme toggle.
+ * Below the wide layout it becomes the SAME 34px circle as the menu button.
  *
- * Not a shrunken pill: at that width the bar is a row of three icon controls,
- * and one of them being a bordered capsule with a word in it is what made the
- * header look broken. Matching the toggle exactly makes them read as a set.
- * The accessible name survives in `title` and the link text is only visually
- * hidden, never removed.
+ * Not a shrunken pill: at that width the bar is a row of icon controls, and one
+ * of them being a bordered capsule with a word in it is what made the header
+ * look broken. The accessible name survives in `title` and the link text is
+ * only visually hidden, never removed.
  */
 @media (max-width: 860px) {
   .accountLink {
@@ -98,4 +122,68 @@
   }
 
   .accountLabel { @include a.sr-only; }
+}
+
+/*
+ * Sign up.
+ *
+ * The accent half of the pair, because it is the action the site wants and the
+ * one a first-time visitor previously had no route to at all: the bar offered
+ * only "sign in", and registering was two clicks deep inside the page that led
+ * to. On a board whose professional side IS a profile you build, that was the
+ * wrong thing to hide.
+ *
+ * Kept at every width. It was going to be desktop-only — the bar below 1000px
+ * is already the brand plus two icon buttons — but measured at 390px the four
+ * of them come to 367 of 390 usable pixels, so it fits, and the request was
+ * precisely that registering be visible from the header.
+ */
+.signUpLink {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: $accent;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: filter 0.14s ease;
+
+  &:hover { filter: brightness(1.06); }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+
+  /* At the narrowest sizes the padding is what has to give, not the word. */
+  @media (max-width: 420px) {
+    padding: 0 11px;
+    font-size: 12.5px;
+  }
+}
+
+/* ── Menu ──────────────────────────────────────────────────── */
+
+.menuButton {
+  width: 34px;
+  height: 34px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid $line-2;
+  border-radius: 999px;
+  background: $bg-1;
+  color: $fg-1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.14s ease, color 0.14s ease, background 0.14s ease;
+
+  &:hover { border-color: $accent; color: $accent; background: $accent-soft; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+
+  /* Only where something has actually moved into it. Above 1000px the bar
+     already shows everything the menu would, and a button that opens a copy of
+     what is on screen is a button that teaches people not to press it. */
+  @media (max-width: 1000px) { display: inline-flex; }
 }

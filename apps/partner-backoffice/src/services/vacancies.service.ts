@@ -109,6 +109,73 @@ export interface VacancyInput {
   contactPhone?: string
 }
 
+/*
+ * ── Applications ────────────────────────────────────────────
+ *
+ * The salon's side of the board. The public app writes these rows; everything
+ * here reads and triages them.
+ */
+
+export type VacancyApplicationStatus = 'new' | 'contacted' | 'shortlisted' | 'rejected'
+export type VacancyApplicationSource = 'board' | 'manual'
+
+/**
+ * What an application says about the account behind it.
+ *
+ * The server draws the privacy line, not this file: an application carries what
+ * the applicant TYPED into this salon's form, while their profile is a separate
+ * thing they may not have published. So `profileId` is null unless they did —
+ * and `hasAccount` still tells the salon they are a registered specialist
+ * rather than an anonymous walk-up, which is useful triage either way.
+ */
+export interface ApplicantAccount {
+  hasAccount: boolean
+  /** Non-null only when the applicant published their profile. */
+  profileId: string | null
+  /** Rides the same gate as the link: empty unless the profile is public. */
+  avatarUrl: string
+}
+
+/**
+ * What an application looks like when the API has not been deployed yet.
+ *
+ * This app and the API ship through separate pipelines, so a backoffice that
+ * knows about `account` WILL at some point talk to an API that does not. That
+ * is a missing feature, not a broken page — and the first version of this
+ * crashed the whole Vacancies route on it, because a `.map` reached straight
+ * into `a.account.avatarUrl`.
+ */
+const NO_ACCOUNT: ApplicantAccount = { hasAccount: false, profileId: null, avatarUrl: '' }
+
+/** Read the account block defensively; an older API simply omits it. */
+export function applicantAccount(application: VacancyApplication): ApplicantAccount {
+  return application.account ?? NO_ACCOUNT
+}
+
+export interface VacancyApplication {
+  id: string
+  name: string
+  phone: string
+  email: string
+  /** Their message to the salon — the free text that actually gets read. */
+  note: string
+  /** The UI language they applied in, so the salon calls back in it. */
+  locale: string
+  source: VacancyApplicationSource
+  status: VacancyApplicationStatus
+  /** First time somebody triaged it — what makes the "new" badge trustworthy. */
+  seenAt: string | null
+  createdAt: string
+  /**
+   * Absent from an API older than this field — read it through
+   * `applicantAccount`, never directly.
+   */
+  account?: ApplicantAccount
+}
+
+/** Per-listing applicant totals, keyed by vacancy id. */
+export type ApplicationCounts = Record<string, { total: number; unseen: number }>
+
 export interface ListVacanciesParams {
   status?: 'all' | VacancyStatus
   locationId?: string
@@ -149,6 +216,38 @@ export const vacanciesService = {
 
   async remove(id: string): Promise<void> {
     return apiDelete(`/vacancies/${id}`)
+  },
+
+  /**
+   * Applicant totals for every listing, in one request.
+   *
+   * One grouped query on the server rather than a count per card — the
+   * alternative is the classic N+1 that makes a list of twelve listings issue
+   * twenty-five requests.
+   */
+  async applicationCounts(): Promise<ApplicationCounts> {
+    return apiGet<ApplicationCounts>('/vacancies/applications/counts')
+  },
+
+  async applications(vacancyId: string): Promise<VacancyApplication[]> {
+    return apiGet<VacancyApplication[]>(`/vacancies/${vacancyId}/applications`)
+  },
+
+  /**
+   * Move an applicant through triage.
+   *
+   * Returns the updated row, so the caller replaces one item instead of
+   * refetching a list the reader is looking at.
+   */
+  async triage(
+    vacancyId: string,
+    applicationId: string,
+    status: VacancyApplicationStatus,
+  ): Promise<VacancyApplication> {
+    return apiPatch<VacancyApplication>(
+      `/vacancies/${vacancyId}/applications/${applicationId}`,
+      { status },
+    )
   },
 }
 

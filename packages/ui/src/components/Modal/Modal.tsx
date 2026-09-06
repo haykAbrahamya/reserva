@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { Button } from '../Button/Button'
 import { useDragDismiss } from '../../hooks/useDragDismiss'
+import { useScrollLock } from '../../hooks/useScrollLock'
 import s from './Modal.module.scss'
 
 const CLOSE_DURATION = 260 // ms — must match longest CSS animation
@@ -51,15 +52,16 @@ export function Modal({ open, onClose, title, subtitle, children, footer, size =
   // Android-style drag-to-dismiss for the mobile sheet (no scroll conflict).
   const drag = useDragDismiss({ onDismiss: handleClose, scrollSelector: `.${s.body}`, handleSelector: `.${s.grab}`, enabled: isMobile })
 
+  // Scroll locking (and the scrollbar-width compensation that stops the page
+  // jolting sideways) lives in useScrollLock — this file used to carry two
+  // copies of it, one here and one in Drawer.
+  useScrollLock(open)
+
   useEffect(() => {
     if (!open) return
     const fn = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose() }
     document.addEventListener('keydown', fn)
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.removeEventListener('keydown', fn)
-      document.body.style.overflow = ''
-    }
+    return () => document.removeEventListener('keydown', fn)
   }, [open, handleClose])
 
   if (!open && !closing) return null
@@ -115,15 +117,16 @@ export function Drawer({ open, onClose, title, subtitle, children, footer }: Omi
   const { closing, handleClose } = useAnimatedClose(open, onClose)
   const drag = useDragDismiss({ onDismiss: handleClose, scrollSelector: `.${s.body}`, handleSelector: `.${s.grab}`, enabled: isMobile })
 
+  // Scroll locking (and the scrollbar-width compensation that stops the page
+  // jolting sideways) lives in useScrollLock — this file used to carry two
+  // copies of it, one here and one in Drawer.
+  useScrollLock(open)
+
   useEffect(() => {
     if (!open) return
     const fn = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose() }
     document.addEventListener('keydown', fn)
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.removeEventListener('keydown', fn)
-      document.body.style.overflow = ''
-    }
+    return () => document.removeEventListener('keydown', fn)
   }, [open, handleClose])
 
   if (!open && !closing) return null

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Briefcase, Plus, MapPin, EyeOff } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Button, Empty, ConfirmDialog, SegmentedFilter, Pagination, useToast } from '@/components/ui'
 import { useResource } from '@/store/useResource'
 import { partnersService } from '@/services/partners.service'
@@ -30,6 +30,7 @@ const FILTERS: StatusFilter[] = ['all', 'published', 'draft', 'paused', 'expired
  */
 export function Vacancies() {
   const { t, tp } = useI18n()
+  const navigate = useNavigate()
   const toast = useToast()
 
   const [status, setStatus] = useState<StatusFilter>('all')
@@ -45,6 +46,20 @@ export function Vacancies() {
     [status, page],
   )
   const { data: counts, reload: reloadCounts } = useResource(() => vacanciesService.counts(), [], {})
+
+  /*
+   * Applicant totals for every card, in one request.
+   *
+   * Not per card: twelve listings would mean twelve requests, and the badge
+   * is decoration until it has a number — so a slow N+1 would show a row of
+   * cards that sprout counts one at a time.
+   */
+  const { data: applicantCounts } = useResource(
+    () => vacanciesService.applicationCounts(),
+    [],
+    {},
+  )
+
   // The catalog and the branches change rarely — fetched once for the editor.
   const { data: groups } = useResource(() => specialtiesService.catalog(), [], [])
   const { data: locations } = useResource(() => partnersService.listLocations(), [], [])
@@ -204,6 +219,8 @@ export function Vacancies() {
           <div className={s.grid}>
             {rows.map((v) => (
               <VacancyCard
+                onOpen={(x) => navigate(`/vacancies/${x.id}`)}
+                applicants={applicantCounts?.[v.id]}
                 key={v.id}
                 vacancy={v}
                 busy={busyId === v.id}

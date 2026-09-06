@@ -73,20 +73,40 @@
 .chevron { flex: 0 0 auto; transition: transform 0.16s ease; }
 .chevronOpen { transform: rotate(180deg); }
 
+/*
+ * Positioned by useAnchoredDropdown (fixed, portalled to <body>).
+ *
+ * Nothing here may set `position`, `top`, `left` or `width` — the hook owns all
+ * four, and it also caps `max-height` to the room actually available on the
+ * side it opened towards. What is left is the surface itself.
+ */
 .panel {
-  position: absolute;
-  z-index: 60;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
   display: flex;
   flex-direction: column;
-  max-height: 320px;
+  max-height: 340px;
   border: 1px solid $line-2;
   border-radius: $r-3;
   background: $bg-1;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+  box-shadow: $shadow-3;
   overflow: hidden;
+  animation: catalog-pop 0.14s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+
+  @media (prefers-reduced-motion: reduce) { animation: none; }
+}
+
+/* The hook's portal div is the surface; this fills it. */
+.panelInner {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+:global {
+  @keyframes catalog-pop {
+    from { opacity: 0; transform: translateY(-4px) scale(0.99); }
+    to   { opacity: 1; transform: none; }
+  }
 }
 
 .searchRow {

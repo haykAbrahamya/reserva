@@ -1,13 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
-import { X, ChevronLeft, ChevronRight } from 'lucide-react'
-import { ModalShell } from '@/components/ModalShell/ModalShell'
+import { Lightbox as SharedLightbox, type LightboxImage } from '@reserva/ui'
 import { useT } from '@/i18n'
-import s from './Lightbox.module.scss'
 
-export interface LightboxImage {
-  url: string
-  label?: string
-}
+export type { LightboxImage }
 
 interface Props {
   images: LightboxImage[]
@@ -16,99 +10,31 @@ interface Props {
   onIndex: (i: number) => void
 }
 
-const SWIPE_THRESHOLD = 50 // px to count as a swipe
-
+/**
+ * The partner gallery's photo viewer.
+ *
+ * The viewer itself lives in @reserva/ui now — the vacancies app needs the same
+ * one for a specialist's portfolio, and the arrows, the arrow keys, the swipe,
+ * the counter and the directional slide are all things that had already been
+ * tuned once and did not deserve a second, worse implementation.
+ *
+ * What stays here is the only part that is genuinely local: this app's
+ * translations.
+ */
 export function Lightbox({ images, index, onClose, onIndex }: Props) {
   const t = useT()
-  // Nav direction: 0 = first open (no slide, just a soft fade-in), 1 = next
-  // (slide from right), -1 = prev (slide from left).
-  const [dir, setDir] = useState<0 | 1 | -1>(0)
-  const touchStartX = useRef<number | null>(null)
-
-  const count = images.length
-  const current = images[index]
-  const go = (d: 1 | -1) => { setDir(d); onIndex((index + d + count) % count) }
-
-  // Arrow-key navigation (Esc + scroll-lock + portal are handled by ModalShell).
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') go(1)
-      else if (e.key === 'ArrowLeft') go(-1)
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [index, count])
-
-  if (!current) return null
-
-  const onTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX }
-  const onTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current === null) return
-    const dx = e.changedTouches[0].clientX - touchStartX.current
-    if (Math.abs(dx) > SWIPE_THRESHOLD) go(dx < 0 ? 1 : -1)
-    touchStartX.current = null
-  }
-
   return (
-    <ModalShell open onClose={onClose} closeDuration={180}>
-      {({ closing, requestClose }) => (
-    <div
-      className={[s.overlay, closing ? s.closing : ''].filter(Boolean).join(' ')}
-      onClick={requestClose}
-      role="dialog"
-      aria-modal="true"
-    >
-      {/* Top bar: counter + close */}
-      <div className={s.topBar} onClick={(e) => e.stopPropagation()}>
-        {count > 1 && <span className={s.counter}>{t('partner.gallery.counter', { current: index + 1, total: count })}</span>}
-        <button className={s.close} onClick={requestClose} aria-label={t('common.close')}>
-          <X size={22} />
-        </button>
-      </div>
-
-      {/* Prev (hidden for single image) */}
-      {count > 1 && (
-        <button
-          className={[s.nav, s.prev].join(' ')}
-          onClick={(e) => { e.stopPropagation(); go(-1) }}
-          aria-label={t('partner.gallery.prev')}
-        >
-          <ChevronLeft size={26} />
-        </button>
-      )}
-
-      {/* Image stage */}
-      <div
-        className={s.stage}
-        onClick={(e) => e.stopPropagation()}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-      >
-        {/* `key={index}` remounts the img each change so the slide keyframe
-            re-fires. First open (dir 0) gets no slide — it rides the stage's soft
-            fade/scale entrance; only navigation slides directionally. */}
-        <img
-          key={index}
-          className={[s.image, dir === 1 ? s.fromRight : dir === -1 ? s.fromLeft : ''].filter(Boolean).join(' ')}
-          src={current.url}
-          alt={current.label || ''}
-        />
-        {current.label && <div key={`cap-${index}`} className={s.caption}>{current.label}</div>}
-      </div>
-
-      {/* Next */}
-      {count > 1 && (
-        <button
-          className={[s.nav, s.next].join(' ')}
-          onClick={(e) => { e.stopPropagation(); go(1) }}
-          aria-label={t('partner.gallery.next')}
-        >
-          <ChevronRight size={26} />
-        </button>
-      )}
-    </div>
-      )}
-    </ModalShell>
+    <SharedLightbox
+      images={images}
+      index={index}
+      onIndex={onIndex}
+      onClose={onClose}
+      labels={{
+        close: t('common.close'),
+        prev: t('partner.gallery.prev'),
+        next: t('partner.gallery.next'),
+        counter: (current, total) => t('partner.gallery.counter', { current, total }),
+      }}
+    />
   )
 }

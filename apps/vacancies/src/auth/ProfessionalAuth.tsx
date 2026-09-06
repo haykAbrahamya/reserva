@@ -15,8 +15,13 @@ import {
   loginProfessional,
   refreshSession,
   registerProfessional,
+  removeAvatar,
+  removePhoto,
+  reorderPhotos,
   revokeSession,
   updateMe,
+  uploadAvatar,
+  uploadPhoto,
   type Authed,
   type Professional,
   type ProfileInput,
@@ -53,6 +58,23 @@ function write(session: StoredSession | null) {
   }
 }
 
+/**
+ * The profile's own images.
+ *
+ * Grouped rather than flattened onto the context so the five of them read as
+ * one capability, and kept HERE rather than called from the page because every
+ * one of them returns a new profile that has to replace the stored one — a page
+ * calling the api module directly would have no way to do that, and a stale
+ * `professional` after an upload is a photo that appears to have not uploaded.
+ */
+export interface ProfileMedia {
+  setAvatar: (file: File) => Promise<void>
+  clearAvatar: () => Promise<void>
+  addPhoto: (file: File, label?: string) => Promise<void>
+  deletePhoto: (url: string) => Promise<void>
+  reorder: (urls: string[]) => Promise<void>
+}
+
 interface AuthValue {
   professional: Professional | null
   /** True until the stored session has been checked. */
@@ -61,6 +83,7 @@ interface AuthValue {
   login: (identifier: string, password: string) => Promise<void>
   register: (input: RegisterInput) => Promise<void>
   updateProfile: (input: ProfileInput) => Promise<void>
+  media: ProfileMedia
   logout: () => void
   /** Authenticated request helper, with one transparent refresh on a 401. */
   authed: Authed
@@ -194,6 +217,17 @@ export function ProfessionalAuthProvider({ children }: { children: ReactNode }) 
     [authed],
   )
 
+  const media = useMemo<ProfileMedia>(
+    () => ({
+      setAvatar: async (file) => setProfessional(await uploadAvatar(authed, file)),
+      clearAvatar: async () => setProfessional(await removeAvatar(authed)),
+      addPhoto: async (file, label) => setProfessional(await uploadPhoto(authed, file, label)),
+      deletePhoto: async (url) => setProfessional(await removePhoto(authed, url)),
+      reorder: async (urls) => setProfessional(await reorderPhotos(authed, urls)),
+    }),
+    [authed],
+  )
+
   const logout = useCallback(() => {
     const refreshToken = tokens.current?.refreshToken
     setSession(null)
@@ -210,10 +244,11 @@ export function ProfessionalAuthProvider({ children }: { children: ReactNode }) 
       login,
       register,
       updateProfile,
+      media,
       logout,
       authed,
     }),
-    [professional, loading, login, register, updateProfile, logout, authed],
+    [professional, loading, login, register, updateProfile, media, logout, authed],
   )
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>

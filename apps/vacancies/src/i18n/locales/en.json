@@ -7,12 +7,20 @@
   "nav": {
     "board": "All listings",
     "forSalons": "For salons",
-    "theme": "Switch theme",
+    "theme": "Theme",
     "language": "Language",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "login": "Sign in",
-    "account": "My account"
+    "account": "My account",
+    "specialists": "Specialists",
+    "primary": "Main navigation",
+    "menu": "Menu",
+    "jobs": "Jobs",
+    "jobsBody": "Openings in salons and clinics",
+    "specialistsBody": "Professionals looking for work",
+    "preferences": "Preferences",
+    "signUp": "Sign up"
   },
   "hero": {
     "title": "Your next job in the beauty industry",
@@ -234,7 +242,8 @@
     "forSalonsBody": "Post your chair or position on Reserva and reach professionals across Armenia.",
     "forSalonsCta": "Post a listing",
     "platform": "A Reserva product",
-    "rights": "All rights reserved."
+    "rights": "All rights reserved.",
+    "browseSpecialists": "Browse specialists"
   },
   "a11y": {
     "skipToResults": "Skip to results",
@@ -324,7 +333,8 @@
       "phoneTaken": "An account with this number already exists. Try signing in.",
       "closed": "Registration is not open at the moment. Please get in touch.",
       "generic": "We could not create the account. Please try again."
-    }
+    },
+    "confirmPlaceholder": "Repeat the same password"
   },
   "auth": {
     "panelTitle": "Welcome back",
@@ -339,8 +349,8 @@
       }
     },
     "signup": {
-      "title": "What brings you here?",
-      "subtitle": "Choose how you will be using Reserva Vacancies."
+      "title": "What are you signing up for?",
+      "subtitle": "Pick the line that describes you."
     },
     "login": {
       "title": "Sign in",
@@ -350,13 +360,15 @@
     },
     "role": {
       "salon": {
-        "title": "Salon",
-        "signupDesc": "I am posting a listing",
+        "signupTitle": "I am hiring",
+        "signupDesc": "I represent a salon and I post listings",
+        "loginTitle": "Salon account",
         "loginDesc": "I manage my listings"
       },
       "specialist": {
-        "title": "Specialist",
-        "signupDesc": "I am looking for work",
+        "signupTitle": "I am looking for work",
+        "signupDesc": "I am a specialist and I apply to listings",
+        "loginTitle": "Specialist account",
         "loginDesc": "I apply to listings"
       }
     },
@@ -382,7 +394,8 @@
       "missing": "Fill in both fields",
       "invalid": "Those details did not match. Check your phone or email and your password.",
       "generic": "Could not sign in. Please try again."
-    }
+    },
+    "passwordPlaceholder": "Your password"
   },
   "specialist": {
     "stepYou": "You",
@@ -400,7 +413,7 @@
     "specialties": "Specialties",
     "specialtiesHint": "Pick the kinds of work you do.",
     "about": "About you",
-    "aboutPlaceholder": "A few sentences about your experience and how you work.",
+    "aboutPlaceholder": "What do you do, what are you good at, what kind of salon are you looking for?",
     "errors": {
       "name": "Enter your full name",
       "phone": "Enter a valid phone number",
@@ -413,12 +426,23 @@
     "addMore": "Add another",
     "searchSpecialties": "Search…",
     "remove": "Remove",
-    "maxReached": "Up to {max} specialties"
+    "maxReached": "Up to {max} specialties",
+    "areas": "Where you can work",
+    "areasHint": "Districts and cities you can travel to",
+    "pickAreas": "Choose areas",
+    "addMoreAreas": "Add more",
+    "searchAreas": "Search areas…",
+    "yearsValue": "{count} years experience",
+    "yearsUnset": "Not set",
+    "yearsNew": "Just starting",
+    "yearsSkip": "Prefer not to say",
+    "yearsLess": "Fewer years",
+    "yearsMore": "More years"
   },
   "account": {
     "title": "My account",
     "logout": "Sign out",
-    "profile": "Your details",
+    "profile": "My profile",
     "save": "Save",
     "saving": "Saving…",
     "saved": "Saved",
@@ -430,6 +454,117 @@
       "contacted": "They got in touch",
       "shortlisted": "Shortlisted",
       "rejected": "Not this time"
-    }
+    },
+    "nav": {
+      "profile": "Profile",
+      "portfolio": "Work",
+      "applications": "My applications",
+      "settings": "Settings",
+      "profileShort": "Profile",
+      "portfolioShort": "Work",
+      "applicationsShort": "Applied",
+      "settingsShort": "Settings"
+    },
+    "completeness": "Profile strength",
+    "editProfile": "Edit profile",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "viewPublic": "View public page",
+    "contact": "Contact",
+    "contactShown": "Your phone number is shown on your public page.",
+    "contactHidden": "Your phone number is hidden from your public page.",
+    "uploading": "Uploading…",
+    "photoFailed": "That photo could not be saved. Try again.",
+    "applicationsCount": "{count} applications",
+    "missing": {
+      "specialties": "No specialty set",
+      "experience": "Experience not set",
+      "about": "Nothing written about you yet",
+      "email": "Not set",
+      "areas": "No work areas set"
+    },
+    "photo": {
+      "title": "Profile photo",
+      "hint": "A square photo works best. Up to 8 MB.",
+      "upload": "Upload photo",
+      "change": "Change",
+      "remove": "Remove",
+      "notImage": "Please choose an image.",
+      "tooLarge": "That image is too large. Up to 8 MB."
+    },
+    "portfolio": {
+      "sub": "Show what you can do. Up to {max} photos.",
+      "add": "Add photo",
+      "full": "You've reached {max} photos. Remove one to add another.",
+      "cover": "First",
+      "moveEarlier": "Move earlier",
+      "moveLater": "Move later",
+      "remove": "Delete photo",
+      "emptyTitle": "No photos yet",
+      "emptyBody": "Salons look at the work first. A few photos make a profile far stronger."
+    },
+    "settings": {
+      "sub": "Decide who can see your profile.",
+      "publicTitle": "Public profile",
+      "publicBody": "Salons can find you in the specialist directory.",
+      "contactTitle": "Show my phone number",
+      "contactBody": "Without this, salons see your profile but not your number.",
+      "contactMoot": "This takes effect once your profile is public.",
+      "thin": "Your profile is {percent}% complete.",
+      "missing": {
+        "avatar": "Add a profile photo.",
+        "specialties": "Set what you do.",
+        "about": "Write a couple of sentences about yourself.",
+        "photos": "Add some photos of your work.",
+        "experience": "Add your years of experience.",
+        "areas": "Say where you can work."
+      },
+      "yourLink": "Your link",
+      "copy": "Copy",
+      "copied": "Copied"
+    },
+    "errors": {
+      "name": "Please enter your name.",
+      "phoneTaken": "An account with this number already exists.",
+      "emailTaken": "An account with this email already exists.",
+      "generic": "Something went wrong. Try again."
+    },
+    "areasCount": "{count} areas",
+    "signOutTitle": "Sign out",
+    "signOutBody": "Ends your session on this device."
+  },
+  "directory": {
+    "eyebrow": "Specialists",
+    "title": "Find your next team member",
+    "lede": "Hairdressers, nail artists, cosmetologists and others looking for work.",
+    "searchPlaceholder": "Name or specialty…",
+    "seoTitle": "Specialists — Reserva Vacancies",
+    "seoDescription": "Find beauty professionals looking for work in Armenia.",
+    "count": "{count} specialists",
+    "minExperience": "Minimum experience",
+    "anyExperience": "Any",
+    "withPhotos": "With photos only",
+    "work": "Work",
+    "noContact": "This specialist has not published a phone number.",
+    "emptyTitle": "No specialists found",
+    "emptyBody": "Nobody has published a profile yet. Check back soon.",
+    "emptyFiltered": "Try removing some of the filters.",
+    "notFoundTitle": "Profile unavailable",
+    "notFoundBody": "This page does not exist, or is not public.",
+    "backToAll": "All specialists",
+    "close": "Close",
+    "prev": "Previous",
+    "next": "Next",
+    "pageOf": "{page} of {total}",
+    "pagination": "Pages",
+    "sort": {
+      "relevant": "Most relevant",
+      "newest": "Newest first",
+      "experience": "Most experienced"
+    },
+    "withPhotosBody": "Only show people who have added photos of their work",
+    "prevPhoto": "Previous photo",
+    "nextPhoto": "Next photo",
+    "photoOf": "{current} of {total}"
   }
 }

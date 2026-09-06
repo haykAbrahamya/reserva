@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import {
-  MoreHorizontal, Pencil, Play, Pause, RefreshCw, Archive, Trash2, MapPin, Users, Phone,
-} from 'lucide-react'
+import { Archive, Inbox, MapPin, MoreHorizontal, Pause, Pencil, Phone, Play, RefreshCw, Trash2, Users } from 'lucide-react'
 import { Badge } from '@/components/ui'
 import { useI18n } from '@/i18n'
 import { useLocalized } from '@/i18n/useLocalized'
@@ -14,11 +12,24 @@ interface Props {
   onEdit: (v: Vacancy) => void
   onAction: (v: Vacancy, action: VacancyAction) => void
   onDelete: (v: Vacancy) => void
+  /** Open this listing's own page. */
+  onOpen: (v: Vacancy) => void
+  /** Applicant totals for THIS listing. Absent while the counts load. */
+  applicants?: { total: number; unseen: number }
   busy?: boolean
 }
 
-/** Perks shown inline before collapsing into "+N". */
-const VISIBLE_PERKS = 3
+/**
+ * Perks shown inline before collapsing into "+N".
+ *
+ * Two, not three. These are full phrases in every locale
+ * («Հաճախորդների բազա տրամադրվում է»), so each one takes a line of its own on a
+ * card — and with the grid now stretching cards to a common row height, a card
+ * carrying three of them set the height for every card beside it. Dropping one
+ * takes the tallest card down by a line without losing anything: the count is
+ * still there, and the full list is one click away in the editor.
+ */
+const VISIBLE_PERKS = 2
 
 /** Renew nags only once the end is actually near. */
 const EXPIRY_WARN_DAYS = 7
@@ -33,7 +44,15 @@ const EXPIRY_WARN_DAYS = 7
  * listing) is also surfaced as a button, because burying it behind a menu is
  * how listings sit unpublished for a week.
  */
-export function VacancyCard({ vacancy: v, onEdit, onAction, onDelete, busy }: Props) {
+export function VacancyCard({
+  vacancy: v,
+  onEdit,
+  onAction,
+  onDelete,
+  onOpen,
+  applicants,
+  busy,
+}: Props) {
   const { t, tp, locale } = useI18n()
   const loc = useLocalized()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -81,11 +100,25 @@ export function VacancyCard({ vacancy: v, onEdit, onAction, onDelete, busy }: Pr
     onAction(v, action)
   }
 
+  /* Near the end of its life, and still live — the one state the footer says
+     out loud rather than in grey. */
+  const expiringSoon = status === 'published' && left != null && left <= EXPIRY_WARN_DAYS
+
   return (
-    <article className={[s.card, busy ? s.busy : ''].filter(Boolean).join(' ')}>
+    <article
+      className={[s.card, s[`status_${status}`], busy ? s.busy : ''].filter(Boolean).join(' ')}
+    >
       <header className={s.head}>
         <div className={s.titleWrap}>
-          <h3 className={s.role}>{role}</h3>
+          {/* The way into the listing's own page. A button rather than the
+              whole card: the card also carries a menu, a primary action and an
+              applicants count, and nesting those inside one big control makes
+              every one of them a place you can miss. */}
+          <h3 className={s.role}>
+            <button type="button" className={s.roleBtn} onClick={() => onOpen(v)}>
+              {role}
+            </button>
+          </h3>
           <div className={s.craft}>
             {craft}
             <span className={s.dot} />
@@ -133,8 +166,17 @@ export function VacancyCard({ vacancy: v, onEdit, onAction, onDelete, busy }: Pr
         </div>
       </header>
 
-      {/* The money — the first thing anyone looks for. */}
-      <div className={s.pay}>{payLabel(v, t, locale)}</div>
+      {/*
+        The money.
+
+        Given its own block and its own size rather than sitting at the same
+        weight as everything else: it is the first thing a partner checks when
+        scanning their own listings and the first thing a candidate reads, and
+        at 15px in a stack of 15px it was neither.
+      */}
+      <div className={s.payBlock}>
+        <span className={s.pay}>{payLabel(v, t, locale)}</span>
+      </div>
 
       <div className={s.meta}>
         {v.scheduleType && <span className={s.metaChip}>{t(`vacancies.schedule.${v.scheduleType}`)}</span>}
@@ -161,13 +203,44 @@ export function VacancyCard({ vacancy: v, onEdit, onAction, onDelete, busy }: Pr
       )}
 
       <footer className={s.foot}>
-        <span className={s.age}>
+        <span className={[s.age, expiringSoon ? s.ageWarn : ''].filter(Boolean).join(' ')}>
           {status === 'published' && left != null
             ? tp('vacancies.expiresIn', left, { count: left })
             : status === 'expired'
               ? t('vacancies.expiredNote')
               : t(`vacancies.statusNote.${status}`)}
         </span>
+
+        {/*
+          Applicants, and the way to read them.
+
+          Shown on anything PUBLISHED, including at zero. "0 applicants" on a
+          card is close to noise — but a control that only appears once someone
+          has applied is a feature nobody discovers before they need it, and
+          this one had no entry point at all until recently. A live listing
+          saying "0" teaches the partner where to look; a draft says nothing,
+          because a draft cannot have any.
+
+          The unseen count is the loud half, because that is the number a
+          partner actually acts on.
+        */}
+        {(applicants?.total ?? 0) > 0 || status === 'published' ? (
+          <button
+            type="button"
+            className={[s.applicants, (applicants?.unseen ?? 0) > 0 ? s.applicantsNew : '']
+              .filter(Boolean)
+              .join(' ')}
+            onClick={() => onOpen(v)}
+          >
+            <Inbox size={13} />
+            {tp('vacancies.applicants.count', applicants?.total ?? 0, {
+              count: applicants?.total ?? 0,
+            })}
+            {(applicants?.unseen ?? 0) > 0 && (
+              <span className={s.applicantsDot}>{applicants?.unseen}</span>
+            )}
+          </button>
+        ) : null}
 
         {primary && (
           <button type="button" className={s.primaryAction} onClick={() => act(primary)} disabled={busy}>

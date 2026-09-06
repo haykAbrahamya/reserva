@@ -146,7 +146,8 @@
     "noPhone": "No phone",
     "delete": "Delete",
     "all": "All",
-    "actions": "Actions"
+    "actions": "Actions",
+    "close": "Close"
   },
   "nav": {
     "sections": {
@@ -1196,7 +1197,9 @@
       "publish": "Vacancy published",
       "pause": "Vacancy paused",
       "close": "Vacancy closed",
-      "renew": "Vacancy renewed for 30 days"
+      "renew": "Vacancy renewed for 30 days",
+      "saved": "Changes saved",
+      "deleted": "Vacancy deleted"
     },
     "pay": {
       "percentValue": "Salon keeps {value}",
@@ -1314,6 +1317,47 @@
       "errPercent": "Set the percentage",
       "errAmount": "Set an amount",
       "errPhone": "Add a phone number"
+    },
+    "applicants": {
+      "title": "Applicants",
+      "count": "{count} applicant",
+      "count_plural": "{count} applicants",
+      "summary": "{count} application",
+      "summary_plural": "{count} applications",
+      "unseen": "{count} new",
+      "emptyTitle": "No applications yet",
+      "emptyBody": "When someone applies to this listing, they will show up here.",
+      "loadFailed": "Could not load applicants. Try again.",
+      "triageFailed": "Could not save that. Try again.",
+      "viewProfile": "View profile",
+      "noProfile": "This specialist has not published a profile.",
+      "status": {
+        "new": "New",
+        "contacted": "Contacted",
+        "shortlisted": "Shortlisted",
+        "rejected": "Rejected"
+      },
+      "mark": {
+        "contacted": "Contacted",
+        "shortlisted": "Shortlist",
+        "rejected": "Reject"
+      }
+    },
+    "detail": {
+      "backToAll": "All vacancies",
+      "description": "Description",
+      "noDescription": "No description added",
+      "conditions": "Conditions",
+      "noPerks": "No conditions listed",
+      "howToApply": "How to apply",
+      "schedule": "Schedule",
+      "experience": "Experience",
+      "seats": "Openings",
+      "lifecycle": "Status",
+      "draftNoApplicants": "This is still a draft, so nobody can apply to it yet.",
+      "notFoundTitle": "Vacancy not found",
+      "notFoundBody": "It may have been deleted, or it is not available to you.",
+      "delete": "Delete vacancy"
     }
   }
 }

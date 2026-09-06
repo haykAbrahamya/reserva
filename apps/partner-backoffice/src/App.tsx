@@ -16,6 +16,7 @@ const Bookings    = lazy(() => import('@/pages/Bookings/Bookings').then(m => ({ 
 const Services    = lazy(() => import('@/pages/Services/Services').then(m => ({ default: m.Services })))
 const Courses     = lazy(() => import('@/pages/Courses/Courses').then(m => ({ default: m.Courses })))
 const Vacancies   = lazy(() => import('@/pages/Vacancies/Vacancies').then(m => ({ default: m.Vacancies })))
+const VacancyDetail = lazy(() => import('@/pages/Vacancies/VacancyDetail').then(m => ({ default: m.VacancyDetail })))
 const Specialists = lazy(() => import('@/pages/Specialists/Specialists').then(m => ({ default: m.Specialists })))
 const Reviews     = lazy(() => import('@/pages/Reviews/Reviews').then(m => ({ default: m.Reviews })))
 const Hours       = lazy(() => import('@/pages/Hours/Hours').then(m => ({ default: m.Hours })))
@@ -142,6 +143,10 @@ export default function App() {
 
             {/* Vacancies product */}
             <Route path="vacancies"   element={<RequireProduct product="vacancies"><Vacancies /></RequireProduct>} />
+            {/* One listing in full, with its applicants. A route rather than a
+                drawer: it is what a notification links to, and what a partner
+                bookmarks while they work through a shortlist. */}
+            <Route path="vacancies/:id" element={<RequireProduct product="vacancies"><VacancyDetail /></RequireProduct>} />
             {/* Admin-only: branches + team management */}
             <Route path="locations"   element={<RequireAdmin><Locations /></RequireAdmin>} />
             <Route path="users"       element={<RequireAdmin><Users /></RequireAdmin>} />

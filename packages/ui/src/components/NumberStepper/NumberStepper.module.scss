@@ -1,0 +1,99 @@
+@use '../../styles/variables' as *;
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: $fg-1;
+}
+
+/* One pill holding both buttons and the value, so the three read as a single
+   control rather than as a number with two buttons parked beside it. */
+.control {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  border: 1px solid $line-2;
+  border-radius: 999px;
+  background: $bg-1;
+  overflow: hidden;
+}
+
+.step {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: none;
+  color: $fg-1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.13s, color 0.13s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover:not(:disabled) { background: $bg-2; color: $fg-0; }
+  &:active:not(:disabled) { transform: scale(0.94); }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: -2px; }
+
+  /* At a bound the button stays in place and stops responding — removing it
+     would resize the control every time someone reached the end of the range. */
+  &:disabled { opacity: 0.35; cursor: not-allowed; }
+}
+
+.value {
+  min-width: 96px;
+  padding: 0 6px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: $fg-0;
+  font-variant-numeric: tabular-nums;
+  /* Fixed width plus tabular figures: the control must not jolt sideways when
+     9 becomes 10 under the finger that is still tapping +. */
+  white-space: nowrap;
+}
+
+.empty {
+  color: $fg-3;
+  font-weight: 500;
+}
+
+.picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pick {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-2;
+  font-family: $font-sans;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.13s, border-color 0.13s, color 0.13s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover:not(:disabled) { border-color: $line-strong; color: $fg-0; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.pickOn {
+  background: $accent-soft;
+  border-color: transparent;
+  color: $accent;
+
+  &:hover:not(:disabled) { border-color: transparent; color: $accent; }
+}

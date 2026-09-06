@@ -22,6 +22,26 @@
 
   &.sm { height: 30px; min-height: 30px; padding: 0 10px; font-size: 12px; }
 
+  /* A 34px pill, sized to stand in a header row beside icon buttons. Not a
+     shrunken field: it is rounded like the buttons next to it and holds only a
+     glyph, a short value and the chevron. */
+  &.compact {
+    width: auto;
+    height: 34px;
+    min-height: 34px;
+    padding: 0 10px;
+    gap: 6px;
+    border-radius: 999px;
+    justify-content: center;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: $fg-1;
+
+    .text { flex: 0 0 auto; }
+    .chevron { margin-left: -2px; }
+  }
+
   &.open {
     border-color: $accent;
     box-shadow: 0 0 0 3px $accent-soft;
@@ -31,6 +51,14 @@
 
   .placeholder { color: $fg-3; }
   .text        { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+
+  /* The accent is what makes a glyph read as this control's subject rather
+     than as decoration attached to the border. */
+  .leadIcon {
+    display: inline-flex;
+    color: $accent;
+    flex-shrink: 0;
+  }
 
   .chevron {
     color: $fg-2;

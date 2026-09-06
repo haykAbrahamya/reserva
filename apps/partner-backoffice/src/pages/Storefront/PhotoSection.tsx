@@ -5,11 +5,10 @@ import {
 import { Button, Modal, useToast } from '@/components/ui'
 import {
   partnersService,
-  galleryImageUrl,
   type GalleryItem,
   type PhotoList,
 } from '@/services/partners.service'
-import { ApiError } from '@/services/http'
+import { ApiError, uploadUrl } from '@/services/http'
 import { useT } from '@/i18n'
 import s from './Storefront.module.scss'
 
@@ -165,18 +164,18 @@ export function PhotoSection({
                 <>
                   <div className={s.baSplit}>
                     <div className={s.baHalf}>
-                      <img className={s.baHalfImg} src={galleryImageUrl(tile.beforeUrl)} alt="before" />
+                      <img className={s.baHalfImg} src={uploadUrl(tile.beforeUrl)} alt="before" />
                       <span className={s.baHalfTag}>{t('storefront.ba.before')}</span>
                     </div>
                     <div className={s.baHalf}>
-                      <img className={s.baHalfImg} src={galleryImageUrl(tile.afterUrl)} alt="after" />
+                      <img className={s.baHalfImg} src={uploadUrl(tile.afterUrl)} alt="after" />
                       <span className={s.baHalfTag}>{t('storefront.ba.after')}</span>
                     </div>
                   </div>
                   <span className={s.baBadge}>{t('storefront.photo.beforeAfter')}</span>
                 </>
               ) : tile.url
-                ? <img className={s.tileImg} src={galleryImageUrl(tile.url)} alt={tile.label || ''} />
+                ? <img className={s.tileImg} src={uploadUrl(tile.url)} alt={tile.label || ''} />
                 : <div className={s.tileTone} style={{ background: tile.tone ?? 'var(--bg-3)' }} />}
               <div
                 className={s.tileTint}

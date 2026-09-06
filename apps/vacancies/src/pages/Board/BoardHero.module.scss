@@ -4,98 +4,14 @@
 /*
   The heading band.
 
-  Built from four CSS layers, no image file — so it is weightless, scales to any
-  width, and re-themes with the tokens instead of needing a second asset:
-
-    1. `::before` — two soft blooms, violet from the left and a cool green from
-       the right. Large and low-contrast; they give the band a light source.
-    2. `::after`  — concentric hairline arcs radiating from beyond the top-right
-       corner, masked so they fade out towards the bottom-left. This is the
-       layer that makes the band read as DESIGNED rather than as a gradient:
-       arcs are structure, a blob is just colour.
-    3. a bottom fade, so the band melts into the results instead of ending on a
-       hard line.
-    4. the page grain underneath, from global.scss.
-
-  Everything is `pointer-events: none` and behind the content.
+  The background itself is `a.hero-band` — see styles/_app.scss, which carries
+  the full note on how the four layers work. It moved there when the specialist
+  directory needed the same band; keeping a second hand-tuned copy here would
+  have meant two visual languages on one product, drifting apart one tweak at a
+  time.
 */
 .hero {
-  position: relative;
-  isolation: isolate;
-  /*
-    A DEFINITE edge, made of three things rather than one hairline:
-
-      · its own SURFACE — a step deeper than the page in light, a step lighter
-        in dark, so the boundary is a change of ground and not a line drawn
-        across a continuous wash
-      · a rule in $line-2
-      · a one-pixel highlight just below the rule, themed — at light-mode
-        strength on a dark ground it was a white line across the page
-
-    The earlier version faded the band's colour into the page just above the
-    border, which is the opposite of what was needed: it removed the very
-    contrast the edge depends on.
-  */
-  background: $hero-bg;
-  border-bottom: 1px solid $line-2;
-  box-shadow: 0 1px 0 $hero-edge;
-  overflow: hidden;
-}
-
-.hero::before,
-.hero::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: -1;
-}
-
-/*
-  Colour. A four-stop mesh rather than one wash.
-
-  Overlapping soft radials in related hues — violet twice from the left, a cool
-  blue at the top right and a warm rose at the bottom right — read as light
-  falling across a surface. A single gradient reads as a gradient. Values are
-  tuned for the BAND (see theme.css); the page ground behind the results uses a
-  much weaker set, because there almost-nothing is the correct amount.
-*/
-.hero::before {
-  background-image:
-    radial-gradient(620px 380px at -2% -22%, $hero-violet, transparent 66%),
-    radial-gradient(520px 340px at 34% 116%, $hero-violet-soft, transparent 62%),
-    radial-gradient(560px 360px at 84% -18%, $hero-blue, transparent 64%),
-    radial-gradient(460px 300px at 104% 96%, $hero-rose, transparent 62%);
-}
-
-/*
-  Contour arcs — one set, from beyond the top-right.
-
-  There were two, from opposite corners, and together with the motif that was
-  three competing structures in a 300px band. One is the minimal version: it
-  gives the band direction without becoming a diagram. Masked away from the
-  headline so nothing crosses the words.
-*/
-.hero::after {
-  background-image: repeating-radial-gradient(
-    circle at 94% -14%,
-    transparent 0 57px,
-    $hero-arc 57px 58px
-  );
-  mask-image: linear-gradient(214deg, rgba(0, 0, 0, 0.95) 0%, transparent 62%);
-  -webkit-mask-image: linear-gradient(214deg, rgba(0, 0, 0, 0.95) 0%, transparent 62%);
-}
-
-/* No fade to the page colour any more: the band has its own surface, so fading
-   into the page just above the border would erase the contrast the edge is
-   made of. */
-
-/* Dark: the warm rose turns to mud over charcoal, so the mesh drops to violet
-   and blue. Strength is carried by the tokens, not by an opacity override. */
-[data-theme='dark'] .hero::before {
-  background-image:
-    radial-gradient(620px 380px at -2% -22%, $hero-violet, transparent 66%),
-    radial-gradient(560px 360px at 84% -18%, $hero-blue, transparent 64%);
+  @include a.hero-band;
 }
 
 .inner {

@@ -4,10 +4,13 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <!-- Matches --bg-0 in both themes so the browser chrome never flashes the
-         wrong colour on load. -->
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAFAF7" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121110" />
+    <!-- --bg-0 in the LIGHT theme (styles/theme.css) — this app's default
+         whatever the operating system prefers. Not two `prefers-color-scheme`
+         variants: the page no longer follows the OS, so an OS-keyed chrome
+         colour would put a near-black address bar over a light page for anyone
+         whose system is dark. useTheme rewrites this from the live --bg-0 on a
+         theme change; the value here is what paints before React mounts. -->
+    <meta name="theme-color" content="#F4F2ED" />
 
     <title>Աշխատանք գեղեցկության ոլորտում — Reserva</title>
     <meta

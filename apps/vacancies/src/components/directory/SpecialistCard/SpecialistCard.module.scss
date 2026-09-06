@@ -1,0 +1,208 @@
+@use '../../../styles/vars' as *;
+
+.card {
+  display: flex;
+  flex-direction: column;
+  /* Every card fills its grid row, so a person with no bio does not leave a
+     shorter card sitting in a ragged row beside a fuller one. */
+  height: 100%;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  background: $bg-1;
+  overflow: hidden;
+  text-decoration: none;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+
+  &:hover {
+    border-color: $accent-line;
+    box-shadow: $shadow-2;
+    transform: translateY(-2px);
+
+    .stripImg { transform: scale(1.04); }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $accent;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: border-color 0.16s ease;
+    &:hover { transform: none; .stripImg { transform: none; } }
+  }
+}
+
+/* ── Cover ─────────────────────────────────────────────────── */
+
+.cover {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: $bg-3;
+  overflow: hidden;
+}
+
+.strip {
+  display: grid;
+  height: 100%;
+  gap: 2px;
+}
+
+/* One photo fills the frame; two split it; three give the first the larger
+   half, because the first tile is the one its owner chose to lead with. */
+.strip1 { grid-template-columns: 1fr; }
+.strip2 { grid-template-columns: 1fr 1fr; }
+.strip3 { grid-template-columns: 1.6fr 1fr; grid-template-rows: 1fr 1fr;
+
+  .stripCell:first-child { grid-row: span 2; }
+}
+
+.stripCell {
+  overflow: hidden;
+  background: $bg-3;
+}
+
+.stripImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+
+/* No photos yet: a calm accent wash with the initial, not a grey void. */
+.coverEmpty {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(120% 90% at 30% 0%, $accent-soft 0%, transparent 70%),
+    linear-gradient(140deg, $hero-violet-soft, $bg-2);
+}
+
+.coverInitial {
+  font-family: $font-serif;
+  font-size: 46px;
+  font-weight: 500;
+  color: $accent-contrast;
+  opacity: 0.5;
+  line-height: 1;
+}
+
+.photoCount {
+  position: absolute;
+  right: 9px;
+  top: 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Body ──────────────────────────────────────────────────── */
+
+.body {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* The portrait straddles the seam between the work and the name — the person
+   introduced by what they made. */
+.avatarWrap {
+  position: absolute;
+  top: -24px;
+  left: 16px;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  /* Ringed in the card's own background so it reads as lifted off the photo
+     rather than pasted onto it. */
+  border: 3px solid $bg-1;
+  box-shadow: $shadow-1;
+  background: $bg-2;
+}
+
+.avatarEmpty {
+  background: $accent;
+  color: #fff;
+  font-family: $font-serif;
+  font-size: 19px;
+  line-height: 1;
+}
+
+.name {
+  margin: 26px 0 0;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: $fg-0;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: $accent-contrast;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.more {
+  color: $fg-3;
+  font-weight: 500;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: 1px;
+}
+
+.metaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  color: $fg-3;
+  min-width: 0;
+}
+
+.excerpt {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: $fg-2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  /* Pushed to the bottom so the meta row sits directly under the name whatever
+     the bio's length — the cards line up across a row. */
+  margin-top: auto;
+  padding-top: 8px;
+}

@@ -1,0 +1,219 @@
+@use '../../../styles/vars' as *;
+@use './section' as sec;
+
+.panel { @include sec.panel; }
+.head { @include sec.head; }
+.heading { @include sec.heading; }
+.sub { @include sec.sub; }
+.error { @include sec.error; }
+.note { @include sec.note; }
+
+/* ── A switch row ──────────────────────────────────────────── */
+
+/*
+ * A row on this screen, laid out on a grid rather than as a flex line.
+ *
+ * The flex version put icon, text and control in one row and let the text
+ * column take whatever was left — which on a 390px phone is about 180px, so a
+ * title wrapped to two lines and its description to four, in a column narrower
+ * than the icon beside it. On the grid the description spans the full width
+ * underneath, and the row reads as one thing at any size.
+ *
+ * A MIXIN rather than a class the sign-out row also carries, because that is
+ * how the sign-out row broke: it declared `display: flex` of its own while
+ * reusing `.rowText`, which is `display: contents` — so the title and the
+ * description were dumped in as flex siblings and sat next to each other.
+ * Anything using `.rowTitle` / `.rowBody` has to BE this grid.
+ */
+@mixin settings-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    'icon title control'
+    'body body  body';
+  align-items: center;
+  column-gap: 13px;
+  row-gap: 6px;
+  padding: 16px;
+  border-radius: $r-2;
+
+  /* With room, the description tucks under the title instead of under the
+     icon — a tidier block when there is width to be tidy in. */
+  @media (min-width: 620px) {
+    grid-template-areas:
+      'icon title control'
+      'icon body  control';
+    row-gap: 3px;
+    column-gap: 14px;
+  }
+}
+
+.row {
+  @include settings-row;
+  border: 1px solid $line-1;
+  background: $bg-0;
+}
+
+.rowIcon {
+  grid-area: icon;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: $accent-soft;
+  color: $accent-contrast;
+}
+
+/*
+ * `rowText` is display: contents so its two children land in the grid areas
+ * directly. Wrapping them in a box would put the title and the description in
+ * one cell again, which is the layout this is replacing.
+ */
+.rowText {
+  display: contents;
+}
+
+.rowTitle {
+  grid-area: title;
+  font-size: 14px;
+  font-weight: 600;
+  color: $fg-0;
+  line-height: 1.35;
+  min-width: 0;
+}
+
+.rowBody {
+  grid-area: body;
+  font-size: 12.5px;
+  color: $fg-2;
+  line-height: 1.5;
+  min-width: 0;
+}
+
+/* The control is the third column, vertically centred across both rows. */
+.row > [role='switch'] {
+  grid-area: control;
+  align-self: center;
+}
+
+/* ── Caution before publishing ─────────────────────────────── */
+
+.warn {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin: -10px 0 0;
+  padding: 11px 13px;
+  border-radius: $r-2;
+  /* Amber, not red: this is advice about a decision, and nothing has gone
+     wrong. Reusing the "rent" hue keeps it inside the palette rather than
+     introducing a fifth colour for one sentence. */
+  background: $pay-rent-soft;
+  color: $pay-rent;
+  font-size: 12.5px;
+  line-height: 1.5;
+
+  svg { flex-shrink: 0; margin-top: 1px; }
+}
+
+/* ── The public link ───────────────────────────────────────── */
+
+.linkBox {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: -10px;
+  padding: 14px 16px;
+  border: 1px solid $accent-line;
+  border-radius: $r-2;
+  background: $accent-wash;
+}
+
+.linkLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $fg-3;
+}
+
+/*
+ * One line with an ellipsis, not a wrapped block.
+ *
+ * A URL has no spaces to break at, so left to wrap it became four ragged lines
+ * of hex in the middle of a settings screen. Nobody reads a link character by
+ * character — they copy it — so the copy button does the work and this just has
+ * to look like a link.
+ */
+.link {
+  display: block;
+  font-family: $font-mono;
+  font-size: 12px;
+  color: $fg-1;
+  padding: 9px 11px;
+  border-radius: $r-1;
+  background: $bg-0;
+  border: 1px solid $line-1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: ltr;
+}
+
+.linkActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.linkBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid $line-2;
+  border-radius: 999px;
+  background: $bg-1;
+  color: $fg-1;
+  font-family: $font-sans;
+  font-size: 12.5px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.13s, color 0.13s, background 0.13s;
+
+  &:hover { border-color: $accent; color: $accent; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+}
+
+/* ── Sign out ──────────────────────────────────────────────────
+   A row like the switches above it, so it belongs to this screen — but with
+   no border and a danger tint on hover, so it never reads as a setting you
+   might toggle by accident while scanning. */
+
+.signOut {
+  @include settings-row;
+  width: 100%;
+  border: 1px solid transparent;
+  background: none;
+  text-align: left;
+  font-family: $font-sans;
+  cursor: pointer;
+  transition: background 0.14s, border-color 0.14s;
+
+  &:hover {
+    background: $danger-soft;
+    .rowTitle { color: $danger; }
+    .signOutIcon { background: $danger-soft; color: $danger; }
+  }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+}
+
+.signOutIcon {
+  background: $bg-2;
+  color: $fg-2;
+  transition: background 0.14s, color 0.14s;
+}

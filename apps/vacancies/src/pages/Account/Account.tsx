@@ -1,203 +1,166 @@
-import { useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
-import { Briefcase, LogOut } from 'lucide-react'
-import { Button, Input, Textarea, Empty } from '@reserva/ui'
-import { fetchMeta } from '@/api/board.api'
-import { fetchMyApplications } from '@/api/professionals.api'
-import { SpecialtyPicker } from '@/components/common/SpecialtyPicker/SpecialtyPicker'
+import { NavLink, Navigate, Outlet, useLocation } from 'react-router-dom'
+import { Briefcase, Images, MapPin, Settings, Sparkles, UserRound } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import { resolveImageUrl } from '@/api/client'
 import { Header } from '@/components/layout/Header/Header'
 import { useProfessionalAuth } from '@/auth/ProfessionalAuth'
-import { useI18n, useLocalized, useT } from '@/i18n'
-import { relativeTime } from '@/lib/dates'
-import { useAsync } from '@/lib/useAsync'
+import { useT } from '@/i18n'
+import { profileCompleteness } from '@/lib/profile'
+import { useTaxonomy } from '@/lib/taxonomy'
 import { useSeo } from '@/lib/useSeo'
 import s from './Account.module.scss'
 
 /**
- * The professional's own page: their profile, and what they have applied to.
+ * The professional's own area.
  *
- * Deliberately small. A job seeker on this board is here to find work, not to
- * maintain a profile — so this is a place to correct a phone number and see
- * whether anyone has read an application, and nothing more. Everything a salon
- * needs is already carried on the application itself.
+ * The shell owns the IDENTITY — the photo, the name, what they do, how finished
+ * the profile is — and the sections own everything else. That split is the fix
+ * for the thing that made this look amateur: the first version put an avatar and
+ * a name in the rail AND another avatar and name at the top of the profile
+ * panel, so on a phone you scrolled past your own face twice in one screen. A
+ * person appears once per page.
+ *
+ * On a phone the identity is a centred hero rather than a squashed rail: at
+ * 390px a horizontal card of avatar-plus-text leaves the name in a 200px gutter
+ * where two specialty chips stack into a column. Centred, it gets the full
+ * width and reads like a profile instead of a settings widget.
+ *
+ * Sections are ROUTES rather than local state. `/account/portfolio` is a place
+ * you can link to, come back to, and reach with the back button after opening a
+ * listing — none of which a `useState` tab can do.
  */
 export function Account() {
   const t = useT()
-  const { locale } = useI18n()
-  const loc = useLocalized()
-  const { professional, loading, signedIn, updateProfile, logout, authed } = useProfessionalAuth()
+  const { professional, loading, signedIn } = useProfessionalAuth()
+  const { specialtyNames } = useTaxonomy()
+  const { pathname } = useLocation()
 
   useSeo({ title: `${t('account.title')} — ${t('app.product')}`, noIndex: true })
-
-  const applications = useAsync((_signal) => fetchMyApplications(authed), [signedIn], {
-    skip: !signedIn,
-  })
-  const meta = useAsync((signal) => fetchMeta(signal), [])
-
-  const [name, setName] = useState('')
-  const [phone, setPhone] = useState('')
-  const [email, setEmail] = useState('')
-  const [about, setAbout] = useState('')
-  const [years, setYears] = useState('')
-  const [specialtyKeys, setSpecialtyKeys] = useState<string[]>([])
-  const [dirty, setDirty] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
-
-  // Seed the form from the profile once it lands, and not again — otherwise a
-  // background refresh would overwrite whatever they are in the middle of
-  // typing.
-  const [seeded, setSeeded] = useState(false)
-  if (professional && !seeded) {
-    setName(professional.name)
-    setPhone(professional.phone)
-    setEmail(professional.email)
-    setAbout(professional.about)
-    setYears(professional.experienceYears == null ? '' : String(professional.experienceYears))
-    setSpecialtyKeys(professional.specialtyKeys)
-    setSeeded(true)
-  }
-
-  const touch = <T,>(setter: (v: T) => void) => (v: T) => {
-    setter(v)
-    setDirty(true)
-    setSaved(false)
-  }
-
-  const save = async () => {
-    setSaving(true)
-    try {
-      await updateProfile({
-        name,
-        phone,
-        email,
-        about,
-        experienceYears: years === '' ? null : Number(years),
-        specialtyKeys,
-      })
-      setDirty(false)
-      setSaved(true)
-    } finally {
-      setSaving(false)
-    }
-  }
 
   // Wait for the stored session to resolve before deciding — otherwise a
   // refresh on this page bounces the visitor to the login screen they are
   // already past.
   if (loading) return null
-  if (!signedIn || !professional) return <Navigate to="/login" replace />
+  if (!signedIn || !professional) {
+    // Where they were going, so signing in returns them to it.
+    return <Navigate to="/login" replace state={{ from: pathname }} />
+  }
+
+  const percent = profileCompleteness(professional)
+  const photo = resolveImageUrl(professional.avatarUrl)
+  const specialties = specialtyNames(professional.specialtyKeys)
+
+  /*
+   * Two labels per destination.
+   *
+   * «Կարգավորումներ» is fourteen characters and a quarter of a 390px bar is
+   * ninety-eight pixels, so the bar gets a short form and the desktop rail —
+   * which has the room — gets the full one. Both are rendered and CSS shows
+   * exactly one, so a screen reader never hears the destination twice.
+   */
+  const links: {
+    to: string
+    icon: LucideIcon
+    /** i18n key stem: `account.nav.<label>` and `…Short`. */
+    label: string
+    /** `/account` also matches its children, so only it needs an exact match. */
+    end?: boolean
+    count?: number
+  }[] = [
+    { to: '/account', end: true, icon: UserRound, label: 'profile' },
+    { to: '/account/portfolio', icon: Images, label: 'portfolio', count: professional.photos.length },
+    { to: '/account/applications', icon: Briefcase, label: 'applications' },
+    { to: '/account/settings', icon: Settings, label: 'settings' },
+  ]
 
   return (
     <>
       <Header />
 
       <div className={s.page}>
-        <header className={s.head}>
-          <div>
-            <h1 className={s.title}>{professional.name}</h1>
-            <p className={s.subtitle}>{professional.phone}</p>
+        <aside className={s.rail}>
+          <div className={s.identity}>
+            {/*
+              The completeness ring IS the meter.
+              A separate progress bar under the name was a second thing
+              competing for the same glance; drawn around the portrait it is
+              read at the same moment as the face, and it makes an unfinished
+              profile feel like an unfinished profile rather than like a number.
+            */}
+            <div className={s.ring} style={{ ['--pct' as string]: percent }}>
+              {photo ? (
+                <img className={s.avatar} src={photo} alt={professional.name} />
+              ) : (
+                <span className={[s.avatar, s.avatarEmpty].join(' ')} aria-hidden="true">
+                  {professional.name.trim().charAt(0).toUpperCase()}
+                </span>
+              )}
+            </div>
+
+            <div className={s.identityText}>
+              <h1 className={s.name}>{professional.name}</h1>
+
+              {specialties.length > 0 && (
+                <p className={s.role}>{specialties.slice(0, 3).join(' · ')}</p>
+              )}
+
+              <div className={s.facts}>
+                {professional.experienceYears != null && (
+                  <span className={s.fact}>
+                    <Sparkles size={12} />
+                    {t('specialist.yearsValue', { count: professional.experienceYears })}
+                  </span>
+                )}
+                {professional.areaKeys.length > 0 && (
+                  <span className={s.fact}>
+                    <MapPin size={12} />
+                    {t('account.areasCount', { count: professional.areaKeys.length })}
+                  </span>
+                )}
+              </div>
+
+              <p
+                className={s.meterLabel}
+                role="progressbar"
+                aria-valuenow={percent}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={t('account.completeness')}
+              >
+                <span className={s.meterValue}>{percent}%</span>
+                {t('account.completeness')}
+              </p>
+            </div>
           </div>
-          <button type="button" className={s.logout} onClick={logout}>
-            <LogOut size={15} />
-            {t('account.logout')}
-          </button>
-        </header>
 
-        <section className={s.card}>
-          <h2 className={s.cardTitle}>{t('account.profile')}</h2>
+          <nav className={s.nav} aria-label={t('account.title')}>
+            {links.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                end={link.end}
+                className={({ isActive }) =>
+                  [s.navLink, isActive ? s.navOn : ''].filter(Boolean).join(' ')
+                }
+              >
+                <link.icon size={19} className={s.navIcon} />
+                <span className={[s.navLabel, s.navShort].join(' ')}>
+                  {t(`account.nav.${link.label}Short`)}
+                </span>
+                <span className={[s.navLabel, s.navFull].join(' ')}>
+                  {t(`account.nav.${link.label}`)}
+                </span>
+                {/* Only when there is something to count — a grey 0 beside
+                    every empty section is noise, not information. */}
+                {link.count ? <span className={s.navCount}>{link.count}</span> : null}
+              </NavLink>
+            ))}
+          </nav>
+        </aside>
 
-          <div className={s.grid}>
-            <Input label={t('specialist.name')} value={name} onChange={(e) => touch(setName)(e.target.value)} />
-            <Input label={t('specialist.phone')} value={phone} onChange={(e) => touch(setPhone)(e.target.value)} />
-            <Input
-              label={t('specialist.email')}
-              type="email"
-              value={email}
-              onChange={(e) => touch(setEmail)(e.target.value)}
-              placeholder={t('specialist.emailPlaceholder')}
-            />
-          </div>
-
-          <div className={s.field}>
-            <span className={s.label}>{t('specialist.specialties')}</span>
-            <SpecialtyPicker
-              groups={meta.data?.specialtyGroups ?? []}
-              selected={specialtyKeys}
-              onChange={touch(setSpecialtyKeys)}
-              loading={meta.loading && !meta.data}
-            />
-          </div>
-
-          <Input
-            label={t('specialist.years')}
-            type="number"
-            inputMode="numeric"
-            min={0}
-            max={60}
-            value={years}
-            onChange={(e) => touch(setYears)(e.target.value)}
-            placeholder={t('specialist.yearsPlaceholder')}
-            className={s.yearsInput}
-          />
-
-          <Textarea
-            label={t('specialist.about')}
-            value={about}
-            onChange={(e) => touch(setAbout)(e.target.value)}
-            rows={4}
-            maxLength={1200}
-          />
-
-          <div className={s.saveRow}>
-            {saved && !dirty && <span className={s.saved}>{t('account.saved')}</span>}
-            <Button variant="accent" onClick={save} disabled={!dirty || saving}>
-              {saving ? t('account.saving') : t('account.save')}
-            </Button>
-          </div>
-        </section>
-
-        <section className={s.card}>
-          <h2 className={s.cardTitle}>{t('account.applications')}</h2>
-
-          {applications.loading && !applications.data ? (
-            <p className={s.muted}>{t('results.loading')}</p>
-          ) : !applications.data?.length ? (
-            <Empty
-              icon={Briefcase}
-              title={t('account.noApplicationsTitle')}
-              description={t('account.noApplicationsBody')}
-              action={
-                <Link to="/">
-                  <Button variant="accent">{t('landing.emptyAction')}</Button>
-                </Link>
-              }
-            />
-          ) : (
-            <ul className={s.appList}>
-              {applications.data.map((a) => (
-                <li key={a.id}>
-                  <Link className={s.appRow} to={`/v/${a.vacancy.id}`}>
-                    <span className={s.appRole}>
-                      {loc(a.vacancy.title, a.vacancy.titleI18n).trim() ||
-                        loc(a.vacancy.specialty.roleName, a.vacancy.specialty.roleNameI18n)}
-                    </span>
-                    <span className={s.appSalon}>
-                      {loc(a.vacancy.partner.name, a.vacancy.partner.nameI18n)}
-                    </span>
-                    <span className={s.appWhen}>{relativeTime(a.createdAt, locale)}</span>
-                    {/* The salon's triage, in the applicant's words. "new" is
-                        shown as "sent" rather than as a status — an applicant
-                        should not be reading the salon's inbox labels. */}
-                    <span className={[s.appStatus, s[`status_${a.status}`]].filter(Boolean).join(' ')}>
-                      {t(`account.status.${a.status}`)}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+        <main className={s.section}>
+          <Outlet />
+        </main>
       </div>
     </>
   )

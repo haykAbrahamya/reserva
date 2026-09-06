@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, Building2, Eye, EyeOff, ExternalLink, Users } from 'lucide-react'
-import { Button, Input } from '@reserva/ui'
+import { ArrowLeft, ArrowRight, Building2, ExternalLink, Users } from 'lucide-react'
+import { Button, Input, PasswordInput } from '@reserva/ui'
 import { ApiError } from '@/api/client'
 import {
   AccountChoice,
@@ -88,7 +88,7 @@ function SalonDoor({ onBack }: { onBack: () => void }) {
 
       <p className={s.doorAlt}>
         {t('auth.salonDoor.noAccount')}{' '}
-        <Link to="/signup">{t('auth.salonDoor.signUp')}</Link>
+        <Link to="/signup?as=salon">{t('auth.salonDoor.signUp')}</Link>
       </p>
 
       <button type="button" className={s.backLink} onClick={onBack}>
@@ -107,7 +107,6 @@ function SpecialistLogin({ onBack }: { onBack: () => void }) {
 
   const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
-  const [showPw, setShowPw] = useState(false)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -155,23 +154,15 @@ function SpecialistLogin({ onBack }: { onBack: () => void }) {
         autoComplete="username"
       />
 
-      <div className={s.pwWrap}>
-        <Input
-          label={t('signup.password')}
-          type={showPw ? 'text' : 'password'}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
-        />
-        <button
-          type="button"
-          className={s.pwToggle}
-          onClick={() => setShowPw((v) => !v)}
-          aria-label={showPw ? t('signup.hidePassword') : t('signup.showPassword')}
-        >
-          {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
-        </button>
-      </div>
+      <PasswordInput
+        label={t('signup.password')}
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder={t('auth.passwordPlaceholder')}
+        autoComplete="current-password"
+        showLabel={t('signup.showPassword')}
+        hideLabel={t('signup.hidePassword')}
+      />
 
       <Button type="submit" variant="accent" disabled={submitting} className={s.submit}>
         {submitting ? t('auth.signingIn') : t('auth.signIn')}
@@ -179,7 +170,7 @@ function SpecialistLogin({ onBack }: { onBack: () => void }) {
       </Button>
 
       <p className={s.altAction}>
-        {t('auth.noAccount')} <Link to="/signup">{t('auth.createOne')}</Link>
+        {t('auth.noAccount')} <Link to="/signup?as=specialist">{t('auth.createOne')}</Link>
       </p>
 
       <button type="button" className={s.backLink} onClick={onBack}>

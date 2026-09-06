@@ -5,6 +5,10 @@
   align-items: center;
   gap: 9px;
   min-width: 0;
+  /* The pill below is nowrap, so without this it would render OVER the header
+     controls rather than be constrained by its own box — which is exactly what
+     happened at 360px before the language group learned to collapse. */
+  overflow: hidden;
 }
 
 /* Matches @reserva/ui's own Logo wordmark, so the board and the rest of the
@@ -31,6 +35,11 @@
   background: $accent-soft;
   color: $accent-contrast;
   white-space: nowrap;
+  /* Last resort at a width no phone actually has: truncate the product name
+     rather than push the controls off the bar. */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @media (max-width: 520px) {

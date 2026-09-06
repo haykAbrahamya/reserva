@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect, useMemo, type ReactNode } from 'react'
 import { ChevronDown, Check, Search } from 'lucide-react'
 import { useAnchoredDropdown } from '../common/useAnchoredDropdown'
 import s from './Select.module.scss'
@@ -13,6 +13,13 @@ export interface SelectOption {
    * ("hairdresser", "парикмахер") without that word cluttering the list.
    */
   keywords?: string[]
+  /**
+   * A shorter form of `label`, shown on the TRIGGER only. Lets a compact
+   * trigger read «ՀԱ» while the open list still reads «Հայերեն» — the value
+   * that fits and the value that explains itself are not always the same
+   * string.
+   */
+  short?: string
 }
 
 interface SelectProps {
@@ -21,7 +28,18 @@ interface SelectProps {
   options: SelectOption[]
   placeholder?: string
   disabled?: boolean
-  size?: 'sm' | 'md'
+  /**
+   * Trigger geometry. `compact` is a 34px pill sized to sit in a header
+   * alongside icon buttons — for a control that has no room for a field but
+   * still wants this dropdown rather than a native one.
+   */
+  size?: 'sm' | 'md' | 'compact'
+  /**
+   * Leading glyph inside the trigger. Use it when the VALUE alone does not say
+   * what the control is: «ՀԱ» in a header is a mystery, a globe beside it is a
+   * language switcher.
+   */
+  icon?: ReactNode
   className?: string
   /** Force-enable/disable the search box. Defaults to auto (on when > 6 options). */
   searchable?: boolean
@@ -35,6 +53,7 @@ interface SelectProps {
 export function Select({
   value, onChange, options, placeholder = 'Select…', disabled,
   size = 'md', className = '', searchable, searchPlaceholder = 'Search…', panelMinWidth,
+  icon,
 }: SelectProps) {
   const { open, setOpen, triggerRef, renderPanel } = useAnchoredDropdown('trigger')
   const [hovered, setHovered] = useState(0)
@@ -98,9 +117,17 @@ export function Select({
         type="button"
         disabled={disabled}
         onClick={() => !disabled && setOpen(o => !o)}
-        className={[s.trigger, size === 'sm' ? s.sm : '', open ? s.open : ''].filter(Boolean).join(' ')}
+        className={[
+          s.trigger,
+          size === 'sm' ? s.sm : '',
+          size === 'compact' ? s.compact : '',
+          open ? s.open : '',
+        ].filter(Boolean).join(' ')}
       >
-        <span className={current ? s.text : s.placeholder}>{current?.label ?? placeholder}</span>
+        {icon && <span className={s.leadIcon}>{icon}</span>}
+        <span className={current ? s.text : s.placeholder}>
+          {current ? (current.short ?? current.label) : placeholder}
+        </span>
         <ChevronDown size={12} className={[s.chevron, open ? s.rotated : ''].filter(Boolean).join(' ')} />
       </button>
 

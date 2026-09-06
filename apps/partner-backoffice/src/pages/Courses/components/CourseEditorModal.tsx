@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { Modal, Button, Input, Select, Toggle, SegmentedFilter } from '@/components/ui'
 import { I18nField } from '@/components/i18n/I18nField/I18nField'
 import { useI18n } from '@/i18n'
-import { galleryImageUrl } from '@/services/partners.service'
+
 import type { Course, CourseLevel, CoursePriceMode, LocalizedText, Specialist } from '@/types'
 import type { CourseInput } from '@/services/courses.service'
 import { CoverPicker } from './CoverPicker'
 import { TutorField, type TutorValue } from './TutorField'
 import s from './CourseEditorModal.module.scss'
+import { uploadUrl } from '@/services/http'
 
 interface Props {
   /** Course being edited, or null for a new one. */
@@ -70,7 +71,7 @@ export function CourseEditorModal({ course, specialists, saving, onClose, onSubm
   // Cover is staged locally; committed URL comes from the loaded course.
   const [coverFile, setCoverFile] = useState<File | null>(null)
   const [coverCleared, setCoverCleared] = useState(false)
-  const committedCover = coverCleared ? '' : galleryImageUrl(course?.coverUrl)
+  const committedCover = coverCleared ? '' : uploadUrl(course?.coverUrl)
 
   const levelOptions = [
     { value: '', label: t('courses.level.none') },

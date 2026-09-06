@@ -1,0 +1,238 @@
+@use '../../../styles/vars' as *;
+@use './section' as sec;
+
+.panel { @include sec.panel; }
+.heading { @include sec.heading; }
+.error { @include sec.error; }
+
+/* Title left, actions right — and on a phone the actions take a full row of
+   their own rather than wrapping one at a time into a ragged stack. */
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+
+  @media (max-width: 620px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+}
+
+.headActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+
+  /* Side by side and equal width: two half-width buttons read as a pair of
+     choices, where two stacked full-width ones read as a queue of steps. */
+  @media (max-width: 620px) {
+    > * { flex: 1; min-width: 0; }
+  }
+}
+
+/* A link that has to sit level with a <Button> without competing with it. */
+.ghostBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 38px;
+  padding: 0 14px;
+  border: 1px solid $line-2;
+  border-radius: $r-2;
+  background: $bg-1;
+  color: $fg-1;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.13s, color 0.13s, background 0.13s;
+
+  &:hover { border-color: $accent-line; color: $accent; background: $accent-soft; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+}
+
+.ghostLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ghostIcon {
+  opacity: 0.6;
+  flex-shrink: 0;
+
+  /* At half width in Armenian the label already needs the room. */
+  @media (max-width: 620px) { display: none; }
+}
+
+.editBtn {
+  justify-content: center;
+  white-space: nowrap;
+}
+
+/* ── Blocks ────────────────────────────────────────────────── */
+
+/*
+ * A stack of labelled facts, separated by rules rather than by boxes.
+ *
+ * Cards inside a card is what made the first version look cheap: the shell is
+ * already a surface, the section is a surface on top of it, and putting each
+ * fact in a third one turns a profile into a filing cabinet. A hairline and
+ * generous space do the same job and leave the content as the only thing with
+ * weight.
+ */
+.block {
+  padding-top: 18px;
+  border-top: 1px solid $line-1;
+
+  &:first-of-type { padding-top: 0; border-top: 0; }
+}
+
+.blockTitle { @include sec.block-title; }
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: $accent-soft;
+  color: $accent-contrast;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+/* Places are context, not identity — so they read one step quieter than the
+   specialties above them. */
+.chipQuiet {
+  background: $bg-2;
+  color: $fg-2;
+  font-weight: 500;
+}
+
+/* An unfilled field, said plainly. Not an error — nothing is wrong, there is
+   just nothing there, and a red line would suggest otherwise. */
+.missing {
+  margin: 0;
+  font-size: 13px;
+  color: $fg-3;
+  font-style: italic;
+}
+
+.about {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: $fg-1;
+  /* Honor the line breaks they typed; collapse the runs of spaces they did
+     not. */
+  white-space: pre-line;
+  max-width: 62ch;
+}
+
+.contactList {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.contactRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid $line-1;
+
+  &:last-child { border-bottom: none; }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    padding: 9px 0;
+  }
+}
+
+.contactLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 132px;
+  flex-shrink: 0;
+  font-size: 12.5px;
+  color: $fg-3;
+
+  @media (max-width: 480px) { width: auto; }
+}
+
+.contactValue {
+  margin: 0;
+  font-size: 14px;
+  color: $fg-0;
+  font-variant-numeric: tabular-nums;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.contactEmpty {
+  color: $fg-3;
+  font-style: italic;
+}
+
+.contactNote {
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: $fg-3;
+  line-height: 1.5;
+}
+
+/* ── Edit form ─────────────────────────────────────────────── */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: $fg-1;
+}
+
+.fieldHint {
+  font-size: 11.5px;
+  color: $fg-3;
+  margin-top: -3px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid $line-1;
+  padding-top: 18px;
+
+  /* On a phone the primary action goes full width and last, where a thumb is. */
+  @media (max-width: 480px) {
+    flex-direction: column-reverse;
+    > * { width: 100%; }
+  }
+}

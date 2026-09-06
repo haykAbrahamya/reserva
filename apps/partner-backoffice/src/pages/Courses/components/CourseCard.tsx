@@ -1,10 +1,11 @@
 import { Pencil, Trash2, Users, GraduationCap } from 'lucide-react'
 import { useI18n, useDateLocale } from '@/i18n'
-import { galleryImageUrl } from '@/services/partners.service'
+
 import type { Course } from '@/types'
 import { StatusPill } from './StatusPill'
 import { coursePriceLabel, fmtDateRange, levelKey, statusKey, statusTone } from '../lib/courseFormat'
 import s from './CourseCard.module.scss'
+import { uploadUrl } from '@/services/http'
 
 interface Props {
   course: Course
@@ -18,7 +19,7 @@ interface Props {
 export function CourseCard({ course, onOpen, onEdit, onDelete }: Props) {
   const { t } = useI18n()
   const dateLocale = useDateLocale()
-  const cover = galleryImageUrl(course.coverUrl)
+  const cover = uploadUrl(course.coverUrl)
   const run = course.currentCohort
   const tutor = course.tutorSpecialist?.name || course.tutorName
   const lvl = levelKey(course.level)
