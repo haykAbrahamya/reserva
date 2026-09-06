@@ -91,10 +91,29 @@ export interface Service {
   nameI18n?: LocalizedText | null
   /** 'fixed' → `price` is exact. 'range' → `price`..`priceMax`. Absent = fixed. */
   priceType?: ServicePriceType
-  /** Fixed price, or the LOWER bound for a range service. */
-  price: number
-  /** Upper bound for a range service; null/absent for fixed. */
+  /**
+   * Fixed price, or the LOWER bound for a range service.
+   *
+   * NULL on public payloads when `hidePrice` is set — the server redacts it
+   * rather than trusting the browser not to render it. It is never null in the
+   * backoffice, which always receives the real figure.
+   *
+   * Deliberately typed nullable even though most callers hold a real number:
+   * that is what makes the compiler point at every place a hidden price could
+   * be printed, instead of leaving it to a code review to notice.
+   */
+  price: number | null
+  /** Upper bound for a range service; null/absent for fixed, and null on public
+   *  payloads when `hidePrice` is set. */
   priceMax?: number | null
+  /**
+   * The salon has chosen not to publish this price.
+   *
+   * A display choice, not a missing value: the price still exists, is still
+   * captured onto every booking, and is still shown to staff. Common for
+   * treatments quoted after a consultation.
+   */
+  hidePrice?: boolean
   duration: number
   active: boolean
   category: string

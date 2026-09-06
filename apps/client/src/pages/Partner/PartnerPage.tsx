@@ -128,8 +128,19 @@ export function PartnerPage() {
                 const spec = openingHoursSpec(partner.locations?.[0]?.hours)
                 return spec.length ? { openingHoursSpecification: spec } : {}
               })(),
+              /*
+               * Structured data has to hide what the page hides.
+               *
+               * This is the leak that is easiest to miss: a salon ticks "hide
+               * price", the page stops showing it, and the number goes to
+               * Google anyway inside priceRange and per-service Offers — where
+               * it can end up quoted in a search result. Published prices only.
+               */
               ...(() => {
-                const prices = partner.services?.filter((sv) => sv.active).map((sv) => sv.price) ?? []
+                const prices = (partner.services ?? [])
+                  .filter((sv) => sv.active && !sv.hidePrice)
+                  .map((sv) => sv.price)
+                  .filter((price): price is number => price != null)
                 return prices.length
                   ? { priceRange: `${Math.min(...prices)}–${Math.max(...prices)} AMD` }
                   : {}
@@ -141,8 +152,12 @@ export function PartnerPage() {
                 .map((sv) => ({
                   '@type': 'Offer',
                   itemOffered: { '@type': 'Service', name: sv.name },
-                  price: sv.price,
-                  priceCurrency: 'AMD',
+                  // The service is still offered — it just has no published
+                  // price. An Offer without one is valid; an Offer with a price
+                  // the page refuses to show is a contradiction.
+                  ...(sv.hidePrice || sv.price == null
+                    ? {}
+                    : { price: sv.price, priceCurrency: 'AMD' }),
                 })),
             },
             {

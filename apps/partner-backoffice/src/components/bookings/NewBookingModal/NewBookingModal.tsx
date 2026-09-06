@@ -247,7 +247,10 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
               label: sv.name,
               sub: sv.requiresSpecialist === false
                 ? t('newBooking.facilitySub', { duration: sv.duration, capacity: sv.capacity ?? 1 })
-                : t('newBooking.serviceSub', { duration: sv.duration, price: sv.price.toLocaleString() }),
+                : t('newBooking.serviceSub', { duration: sv.duration, // Never null here: `price` is nullable only because the PUBLIC payload
+                    // redacts a hidden price, and the backoffice is on the other side of
+                    // that — staff see the real figure whatever the page shows.
+                    price: (sv.price ?? 0).toLocaleString() }),
             }))}
             placeholder={t('newBooking.servicePlaceholder')}
           />

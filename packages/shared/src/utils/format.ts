@@ -19,11 +19,31 @@ export function fmtAMD(amount: number): string {
  * "min – max" range (en-dash) when the service is range-priced. Shared by the
  * client page, booking flow and backoffice so pricing reads identically.
  */
-export function fmtServicePrice(svc: {
-  price: number
-  priceType?: 'fixed' | 'range'
-  priceMax?: number | null
-}): string {
+export function fmtServicePrice(
+  svc: {
+    price: number | null
+    priceType?: 'fixed' | 'range'
+    priceMax?: number | null
+    hidePrice?: boolean
+  },
+  /**
+   * What to show when the salon has withheld the price — "Price on request",
+   * translated by the caller.
+   *
+   * A label rather than a hardcoded string, because this package has no i18n
+   * and inventing one here would put English on an Armenian page. The same
+   * arrangement as `fmtCoursePrice`, which already takes its "free" label.
+   */
+  hiddenLabel = '',
+): string {
+  /*
+   * Two ways to arrive here without a number, and both mean the same thing to a
+   * reader. `hidePrice` is the salon's choice; a null `price` is the server
+   * having acted on it. Checking both means a payload that carries one without
+   * the other still cannot print a figure — or, worse, "NaN ֏".
+   */
+  if (svc.hidePrice || svc.price == null) return hiddenLabel
+
   if (svc.priceType === 'range' && svc.priceMax != null) {
     // Currency once, at the end: "1,000 – 6,000 ֏". Compact and unambiguous —
     // avoids the awkward "AMD 1,000 – AMD 6,000" that overflowed tight cards.

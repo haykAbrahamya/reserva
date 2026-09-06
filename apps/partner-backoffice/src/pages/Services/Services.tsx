@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Sparkles, Pencil, Clock, RotateCcw, X, Users, Waves, ArrowUpDown, Search } from 'lucide-react'
+import { ArrowUpDown, Clock, EyeOff, Pencil, Plus, RotateCcw, Search, Sparkles, Users, Waves, X } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useIsAdmin } from '@/store/auth.hooks'
 import { useDebouncedValue } from '@/hooks/useDebouncedValue'
@@ -32,6 +32,9 @@ const EMPTY_FORM = {
   repeatMonths: '', repeatDays: '',
   // Pricing: 'fixed' → single price; 'range' → price..priceMax bounds.
   priceType: 'fixed' as 'fixed' | 'range', priceMax: '',
+  // Keep the price off the public page. Display only — the amount is still
+  // required, still captured onto every booking, still shown here.
+  hidePrice: false,
   // Facility/entry service (spa): no specialist, N concurrent spots per slot.
   requiresSpecialist: true, capacity: '1',
   // Per-language overrides for name + category (null = base only).
@@ -141,6 +144,7 @@ export function Services() {
       category: svc.category, active: svc.active,
       priceType: svc.priceType ?? 'fixed',
       priceMax: svc.priceMax != null ? String(svc.priceMax) : '',
+      hidePrice: svc.hidePrice ?? false,
       requiresSpecialist: svc.requiresSpecialist ?? true,
       capacity: String(svc.capacity ?? 1),
       nameI18n: svc.nameI18n ?? null,
@@ -177,6 +181,7 @@ export function Services() {
       priceType: form.priceType,
       price: Number(form.price),
       priceMax: form.priceType === 'range' ? Number(form.priceMax) : null,
+      hidePrice: form.hidePrice,
       duration: Number(form.duration),
       category: form.category,
       categoryI18n: form.categoryI18n,
@@ -339,7 +344,18 @@ export function Services() {
                   <Td><span className={s.category}>{svc.category}</span></Td>
                   <Td><span className={s.duration}>{fmtDuration(svc.duration)}</span></Td>
                   <Td><span className={s.repeat}>{repeatLabel(svc.repeatEveryDays)}</span></Td>
-                  <Td><span className={s.price}>{fmtServicePrice(svc)}</span></Td>
+                  <Td>
+                    <span className={s.price}>{fmtServicePrice(svc)}</span>
+                    {/* Staff still see the figure — the badge says the PUBLIC
+                        page does not, which is the thing that would otherwise
+                        be invisible from in here. */}
+                    {svc.hidePrice && (
+                      <span className={s.hiddenBadge} title={t('services.modal.hidePriceOn')}>
+                        <EyeOff size={11} />
+                        {t('services.hiddenPrice')}
+                      </span>
+                    )}
+                  </Td>
                   <Td><Toggle checked={svc.active} onChange={() => handleToggleActive(svc)} /></Td>
                   <Td>
                     <Button variant="ghost" size="sm" icon onClick={e => { e.stopPropagation(); openEdit(svc) }}>
@@ -408,6 +424,30 @@ export function Services() {
               <Input label={t('services.modal.priceToLabel')} type="number" value={form.priceMax} onChange={e => { setForm(f => ({ ...f, priceMax: e.target.value })); setErrs(x => ({ ...x, priceMax: '' })) }} placeholder={t('services.modal.pricePlaceholder')} error={errs.priceMax || undefined} />
             </>
           )}
+          {/*
+            Under the price, not down with the other switches: it is a decision
+            ABOUT the number just typed, and a reader who has just entered one
+            is the only reader who needs it. The hint says what stays true so
+            nobody reads this as "leave the price blank" — the amount is still
+            required, still lands on every booking, and staff still see it here.
+          */}
+          <div className={s.formFull}>
+            <div className={s.hidePriceRow}>
+              <div className={s.hidePriceBody}>
+                <span className={s.hidePriceLabel}>{t('services.modal.hidePrice')}</span>
+                <span className={s.hidePriceHint}>
+                  {form.hidePrice
+                    ? t('services.modal.hidePriceOn')
+                    : t('services.modal.hidePriceOff')}
+                </span>
+              </div>
+              <Toggle
+                checked={form.hidePrice}
+                onChange={v => setForm(f => ({ ...f, hidePrice: v }))}
+              />
+            </div>
+          </div>
+
           <Input label={t('services.modal.durationLabel')} type="number" value={form.duration} onChange={e => { setForm(f => ({ ...f, duration: e.target.value })); setErrs(x => ({ ...x, duration: '' })) }} placeholder={t('services.modal.durationPlaceholder')} error={errs.duration || undefined} />
           <div className={s.formFull}>
             <I18nField

@@ -125,7 +125,7 @@ export function PartnerServices({ partner, onBook, tone = 'cream' }: Props) {
                   </div>
                 </div>
                 <div className={s.right}>
-                  <span className={s.price}>{fmtServicePrice(sv)}</span>
+                  <span className={s.price}>{fmtServicePrice(sv, t('services.onRequest'))}</span>
                   {bookable && (
                     <button className={s.bookBtn} onClick={() => onBook(sv.id)}>
                       <Plus size={14} /> {t('partner.services.book')}

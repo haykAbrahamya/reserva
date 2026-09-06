@@ -447,7 +447,10 @@
       "requiresSpecialistOn": "Clients pick a specialist when booking this service.",
       "requiresSpecialistOff": "Entry / facility service (sauna, pool, day pass) — no specialist; spots are limited by capacity.",
       "capacityLabel": "Capacity",
-      "capacityHint": "How many people can use it at the same time."
+      "capacityHint": "How many people can use it at the same time.",
+      "hidePrice": "Hide the price on the public page",
+      "hidePriceOn": "Clients see “Price on request”. The amount still lands on every booking and in your reports.",
+      "hidePriceOff": "The price is shown on your public page."
     },
     "capacityShort": "{n} spots",
     "reorder": {
@@ -462,7 +465,8 @@
       "save": "Save order",
       "saving": "Saving…",
       "saved": "Order updated"
-    }
+    },
+    "hiddenPrice": "Hidden"
   },
   "reviews": {
     "title": "Reviews",

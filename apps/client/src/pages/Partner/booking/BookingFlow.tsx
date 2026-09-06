@@ -862,7 +862,7 @@ function ServiceStep({ partner, selectedId, onSelect, onlyServiceIds }: {
                   )}
                 </div>
               </div>
-              <span className={s.optPrice}>{fmtServicePrice(sv)}</span>
+              <span className={s.optPrice}>{fmtServicePrice(sv, t('services.onRequest'))}</span>
             </button>
           ))}
         </div>
@@ -922,7 +922,7 @@ function SummaryRows({ service, specialist, anySpecialist, hideSpecialist, locat
       {!hidePrice && service && (
         <div className={[s.sumRow, s.sumTotal].join(' ')}>
           <span className={s.sumTotalLabel}>{t('booking.summary.total')}</span>
-          <span className={s.sumTotalValue}>{fmtServicePrice(service)}</span>
+          <span className={s.sumTotalValue}>{fmtServicePrice(service, t('services.onRequest'))}</span>
         </div>
       )}
       {!hidePrice && service?.priceType === 'range' && (
