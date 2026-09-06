@@ -1,38 +1,13 @@
-/* ============================================================
-   Vacancies — app theme.
-
-   Layered ON TOP of @reserva/ui's tokens.css, which supplies the neutral
-   system, the type scale, the shadows and the animations. This file changes
-   three things: the accent, the script coverage of the type stacks, and the
-   depth of the page ground.
-   ============================================================ */
-
 /*
-  Armenian and Cyrillic coverage.
+  Type comes from the design system.
 
-  The house display face is Fraunces and the house mono is Geist Mono. Neither
-  carries a single Armenian glyph, and Fraunces has no Cyrillic either — so on
-  an Armenian-market product EVERY heading was being drawn by whatever generic
-  serif the browser had lying around (Georgia, in practice). That is what made
-  the headings look wrong in a way no amount of weight or size adjustment could
-  fix: they were not the typeface at all.
-
-  Browsers resolve font-family per GLYPH, so appending the Noto Armenian faces
-  keeps Latin text in Fraunces and Geist while giving Armenian text a real
-  design of its own, in the same voice — serif where we set serif, sans where we
-  set sans. Cyrillic falls to Noto Serif for the same reason.
-
-  Loaded here rather than in tokens.css so the three existing apps do not pay
-  for fonts they have not been designed against yet.
+  The Armenian and Cyrillic faces used to be loaded here, because this was the
+  first app that needed them. They now live in packages/ui/src/styles/tokens.css
+  so every app gets the same stack — the client's partner pages had exactly the
+  same problem and were still falling back to a generic serif.
 */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Armenian:wght@400;500;600;700&family=Noto+Serif+Armenian:wght@400;500;600&family=Noto+Serif:wght@400;500;600&display=swap');
 
 :root {
-  /* ── Type ── */
-  --font-sans: 'Geist', 'Noto Sans Armenian', 'Inter', -apple-system, sans-serif;
-  --font-serif: 'Fraunces', 'Noto Serif Armenian', 'Noto Serif', Georgia, serif;
-  --font-mono: 'Geist Mono', 'Noto Sans Armenian', ui-monospace, monospace;
-
   /* ── Accent ── */
   --accent: #7c5cff;
   /* Deep enough to pass contrast as TEXT on the light ground. The raw accent

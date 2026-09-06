@@ -6,6 +6,24 @@
 /* Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap');
 
+/*
+  Armenian and Cyrillic coverage.
+
+  Fraunces carries not one Armenian glyph and no Cyrillic either, and Geist is
+  Latin-only — so on an Armenian-market product every heading and every
+  paragraph was being drawn by whatever face the browser had lying around
+  (Georgia, then Times, in practice). That is what makes Armenian body copy look
+  wrong in a way no amount of size or weight can fix: it is not the typeface at
+  all, it is a fallback.
+
+  Browsers resolve font-family PER GLYPH, so appending these keeps Latin text in
+  Fraunces and Geist while giving Armenian text a real design of its own, in the
+  same voice — serif where we set serif, sans where we set sans. Google serves
+  them with a `unicode-range`, so a page with no Armenian on it never downloads
+  the file.
+*/
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Armenian:wght@400;500;600;700&family=Noto+Serif+Armenian:wght@400;500;600&family=Noto+Serif:wght@400;500;600&display=swap');
+
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
@@ -53,10 +71,11 @@
   --shadow-2: 0 4px 16px rgba(20,17,14,.06), 0 1px 0 rgba(20,17,14,.04);
   --shadow-3: 0 24px 60px rgba(20,17,14,.18), 0 8px 18px rgba(20,17,14,.08);
 
-  /* Typography */
-  --font-sans: "Geist", "Inter", -apple-system, sans-serif;
-  --font-serif: "Fraunces", Georgia, serif;
-  --font-mono: "Geist Mono", ui-monospace, monospace;
+  /* Typography. The Noto faces are the Armenian/Cyrillic half of each stack —
+     see the note by the @import above; order matters, Latin first. */
+  --font-sans: "Geist", "Noto Sans Armenian", "Inter", -apple-system, sans-serif;
+  --font-serif: "Fraunces", "Noto Serif Armenian", "Noto Serif", Georgia, serif;
+  --font-mono: "Geist Mono", "Noto Sans Armenian", ui-monospace, monospace;
 
   /* Density */
   --row-h: 44px;

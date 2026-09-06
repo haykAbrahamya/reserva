@@ -43,6 +43,28 @@
   /* Honor the line breaks the partner typed in the About field (collapses runs
      of spaces like normal text, but keeps \n as real line breaks). */
   white-space: pre-line;
+
+  /*
+   * Armenian sets in the SANS face here.
+   *
+   * The serif is right for a heading in any language and right for a paragraph
+   * in Latin, but Armenian letterforms already carry a lot of stroke contrast
+   * and terminals of their own — add serifs at 19px over six lines and the
+   * texture turns dense enough to slow the reading down. The sans is the same
+   * voice, one weight lighter on the eye, and it is what the rest of this
+   * page's body copy already uses.
+   *
+   * Scoped by the document language (I18nProvider stamps `lang` on <html>), so
+   * it follows the visitor's own switch with no JavaScript and no prop.
+   * Headings keep the serif deliberately — this is about long-form copy only.
+   *
+   * `letter-spacing` goes back to normal: the -0.01em tightening is tuned for
+   * Fraunces and pinches Armenian.
+   */
+  :global(html[lang^='hy']) & {
+    font-family: $font-sans;
+    letter-spacing: normal;
+  }
 }
 
 /* Info card with quick facts */
