@@ -732,8 +732,5 @@
     "errContact": "Add a phone or email so we can reach you.",
     "errNetwork": "Can’t reach the server. Please check your connection and try again.",
     "errGeneric": "Something went wrong. Please try again."
-  },
-  "services": {
-    "onRequest": "Price on request"
   }
 }

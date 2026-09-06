@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Plus, Clock, Search, X, ChevronDown } from 'lucide-react'
-import { fmtServicePrice, fmtDuration } from '@reserva/shared'
+import { fmtServicePrice, fmtDuration, hasPublicPrice } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
 import { canBook } from '@/services/booking.service'
 import { useT, useLocalized } from '@/i18n'
@@ -106,7 +106,12 @@ export function TabbedServices({ partner, onBook }: Props) {
       ) : (
       <div className={s.grid}>
         {visible.map((sv) => (
-          <div key={sv.id} className={s.card}>
+          <div
+            key={sv.id}
+            className={[s.card, hasPublicPrice(sv) || bookable ? '' : s.cardFlush]
+              .filter(Boolean)
+              .join(' ')}
+          >
             <div className={s.cardBody}>
               <div className={s.name}>{loc(sv.name, sv.nameI18n)}</div>
               <div className={s.meta}>
@@ -116,14 +121,23 @@ export function TabbedServices({ partner, onBook }: Props) {
                 {sv.category && <span className={s.metaCat}>{loc(sv.category, sv.categoryI18n)}</span>}
               </div>
             </div>
-            <div className={s.right}>
-              <span className={s.price}>{fmtServicePrice(sv, t('services.onRequest'))}</span>
-              {bookable && (
-                <button className={s.bookBtn} onClick={() => onBook(sv.id)}>
-                  <Plus size={14} /> {t('partner.services.book')}
-                </button>
-              )}
-            </div>
+            {/* Dropped entirely when the price is withheld — same reasoning as
+                the classic template, and the two must behave identically or a
+                salon's page changes shape when it switches template. */}
+            {(hasPublicPrice(sv) || bookable) && (
+              <div
+                className={[s.right, hasPublicPrice(sv) ? '' : s.rightNoPrice]
+                  .filter(Boolean)
+                  .join(' ')}
+              >
+                {hasPublicPrice(sv) && <span className={s.price}>{fmtServicePrice(sv)}</span>}
+                {bookable && (
+                  <button className={s.bookBtn} onClick={() => onBook(sv.id)}>
+                    <Plus size={14} /> {t('partner.services.book')}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         ))}
       </div>

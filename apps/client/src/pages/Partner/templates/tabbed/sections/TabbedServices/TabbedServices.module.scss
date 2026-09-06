@@ -225,3 +225,24 @@
 }
 .moreChevron { transition: transform 0.2s ease; }
 .moreChevronUp { transform: rotate(180deg); }
+
+/* No price to show: the band holds only the Book button, so it right-aligns
+   rather than leaving it stranded on the left by `space-between`. */
+.rightNoPrice {
+  justify-content: flex-end;
+}
+
+/*
+ * A card whose price is withheld has no bottom band — so it centres what it
+ * has instead of leaving the space under it.
+ *
+ * The grid keeps equal-height rows on purpose. Letting the card shrink (or
+ * packing the cards in columns) removes the space inside the card and puts it
+ * between the cards instead, which is the same hole somewhere less expected.
+ * A full-height card with its name centred reads as a card, not as a card
+ * missing a piece — and this layout is single-column on a phone, where the
+ * question does not arise at all.
+ */
+.cardFlush {
+  justify-content: center;
+}

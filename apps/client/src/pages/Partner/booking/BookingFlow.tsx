@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { ArrowLeft, X, Check, Users, Calendar, Clock, CheckCircle2, ArrowRight, Sparkles, MapPin, Send, AlertCircle, CalendarPlus, Bell, BellRing, Share } from 'lucide-react'
-import { fmtServicePrice, fmtDuration, fmtDateInput, initials, isValidPhone } from '@reserva/shared'
+import { fmtServicePrice, fmtDuration, fmtDateInput, hasPublicPrice, initials, isValidPhone } from '@reserva/shared'
 import { StarRatingDisplay } from '@/components/StarRating/StarRating'
 import { DatePicker } from '@reserva/ui'
 import { DayStrip, type DayInfo } from './DayStrip/DayStrip'
@@ -862,7 +862,12 @@ function ServiceStep({ partner, selectedId, onSelect, onlyServiceIds }: {
                   )}
                 </div>
               </div>
-              <span className={s.optPrice}>{fmtServicePrice(sv, t('services.onRequest'))}</span>
+              {/* Omitted rather than blanked: the row is a flex with the name
+                  on the left and the price on the right, so an empty span would
+                  reserve a column for nothing. */}
+              {hasPublicPrice(sv) && (
+                <span className={s.optPrice}>{fmtServicePrice(sv)}</span>
+              )}
             </button>
           ))}
         </div>
@@ -919,14 +924,26 @@ function SummaryRows({ service, specialist, anySpecialist, hideSpecialist, locat
       />
       {name && <Row icon={<Users size={15} />} label={t('booking.summary.name')} value={name} />}
       {phone && <Row icon={<MapPin size={15} />} label={t('booking.summary.phone')} value={formatPhoneDisplay(phone)} />}
-      {!hidePrice && service && (
-        <div className={[s.sumRow, s.sumTotal].join(' ')}>
-          <span className={s.sumTotalLabel}>{t('booking.summary.total')}</span>
-          <span className={s.sumTotalValue}>{fmtServicePrice(service, t('services.onRequest'))}</span>
-        </div>
-      )}
-      {!hidePrice && service?.priceType === 'range' && (
-        <div className={s.sumNote}>{t('booking.priceRangeNote')}</div>
+      {/*
+        Two independent reasons there is no total to show, and both drop the
+        whole ROW rather than emptying it — a "Total" label with nothing beside
+        it is worse than no row at all.
+
+        `hidePrice` is this screen's own choice (the confirmation does not
+        repeat the price). `hasPublicPrice` is the salon's: a service whose
+        price is withheld has no total to state, and the range note below it
+        would be describing a range nobody can see.
+      */}
+      {!hidePrice && service && hasPublicPrice(service) && (
+        <>
+          <div className={[s.sumRow, s.sumTotal].join(' ')}>
+            <span className={s.sumTotalLabel}>{t('booking.summary.total')}</span>
+            <span className={s.sumTotalValue}>{fmtServicePrice(service)}</span>
+          </div>
+          {service.priceType === 'range' && (
+            <div className={s.sumNote}>{t('booking.priceRangeNote')}</div>
+          )}
+        </>
       )}
     </>
   )

@@ -19,30 +19,38 @@ export function fmtAMD(amount: number): string {
  * "min – max" range (en-dash) when the service is range-priced. Shared by the
  * client page, booking flow and backoffice so pricing reads identically.
  */
-export function fmtServicePrice(
-  svc: {
-    price: number | null
-    priceType?: 'fixed' | 'range'
-    priceMax?: number | null
-    hidePrice?: boolean
-  },
-  /**
-   * What to show when the salon has withheld the price — "Price on request",
-   * translated by the caller.
-   *
-   * A label rather than a hardcoded string, because this package has no i18n
-   * and inventing one here would put English on an Armenian page. The same
-   * arrangement as `fmtCoursePrice`, which already takes its "free" label.
-   */
-  hiddenLabel = '',
-): string {
-  /*
-   * Two ways to arrive here without a number, and both mean the same thing to a
-   * reader. `hidePrice` is the salon's choice; a null `price` is the server
-   * having acted on it. Checking both means a payload that carries one without
-   * the other still cannot print a figure — or, worse, "NaN ֏".
-   */
-  if (svc.hidePrice || svc.price == null) return hiddenLabel
+export interface PricedService {
+  price: number | null
+  priceType?: 'fixed' | 'range'
+  priceMax?: number | null
+  hidePrice?: boolean
+}
+
+/**
+ * Is there a price to put on the page at all?
+ *
+ * Two ways to arrive without one, meaning the same thing to a reader:
+ * `hidePrice` is the salon's choice, a null `price` is the server having acted
+ * on it by redacting the number out of the public payload. Checking both means
+ * a payload carrying one without the other still cannot print a figure.
+ *
+ * Callers use this to decide whether to render the price ELEMENT — not just
+ * what to put inside it. A withheld price shows nothing at all: no figure, no
+ * "on request", no empty row where one used to be.
+ */
+export function hasPublicPrice(svc: PricedService): svc is PricedService & { price: number } {
+  return !svc.hidePrice && svc.price != null
+}
+
+/**
+ * Returns '' for a withheld price rather than a placeholder.
+ *
+ * That is a backstop, not the interface: a caller that forgets `hasPublicPrice`
+ * gets an empty string instead of "NaN ֏", but it also gets an empty element,
+ * which is why the check belongs at the call site.
+ */
+export function fmtServicePrice(svc: PricedService): string {
+  if (!hasPublicPrice(svc)) return ''
 
   if (svc.priceType === 'range' && svc.priceMax != null) {
     // Currency once, at the end: "1,000 – 6,000 ֏". Compact and unambiguous —

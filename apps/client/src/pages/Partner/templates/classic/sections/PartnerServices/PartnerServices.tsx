@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Plus, Search, X, ChevronDown, Clock } from 'lucide-react'
-import { fmtServicePrice, fmtDuration } from '@reserva/shared'
+import { fmtServicePrice, fmtDuration, hasPublicPrice } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { canBook } from '@/services/booking.service'
@@ -114,7 +114,15 @@ export function PartnerServices({ partner, onBook, tone = 'cream' }: Props) {
         ) : (
           <div className={s.list}>
             {visible.map((sv, i) => (
-              <Reveal key={sv.id} className={s.card} delay={(i % 2) * 60}>
+              <Reveal
+                key={sv.id}
+                /* No price and nothing to book means no bottom band, so the
+                   card centres what it has rather than leaving a gap under it. */
+                className={[s.card, hasPublicPrice(sv) || bookable ? '' : s.cardFlush]
+                  .filter(Boolean)
+                  .join(' ')}
+                delay={(i % 2) * 60}
+              >
                 <div className={s.cardBody}>
                   <div className={s.svcName}>{loc(sv.name, sv.nameI18n)}</div>
                   <div className={s.svcMeta}>
@@ -124,14 +132,32 @@ export function PartnerServices({ partner, onBook, tone = 'cream' }: Props) {
                     {sv.category && <span className={s.metaCat}>{loc(sv.category, sv.categoryI18n)}</span>}
                   </div>
                 </div>
-                <div className={s.right}>
-                  <span className={s.price}>{fmtServicePrice(sv, t('services.onRequest'))}</span>
-                  {bookable && (
-                    <button className={s.bookBtn} onClick={() => onBook(sv.id)}>
-                      <Plus size={14} /> {t('partner.services.book')}
-                    </button>
-                  )}
-                </div>
+                {/*
+                  The price band disappears entirely when the salon withholds
+                  the price — no figure, no placeholder. An empty bordered strip
+                  with a tinted background reads as a broken card, which is
+                  worse than the price simply not being part of this card.
+
+                  When the service is still bookable the band stays for the
+                  button alone and right-aligns it: `space-between` with one
+                  child would park it on the left, under nothing.
+                */}
+                {(hasPublicPrice(sv) || bookable) && (
+                  <div
+                    className={[s.right, hasPublicPrice(sv) ? '' : s.rightNoPrice]
+                      .filter(Boolean)
+                      .join(' ')}
+                  >
+                    {hasPublicPrice(sv) && (
+                      <span className={s.price}>{fmtServicePrice(sv)}</span>
+                    )}
+                    {bookable && (
+                      <button className={s.bookBtn} onClick={() => onBook(sv.id)}>
+                        <Plus size={14} /> {t('partner.services.book')}
+                      </button>
+                    )}
+                  </div>
+                )}
               </Reveal>
             ))}
           </div>
