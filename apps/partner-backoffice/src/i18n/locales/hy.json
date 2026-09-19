@@ -395,6 +395,7 @@
     "noMatchTitle": "Ծառայություններ չգտնվեցին",
     "noMatchDesc": "Ոչ մի ծառայություն չի համապատասխանում որոնմանը կամ կատեգորիային։ Փորձեք այլ բառ։",
     "otherCategory": "Այլ",
+    "priceFrom": "{price}-ից",
     "filter": {
       "searchPlaceholder": "Որոնել ծառայություն ըստ անվան…",
       "searchCategory": "Որոնել կատեգորիա…",
@@ -421,6 +422,10 @@
       "priceTypeRange": "Գնային միջակայք",
       "priceFromLabel": "Սկսած (֏)",
       "priceToLabel": "Մինչև (֏)",
+      "priceToOptionalLabel": "Մինչև (֏) — ըստ ցանկության",
+      "priceToPlaceholder": "Առանց սահմանի",
+      "priceToOptionalHint": "Թողեք դատարկ՝ առանց վերին սահմանի բաց գնի համար։",
+      "priceOpenEndedHint": "Հաճախորդները կտեսնեն՝ «{price}»։",
       "priceRangeError": "Վերին գինը պետք է մեծ լինի ստորին գնից",
       "pricePlaceholder": "5000",
       "durationLabel": "Տևողություն (րոպե)",

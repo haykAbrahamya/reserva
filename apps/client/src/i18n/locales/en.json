@@ -283,6 +283,7 @@
       "book": "Book",
       "min": "min",
       "hour": "h",
+      "priceFrom": "from {price}",
       "searchPlaceholder": "Search services…",
       "seeMore": "See {count} more",
       "showLess": "Show less",

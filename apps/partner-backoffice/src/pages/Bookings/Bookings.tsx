@@ -1,10 +1,11 @@
-import { useState, useEffect, type CSSProperties } from 'react'
+import { useState, useEffect, useMemo, type CSSProperties } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Plus, Calendar, X, Search } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import { Button, Table, Th, Td, Tr, BookingBadge, Avatar, Empty, Select, DateRangePicker, Pagination } from '@/components/ui'
 import { fmtAMD, fmtServicePrice, fmtDateTime, fmtDuration, fmtTime, fmtDateInput } from '@/utils/format'
+import type { PriceLabels } from '@/utils/format'
 import { bookingsService } from '@/services/bookings.service'
 import { partnersService } from '@/services/partners.service'
 import { useNewBooking } from '@/App'
@@ -28,9 +29,9 @@ const STATUS_FILTERS = ['all', 'confirmed', 'pending', 'completed', 'cancelled',
 
 /** Effective price for a booking row: the exact final price once set, otherwise
  *  the service's price (a range for range-priced services). */
-function effectivePrice(b: Booking): string {
+function effectivePrice(b: Booking, labels: PriceLabels): string {
   if (b.finalPrice != null) return fmtAMD(b.finalPrice)
-  return b.service ? fmtServicePrice(b.service) : '—'
+  return b.service ? fmtServicePrice(b.service, labels) : '—'
 }
 
 export function Bookings() {
@@ -43,6 +44,8 @@ export function Bookings() {
   const { t, tp }      = useI18n()
   const dateLocale     = useDateLocale()
   const rangeLabels    = useDateRangeLabels()
+  // Open-ended range wording ("from 5,000 ֏"), handed to the shared formatter.
+  const priceLabels    = useMemo(() => ({ from: t('services.priceFrom') }), [t])
 
   const [statusFilter, setStatusFilter] = useState('all')
   const [selectedId,   setSelectedId]   = useState<string | null>(null)
@@ -244,7 +247,7 @@ export function Bookings() {
                         <div className={s.cardSvc}>{b.service?.name ?? '—'}</div>
                         <div className={s.cardSpec}>{b.specialist?.name ?? '—'}{b.service ? ` · ${fmtDuration(b.service.duration)}` : ''}</div>
                       </div>
-                      {b.service && <div className={s.cardPrice}>{effectivePrice(b)}</div>}
+                      {b.service && <div className={s.cardPrice}>{effectivePrice(b, priceLabels)}</div>}
                     </div>
                   </div>
                 ))}
@@ -296,7 +299,7 @@ export function Bookings() {
                     </Td>
                     <Td><span className={s.specialistName}>{b.specialist?.name ?? '—'}</span></Td>
                     <Td style={{ whiteSpace: 'nowrap' }}>{fmtDateTime(b.startISO)}</Td>
-                    <Td><span className={s.price}>{effectivePrice(b)}</span></Td>
+                    <Td><span className={s.price}>{effectivePrice(b, priceLabels)}</span></Td>
                     <Td><BookingBadge status={b.status} /></Td>
                   </Tr>
               ))}

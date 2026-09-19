@@ -149,7 +149,7 @@ export function PartnerServices({ partner, onBook, tone = 'cream' }: Props) {
                       .join(' ')}
                   >
                     {hasPublicPrice(sv) && (
-                      <span className={s.price}>{fmtServicePrice(sv)}</span>
+                      <span className={s.price}>{fmtServicePrice(sv, { from: t('partner.services.priceFrom') })}</span>
                     )}
                     {bookable && (
                       <button className={s.bookBtn} onClick={() => onBook(sv.id)}>

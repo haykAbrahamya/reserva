@@ -395,6 +395,7 @@
     "noMatchTitle": "Услуги не найдены",
     "noMatchDesc": "Ни одна услуга не соответствует поиску или категории. Попробуйте другой запрос.",
     "otherCategory": "Прочее",
+    "priceFrom": "от {price}",
     "filter": {
       "searchPlaceholder": "Поиск услуги по названию…",
       "searchCategory": "Поиск категории…",
@@ -421,6 +422,10 @@
       "priceTypeRange": "Диапазон цен",
       "priceFromLabel": "От (AMD)",
       "priceToLabel": "До (AMD)",
+      "priceToOptionalLabel": "До (AMD) — необязательно",
+      "priceToPlaceholder": "Без верхней границы",
+      "priceToOptionalHint": "Оставьте пустым, чтобы цена была открытой, без верхней границы.",
+      "priceOpenEndedHint": "Клиенты увидят «{price}».",
       "priceRangeError": "Верхняя цена должна быть больше нижней",
       "pricePlaceholder": "5000",
       "durationLabel": "Длительность (мин)",

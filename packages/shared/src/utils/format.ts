@@ -43,20 +43,49 @@ export function hasPublicPrice(svc: PricedService): svc is PricedService & { pri
 }
 
 /**
+ * Wording for a price that has a lower bound but no upper one.
+ *
+ * Same shape as {@link DurationLabels}, for the same reason: @reserva/shared
+ * carries no message bundle, so the localized string is passed IN by the app.
+ * The English default keeps non-localized callers rendering real words instead
+ * of a raw key.
+ */
+export interface PriceLabels {
+  /** Open-ended range template; `{price}` is the formatted lower bound. */
+  from: string
+}
+
+export const DEFAULT_PRICE_LABELS: PriceLabels = { from: 'from {price}' }
+
+/**
  * Returns '' for a withheld price rather than a placeholder.
  *
  * That is a backstop, not the interface: a caller that forgets `hasPublicPrice`
  * gets an empty string instead of "NaN ֏", but it also gets an empty element,
  * which is why the check belongs at the call site.
  */
-export function fmtServicePrice(svc: PricedService): string {
+export function fmtServicePrice(
+  svc: PricedService,
+  labels: PriceLabels = DEFAULT_PRICE_LABELS,
+): string {
   if (!hasPublicPrice(svc)) return ''
 
-  if (svc.priceType === 'range' && svc.priceMax != null) {
-    // Currency once, at the end: "1,000 – 6,000 ֏". Compact and unambiguous —
-    // avoids the awkward "AMD 1,000 – AMD 6,000" that overflowed tight cards.
-    const nf = new Intl.NumberFormat('hy-AM', { maximumFractionDigits: 0 })
-    return `${nf.format(svc.price)} – ${nf.format(svc.priceMax)} ${AMD_SIGN}`
+  if (svc.priceType === 'range') {
+    if (svc.priceMax != null) {
+      // Currency once, at the end: "1,000 – 6,000 ֏". Compact and unambiguous —
+      // avoids the awkward "AMD 1,000 – AMD 6,000" that overflowed tight cards.
+      const nf = new Intl.NumberFormat('hy-AM', { maximumFractionDigits: 0 })
+      return `${nf.format(svc.price)} – ${nf.format(svc.priceMax)} ${AMD_SIGN}`
+    }
+    /*
+     * Open-ended range — a lower bound and no upper one.
+     *
+     * This must NOT fall through to the bare amount below. "5,000 ֏" on its own
+     * reads as the exact charge, so a salon that deliberately left the ceiling
+     * open would be quoting a fixed price it never agreed to, and the client
+     * would arrive expecting to pay it. The wording IS the value here.
+     */
+    return labels.from.replace('{price}', fmtAMD(svc.price))
   }
   return fmtAMD(svc.price)
 }

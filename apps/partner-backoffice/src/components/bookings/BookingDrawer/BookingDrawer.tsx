@@ -206,7 +206,7 @@ export function BookingDrawer({ bookingId, onClose, sheet, onChanged }: Props) {
         <div className={s.section}>
           <div className={s.label}>{t('bookingDrawer.service')}</div>
           <div className={s.value}>{svc.name}</div>
-          <div className={s.sub}>{fmtDuration(svc.duration)} · {fmtServicePrice(svc)}</div>
+          <div className={s.sub}>{fmtDuration(svc.duration)} · {fmtServicePrice(svc, { from: t('services.priceFrom') })}</div>
         </div>
       )}
 
@@ -271,7 +271,7 @@ export function BookingDrawer({ bookingId, onClose, sheet, onChanged }: Props) {
 
   const finalPriceModal = priceModal && svc && (
     <FinalPriceModal
-      rangeHint={fmtServicePrice(svc)}
+      rangeHint={fmtServicePrice(svc, { from: t('services.priceFrom') })}
       initial={booking.finalPrice ?? booking.priceAtBooking ?? svc.price}
       saveLabelKey={priceModal === 'complete' ? 'bookingDrawer.completeAndSave' : 'bookingDrawer.saveFinalPrice'}
       onCancel={() => setPriceModal(null)}

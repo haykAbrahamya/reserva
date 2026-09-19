@@ -283,6 +283,7 @@
       "book": "Записаться",
       "min": "мин",
       "hour": "ч",
+      "priceFrom": "от {price}",
       "searchPlaceholder": "Поиск услуг…",
       "seeMore": "Показать ещё {count}",
       "showLess": "Свернуть",

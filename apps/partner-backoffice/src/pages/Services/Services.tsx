@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { ArrowUpDown, Clock, EyeOff, Pencil, Plus, RotateCcw, Search, Sparkles, Users, Waves, X } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useIsAdmin } from '@/store/auth.hooks'
@@ -72,6 +72,11 @@ export function Services() {
   const { t, tp }   = useI18n()
   const toast       = useToast()
   useSpotlight()
+
+  // Wording for open-ended ranges ("from 5,000 ֏"). @reserva/shared holds no
+  // message bundle, so the localized template is handed to the formatter —
+  // same contract as fmtDuration's unit labels.
+  const priceLabels = useMemo(() => ({ from: t('services.priceFrom') }), [t])
 
   const [page,     setPage]     = useState(1)
   const [pageSize, setPageSize] = useState(5)
@@ -166,8 +171,14 @@ export function Services() {
     const e: Record<string, string> = {}
     if (!form.name.trim()) e.name = t('errors.required')
     if (form.price === '' || Number(form.price) < 0 || Number.isNaN(Number(form.price))) e.price = t('errors.invalid')
-    if (form.priceType === 'range') {
-      if (form.priceMax === '' || Number(form.priceMax) < 0 || Number.isNaN(Number(form.priceMax))) e.priceMax = t('errors.invalid')
+    /*
+     * The upper bound is OPTIONAL. Leaving it blank is a real pricing choice —
+     * "from 5000, depends on the work" — not an unfinished form, so an empty
+     * field is valid and publishes as "from 5,000 ֏". A value that IS typed
+     * still has to be a sane ceiling.
+     */
+    if (form.priceType === 'range' && form.priceMax !== '') {
+      if (Number(form.priceMax) < 0 || Number.isNaN(Number(form.priceMax))) e.priceMax = t('errors.invalid')
       else if (!e.price && Number(form.priceMax) <= Number(form.price)) e.priceMax = t('services.modal.priceRangeError')
     }
     if (form.duration === '' || Number(form.duration) <= 0 || Number.isNaN(Number(form.duration))) e.duration = t('errors.invalid')
@@ -180,7 +191,9 @@ export function Services() {
       nameI18n: form.nameI18n,
       priceType: form.priceType,
       price: Number(form.price),
-      priceMax: form.priceType === 'range' ? Number(form.priceMax) : null,
+      // null covers both "fixed price" and "range with no ceiling" — the two
+      // cases where there is genuinely no upper bound to store.
+      priceMax: form.priceType === 'range' && form.priceMax !== '' ? Number(form.priceMax) : null,
       hidePrice: form.hidePrice,
       duration: Number(form.duration),
       category: form.category,
@@ -293,7 +306,7 @@ export function Services() {
                       </div>
                     </div>
                     <div className={s.svcCardRight}>
-                      <span className={s.svcCardPrice}>{fmtServicePrice(svc)}</span>
+                      <span className={s.svcCardPrice}>{fmtServicePrice(svc, priceLabels)}</span>
                       <Toggle
                         checked={svc.active}
                         onChange={e => { e; handleToggleActive(svc) }}
@@ -345,7 +358,7 @@ export function Services() {
                   <Td><span className={s.duration}>{fmtDuration(svc.duration)}</span></Td>
                   <Td><span className={s.repeat}>{repeatLabel(svc.repeatEveryDays)}</span></Td>
                   <Td>
-                    <span className={s.price}>{fmtServicePrice(svc)}</span>
+                    <span className={s.price}>{fmtServicePrice(svc, priceLabels)}</span>
                     {/* Staff still see the figure — the badge says the PUBLIC
                         page does not, which is the thing that would otherwise
                         be invisible from in here. */}
@@ -421,7 +434,23 @@ export function Services() {
           ) : (
             <>
               <Input label={t('services.modal.priceFromLabel')} type="number" value={form.price} onChange={e => { setForm(f => ({ ...f, price: e.target.value })); setErrs(x => ({ ...x, price: '', priceMax: '' })) }} placeholder={t('services.modal.pricePlaceholder')} error={errs.price || undefined} />
-              <Input label={t('services.modal.priceToLabel')} type="number" value={form.priceMax} onChange={e => { setForm(f => ({ ...f, priceMax: e.target.value })); setErrs(x => ({ ...x, priceMax: '' })) }} placeholder={t('services.modal.pricePlaceholder')} error={errs.priceMax || undefined} />
+              {/* Optional on purpose: blank means "from X, no ceiling", which
+                  the public page renders as "from 5,000 ֏". The help text says
+                  so, because an empty field next to a filled one otherwise
+                  looks like something the form is still waiting for. */}
+              <Input
+                label={t('services.modal.priceToOptionalLabel')}
+                type="number"
+                value={form.priceMax}
+                onChange={e => { setForm(f => ({ ...f, priceMax: e.target.value })); setErrs(x => ({ ...x, priceMax: '' })) }}
+                placeholder={t('services.modal.priceToPlaceholder')}
+                help={form.priceMax === '' && form.price !== '' && !errs.price
+                  ? t('services.modal.priceOpenEndedHint', {
+                      price: fmtServicePrice({ price: Number(form.price), priceType: 'range', priceMax: null }, priceLabels),
+                    })
+                  : t('services.modal.priceToOptionalHint')}
+                error={errs.priceMax || undefined}
+              />
             </>
           )}
           {/*

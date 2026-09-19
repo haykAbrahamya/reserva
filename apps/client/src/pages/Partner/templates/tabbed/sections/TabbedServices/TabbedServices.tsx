@@ -130,7 +130,7 @@ export function TabbedServices({ partner, onBook }: Props) {
                   .filter(Boolean)
                   .join(' ')}
               >
-                {hasPublicPrice(sv) && <span className={s.price}>{fmtServicePrice(sv)}</span>}
+                {hasPublicPrice(sv) && <span className={s.price}>{fmtServicePrice(sv, { from: t('partner.services.priceFrom') })}</span>}
                 {bookable && (
                   <button className={s.bookBtn} onClick={() => onBook(sv.id)}>
                     <Plus size={14} /> {t('partner.services.book')}

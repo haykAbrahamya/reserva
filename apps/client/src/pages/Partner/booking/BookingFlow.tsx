@@ -866,7 +866,7 @@ function ServiceStep({ partner, selectedId, onSelect, onlyServiceIds }: {
                   on the left and the price on the right, so an empty span would
                   reserve a column for nothing. */}
               {hasPublicPrice(sv) && (
-                <span className={s.optPrice}>{fmtServicePrice(sv)}</span>
+                <span className={s.optPrice}>{fmtServicePrice(sv, { from: t('partner.services.priceFrom') })}</span>
               )}
             </button>
           ))}
@@ -938,7 +938,7 @@ function SummaryRows({ service, specialist, anySpecialist, hideSpecialist, locat
         <>
           <div className={[s.sumRow, s.sumTotal].join(' ')}>
             <span className={s.sumTotalLabel}>{t('booking.summary.total')}</span>
-            <span className={s.sumTotalValue}>{fmtServicePrice(service)}</span>
+            <span className={s.sumTotalValue}>{fmtServicePrice(service, { from: t('partner.services.priceFrom') })}</span>
           </div>
           {service.priceType === 'range' && (
             <div className={s.sumNote}>{t('booking.priceRangeNote')}</div>

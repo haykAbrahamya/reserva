@@ -283,6 +283,7 @@
       "book": "Ամրագրել",
       "min": "րոպե",
       "hour": "ժ",
+      "priceFrom": "{price}-ից",
       "searchPlaceholder": "Փնտրել ծառայություններ…",
       "seeMore": "Տեսնել ևս {count}-ը",
       "showLess": "Ցույց տալ քիչ",

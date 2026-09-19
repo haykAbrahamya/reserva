@@ -395,6 +395,7 @@
     "noMatchTitle": "No services found",
     "noMatchDesc": "No services match your search or category. Try a different term.",
     "otherCategory": "Other",
+    "priceFrom": "from {price}",
     "filter": {
       "searchPlaceholder": "Search services by name…",
       "searchCategory": "Search categories…",
@@ -421,6 +422,10 @@
       "priceTypeRange": "Price range",
       "priceFromLabel": "From (AMD)",
       "priceToLabel": "To (AMD)",
+      "priceToOptionalLabel": "To (AMD) — optional",
+      "priceToPlaceholder": "No limit",
+      "priceToOptionalHint": "Leave empty for an open-ended price with no upper limit.",
+      "priceOpenEndedHint": "Clients will see “{price}”.",
       "priceRangeError": "The upper price must be greater than the lower price",
       "pricePlaceholder": "5000",
       "durationLabel": "Duration (min)",
