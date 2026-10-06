@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from 'react'
-import { ArrowUpDown, Clock, EyeOff, Pencil, Plus, RotateCcw, Search, Sparkles, Users, Waves, X } from 'lucide-react'
+import { ArrowUpDown, Clock, EyeOff, Pencil, Plus, RotateCcw, Search, Sparkles, Tags, Users, Waves, X } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useIsAdmin } from '@/store/auth.hooks'
 import { useDebouncedValue } from '@/hooks/useDebouncedValue'
+import { useBranchPricing } from '@/hooks/useBranchPricing'
+import { ServicePricesModal } from '@/components/services/ServicePricesModal/ServicePricesModal'
 import { ReorderServicesModal } from '@/components/services/ReorderServicesModal/ReorderServicesModal'
 import { ServicesFilterBar, ALL_CATEGORIES } from './ServicesFilterBar'
 import { useResource } from '@/store/useResource'
@@ -71,6 +73,7 @@ export function Services() {
   const isAdmin     = useIsAdmin()
   const { t, tp }   = useI18n()
   const toast       = useToast()
+  const branchPricing = useBranchPricing()
   useSpotlight()
 
   // Wording for open-ended ranges ("from 5,000 ֏"). @reserva/shared holds no
@@ -121,6 +124,32 @@ export function Services() {
   // Repeat-period editor is collapsed behind a button until the user opens it
   // (or it auto-opens when editing a service that already has a period set).
   const [repeatOpen, setRepeatOpen] = useState(false)
+  // The service whose branch/specialist prices are open (branch pricing only).
+  const [pricesFor, setPricesFor] = useState<Service | null>(null)
+
+  // Branch & specialist overrides — only to mark services whose price varies.
+  const { data: pricing, reload: reloadPricing } = useResource(
+    () => (branchPricing ? partnersService.getPricing() : Promise.resolve(null)),
+    [branchPricing, result],
+    null,
+  )
+  /**
+   * Whether a service has a Prices screen. With one branch only people can be
+   * priced, so a facility service (sauna, pool — no specialist) has none: its
+   * own price IS the price, edited in the service form.
+   */
+  const singleBranch = (partner?.locationCount ?? 0) <= 1
+  const priceable = (svc: Service) => branchPricing && !(singleBranch && svc.requiresSpecialist === false)
+  /** True when a branch or a specialist sets their own price/duration, or a branch doesn't offer it. */
+  const varies = (svc: Service) =>
+    !!pricing && (
+      pricing.branches.some(r => r.serviceId === svc.id && (!r.offered || r.price != null || r.duration != null || r.capacity != null)) ||
+      pricing.specialists.some(r => r.serviceId === svc.id)
+    )
+  // Staff always see the figure, hidden on the public page or not (the badge
+  // says it is hidden there). The formatter withholds hidden prices by design,
+  // so hand it a copy without the flag.
+  const staffPrice = (svc: Service) => fmtServicePrice({ ...svc, hidePrice: false }, priceLabels)
 
   if (!partner) return null
 
@@ -306,7 +335,16 @@ export function Services() {
                       </div>
                     </div>
                     <div className={s.svcCardRight}>
-                      <span className={s.svcCardPrice}>{fmtServicePrice(svc, priceLabels)}</span>
+                      <span className={s.svcCardPrice}>{staffPrice(svc)}</span>
+                      {priceable(svc) && (
+                        <button
+                          type="button"
+                          className={[s.pricesPill, varies(svc) ? s.pricesPillOn : ''].join(' ')}
+                          onClick={e => { e.stopPropagation(); setPricesFor(svc) }}
+                        >
+                          <Tags size={11} /> {varies(svc) ? t('branchPricing.list.varies') : t('branchPricing.list.prices')}
+                        </button>
+                      )}
                       <Toggle
                         checked={svc.active}
                         onChange={e => { e; handleToggleActive(svc) }}
@@ -358,7 +396,17 @@ export function Services() {
                   <Td><span className={s.duration}>{fmtDuration(svc.duration)}</span></Td>
                   <Td><span className={s.repeat}>{repeatLabel(svc.repeatEveryDays)}</span></Td>
                   <Td>
-                    <span className={s.price}>{fmtServicePrice(svc, priceLabels)}</span>
+                    <span className={s.price}>{staffPrice(svc)}</span>
+                    {priceable(svc) && varies(svc) && (
+                      <button
+                        type="button"
+                        className={[s.pricesPill, s.pricesPillOn].join(' ')}
+                        title={t('branchPricing.list.variesHint')}
+                        onClick={() => setPricesFor(svc)}
+                      >
+                        <Tags size={11} /> {t('branchPricing.list.varies')}
+                      </button>
+                    )}
                     {/* Staff still see the figure — the badge says the PUBLIC
                         page does not, which is the thing that would otherwise
                         be invisible from in here. */}
@@ -371,9 +419,23 @@ export function Services() {
                   </Td>
                   <Td><Toggle checked={svc.active} onChange={() => handleToggleActive(svc)} /></Td>
                   <Td>
-                    <Button variant="ghost" size="sm" icon onClick={e => { e.stopPropagation(); openEdit(svc) }}>
-                      <Pencil size={13} />
-                    </Button>
+                    <div className={s.rowActions}>
+                      {priceable(svc) && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          icon
+                          title={t('branchPricing.list.pricesHint')}
+                          aria-label={t('branchPricing.list.prices')}
+                          onClick={e => { e.stopPropagation(); setPricesFor(svc) }}
+                        >
+                          <Tags size={13} />
+                        </Button>
+                      )}
+                      <Button variant="ghost" size="sm" icon onClick={e => { e.stopPropagation(); openEdit(svc) }}>
+                        <Pencil size={13} />
+                      </Button>
+                    </div>
                   </Td>
                 </Tr>
               ))}
@@ -626,6 +688,15 @@ export function Services() {
         onClose={() => setReorderOpen(false)}
         onSaved={reload}
       />
+
+      {branchPricing && (
+        <ServicePricesModal
+          open={!!pricesFor}
+          service={pricesFor}
+          onClose={() => setPricesFor(null)}
+          onSaved={reloadPricing}
+        />
+      )}
     </div>
   )
 }

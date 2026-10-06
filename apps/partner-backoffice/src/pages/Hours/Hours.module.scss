@@ -130,6 +130,42 @@
   svg { flex-shrink: 0; margin-top: 1px; }
 }
 
+/* Multi-branch specialists: one set of hours per branch */
+.branchBar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 4px 0 12px;
+  padding: 12px 14px;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  background: $bg-2;
+}
+.branchIntro {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: $fg-1;
+  svg { color: $accent; flex-shrink: 0; }
+}
+.branchNote { font-size: 12px; color: $fg-2; }
+
+/* Overlapping hours at two branches — allowed, explained */
+.overlapNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: $r-2;
+  background: $warn-soft;
+  color: $fg-1;
+  font-size: 12.5px;
+  line-height: 1.5;
+  svg { color: $warn; flex-shrink: 0; margin-top: 2px; }
+}
+
 .timeInput {
   width: 104px;
   height: 34px;

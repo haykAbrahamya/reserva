@@ -4,8 +4,8 @@ import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import { Select, BookingBadge } from '@/components/ui'
 import { useNewBooking } from '@/App'
-import { isSameDay, fmtTime, fmtAMD } from '@/utils/format'
-import { bookingsService } from '@/services/bookings.service'
+import { isSameDay, fmtTime, fmtAMD, bookingAmount, worksAt } from '@/utils/format'
+import { bookingsService, type BusyElsewhere } from '@/services/bookings.service'
 import { partnersService } from '@/services/partners.service'
 import { offBandsForDay, isBookingInAnyTimeOff } from '@/utils/timeOff'
 import { useToast } from '@/components/ui'
@@ -70,6 +70,16 @@ export function CalendarPage() {
     [],
   )
 
+  // A manager's specialists who also work at another branch: when they are
+  // booked THERE, they are not free here. Shown as grey blocks (no client data).
+  const { data: busyAway } = useResource<BusyElsewhere[]>(
+    () => (scopedLocationId
+      ? bookingsService.busyElsewhere(rangeStart.toISOString(), rangeEnd.toISOString()).catch(() => [])
+      : Promise.resolve([])),
+    [rangeKey, scopedLocationId],
+    [],
+  )
+
   // Refresh when a booking is created from the global New-Booking modal.
   useEffect(() => {
     const fn = () => reloadBookings()
@@ -84,9 +94,10 @@ export function CalendarPage() {
     setMobDay(d)
   }
 
-  // Managers only see their branch's specialists (and therefore bookings).
+  // Managers only see their branch's specialists (and therefore bookings) —
+  // including those who also work at another branch.
   const branchSpecialists = useMemo(
-    () => allSpecialists.filter(sp => !scopedLocationId || sp.locationId === scopedLocationId),
+    () => allSpecialists.filter(sp => !scopedLocationId || worksAt(sp, scopedLocationId)),
     [allSpecialists, scopedLocationId]
   )
 
@@ -96,6 +107,15 @@ export function CalendarPage() {
       : branchSpecialists.filter(sp => sp.id === filterSp),
     [branchSpecialists, filterSp]
   )
+
+  const visibleBusy = useMemo(
+    () => busyAway.filter(b => visibleSpecialists.some(sp => sp.id === b.specialistId)),
+    [busyAway, visibleSpecialists],
+  )
+  const busyLabel = (b: BusyElsewhere) => {
+    const who = allSpecialists.find(sp => sp.id === b.specialistId)?.name.split(' ')[0] ?? ''
+    return `${who ? who + ' · ' : ''}${t('branchPricing.calendar.busyAt', { branch: b.location?.name ?? '' })}`
+  }
 
   const filteredBookings = useMemo(() =>
     bookings.filter(b =>
@@ -208,6 +228,7 @@ export function CalendarPage() {
     const mobDayBks = filteredBookings
       .filter(b => isSameDay(new Date(b.startISO), mobDay))
       .sort((a, b) => a.startISO.localeCompare(b.startISO))
+    const mobDayBusy = visibleBusy.filter(b => isSameDay(new Date(b.startISO), mobDay))
 
     return (
       <div className={s.page}>
@@ -241,7 +262,13 @@ export function CalendarPage() {
 
         {/* Day booking cards */}
         <div className={s.mobDayScroll}>
-          {mobDayBks.length === 0 ? (
+          {mobDayBusy.map(b => (
+            <div key={`away-${b.id}`} className={s.mobBusyAway}>
+              <span className={s.mobEventTime}>{fmtTime(b.startISO)}–{fmtTime(b.endISO)}</span>
+              <span>{busyLabel(b)}</span>
+            </div>
+          ))}
+          {mobDayBks.length === 0 && mobDayBusy.length === 0 ? (
             <div className={s.mobEmpty}>
               <Calendar size={28} strokeWidth={1} style={{ color: 'var(--fg-3)', marginBottom: 8 }} />
               <div style={{ fontFamily: 'var(--font-serif)', fontSize: 18, color: 'var(--fg-1)' }}>{t('calendar.nothingBooked')}</div>
@@ -264,7 +291,7 @@ export function CalendarPage() {
                 <div className={s.mobEventName}>{b.clientName}</div>
                 <div className={s.mobEventSub}>
                   {b.service?.name ?? '—'} · {t('calendar.with')} {b.specialist?.name.split(' ')[0] ?? '—'}
-                  {b.service && <span> · {fmtAMD(b.service.price)}</span>}
+                  {bookingAmount(b) != null && <span> · {fmtAMD(bookingAmount(b)!)}</span>}
                 </div>
               </div>
             ))
@@ -362,6 +389,17 @@ export function CalendarPage() {
                 {isToday && nowOffset > 0 && nowOffset < colHeight && (
                   <div className={s.nowLine} style={{ top: nowOffset }} />
                 )}
+                {visibleBusy.filter(b => isSameDay(new Date(b.startISO), d)).map(b => {
+                  const st = new Date(b.startISO)
+                  const en = new Date(b.endISO)
+                  const top = (st.getHours() * 60 + st.getMinutes() - HOUR_START * 60) * PX_PER_MIN
+                  const height = Math.max(((en.getTime() - st.getTime()) / 60_000) * PX_PER_MIN, 18)
+                  return (
+                    <div key={`away-${b.id}`} className={s.busyAway} style={{ top: Math.max(top, 0), height }} title={busyLabel(b)}>
+                      {height > 22 && <span className={s.busyAwayLabel}>{busyLabel(b)}</span>}
+                    </div>
+                  )
+                })}
                 {dayBks.map(b => (
                   <CalEvent
                     key={b.id}

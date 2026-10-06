@@ -4,7 +4,7 @@ import { Plus, Calendar, X, Search } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import { Button, Table, Th, Td, Tr, BookingBadge, Avatar, Empty, Select, DateRangePicker, Pagination } from '@/components/ui'
-import { fmtAMD, fmtServicePrice, fmtDateTime, fmtDuration, fmtTime, fmtDateInput } from '@/utils/format'
+import { fmtServicePrice, fmtDateTime, fmtDuration, fmtTime, fmtDateInput, bookingPrice, bookingMinutes, worksAt } from '@/utils/format'
 import type { PriceLabels } from '@/utils/format'
 import { bookingsService } from '@/services/bookings.service'
 import { partnersService } from '@/services/partners.service'
@@ -27,11 +27,11 @@ function useIsMobile() {
 
 const STATUS_FILTERS = ['all', 'confirmed', 'pending', 'completed', 'cancelled', 'noshow'] as const
 
-/** Effective price for a booking row: the exact final price once set, otherwise
- *  the service's price (a range for range-priced services). */
+/** What a booking row cost: the exact final price once set, otherwise the price
+ *  it was booked at (a range for range-priced bookings) — never today's catalog
+ *  price, which may have changed since, or differ by branch and specialist. */
 function effectivePrice(b: Booking, labels: PriceLabels): string {
-  if (b.finalPrice != null) return fmtAMD(b.finalPrice)
-  return b.service ? fmtServicePrice(b.service, labels) : '—'
+  return fmtServicePrice(bookingPrice(b), labels) || '—'
 }
 
 export function Bookings() {
@@ -128,7 +128,7 @@ export function Bookings() {
 
   // Specialists scoped to the manager's branch (mirrors other pages).
   const branchSpecialists = specialists.filter(
-    sp => !scopedLocationId || sp.locationId === scopedLocationId
+    sp => !scopedLocationId || worksAt(sp, scopedLocationId)
   )
 
   // Group by date for mobile card list
@@ -245,7 +245,7 @@ export function Bookings() {
                     <div className={s.cardMeta}>
                       <div style={{ minWidth: 0 }}>
                         <div className={s.cardSvc}>{b.service?.name ?? '—'}</div>
-                        <div className={s.cardSpec}>{b.specialist?.name ?? '—'}{b.service ? ` · ${fmtDuration(b.service.duration)}` : ''}</div>
+                        <div className={s.cardSpec}>{b.specialist?.name ?? '—'} · {fmtDuration(bookingMinutes(b))}</div>
                       </div>
                       {b.service && <div className={s.cardPrice}>{effectivePrice(b, priceLabels)}</div>}
                     </div>
@@ -295,7 +295,7 @@ export function Bookings() {
                     </Td>
                     <Td>
                       <div className={s.svcName}>{b.service?.name ?? '—'}</div>
-                      {b.service && <div className={s.svcDur}>{fmtDuration(b.service.duration)}</div>}
+                      <div className={s.svcDur}>{fmtDuration(bookingMinutes(b))}</div>
                     </Td>
                     <Td><span className={s.specialistName}>{b.specialist?.name ?? '—'}</span></Td>
                     <Td style={{ whiteSpace: 'nowrap' }}>{fmtDateTime(b.startISO)}</Td>

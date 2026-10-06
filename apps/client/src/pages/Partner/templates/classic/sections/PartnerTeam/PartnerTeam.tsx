@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { MapPin } from 'lucide-react'
-import { initials } from '@reserva/shared'
+import { initials, specialistBranchIds, worksAt } from '@reserva/shared'
 import type { Specialist } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
@@ -28,13 +28,26 @@ export function PartnerTeam({ partner, onSelect, tone = 'plain' }: Props) {
   // count so a visitor sees where the team is before clicking.
   const locationTabs = useMemo(() => {
     const counts = new Map<string, number>()
-    for (const sp of team) counts.set(sp.locationId, (counts.get(sp.locationId) ?? 0) + 1)
+    // A specialist who works at several branches counts at each of them.
+    for (const sp of team) {
+      for (const id of specialistBranchIds(sp)) counts.set(id, (counts.get(id) ?? 0) + 1)
+    }
     return partner.locations
       .filter(l => counts.has(l.id))
       .map(l => ({ id: l.id, name: loc(l.name, l.nameI18n), count: counts.get(l.id)! }))
   }, [team, partner.locations, loc])
 
   const showFilter = locationTabs.length > 1
+  const hasRating = (sp: Specialist) => (sp.rating ?? 0) > 0 && (sp.reviewCount ?? 0) > 0
+  /** On a multi-branch team every card says where that person works. */
+  const branchesOf = (sp: Specialist): string =>
+    showFilter
+      ? specialistBranchIds(sp)
+          .map(id => partner.locations.find(l => l.id === id))
+          .filter(Boolean)
+          .map(l => loc(l!.name, l!.nameI18n))
+          .join(' · ')
+      : ''
 
   // Default to the FIRST branch (not "All") so the section opens compact when a
   // team spans many locations — the whole point of the filter. "All" is still
@@ -45,7 +58,7 @@ export function PartnerTeam({ partner, onSelect, tone = 'plain' }: Props) {
   )
   // Guard: if the active branch has no members (shouldn't happen), fall back to All.
   const visibleTeam = useMemo(
-    () => (activeLoc === ALL ? team : team.filter(sp => sp.locationId === activeLoc)),
+    () => (activeLoc === ALL ? team : team.filter(sp => worksAt(sp, activeLoc))),
     [team, activeLoc],
   )
 
@@ -108,17 +121,30 @@ export function PartnerTeam({ partner, onSelect, tone = 'plain' }: Props) {
                 </div>
                 <div className={s.spName}>{loc(sp.name, sp.nameI18n)}</div>
                 <div className={s.spTitle}>{loc(sp.title, sp.titleI18n)}</div>
-                {/* Real rating only — never fabricated. */}
-                {(sp.rating ?? 0) > 0 && (sp.reviewCount ?? 0) > 0 && (
-                  <StarRatingDisplay
-                    className={s.spRating}
-                    value={sp.rating!}
-                    count={sp.reviewCount!}
-                    compact
-                  />
+                {/* Rating, then where they work — each on its own line. */}
+                {(hasRating(sp) || branchesOf(sp)) && (
+                  <div className={s.spMeta}>
+                    {/* Real rating only — never fabricated. */}
+                    {hasRating(sp) && (
+                      <StarRatingDisplay
+                        className={s.spRating}
+                        value={sp.rating!}
+                        count={sp.reviewCount!}
+                        compact
+                      />
+                    )}
+                    {branchesOf(sp) && (
+                      <div className={s.spBranches}>
+                        <MapPin size={12} />
+                        <span>{branchesOf(sp)}</span>
+                      </div>
+                    )}
+                  </div>
                 )}
+                {/* Takes the spare height, so the footer lines up across a row. */}
+                <span className={s.spacer} aria-hidden />
                 <div className={s.spServices}>
-                  {tp('partner.team.serviceCount', sp.services.length)}
+                  {tp('partner.team.serviceCount', sp.services.filter(id => partner.services.some(sv => sv.id === id && sv.active)).length)}
                 </div>
                 <span className={s.viewHint}>{t('partner.team.viewProfile')}</span>
               </button>

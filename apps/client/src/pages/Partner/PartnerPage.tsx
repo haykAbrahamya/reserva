@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { getPartnerBySlug } from '@/services/booking.service'
+import { getPartnerBySlug, offersFor, priceSpanFor } from '@/services/booking.service'
 import { useTenantSlug } from '@/hooks/useTenantSlug'
 import { useAppSelector } from '@/store/hooks'
 import type { PublicPartner } from '@/mock/partners'
@@ -49,6 +49,8 @@ export function PartnerPage() {
   const [bookingOpen, setBookingOpen] = useState(false)
   const [seedServiceId, setSeedServiceId] = useState<string | null>(null)
   const [seedSpecialistId, setSeedSpecialistId] = useState<string | null>(null)
+  // The branch a "Book" came from (a branch card, or the services list's branch).
+  const [seedLocationId, setSeedLocationId] = useState<string | null>(null)
 
   // Specialist detail popup.
   const [activeSpecialist, setActiveSpecialist] = useState<Specialist | null>(null)
@@ -137,9 +139,11 @@ export function PartnerPage() {
                * it can end up quoted in a search result. Published prices only.
                */
               ...(() => {
+                // Every price a client could actually pay — across branches and
+                // specialists, not just each service's default.
                 const prices = (partner.services ?? [])
                   .filter((sv) => sv.active && !sv.hidePrice)
-                  .map((sv) => sv.price)
+                  .flatMap((sv) => offersFor(partner, sv, null).flatMap((o) => [o.price, o.priceMax]))
                   .filter((price): price is number => price != null)
                 return prices.length
                   ? { priceRange: `${Math.min(...prices)}–${Math.max(...prices)} AMD` }
@@ -155,9 +159,12 @@ export function PartnerPage() {
                   // The service is still offered — it just has no published
                   // price. An Offer without one is valid; an Offer with a price
                   // the page refuses to show is a contradiction.
-                  ...(sv.hidePrice || sv.price == null
-                    ? {}
-                    : { price: sv.price, priceCurrency: 'AMD' }),
+                  ...(() => {
+                    if (sv.hidePrice || sv.price == null) return {}
+                    // The lowest price anyone pays for it ("from").
+                    const from = priceSpanFor(partner, sv, null).price
+                    return from == null ? {} : { price: from, priceCurrency: 'AMD' }
+                  })(),
                 })),
             },
             {
@@ -173,15 +180,17 @@ export function PartnerPage() {
       : undefined,
   })
 
-  const openBooking = useCallback((serviceId?: string) => {
+  const openBooking = useCallback((serviceId?: string, locationId?: string) => {
     setSeedServiceId(serviceId ?? null)
     setSeedSpecialistId(null)
+    setSeedLocationId(locationId ?? null)
     setBookingOpen(true)
   }, [])
 
-  const bookWithSpecialist = useCallback((specialistId: string) => {
+  const bookWithSpecialist = useCallback((specialistId: string, locationId?: string) => {
     setSeedServiceId(null)
     setSeedSpecialistId(specialistId)
+    setSeedLocationId(locationId ?? null)
     setBookingOpen(true)
   }, [])
 
@@ -231,6 +240,7 @@ export function PartnerPage() {
           partner={partner}
           seedServiceId={seedServiceId}
           seedSpecialistId={seedSpecialistId}
+          seedLocationId={seedLocationId}
           onClose={() => setBookingOpen(false)}
         />
       )}

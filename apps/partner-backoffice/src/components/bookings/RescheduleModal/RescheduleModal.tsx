@@ -4,7 +4,8 @@ import { Modal, Button, DatePicker, useToast } from '@/components/ui'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import { bookingsService } from '@/services/bookings.service'
-import { fmtDateInput, fmtDateTime } from '@/utils/format'
+import { fmtDateInput, fmtDateTime, bookingMinutes } from '@/utils/format'
+import { errorMessage } from '@/utils/errors'
 import { useT, useDateLocale, useDatePickerLabels } from '@/i18n'
 import type { Booking } from '@/types'
 import s from './RescheduleModal.module.scss'
@@ -66,16 +67,22 @@ export function RescheduleModal({ booking, onClose, onDone }: Props) {
     const [h, m] = time.split(':').map(Number)
     const newStart = new Date(`${date}T00:00:00`)
     newStart.setHours(h, m, 0, 0)
-    const newEnd = new Date(newStart.getTime() + svc.duration * 60_000)
+    // A moved booking keeps its own length (the server does the same).
+    const newEnd = new Date(newStart.getTime() + bookingMinutes(booking) * 60_000)
 
-    const updated = await bookingsService.update(booking.id, {
-      startISO: newStart.toISOString(),
-      endISO: newEnd.toISOString(),
-    })
-    setSaving(false)
-    toast(t('reschedule.movedToast', { datetime: fmtDateTime(updated.startISO) }))
-    onDone?.()
-    onClose()
+    try {
+      const updated = await bookingsService.update(booking.id, {
+        startISO: newStart.toISOString(),
+        endISO: newEnd.toISOString(),
+      })
+      toast(t('reschedule.movedToast', { datetime: fmtDateTime(updated.startISO) }))
+      onDone?.()
+      onClose()
+    } catch (err) {
+      toast(errorMessage(err, t))
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -145,7 +152,7 @@ export function RescheduleModal({ booking, onClose, onDone }: Props) {
                 date: new Date(date).toLocaleDateString(dateLocale, { weekday: 'long', day: 'numeric', month: 'long' }),
                 time,
                 service: svc.name,
-                duration: svc.duration,
+                duration: bookingMinutes(booking),
               })}
             </span>
           </div>

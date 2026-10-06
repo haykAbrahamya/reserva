@@ -99,10 +99,14 @@
 /* Reveal wrapper — no box styling, just lays out the button. */
 .card { display: flex; }
 
+/* A flex column, top-aligned: a <button> otherwise centres its content
+   vertically, so a card with one line less sat lower than its neighbours. */
 .cardBtn {
   position: relative;
   flex: 1;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
   background: $bg-1;
   border: 1px solid $line-1;
@@ -155,10 +159,20 @@
   letter-spacing: -0.01em;
 }
 .spTitle { font-size: 13px; color: $fg-2; }
-.spRating { margin-top: 8px; justify-content: center; }
+/* Rating and branches stack — side by side they ran into each other. */
+.spMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+.spRating { justify-content: center; }
+
+.spacer { flex: 1 0 12px; }
 
 .spServices {
-  margin-top: 12px;
+  align-self: stretch; /* the divider spans the card, not just the text */
   padding-top: 12px;
   border-top: 1px solid $line-1;
   font-size: 12px;
@@ -180,3 +194,17 @@
 }
 
 .plain { background: var(--bg-1); }
+
+/* Works at several branches: where (shown only on multi-branch teams). */
+.spBranches {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  max-width: 100%;
+  font-size: 12px;
+  font-weight: 500;
+  color: $accent-contrast;
+  svg { flex-shrink: 0; }
+  span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}

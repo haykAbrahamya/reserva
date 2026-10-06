@@ -5,7 +5,7 @@ import { useResource } from '@/store/useResource'
 import { Button, Avatar, BookingBadge, Modal, Input } from '@/components/ui'
 import { useToast } from '@/components/ui'
 import { bookingsService } from '@/services/bookings.service'
-import { fmtAMD, fmtServicePrice, fmtDateTime, fmtDuration } from '@/utils/format'
+import { fmtAMD, fmtServicePrice, fmtDateTime, fmtDuration, bookingMinutes, bookingPriceType } from '@/utils/format'
 import { useT } from '@/i18n'
 import type { BookingStatus } from '@/types'
 import { RescheduleModal } from '../RescheduleModal/RescheduleModal'
@@ -122,7 +122,13 @@ export function BookingDrawer({ bookingId, onClose, sheet, onChanged }: Props) {
   const sp  = booking.specialist
   const loc = booking.location
 
-  const isRange = svc?.priceType === 'range'
+  // The booking's OWN price and type — what it was booked at, whatever the
+  // catalog says today (prices may since have changed, or differ by branch and
+  // specialist). Older bookings without a recorded type use the service's.
+  const isRange = bookingPriceType(booking) === 'range'
+  const booked = booking.priceAtBooking != null
+    ? { price: booking.priceAtBooking, priceType: bookingPriceType(booking), priceMax: booking.priceMaxAtBooking ?? null }
+    : { price: svc?.price ?? null, priceType: svc?.priceType ?? 'fixed' as const, priceMax: svc?.priceMax ?? null }
 
   const statusToast = (status: BookingStatus) =>
     toast(t('bookingDrawer.statusToast', { status: t(`status.${status}`).toLowerCase() }))
@@ -206,7 +212,7 @@ export function BookingDrawer({ bookingId, onClose, sheet, onChanged }: Props) {
         <div className={s.section}>
           <div className={s.label}>{t('bookingDrawer.service')}</div>
           <div className={s.value}>{svc.name}</div>
-          <div className={s.sub}>{fmtDuration(svc.duration)} · {fmtServicePrice(svc, { from: t('services.priceFrom') })}</div>
+          <div className={s.sub}>{fmtDuration(bookingMinutes(booking))} · {fmtServicePrice(booked, { from: t('services.priceFrom') })}</div>
         </div>
       )}
 
@@ -271,7 +277,7 @@ export function BookingDrawer({ bookingId, onClose, sheet, onChanged }: Props) {
 
   const finalPriceModal = priceModal && svc && (
     <FinalPriceModal
-      rangeHint={fmtServicePrice(svc, { from: t('services.priceFrom') })}
+      rangeHint={fmtServicePrice(booked, { from: t('services.priceFrom') })}
       initial={booking.finalPrice ?? booking.priceAtBooking ?? svc.price}
       saveLabelKey={priceModal === 'complete' ? 'bookingDrawer.completeAndSave' : 'bookingDrawer.saveFinalPrice'}
       onCancel={() => setPriceModal(null)}

@@ -154,7 +154,9 @@
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  margin: 1px 8px;
+  /* 3px between items (vertical margins collapse): a hovered item never butts
+     up against the selected one, whose shadow ate the old 1px gap. */
+  margin: 3px 8px;
   border-radius: 6px;
   font-size: 13px;
   font-weight: 500;

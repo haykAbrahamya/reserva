@@ -6,7 +6,7 @@ import { bookingsService } from '@/services/bookings.service'
 import { partnersService } from '@/services/partners.service'
 import { BookingBadge } from '@/components/ui'
 import { SpecialistReviews } from '@/components/specialists/SpecialistReviews/SpecialistReviews'
-import { fmtAMD, fmtTime, fmtDateShort, initials } from '@/utils/format'
+import { fmtAMD, fmtTime, fmtDateShort, initials, bookingAmount, specialistBranchIds } from '@/utils/format'
 import { useT } from '@/i18n'
 import type { Specialist } from '@/types'
 import s from './SpecialistDashboard.module.scss'
@@ -64,7 +64,11 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
     return () => { document.removeEventListener('keydown', fn); document.body.style.overflow = '' }
   }, [handleClose])
 
-  const loc = locations.find(l => l.id === sp.locationId)
+  // Every branch they work at, home first ("Kentron · Komitas").
+  const branchLabel = specialistBranchIds(sp)
+    .map(id => locations.find(l => l.id === id)?.name)
+    .filter(Boolean)
+    .join(' · ')
 
   // ── Stats ── (bookings already scoped to this specialist) ──
   const spBookings = bookings
@@ -78,7 +82,7 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
   const totalRevenue = useMemo(() =>
     spBookings
       .filter(b => b.status === 'completed')
-      .reduce((sum, b) => sum + (b.finalPrice ?? b.priceAtBooking ?? b.service?.price ?? 0), 0),
+      .reduce((sum, b) => sum + (bookingAmount(b) ?? 0), 0),
     [spBookings]
   )
 
@@ -108,7 +112,7 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
       const daysAgo = (now - new Date(b.startISO).getTime()) / 86_400_000
       const weekIdx = Math.floor(daysAgo / 7)
       if (weekIdx < 7) {
-        weeks[6 - weekIdx] += b.finalPrice ?? b.priceAtBooking ?? b.service?.price ?? 0
+        weeks[6 - weekIdx] += bookingAmount(b) ?? 0
       }
     })
     return weeks
@@ -152,9 +156,9 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'currentColor' }} />
                 {sp.active ? t('common.active') : t('common.inactive')}
               </span>
-              {loc && (
+              {branchLabel && (
                 <span className={s.heroBadge}>
-                  <MapPin size={10} /> {loc.name}
+                  <MapPin size={10} /> {branchLabel}
                 </span>
               )}
               {sp.phone && (
@@ -261,7 +265,7 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
           </div>
           <div className={s.infoRow}>
             <span className={s.infoLabel}>{t('specialistDashboard.location')}</span>
-            <span className={s.infoValue}>{loc?.name ?? '—'}</span>
+            <span className={s.infoValue}>{branchLabel || '—'}</span>
           </div>
           <div className={s.infoRow}>
             <span className={s.infoLabel}>{t('specialistDashboard.phone')}</span>
@@ -304,7 +308,7 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
                     <div className={s.bkClient}>{b.clientName}</div>
                     <div className={s.bkSvc}>{fmtDateShort(b.startISO)}{b.service ? ` · ${b.service.name}` : ''}</div>
                   </div>
-                  {b.service && <div className={s.bkPrice}>{fmtAMD(b.service.price)}</div>}
+                  {bookingAmount(b) != null && <div className={s.bkPrice}>{fmtAMD(bookingAmount(b)!)}</div>}
                   <BookingBadge status={b.status} />
                 </div>
             ))

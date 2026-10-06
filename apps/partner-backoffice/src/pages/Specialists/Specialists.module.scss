@@ -228,6 +228,33 @@
 .formFull { grid-column: span 2; }
 .avatarRow { margin-bottom: 2px; }
 
+/* "Works at": every branch the specialist takes clients at (multi-branch only) */
+.worksAt {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  background: $bg-2;
+}
+.worksAtHead { display: flex; flex-direction: column; gap: 3px; }
+.fieldLabel { font-size: 12px; font-weight: 600; color: $fg-0; }
+.fieldHint { font-size: 12px; color: $fg-2; line-height: 1.45; }
+.branchChips { display: flex; flex-wrap: wrap; gap: 8px; }
+.mainBranch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed $line-2;
+  flex-wrap: wrap;
+}
+.mainBranchText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mainBranchSelect { min-width: 200px; flex: 0 1 240px; }
+.fieldNote { margin: 0; font-size: 12px; color: $fg-2; }
+
 @media (max-width: 768px) {
   .page { padding: 16px; }
   .h1   { font-size: 26px; }

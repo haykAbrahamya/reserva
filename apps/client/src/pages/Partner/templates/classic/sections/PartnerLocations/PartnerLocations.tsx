@@ -1,4 +1,5 @@
 import { MapPin, Phone, CalendarCheck, Clock, Users, Navigation } from 'lucide-react'
+import { worksAt } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { useI18n, useLocalized } from '@/i18n'
@@ -8,7 +9,8 @@ import s from './PartnerLocations.module.scss'
 
 interface Props {
   partner: PublicPartner
-  onBook: () => void
+  /** Open the booking flow at this branch. */
+  onBook: (locationId: string) => void
   tone?: 'cream' | 'plain'
 }
 
@@ -57,7 +59,7 @@ export function PartnerLocations({ partner, onBook, tone = 'cream' }: Props) {
 
         <div className={s.grid}>
           {bookable.map((loc, i) => {
-            const staffHere = partner.specialists.filter(sp => sp.active && sp.locationId === loc.id).length
+            const staffHere = partner.specialists.filter(sp => sp.active && worksAt(sp, loc.id)).length
             const hours = summarizeHours(loc.hours, t('partner.locations.closed'), {
               mon: t('partner.locations.days.mon'),
               tue: t('partner.locations.days.tue'),
@@ -109,7 +111,7 @@ export function PartnerLocations({ partner, onBook, tone = 'cream' }: Props) {
 
                   <div className={s.actions}>
                     {canBook(partner) && (
-                      <button className={s.bookBtn} onClick={onBook}>
+                      <button className={s.bookBtn} onClick={() => onBook(loc.id)}>
                         <CalendarCheck size={15} /> {t('partner.locations.bookHere')}
                       </button>
                     )}

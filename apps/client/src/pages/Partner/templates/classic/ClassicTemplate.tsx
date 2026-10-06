@@ -42,7 +42,7 @@ export function ClassicTemplate({ partner, onBook, onOpenSpecialist }: TemplateP
           <>
             <PartnerServices partner={partner} onBook={onBook} tone={tone()} />
             <PartnerAbout partner={partner} tone={tone()} />
-            <PartnerLocations partner={partner} onBook={() => onBook()} tone={tone()} />
+            <PartnerLocations partner={partner} onBook={(locationId) => onBook(undefined, locationId)} tone={tone()} />
             {showTeam && <PartnerTeam partner={partner} onSelect={onOpenSpecialist} tone={tone()} />}
             {showCourses && <PartnerCourses partner={partner} tone={tone()} />}
             {showGallery && <PartnerGallery partner={partner} variant="gallery" tone={tone()} />}

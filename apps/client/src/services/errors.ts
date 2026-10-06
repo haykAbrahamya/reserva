@@ -24,6 +24,8 @@ const KNOWN_CODES = new Set([
   'COURSE_FULL',
   'ENROLLMENT_CLOSED',
   'ALREADY_ENROLLED',
+  'PRICE_CHANGED',
+  'SPECIALIST_NOT_AT_LOCATION',
 ])
 
 /** The i18n key for a given backend error code (or the generic fallback). */

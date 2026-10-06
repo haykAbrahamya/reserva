@@ -116,7 +116,7 @@ export function TabbedTemplate({ partner, onBook }: TemplateProps) {
               ['courses', <TabbedCourses key="c" partner={partner} />],
               ['reviews', <TabbedReviews key="r" partner={partner} />],
               ['gallery', <TabbedGallery key="g" partner={partner} />],
-              ['branches', <TabbedBranches key="b" partner={partner} onBook={() => onBook()} />],
+              ['branches', <TabbedBranches key="b" partner={partner} onBook={(locationId) => onBook(undefined, locationId)} />],
             ] as const).map(([key, node]) => {
               const isActive = active === key
               return (

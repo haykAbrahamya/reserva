@@ -360,3 +360,31 @@
   white-space: nowrap;
   vertical-align: middle;
 }
+
+/* Branch & specialist pricing: "Prices" / "Varies" pill and row actions */
+.pricesPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border: 1px solid $line-2;
+  border-radius: 999px;
+  background: $bg-1;
+  color: $fg-2;
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  &:hover { color: $fg-0; border-color: $line-strong; }
+}
+.pricesPillOn {
+  background: $info-soft;
+  border-color: $info;
+  color: $info;
+  &:hover { color: $info; border-color: $info; }
+}
+.rowActions { display: inline-flex; align-items: center; gap: 2px; }

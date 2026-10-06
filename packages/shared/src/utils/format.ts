@@ -141,6 +141,20 @@ export function fmtDuration(minutes: number, labels: DurationLabels = { min: 'mi
   return m > 0 ? `${h}${labels.h} ${m}${labels.min}` : `${h}${labels.h}`
 }
 
+/**
+ * A duration that differs between specialists: "30–45 min", or
+ * "45 min – 1h 15min" across the hour. A single value when they agree.
+ */
+export function fmtDurationSpan(
+  min: number,
+  max: number,
+  labels: DurationLabels = { min: 'min', h: 'h' },
+): string {
+  if (min === max) return fmtDuration(min, labels)
+  if (max < 60) return `${min}–${max} ${labels.min}`
+  return `${fmtDuration(min, labels)} – ${fmtDuration(max, labels)}`
+}
+
 export function initials(name: string): string {
   return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
 }

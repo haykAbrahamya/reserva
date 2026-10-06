@@ -1,4 +1,5 @@
-import type { Booking, Service, Specialist, LocalizedText } from '@reserva/shared'
+import type { Booking, Service, Specialist, LocalizedText, SpecialistPrice, ServicePriceType } from '@reserva/shared'
+import { PriceBook, spanOf, worksAt, type Offer, type OfferSpan } from '@reserva/shared'
 import type { PublicPartner, PartnerPresentation, PublicCourse } from '@/mock/partners'
 
 /** Raw course shape from the API (cover url is a server path resolved below). */
@@ -73,6 +74,8 @@ interface ApiPartner {
   locations: PublicPartner['locations']
   services: Service[]
   specialists: ApiSpecialist[]
+  /** Specialists' own prices per branch (sparse; absent on older APIs). */
+  specialistPrices?: SpecialistPrice[]
   courses?: ApiCourse[]
   presentation: {
     tagline: string
@@ -128,6 +131,7 @@ function toPublicPartner(p: ApiPartner): PublicPartner {
     locations: p.locations,
     services: p.services.map((sv) => ({ ...sv, priceType: sv.priceType, priceMax: sv.priceMax })),
     specialists: p.specialists.map(({ serviceIds, ...rest }) => ({ ...rest, services: serviceIds })),
+    specialistPrices: p.specialistPrices ?? [],
     courses: (p.courses ?? []).map(toPublicCourse),
     presentation,
   }
@@ -158,31 +162,125 @@ export async function getPartnerBySlug(slug: string): Promise<PublicPartner | nu
   }
 }
 
-// ── Pure helpers (operate on the loaded partner; unchanged) ──
+// ── Pure helpers (operate on the loaded partner) ──
+//
+// Branches & prices: a specialist can work at several branches, and a service's
+// price/duration can differ per branch and per specialist. The partner payload
+// carries the (sparse) overrides; `PriceBook` resolves them with the same rule
+// the server applies — own price at the branch → branch price → service default.
 
+const priceBooks = new WeakMap<PublicPartner, PriceBook>()
+
+/** The partner's price overrides, indexed once per loaded partner. */
+export function priceBookOf(partner: PublicPartner): PriceBook {
+  let book = priceBooks.get(partner)
+  if (!book) {
+    book = PriceBook.fromPartner(partner)
+    priceBooks.set(partner, book)
+  }
+  return book
+}
+
+/**
+ * Active specialists who can do the service — at the given branch (they work
+ * there and the branch offers it), or anywhere when no branch is given.
+ */
 export function specialistsForService(
   partner: PublicPartner,
   serviceId: string,
   locationId?: string | null,
 ): Specialist[] {
+  const book = priceBookOf(partner)
+  if (locationId && !book.offered(locationId, serviceId)) return []
   return partner.specialists.filter(
     (sp) =>
       sp.active &&
       sp.services.includes(serviceId) &&
-      (!locationId || sp.locationId === locationId),
+      (!locationId || worksAt(sp, locationId)),
   )
 }
 
 /**
- * Branches that are actually bookable: a location is functional only when it has
- * at least one ACTIVE specialist (otherwise nothing can be booked there). Used
- * everywhere the public page lists or COUNTS locations, so the hero count, the
- * About facts, the Locations section and the booking flow all agree.
+ * Branches that are actually bookable: a location is functional only when at
+ * least one ACTIVE specialist works there (otherwise nothing can be booked
+ * there). Used everywhere the public page lists or COUNTS locations, so the
+ * hero count, the About facts, the Locations section and the booking flow all
+ * agree.
  */
 export function bookableLocations(partner: PublicPartner): PublicPartner['locations'] {
   return partner.locations.filter((loc) =>
-    partner.specialists.some((sp) => sp.active && sp.locationId === loc.id),
+    partner.specialists.some((sp) => sp.active && worksAt(sp, loc.id)),
   )
+}
+
+/**
+ * Can the service be booked at this branch? The branch must offer it, and a
+ * person-based service needs someone there who does it.
+ */
+export function bookableAt(partner: PublicPartner, service: Service, locationId: string): boolean {
+  if (!priceBookOf(partner).offered(locationId, service.id)) return false
+  if (service.requiresSpecialist === false) return true
+  return partner.specialists.some(
+    (sp) => sp.active && sp.services.includes(service.id) && worksAt(sp, locationId),
+  )
+}
+
+/** Bookable branches where the service can be booked. */
+export function branchesForService(partner: PublicPartner, service: Service): PublicPartner['locations'] {
+  return bookableLocations(partner).filter((l) => bookableAt(partner, service, l.id))
+}
+
+/**
+ * Everything a client could pay for a service: one offer per specialist who
+ * does it (at the branch, or at every bookable branch when `locationId` is
+ * null). Falls back to the branch/service price when nobody is linked yet, so a
+ * menu-only service still shows its price exactly as before.
+ */
+export function offersFor(partner: PublicPartner, service: Service, locationId: string | null): Offer[] {
+  const book = priceBookOf(partner)
+  const branches = locationId ? [locationId] : bookableLocations(partner).map((l) => l.id)
+  const out: Offer[] = []
+  for (const l of branches) {
+    if (!book.offered(l, service.id)) continue
+    if (service.requiresSpecialist === false) {
+      out.push(book.offer(service, l))
+      continue
+    }
+    const staff = partner.specialists.filter(
+      (sp) => sp.active && sp.services.includes(service.id) && worksAt(sp, l),
+    )
+    if (staff.length === 0) out.push(book.offer(service, l))
+    else for (const sp of staff) out.push(book.offer(service, l, sp.id))
+  }
+  return out.length ? out : [book.offer(service, locationId ?? '')]
+}
+
+/** The displayable price + duration span of a service (at a branch, or overall). */
+export function priceSpanFor(partner: PublicPartner, service: Service, locationId: string | null): OfferSpan {
+  return spanOf(offersFor(partner, service, locationId))!
+}
+
+/**
+ * Whether choosing a branch changes anything the visitor sees in the services
+ * list: some service is bookable at one branch and not another, or costs /
+ * takes a different amount at each. Without any difference a branch switcher
+ * would be noise, so the list stays exactly as it always was.
+ */
+export function branchesDiffer(partner: PublicPartner): boolean {
+  const branches = bookableLocations(partner)
+  if (branches.length < 2) return false
+  for (const sv of partner.services) {
+    if (!sv.active) continue
+    let first: string | null = null
+    for (const l of branches) {
+      const key = bookableAt(partner, sv, l.id)
+        ? JSON.stringify((({ price, priceMax, priceType, durationMin, durationMax }) => ({ price, priceMax, priceType, durationMin, durationMax }))(priceSpanFor(partner, sv, l.id)))
+        : 'none'
+      if (first === null) first = key
+      else if (key !== first) return true
+    }
+  }
+  return false
 }
 
 export function servicesForSpecialist(partner: PublicPartner, specialist: Specialist): Service[] {
@@ -221,6 +319,32 @@ export async function getAvailableSlots(q: SlotQuery): Promise<string[]> {
   if (q.specialistId) params.set('specialistId', q.specialistId)
   if (q.locationId) params.set('locationId', q.locationId)
   return api<string[]>(`/public/partners/${q.partner.slug}/slots?${params.toString()}`)
+}
+
+/**
+ * A start time for "any available", with who would be booked and their price —
+ * shown before the client confirms. Null price = the salon hides it.
+ */
+export interface SlotOption {
+  time: string
+  specialistId: string
+  locationId: string
+  priceType: ServicePriceType
+  price: number | null
+  priceMax: number | null
+  duration: number
+}
+
+/** "Any available" times with their assignment. Older APIs lack the route → null. */
+export async function getSlotOptions(q: SlotQuery): Promise<SlotOption[] | null> {
+  const params = new URLSearchParams({ serviceId: q.service.id, date: q.date })
+  if (q.locationId) params.set('locationId', q.locationId)
+  try {
+    return await api<SlotOption[]>(`/public/partners/${q.partner.slug}/slot-options?${params.toString()}`)
+  } catch (e) {
+    if (e instanceof BookingApiError && e.code === 'NOT_FOUND') return null
+    throw e
+  }
 }
 
 /** One day's availability signal for the booking day-strip. */
@@ -263,6 +387,10 @@ export interface CreateBookingInput {
   notes?: string
   /** UI language the booking was made in, for localized reminders. */
   locale?: string
+  /** The price the client was shown; the booking is refused (PRICE_CHANGED) if it differs. */
+  expectedPrice?: number | null
+  /** "Any available": the specialist the page previewed for this time (tried first). */
+  preferredSpecialistId?: string | null
 }
 
 export async function createBooking(input: CreateBookingInput): Promise<Booking> {
@@ -276,6 +404,8 @@ export async function createBooking(input: CreateBookingInput): Promise<Booking>
     clientPhone: input.clientPhone,
     notes: input.notes,
     locale: input.locale,
+    ...(input.expectedPrice != null ? { expectedPrice: input.expectedPrice } : {}),
+    ...(input.preferredSpecialistId ? { preferredSpecialistId: input.preferredSpecialistId } : {}),
   }
   const b = await api<{
     id: string
@@ -289,6 +419,9 @@ export async function createBooking(input: CreateBookingInput): Promise<Booking>
     endAt: string
     status: Booking['status']
     notes?: string | null
+    priceAtBooking?: number
+    priceMaxAtBooking?: number | null
+    priceTypeAtBooking?: ServicePriceType | null
   }>(`/public/partners/${input.partner.slug}/bookings`, {
     method: 'POST',
     body: JSON.stringify(body),
@@ -305,6 +438,10 @@ export async function createBooking(input: CreateBookingInput): Promise<Booking>
     endISO: b.endAt,
     status: b.status,
     notes: b.notes ?? undefined,
+    // What it was booked at — shown on the success screen.
+    priceAtBooking: b.priceAtBooking,
+    priceMaxAtBooking: b.priceMaxAtBooking ?? null,
+    priceTypeAtBooking: b.priceTypeAtBooking ?? null,
   }
 }
 

@@ -141,8 +141,12 @@ export function useProfileCompletion(): ProfileCompletion {
         // null personal schedule falls back to location hours).
         const locHours = new Map(locations.map((l) => [l.id, l.hours]))
         const hasLinkedService = specialists.some((sp) => sp.services.length > 0)
-        const hasAvailability = specialists.some(
-          (sp) => hasEnabledDay(sp.schedule) || hasEnabledDay(locHours.get(sp.locationId)),
+        // Any branch a specialist works at counts: their hours there, or that
+        // branch's own hours when they have none.
+        const hasAvailability = specialists.some((sp) =>
+          (sp.locations?.length ? sp.locations : [{ locationId: sp.locationId, schedule: sp.schedule }]).some(
+            (b) => hasEnabledDay(b.schedule) || hasEnabledDay(locHours.get(b.locationId)),
+          ),
         )
         setCounts({
           hasLocation: locations.length > 0,

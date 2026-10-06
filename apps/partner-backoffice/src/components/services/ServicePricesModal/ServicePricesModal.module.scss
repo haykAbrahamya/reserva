@@ -1,0 +1,188 @@
+@use 'variables' as *;
+
+.wrap { display: flex; flex-direction: column; gap: 14px; }
+
+/* ── Defaults + order of precedence ── */
+.defaults {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 18px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  border-radius: $r-2;
+  background: $bg-2;
+  border: 1px solid $line-1;
+}
+.defaultsMain { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.defaultsLabel { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: $fg-2; }
+.defaultsValue { font-family: $font-mono; font-size: 14px; font-weight: 500; color: $fg-0; }
+
+.order { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.arrow { color: $fg-3; font-size: 13px; }
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: $bg-1;
+  border: 1px solid $line-2;
+  color: $fg-1;
+  white-space: nowrap;
+}
+.tagOwn { background: $accent-soft; border-color: $accent; color: $accent-contrast; }
+.tagBranch { background: $info-soft; border-color: $info; color: $info; }
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: $fg-1;
+  svg { flex-shrink: 0; margin-top: 2px; color: $fg-2; }
+}
+
+.loading { padding: 28px 0; text-align: center; font-size: 13px; color: $fg-2; }
+
+/* ── One branch ── */
+.branch {
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  background: $bg-1;
+  overflow: hidden;
+}
+.branchHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 14px;
+  border-bottom: 1px solid $line-1;
+  background: $bg-2;
+}
+.branchName {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: $fg-0;
+  min-width: 0;
+  svg { color: $accent; flex-shrink: 0; }
+  span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+.offered {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: $fg-1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.off .branchHead { border-bottom: none; }
+.offNote { margin: 0; padding: 12px 14px; font-size: 12.5px; color: $fg-2; }
+
+.rows { display: flex; flex-direction: column; }
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(150px, 1.25fr) minmax(170px, 1.2fr) auto;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 10px 14px;
+  border-top: 1px solid $line-1;
+
+  &:first-child { border-top: none; }
+}
+.branchRow { background: color-mix(in srgb, #{$info-soft} 40%, transparent); }
+
+.who { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.person { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.whoName {
+  font-size: 13px;
+  font-weight: 600;
+  color: $fg-0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.whoHint { font-size: 11.5px; color: $fg-2; }
+.ownHint { color: $accent-contrast; font-weight: 600; }
+.inactive {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: $bg-2;
+  color: $fg-2;
+  flex-shrink: 0;
+}
+
+.priceInputs { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.dash { color: $fg-3; }
+.durationCell { display: flex; align-items: center; gap: 6px; }
+.durationInput { display: flex; align-items: center; gap: 6px; }
+.unit { font-size: 12px; color: $fg-2; white-space: nowrap; }
+
+.num {
+  width: 100%;
+  min-width: 0;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid $line-2;
+  border-radius: $r-1;
+  background: $bg-1;
+  color: $fg-0;
+  font-family: $font-mono;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.12s, box-shadow 0.12s;
+  -moz-appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  &::placeholder { color: $fg-3; font-family: $font-mono; }
+  &:focus { border-color: $accent; box-shadow: 0 0 0 3px $accent-soft; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+  /* A filled field is an override — make it read as "set here". */
+  &:not(:placeholder-shown) { border-color: $accent; background: $accent-soft; }
+}
+.short { width: 76px; flex: none; }
+.bad, .bad:not(:placeholder-shown) { border-color: $danger; background: $danger-soft; }
+
+.reset {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: $r-1;
+  border: 1px solid transparent;
+  background: transparent;
+  color: $fg-2;
+  cursor: pointer;
+  &:hover { background: $bg-2; color: $fg-0; border-color: $line-2; }
+}
+
+.emptyStaff { margin: 0; padding: 10px 14px 12px; font-size: 12.5px; color: $fg-2; border-top: 1px solid $line-1; }
+
+.footnote { margin: 2px 0 0; font-size: 12px; color: $fg-2; }
+
+/* ── Footer ── */
+.footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; flex-wrap: wrap; }
+.footerMain { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+
+/* ── Phones: name on top, inputs below ── */
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: 1fr auto;
+    gap: 8px 10px;
+  }
+  .who { grid-column: 1 / -1; }
+  .defaults { flex-direction: column; align-items: flex-start; }
+  .footer > :first-child { width: 100%; justify-content: center; }
+  .footerMain { width: 100%; justify-content: flex-end; }
+}

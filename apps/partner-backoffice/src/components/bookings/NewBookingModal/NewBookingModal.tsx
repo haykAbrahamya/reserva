@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { Calendar } from 'lucide-react'
 import { Modal, Input, Select, Button, DatePicker, FieldError, useToast } from '@/components/ui'
 import { usePartner } from '@/store/app.store'
@@ -6,7 +6,7 @@ import { useResource } from '@/store/useResource'
 import { useScopedLocationId } from '@/store/auth.hooks'
 import { bookingsService } from '@/services/bookings.service'
 import { partnersService } from '@/services/partners.service'
-import { fmtDateInput } from '@/utils/format'
+import { fmtDateInput, fmtDuration, fmtServicePrice, PriceBook, worksAt, type Offer } from '@/utils/format'
 import { errorMessage } from '@/utils/errors'
 import { useT, useDateLocale, useDatePickerLabels } from '@/i18n'
 import { SlotPicker } from '../SlotPicker/SlotPicker'
@@ -27,6 +27,9 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
   const { data: svcCatalog }  = useResource(() => (open ? partnersService.listServices() : Promise.resolve([])), [open], [])
   const { data: spCatalog }   = useResource(() => (open ? partnersService.listSpecialists() : Promise.resolve([])), [open], [])
   const { data: locCatalog }  = useResource(() => (open ? partnersService.listLocations() : Promise.resolve([])), [open], [])
+  // Branch & specialist prices (sparse; usually empty → every price is the service's own).
+  const { data: pricing }     = useResource(() => (open ? partnersService.getPricing().catch(() => null) : Promise.resolve(null)), [open], null)
+  const book = useMemo(() => new PriceBook(pricing?.branches ?? [], pricing?.specialists ?? []), [pricing])
   const toast         = useToast()
   const scopedLocationId = useScopedLocationId()
   const t             = useT()
@@ -70,6 +73,12 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
   }, [open, isSolo, specialistId, spCatalog])
 
   const selectedService = svcCatalog.find(sv => sv.id === serviceId)
+  // What this booking will cost and how long it takes: the specialist's own
+  // price at this branch, else the branch price, else the service default —
+  // exactly what the server will snapshot onto the booking.
+  const offer: Offer | null = selectedService && locationId
+    ? book.offer(selectedService, locationId, selectedService.requiresSpecialist === false ? null : specialistId || null)
+    : null
   // Facility/entry service (spa): no specialist — a walk-in just needs a spot.
   const isFacility = selectedService?.requiresSpecialist === false
   // The time grid is ready once we can resolve availability: a specialist for a
@@ -114,14 +123,24 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
   // selecting a specialist who can't do it, which would drop the service).
   const specialists = spCatalog.filter(sp =>
     sp.active &&
-    (!locationId || sp.locationId === locationId) &&
+    (!locationId || worksAt(sp, locationId)) &&
     (!serviceId || sp.services.includes(serviceId))
   )
   // Services are likewise filtered by the chosen specialist (the reverse), so the
   // two dropdowns always agree in either order of selection.
   const services = svcCatalog.filter(sv =>
-    sv.active && (!specialistId || spCatalog.find(sp => sp.id === specialistId)?.services.includes(sv.id))
+    sv.active &&
+    // A branch can switch a service off (no laser machine there).
+    (!locationId || book.offered(locationId, sv.id)) &&
+    (!specialistId || spCatalog.find(sp => sp.id === specialistId)?.services.includes(sv.id))
   )
+  const priceLabels = { from: t('services.priceFrom') }
+  /** "45 min · 7 000 ֏" for one option, staff always seeing the real price. */
+  const optionSub = (o: Offer) =>
+    t('branchPricing.booking.optionSub', {
+      duration: fmtDuration(o.duration),
+      price: fmtServicePrice({ ...o, hidePrice: false }, priceLabels),
+    })
   /** Pick a date, then — if the client fields below are still empty — smoothly
    *  reveal them. The tall time grid pushes name/phone off-screen, so without
    *  this it's easy to miss that there's more form below. We wait a frame so the
@@ -162,7 +181,7 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
     const [h, m] = time.split(':').map(Number)
     const start = new Date(`${date}T00:00:00`)
     start.setHours(h, m, 0, 0)
-    const end = new Date(start.getTime() + selectedService.duration * 60_000)
+    const end = new Date(start.getTime() + (offer?.duration ?? selectedService.duration) * 60_000)
 
     setSaving(true)
     try {
@@ -246,11 +265,13 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
               value: sv.id,
               label: sv.name,
               sub: sv.requiresSpecialist === false
-                ? t('newBooking.facilitySub', { duration: sv.duration, capacity: sv.capacity ?? 1 })
-                : t('newBooking.serviceSub', { duration: sv.duration, // Never null here: `price` is nullable only because the PUBLIC payload
-                    // redacts a hidden price, and the backoffice is on the other side of
-                    // that — staff see the real figure whatever the page shows.
-                    price: (sv.price ?? 0).toLocaleString() }),
+                ? t('newBooking.facilitySub', {
+                    duration: locationId ? book.offer(sv, locationId).duration : sv.duration,
+                    capacity: locationId ? book.offer(sv, locationId).capacity : (sv.capacity ?? 1),
+                  })
+                // The branch's price for this service (a specialist may charge
+                // their own — shown next to their name below).
+                : optionSub(locationId ? book.offer(sv, locationId) : book.offer(sv, '')),
             }))}
             placeholder={t('newBooking.servicePlaceholder')}
           />
@@ -265,7 +286,14 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
             <Select
               value={specialistId}
               onChange={v => { setSpecialistId(v); setTime(''); clearErr('specialistId') }}
-              options={specialists.map(sp => ({ value: sp.id, label: sp.name, sub: sp.title }))}
+              options={specialists.map(sp => ({
+                value: sp.id,
+                label: sp.name,
+                // With a service chosen, show what THIS specialist charges here.
+                sub: selectedService && locationId
+                  ? [sp.title, optionSub(book.offer(selectedService, locationId, sp.id))].filter(Boolean).join(' · ')
+                  : sp.title,
+              }))}
               placeholder={t('newBooking.specialistPlaceholder')}
               disabled={!locationId}
             />
@@ -323,8 +351,9 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
                 date: new Date(date).toLocaleDateString(dateLocale, { weekday: 'long', day: 'numeric', month: 'long' }),
                 time,
                 service: selectedService.name,
-                duration: selectedService.duration,
+                duration: offer?.duration ?? selectedService.duration,
               })}
+              {offer && <> · <strong>{fmtServicePrice({ ...offer, hidePrice: false }, priceLabels)}</strong></>}
             </span>
           </div>
         )}

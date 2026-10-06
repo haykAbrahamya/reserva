@@ -642,3 +642,128 @@
   @keyframes bf-sheet-out { from { transform: translateY(0) } to { transform: translateY(100%) } }
   @keyframes bf-spin      { to { transform: rotate(360deg) } }
 }
+
+/* ── Branch & specialist pricing ─────────────────────────────── */
+
+/* "Which branch" stays visible on every step of a multi-branch booking, with a
+   one-tap way back to change it. */
+.contextBar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 12px 0 0;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, $accent 9%, $bg-2);
+  color: $accent-contrast;
+  font-size: 13px;
+  min-width: 0;
+  svg { flex-shrink: 0; }
+}
+.contextName {
+  font-weight: 600;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.contextChange {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 2px 4px;
+  border: none;
+  background: transparent;
+  color: $accent-contrast;
+  font-family: $font-sans;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  &:hover { color: $fg-0; }
+}
+
+/* A branch that doesn't do the service already chosen: still pickable (the
+   visitor may change service), but quieter. */
+.optionMuted {
+  opacity: 0.62;
+  .anyIcon { background: $bg-2; color: $fg-2; }
+}
+.optMetaWrap { white-space: normal !important; }
+.optHint {
+  margin-top: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: $accent-contrast;
+}
+
+/* Small avatar (the "you'll be with" card). */
+.optAvatarSm {
+  width: 38px;
+  height: 38px;
+  font-size: 15px;
+}
+
+/* Empty step: nobody here does it / nothing bookable at this branch. */
+.emptyStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 32px 16px;
+  text-align: center;
+  color: $fg-2;
+  font-size: 14px;
+  p { margin: 0; max-width: 32ch; }
+  svg { color: color-mix(in srgb, $accent 55%, $fg-3); }
+}
+
+/* "Any available": who this time goes to, and the exact price — shown under the
+   slots the moment a time is picked, before anything is confirmed. */
+.assigned {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: $r-2;
+  border: 1px solid color-mix(in srgb, $accent 35%, $line-2);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, $accent 12%, transparent), color-mix(in srgb, $accent 3%, transparent) 70%),
+    $bg-1;
+  animation: assignedIn 0.22s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+}
+.assignedBody { flex: 1; min-width: 0; }
+.assignedLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: $accent-contrast;
+}
+.assignedName {
+  margin-top: 2px;
+  font-size: 15px;
+  font-weight: 600;
+  color: $fg-0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.assignedPrice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  span { font-family: $font-serif; font-size: 18px; color: $fg-0; white-space: nowrap; }
+  small { font-size: 12px; color: $fg-2; }
+}
+@keyframes assignedIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .assigned { animation: none; }
+}

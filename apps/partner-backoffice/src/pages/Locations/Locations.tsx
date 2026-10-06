@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MapPin, Plus, Pencil, Trash2, Phone, Clock } from 'lucide-react'
+import { MapPin, Plus, Pencil, Trash2, Phone, Clock, Tags } from 'lucide-react'
 import { useMemo } from 'react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
@@ -12,6 +12,8 @@ import {
   summarizeHours, dayOf, type DayKey,
 } from '@/utils/locationHours'
 import { MapPicker } from '@/components/maps/MapPicker/MapPicker'
+import { BranchServicesModal } from '@/components/locations/BranchServicesModal/BranchServicesModal'
+import { useBranchPricing } from '@/hooks/useBranchPricing'
 import { mapsEnabled } from '@/lib/googleMaps'
 import { I18nField } from '@/components/i18n/I18nField/I18nField'
 import { useI18n } from '@/i18n'
@@ -45,6 +47,7 @@ export function Locations() {
   // Resolves a catalog name for the current UI language (shared helper, also
   // used by the vacancies pages).
   const loc = useLocalized()
+  const branchPricing = useBranchPricing()
   useSpotlight()
 
   // Branches are few per partner — load them all as cards, no pagination.
@@ -63,6 +66,8 @@ export function Locations() {
   const [confirmDel,  setConfirmDel]  = useState<Location | null>(null)
   const [saving,      setSaving]      = useState(false)
   const [errs,        setErrs]        = useState<Record<string, string>>({})
+  // The branch whose services & prices are open (branch pricing only).
+  const [servicesFor, setServicesFor] = useState<Location | null>(null)
 
   if (!partner) return null
 
@@ -221,6 +226,13 @@ export function Locations() {
                   )}
                 </div>
               </div>
+              {branchPricing && !isSingle && total > 1 && (
+                <div className={s.cardFoot}>
+                  <Button variant="ghost" size="sm" onClick={() => setServicesFor(loc)}>
+                    <Tags size={13} /> {t('branchPricing.branch.open')}
+                  </Button>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -360,6 +372,10 @@ export function Locations() {
           })()}
         </p>
       </Modal>
+
+      {branchPricing && !isSingle && (
+        <BranchServicesModal open={!!servicesFor} location={servicesFor} onClose={() => setServicesFor(null)} />
+      )}
     </div>
   )
 }

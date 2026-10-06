@@ -23,13 +23,21 @@
   max-width: 480px;
   max-height: 88vh;
   background: $bg-1;
-  border: 1px solid $line-1;
+  /* No hairline in light mode: around the coloured banner it read as a white
+     frame, and the shadow already lifts the card off the dimmed page. Dark mode
+     keeps it — there it is what separates the card from the scrim. */
+  border: none;
   border-radius: $r-3;
   box-shadow: $shadow-3;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   animation: sm-pop 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  :global([data-theme='dark']) & {
+    border: 1px solid $line-1;
+    @media (max-width: 600px) { border-bottom: none; } /* bottom sheet: open at the screen edge */
+  }
 
   @media (max-width: 600px) {
     max-width: 100%;
@@ -184,37 +192,76 @@
   margin: 0 0 22px;
 }
 
-/* services chips */
-.svcChips {
+/* ── Services: a price list, in the same kind of card as the week below ── */
+.svcSection { margin-bottom: 24px; }
+.svcList {
+  list-style: none;
+  margin: 0;
+  padding: 2px 4px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin-bottom: 24px;
+  flex-direction: column;
+  border: 1px solid $line-1;
+  border-radius: 14px;
+  background: $bg-1;
 }
-.chip {
-  font-size: 12px;
-  font-weight: 500;
-  padding: 5px 11px;
-  border-radius: 999px;
-  background: $bg-2;
-  color: $fg-1;
-  border: 1px solid $line-2;
+.svcRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px;
 }
-/* "+N more" / "Show less" — an ACTION, not a service. Accent-tinted + tappable
-   so it reads distinctly from the passive service chips beside it. */
-.chipMore {
-  cursor: pointer;
+.svcRow + .svcRow,
+.svcMoreRow { border-top: 1px solid $line-1; }
+.svcInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.svcName {
+  font-size: 13.5px;
   font-weight: 600;
-  color: $accent-contrast;
-  background: color-mix(in srgb, $accent 12%, transparent);
-  border-color: color-mix(in srgb, $accent 30%, transparent);
-  transition: background 0.14s, border-color 0.14s;
-  -webkit-tap-highlight-color: transparent;
-  &:hover {
-    background: color-mix(in srgb, $accent 20%, transparent);
-    border-color: color-mix(in srgb, $accent 45%, transparent);
-  }
+  line-height: 20px;
+  color: $fg-0;
+  overflow-wrap: anywhere;
 }
+.svcDur {
+  font-size: 12px;
+  line-height: 16px;
+  color: $fg-3;
+}
+.svcPrice {
+  flex-shrink: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: $accent-contrast;
+  white-space: nowrap;
+}
+/* "+N more" / "Show less" — an action, so accent text on a quiet row. */
+.svcMore {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin: 3px 0;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: $accent-contrast;
+  font-family: $font-sans;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.14s;
+  -webkit-tap-highlight-color: transparent;
+  &:hover { background: color-mix(in srgb, $accent 10%, transparent); }
+  svg { transition: transform 0.2s ease; }
+}
+.svcMoreOpen svg { transform: rotate(180deg); }
 
 /* ── Reviews header + write button ── */
 .reviewsHead {
@@ -417,3 +464,141 @@
   @keyframes sm-form      { from { opacity: 0; transform: translateY(-4px) } to { opacity: 1; transform: none } }
   @keyframes sm-spin      { to { transform: rotate(360deg) } }
 }
+
+/* Where they work — under the title, on the banner. */
+.spBranches {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.86);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  svg { flex-shrink: 0; }
+}
+
+/* ── Working hours: the week at a glance, today marked ── */
+.hours { margin-bottom: 24px; }
+.hoursHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 10px;
+  .sectionLabel { margin: 0; }
+}
+
+/* Live status: "Working now · until 19:00" / "Tomorrow from 10:00". */
+.nowPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 26px;
+  padding: 3px 11px;
+  border-radius: 999px;
+  border: 1px solid $line-2;
+  background: $bg-2;
+  color: $fg-1;
+  font-size: 12px;
+  font-weight: 600;
+}
+.nowDot {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: $fg-3;
+}
+.nowOpen {
+  color: $success;
+  background: color-mix(in srgb, $success 10%, transparent);
+  border-color: color-mix(in srgb, $success 28%, transparent);
+  .nowDot {
+    background: $success;
+    box-shadow: 0 0 0 3px color-mix(in srgb, $success 20%, transparent);
+  }
+}
+
+.week {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 1px solid $line-1;
+  border-radius: 14px;
+  background: $bg-1;
+}
+.day {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  line-height: 20px;
+}
+/* Today: an accent tint with a stripe on the leading edge — no shadow. */
+.dayToday {
+  background: color-mix(in srgb, $accent 11%, transparent);
+  box-shadow: inset 3px 0 0 $accent;
+}
+.dayName {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  font-weight: 600;
+  color: $fg-1;
+}
+.todayTag {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: $accent;
+  color: $fg-on-accent;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 16px;
+  text-transform: uppercase;
+}
+.dayWins {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  min-width: 0;
+}
+.win {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  max-width: 100%;
+}
+.winBranch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font-size: 12px;
+  color: $fg-2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  svg { flex-shrink: 0; color: color-mix(in srgb, $accent 70%, $fg-3); }
+}
+.winTime {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: $fg-0;
+  white-space: nowrap;
+}
+.dayOff .dayName { color: $fg-3; font-weight: 500; }
+.offText { color: $fg-3; font-size: 13px; }

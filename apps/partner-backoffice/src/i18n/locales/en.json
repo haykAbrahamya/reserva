@@ -600,7 +600,8 @@
       "fri": "Fri",
       "sat": "Sat",
       "sun": "Sun"
-    }
+    },
+    "savedToast": "Hours saved"
   },
   "timeOff": {
     "sectionTitle": "Time off & exceptions",
@@ -994,7 +995,11 @@
       "SERVICE_NOT_OFFERED": "This service isn’t available for that selection.",
       "TIME_OFF_HAS_CONFLICTS": "There are bookings during that time off.",
       "INVALID_TIME_RANGE": "The end time must be after the start time.",
-      "PAST_DATE": "Please choose a time in the future."
+      "PAST_DATE": "Please choose a time in the future.",
+      "FEATURE_NOT_ENABLED": "This feature isn’t switched on for your account yet.",
+      "SPECIALIST_NOT_AT_LOCATION": "This specialist doesn’t work at that branch.",
+      "PRICE_CHANGED": "The price has changed. Please check it and try again.",
+      "BRANCH_HAS_BOOKINGS": "They still have upcoming bookings at that branch. Move or cancel those first."
     }
   },
   "courses": {
@@ -1363,6 +1368,81 @@
       "notFoundTitle": "Vacancy not found",
       "notFoundBody": "It may have been deleted, or it is not available to you.",
       "delete": "Delete vacancy"
+    }
+  },
+  "branchPricing": {
+    "worksAt": {
+      "label": "Works at",
+      "hint": "Choose every branch where this specialist takes clients.",
+      "managerLocked": "Only an admin can change which branches a specialist works at.",
+      "pickOne": "Choose at least one branch.",
+      "main": "Main branch",
+      "mainHint": "Shown first on their profile.",
+      "hoursHint": "Set their hours at each branch on the Working hours page."
+    },
+    "hours": {
+      "intro": "Works at {count} branches — set the hours for each one.",
+      "readOnly": "You can view these hours. Only this branch’s manager or an admin can change them.",
+      "overlap": "On {days} the hours at “{a}” and “{b}” overlap. During that time clients can book either branch, and a booking at one makes the specialist busy at the other."
+    },
+    "prices": {
+      "title": "Prices · {name}",
+      "subtitle": "Set a different price or duration for a branch or a specialist. Leave a field empty to use the one above it.",
+      "defaultLabel": "Default for everyone",
+      "spotsValue": "{n} spots",
+      "orderAria": "Which price applies",
+      "own": "Specialist’s own price",
+      "branch": "Branch price",
+      "default": "Default",
+      "hiddenNote": "This price is hidden on your public page. These prices are still used for bookings and shown to your team.",
+      "managerNote": "You’re changing prices for your branch only.",
+      "offered": "Offered here",
+      "notOffered": "Clients can’t book this service at “{branch}”.",
+      "branchRow": "Everyone at this branch",
+      "usesDefault": "Uses the default",
+      "branchSet": "Branch price set",
+      "noSpecialists": "No specialist at this branch does this service yet.",
+      "ownSet": "Own price",
+      "usesBranch": "Uses the branch price",
+      "reset": "Use the price above",
+      "from": "From",
+      "to": "To",
+      "min": "min",
+      "spots": "spots",
+      "col": {
+        "price": "Price",
+        "duration": "Duration",
+        "spots": "Spots",
+        "service": "Service"
+      },
+      "sameEverywhere": "Same price everywhere",
+      "save": "Save prices",
+      "saved": "Prices saved",
+      "fixFields": "Check the highlighted fields.",
+      "footnote": "Changes apply to new bookings. Bookings already made keep their price.",
+      "subtitleSingle": "Set a different price or duration for a specialist. Leave a field empty to use the default.",
+      "sameForEveryone": "Same price for everyone"
+    },
+    "list": {
+      "varies": "Varies",
+      "prices": "Prices",
+      "variesHint": "The price differs by branch or specialist",
+      "pricesHint": "Prices by branch and specialist"
+    },
+    "branch": {
+      "title": "Services at {branch}",
+      "subtitle": "Switch off what this branch doesn’t offer. Set a branch price or duration only where it differs — empty fields use the default.",
+      "search": "Search services…",
+      "offeredCount": "{n} of {total} offered here",
+      "noMatch": "No services match your search.",
+      "footnote": "Specialists’ own prices are set on each service’s Prices screen.",
+      "open": "Services & prices"
+    },
+    "booking": {
+      "optionSub": "{duration} · {price}"
+    },
+    "calendar": {
+      "busyAt": "Busy · {branch}"
     }
   }
 }

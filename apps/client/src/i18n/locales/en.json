@@ -356,6 +356,11 @@
       "text": "Pick a time that works for you and book your appointment in seconds.",
       "bookNow": "Book now",
       "poweredBy": "Powered by Reserva"
+    },
+    "branches": {
+      "choose": "Choose a branch",
+      "openUntil": "Open until {time}",
+      "opensTomorrow": "Opens tomorrow {time}"
     }
   },
   "specialistModal": {
@@ -387,7 +392,14 @@
       "loadMore": "Show more reviews"
     },
     "bookWith": "Book with {name}",
-    "close": "Close"
+    "close": "Close",
+    "hours": "Working hours",
+    "today": "Today",
+    "dayOff": "Day off",
+    "workingNow": "Working now · until {time}",
+    "nextToday": "Today from {time}",
+    "nextTomorrow": "Tomorrow from {time}",
+    "nextDay": "{day} from {time}"
   },
   "booking": {
     "stepLabel": "Step {current} of {total}",
@@ -491,7 +503,14 @@
       "title": "{service} · {salon}",
       "description": "Your appointment for {service} at {salon} with {specialist}.",
       "anySpecialist": "the team"
-    }
+    },
+    "back": "Back",
+    "changeBranch": "Change",
+    "notAtBranch": "{service} isn’t available here",
+    "noOneHere": "Nobody at this branch offers this service right now.",
+    "noServicesHere": "Nothing can be booked online at this branch right now.",
+    "anyVaries": "We’ll show who and the exact price before you confirm",
+    "assignedLabel": "At {time} you’ll be with"
   },
   "signup": {
     "panelTag": "For salons",
@@ -667,7 +686,9 @@
       "SLUG_TAKEN": "That address is already taken. Try another.",
       "COURSE_FULL": "Sorry, this course just filled up.",
       "ENROLLMENT_CLOSED": "Registration for this course is closed.",
-      "ALREADY_ENROLLED": "You're already registered for this course."
+      "ALREADY_ENROLLED": "You're already registered for this course.",
+      "PRICE_CHANGED": "The price for this time has just changed. Please check it and confirm again.",
+      "SPECIALIST_NOT_AT_LOCATION": "This specialist doesn’t work at the selected branch."
     }
   },
   "courses": {

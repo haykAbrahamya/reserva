@@ -357,6 +357,11 @@
       "text": "Выберите удобное время и запишитесь за секунды.",
       "bookNow": "Записаться",
       "poweredBy": "Работает на Reserva"
+    },
+    "branches": {
+      "choose": "Выберите филиал",
+      "openUntil": "Открыто до {time}",
+      "opensTomorrow": "Открытие завтра в {time}"
     }
   },
   "specialistModal": {
@@ -388,7 +393,14 @@
       "loadMore": "Показать больше отзывов"
     },
     "bookWith": "Записаться к {name}",
-    "close": "Закрыть"
+    "close": "Закрыть",
+    "hours": "Часы работы",
+    "today": "Сегодня",
+    "dayOff": "Выходной",
+    "workingNow": "Сейчас работает · до {time}",
+    "nextToday": "Сегодня с {time}",
+    "nextTomorrow": "Завтра с {time}",
+    "nextDay": "{day} с {time}"
   },
   "booking": {
     "stepLabel": "Шаг {current} из {total}",
@@ -492,7 +504,14 @@
       "title": "{service} · {salon}",
       "description": "Ваша запись на «{service}» в {salon}, специалист — {specialist}.",
       "anySpecialist": "команда"
-    }
+    },
+    "back": "Назад",
+    "changeBranch": "Изменить",
+    "notAtBranch": "Здесь нет услуги «{service}»",
+    "noOneHere": "В этом филиале сейчас никто не оказывает эту услугу.",
+    "noServicesHere": "В этом филиале сейчас нет услуг для онлайн-записи.",
+    "anyVaries": "Покажем, кто будет мастером, и точную цену до подтверждения",
+    "assignedLabel": "В {time} вас примет"
   },
   "signup": {
     "panelTag": "Для салонов",
@@ -668,7 +687,9 @@
       "SLUG_TAKEN": "Этот адрес уже занят. Попробуйте другой.",
       "COURSE_FULL": "К сожалению, на этот курс только что не осталось мест.",
       "ENROLLMENT_CLOSED": "Запись на этот курс закрыта.",
-      "ALREADY_ENROLLED": "Вы уже записаны на этот курс."
+      "ALREADY_ENROLLED": "Вы уже записаны на этот курс.",
+      "PRICE_CHANGED": "Цена на это время только что изменилась. Проверьте её и подтвердите снова.",
+      "SPECIALIST_NOT_AT_LOCATION": "Этот специалист не работает в выбранном филиале."
     }
   },
   "courses": {

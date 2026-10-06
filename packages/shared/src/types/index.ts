@@ -66,8 +66,18 @@ export interface Specialist {
   title: string
   /** Optional per-language overrides for `title` (falls back to `title`). */
   titleI18n?: LocalizedText | null
+  /** HOME branch. A specialist may also work at other branches — see `locationIds`. */
   locationId: string
+  /**
+   * Every branch the specialist works at, home first. Absent on payloads from
+   * before branches existed — read it through `specialistBranchIds()`, which
+   * falls back to `[locationId]`.
+   */
+  locationIds?: string[]
+  /** Branches with the specialist's weekly hours at each (backoffice payloads). */
+  locations?: SpecialistBranch[]
   active: boolean
+  /** Staff contact. Backoffice only — public payloads don't carry it. */
   phone: string
   services: string[]
   /** Optional profile photo URL. Empty/absent → letter-initial avatar. */
@@ -78,11 +88,63 @@ export interface Specialist {
   rating?: number
   /** Number of public reviews (0 when none). Present on public payloads. */
   reviewCount?: number
+  /**
+   * When and where they work, as the booking flow applies it (their hours at a
+   * branch ∩ the branch's). Public payloads; absent on older ones.
+   */
+  week?: SpecialistWorkWindow[]
+}
+
+/** One working stretch of a specialist's week: weekday, branch and hours. */
+export interface SpecialistWorkWindow {
+  day: 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun'
+  locationId: string
+  /** 'HH:MM'. An `end` at or before `start` closes after midnight. */
+  start: string
+  end: string
+}
+
+/** One branch a specialist works at, with their weekly hours there. */
+export interface SpecialistBranch {
+  locationId: string
+  schedule?: WeekSchedule
 }
 
 /** Fixed exact price, or a min–max range whose exact charge is captured per
  *  booking on completion. */
 export type ServicePriceType = 'fixed' | 'range'
+
+/**
+ * A branch's own settings for one service. Sparse: a branch with no entry
+ * offers the service at the service's own price and duration. The price fields
+ * are one unit — all null (inherit) or a complete price.
+ */
+export interface ServiceBranchSetting {
+  locationId: string
+  /** false = this branch doesn't offer the service. */
+  offered: boolean
+  priceType: ServicePriceType | null
+  price: number | null
+  priceMax: number | null
+  /** Minutes; null = the service's duration. */
+  duration: number | null
+  /** Facility services: concurrent guests at this branch; null = the service's. */
+  capacity: number | null
+}
+
+/**
+ * One specialist's own price/duration for one service at one branch. Sparse:
+ * no entry = the branch price (or the service default).
+ */
+export interface SpecialistPrice {
+  specialistId: string
+  locationId: string
+  serviceId: string
+  priceType: ServicePriceType | null
+  price: number | null
+  priceMax: number | null
+  duration: number | null
+}
 
 export interface Service {
   id: string
@@ -134,6 +196,12 @@ export interface Service {
    *  Server-owned — set via drag-to-reorder, never sent on create/update.
    *  Optional because older/partial payloads may omit it. */
   sortOrder?: number
+  /**
+   * Branches that override something for this service (public payload). Absent
+   * or empty = offered everywhere at the service's own price and duration.
+   * Resolve through `PriceBook` rather than reading it directly.
+   */
+  branchSettings?: ServiceBranchSetting[]
 }
 
 // ── Courses ─────────────────────────────────────────────────
@@ -260,6 +328,12 @@ export interface Booking {
   priceAtBooking?: number
   /** Upper bound snapshot for a range-priced booking; null for fixed. */
   priceMaxAtBooking?: number | null
+  /**
+   * Price type the booking was made with (a branch or specialist may price a
+   * range service as fixed). Null on bookings made before it was recorded —
+   * fall back to `service.priceType`; see `bookingPriceType()`.
+   */
+  priceTypeAtBooking?: ServicePriceType | null
   /** Exact amount charged, captured on completion of a range booking. */
   finalPrice?: number | null
   /**
@@ -330,4 +404,6 @@ export interface Partner {
   locations: Location[]
   specialists: Specialist[]
   services: Service[]
+  /** Specialists' own prices per branch (public payload; sparse, often empty). */
+  specialistPrices?: SpecialistPrice[]
 }

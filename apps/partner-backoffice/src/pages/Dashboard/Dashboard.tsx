@@ -9,7 +9,7 @@ import { bookingsService } from '@/services/bookings.service'
 import { Button, Card, CardHeader, CardTitle, BookingBadge, Avatar } from '@/components/ui'
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
 import { ProfileChecklist } from '@/components/onboarding/ProfileChecklist'
-import { fmtAMD, fmtTime, isSameDay } from '@/utils/format'
+import { fmtAMD, fmtTime, isSameDay, bookingAmount } from '@/utils/format'
 import { useScopedLocationId } from '@/store/auth.hooks'
 import { useI18n, useDateLocale } from '@/i18n'
 import type { Booking } from '@/types'
@@ -83,7 +83,7 @@ export function Dashboard() {
   const weekAgo    = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7)
   const last7      = bookings.filter(b => b.partnerId === partner.id && new Date(b.startISO) >= weekAgo && new Date(b.startISO) <= now)
   const completed7 = last7.filter(b => b.status === 'completed')
-  const revenue7   = completed7.reduce((sum, b) => sum + (b.finalPrice ?? b.priceAtBooking ?? b.service?.price ?? 0), 0)
+  const revenue7   = completed7.reduce((sum, b) => sum + (bookingAmount(b) ?? 0), 0)
 
   const upcoming30 = (() => {
     const t30 = new Date(now); t30.setDate(t30.getDate() + 30)
@@ -254,7 +254,7 @@ function BookingRow({ booking, compact, onClick }: {
         <div className={s.clientName}>{booking.clientName}</div>
         <div className={s.clientSub}>{booking.service?.name ?? '—'} · {booking.specialist?.name.split(' ')[0] ?? '—'}</div>
       </div>
-      <div className={s.price}>{booking.service ? fmtAMD(booking.service.price) : ''}</div>
+      <div className={s.price}>{bookingAmount(booking) != null ? fmtAMD(bookingAmount(booking)!) : ''}</div>
       <BookingBadge status={booking.status} />
     </div>
   )

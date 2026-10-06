@@ -1,4 +1,5 @@
 import { MapPin, Phone, Clock, Users, Navigation, CalendarCheck } from 'lucide-react'
+import { worksAt } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
 import { useI18n, useLocalized } from '@/i18n'
 import { bookableLocations, canBook } from '@/services/booking.service'
@@ -7,7 +8,8 @@ import s from './TabbedBranches.module.scss'
 
 interface Props {
   partner: PublicPartner
-  onBook: () => void
+  /** Open the booking flow at this branch. */
+  onBook: (locationId: string) => void
 }
 
 /** Google Maps URL — exact pin when coords exist, else address text. */
@@ -44,7 +46,7 @@ export function TabbedBranches({ partner, onBook }: Props) {
     <section className={s.section}>
       <div className={s.list}>
         {bookable.map((loc) => {
-          const staffHere = partner.specialists.filter((sp) => sp.active && sp.locationId === loc.id).length
+          const staffHere = partner.specialists.filter((sp) => sp.active && worksAt(sp, loc.id)).length
           const hours = summarizeHours(loc.hours, t('partner.locations.closed'), dayLabels)
           return (
             <div key={loc.id} className={s.card}>
@@ -77,7 +79,7 @@ export function TabbedBranches({ partner, onBook }: Props) {
                   <Navigation size={15} /> {t('partner.locations.directions')}
                 </a>
                 {canBook(partner) && (
-                  <button className={s.bookHere} onClick={onBook}>
+                  <button className={s.bookHere} onClick={() => onBook(loc.id)}>
                     <CalendarCheck size={15} /> {t('partner.locations.bookHere')}
                   </button>
                 )}

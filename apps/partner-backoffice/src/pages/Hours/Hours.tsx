@@ -1,19 +1,21 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Clock, Plus, Pencil, Trash2, CalendarOff, Sun, AlertTriangle, ArrowRight } from 'lucide-react'
+import { Clock, Plus, Pencil, Trash2, CalendarOff, Sun, AlertTriangle, ArrowRight, MapPin } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
-import { Avatar, Button, TimePicker, ConfirmDialog, useToast } from '@/components/ui'
+import { Avatar, Button, TimePicker, ConfirmDialog, SegmentedFilter, useToast } from '@/components/ui'
 import { partnersService } from '@/services/partners.service'
 import { bookingsService } from '@/services/bookings.service'
 import { useScopedLocationId } from '@/store/auth.hooks'
 import { AddTimeOffModal, type TimeOffDraft } from '@/components/specialists/AddTimeOffModal/AddTimeOffModal'
 import { findConflictingBookings } from '@/utils/timeOff'
+import { errorMessage } from '@/utils/errors'
 import { fmtTime, fmtDateInput } from '@/utils/format'
+import { worksAt } from '@reserva/shared'
 import { useI18n, useDateLocale } from '@/i18n'
 import { useSpotlight } from '@/components/onboarding/useSpotlight'
 import { notifyProfileUpdated } from '@/components/onboarding/useProfileCompletion'
-import type { WeekSchedule, WorkingDay, SpecialistTimeOff } from '@/types'
+import type { WeekSchedule, WorkingDay, SpecialistTimeOff, Specialist, SpecialistBranch } from '@/types'
 import s from './Hours.module.scss'
 
 const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const
@@ -29,12 +31,40 @@ const DEFAULT_SCHEDULE: WeekSchedule = {
   sun: { enabled: false, start: '10:00', end: '17:00' },
 }
 
+/** Editable hours are keyed per specialist AND branch. */
+const keyOf = (specialistId: string, locationId: string) => `${specialistId}|${locationId}`
+
+/** The branches a specialist works at with their hours, home first (old payloads: home only). */
+function branchesOf(sp: Specialist): SpecialistBranch[] {
+  return sp.locations?.length ? sp.locations : [{ locationId: sp.locationId, schedule: sp.schedule }]
+}
+
+/** A day's open window in minutes; an end before the start runs past midnight. */
+function windowOf(d?: WorkingDay): [number, number] | null {
+  if (!d?.enabled) return null
+  const toMin = (hhmm: string) => { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m }
+  const start = toMin(d.start)
+  let end = toMin(d.end)
+  if (end <= start) end += 1440
+  return [start, end]
+}
+
+/** Weekdays on which two branches' hours overlap. */
+function overlappingDays(a: WeekSchedule, b: WeekSchedule): string[] {
+  return DAY_KEYS.filter(k => {
+    const x = windowOf(a[k])
+    const y = windowOf(b[k])
+    return !!x && !!y && x[0] < y[1] && y[0] < x[1]
+  })
+}
+
 export function Hours() {
   const partner = usePartner()
   const scopedLocationId = useScopedLocationId()
-  const { data: specialists } = useResource(
+  const { data: specialists, reload: reloadSpecialists } = useResource(
     () => partnersService.listSpecialists({ includeInactive: true }), [], [],
   )
+  const { data: locations } = useResource(() => partnersService.listLocations(), [], [])
   // Bookings in a window — used only to count time-off conflicts.
   const { data: bookings } = useResource(() => {
     const from = new Date(); from.setMonth(from.getMonth() - 1)
@@ -47,8 +77,11 @@ export function Hours() {
   const dateLocale = useDateLocale()
   useSpotlight()
 
+  // Hours being edited, per `specialistId|locationId`.
   const [schedules, setSchedules] = useState<Record<string, WeekSchedule>>({})
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  // Which branch's hours are on screen (only matters for multi-branch specialists).
+  const [branchId, setBranchId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
   // Time off — loaded per selected specialist.
@@ -71,13 +104,14 @@ export function Hours() {
       .finally(() => setTimeOffLoading(false))
   }, [])
 
-  // Managers only manage their branch's team.
+  // Managers only manage their branch's team — everyone who works there,
+  // including specialists who also work at another branch.
   const teamSpecialists = specialists.filter(
-    sp => !scopedLocationId || sp.locationId === scopedLocationId
+    sp => !scopedLocationId || worksAt(sp, scopedLocationId)
   )
 
-  // Specialists carry their weekly schedule inline; seed the editable map from
-  // them (no extra per-specialist round-trips) and auto-select the first.
+  // Specialists carry their weekly hours inline (per branch); seed the editable
+  // map from them (no extra per-specialist round-trips) and auto-select the first.
   useEffect(() => {
     if (teamSpecialists.length === 0) return
     const first = teamSpecialists.find(sp => sp.active) ?? teamSpecialists[0]
@@ -85,10 +119,12 @@ export function Hours() {
 
     const map: Record<string, WeekSchedule> = {}
     teamSpecialists.forEach(sp => {
-      // Treat a missing OR empty schedule as the default template, so the editor
-      // is always usable (covers specialists created before defaults existed).
-      const hasSchedule = sp.schedule && Object.keys(sp.schedule).length > 0
-      map[sp.id] = hasSchedule ? sp.schedule! : DEFAULT_SCHEDULE
+      branchesOf(sp).forEach(b => {
+        // Treat a missing OR empty schedule as the default template, so the editor
+        // is always usable (covers specialists created before defaults existed).
+        const hasSchedule = b.schedule && Object.keys(b.schedule).length > 0
+        map[keyOf(sp.id, b.locationId)] = hasSchedule ? b.schedule! : DEFAULT_SCHEDULE
+      })
     })
     setSchedules(map)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -103,7 +139,32 @@ export function Hours() {
   if (!partner) return null
 
   const selectedSp = specialists.find(sp => sp.id === selectedId)
-  const schedule = selectedId ? (schedules[selectedId] ?? DEFAULT_SCHEDULE) : null
+  const spBranches = selectedSp ? branchesOf(selectedSp) : []
+  const multiBranch = spBranches.length > 1
+  // The branch on screen: the chosen tab, else the manager's own branch, else home.
+  const activeBranchId =
+    (branchId && spBranches.some(b => b.locationId === branchId) && branchId) ||
+    (scopedLocationId && spBranches.some(b => b.locationId === scopedLocationId) && scopedLocationId) ||
+    spBranches[0]?.locationId ||
+    null
+  // A manager edits hours at their own branch only; other branches are shown read-only.
+  const readOnly = !!scopedLocationId && activeBranchId !== scopedLocationId
+  const scheduleKey = selectedId && activeBranchId ? keyOf(selectedId, activeBranchId) : null
+  const schedule = scheduleKey ? (schedules[scheduleKey] ?? DEFAULT_SCHEDULE) : null
+  const branchName = (id: string) => locations.find(l => l.id === id)?.name ?? '—'
+
+  // Days where two of this specialist's branches have overlapping hours.
+  const overlaps: { a: string; b: string; days: string[] }[] = []
+  if (selectedId && multiBranch) {
+    for (let i = 0; i < spBranches.length; i++) {
+      for (let j = i + 1; j < spBranches.length; j++) {
+        const a = schedules[keyOf(selectedId, spBranches[i].locationId)]
+        const b = schedules[keyOf(selectedId, spBranches[j].locationId)]
+        const days = a && b ? overlappingDays(a, b) : []
+        if (days.length) overlaps.push({ a: spBranches[i].locationId, b: spBranches[j].locationId, days })
+      }
+    }
+  }
 
   const confirmDeleteTimeOff = async () => {
     if (!deleteTarget) return
@@ -129,12 +190,12 @@ export function Hours() {
   }
 
   const updateDay = (day: string, patch: Partial<WorkingDay>) => {
-    if (!selectedId) return
+    if (!scheduleKey || readOnly) return
     setSchedules(prev => ({
       ...prev,
-      [selectedId]: {
-        ...prev[selectedId],
-        [day]: { ...(prev[selectedId]?.[day] ?? DEFAULT_DAY), ...patch },
+      [scheduleKey]: {
+        ...(prev[scheduleKey] ?? DEFAULT_SCHEDULE),
+        [day]: { ...(prev[scheduleKey]?.[day] ?? DEFAULT_DAY), ...patch },
       },
     }))
   }
@@ -163,17 +224,40 @@ export function Hours() {
   // 02:30 next morning). The only impossible combination is start === end, which
   // can't be told apart from a zero-length day — catch it here so the partner
   // gets a readable message instead of a raw API "Validation failed".
-  const sameTimeDays = DAY_KEYS.filter(k => {
-    const d = schedule?.[k]
-    return d?.enabled && d.start === d.end
-  })
+  // Checked across every branch of the specialist, since they're saved together.
+  const sameTimeDays = DAY_KEYS.filter(k =>
+    (selectedId ? spBranches : []).some(b => {
+      const d = schedules[keyOf(selectedId!, b.locationId)]?.[k]
+      return d?.enabled && d.start === d.end
+    }),
+  )
 
   const handleSave = async () => {
-    if (!selectedId || !schedule || sameTimeDays.length > 0) return
+    if (!selectedSp || !selectedId || !schedule || sameTimeDays.length > 0) return
     setSaving(true)
-    await partnersService.updateHours(selectedId, schedule)
-    notifyProfileUpdated()
-    setSaving(false)
+    try {
+      if (multiBranch) {
+        // Every branch's hours in one save (the list of branches is unchanged).
+        await partnersService.updateBranchHours(
+          selectedId,
+          selectedSp.locationId,
+          spBranches.map(b => ({
+            locationId: b.locationId,
+            schedule: schedules[keyOf(selectedId, b.locationId)] ?? DEFAULT_SCHEDULE,
+          })),
+        )
+        reloadSpecialists()
+      } else {
+        // One branch: the original single-schedule save, unchanged.
+        await partnersService.updateHours(selectedId, schedule)
+      }
+      notifyProfileUpdated()
+      toast(t('hours.savedToast'))
+    } catch (err) {
+      toast(errorMessage(err, t))
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -229,6 +313,22 @@ export function Hours() {
                   </div>
                 </div>
 
+                {/* Works at several branches: one set of hours per branch. */}
+                {multiBranch && activeBranchId && (
+                  <div className={s.branchBar}>
+                    <div className={s.branchIntro}>
+                      <MapPin size={14} />
+                      <span>{t('branchPricing.hours.intro', { count: spBranches.length })}</span>
+                    </div>
+                    <SegmentedFilter
+                      value={activeBranchId}
+                      onChange={v => setBranchId(v)}
+                      options={spBranches.map(b => ({ value: b.locationId, label: branchName(b.locationId) }))}
+                    />
+                    {readOnly && <div className={s.branchNote}>{t('branchPricing.hours.readOnly')}</div>}
+                  </div>
+                )}
+
                 {DAY_KEYS.map((key) => {
                   const day: WorkingDay = schedule[key] ?? { enabled: false, start: '10:00', end: '19:00' }
                   const sameTime = day.enabled && day.start === day.end
@@ -238,14 +338,14 @@ export function Hours() {
                       <div className={s.timeInputs}>
                         <TimePicker
                           value={day.start}
-                          disabled={!day.enabled}
+                          disabled={!day.enabled || readOnly}
                           step={15}
                           onChange={v => updateDay(key, { start: v })}
                         />
                         <span className={s.timeSep}>–</span>
                         <TimePicker
                           value={day.end}
-                          disabled={!day.enabled}
+                          disabled={!day.enabled || readOnly}
                           step={15}
                           onChange={v => updateDay(key, { end: v })}
                         />
@@ -259,6 +359,20 @@ export function Hours() {
                     </div>
                   )
                 })}
+
+                {/* Same person, two places at once: allowed, but say what it means. */}
+                {overlaps.map(o => (
+                  <div key={`${o.a}|${o.b}`} className={s.overlapNote} role="status">
+                    <AlertTriangle size={15} />
+                    <span>
+                      {t('branchPricing.hours.overlap', {
+                        days: o.days.map(d => t(`hours.days.${d}`)).join(', '),
+                        a: branchName(o.a),
+                        b: branchName(o.b),
+                      })}
+                    </span>
+                  </div>
+                ))}
 
                 {/* ── Time off & exceptions ── */}
                 <div className={s.timeOffSection}>

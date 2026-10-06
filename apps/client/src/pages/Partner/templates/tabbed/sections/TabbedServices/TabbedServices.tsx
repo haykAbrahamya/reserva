@@ -1,14 +1,16 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { Plus, Clock, Search, X, ChevronDown } from 'lucide-react'
-import { fmtServicePrice, fmtDuration, hasPublicPrice } from '@reserva/shared'
+import { fmtServicePrice, fmtDurationSpan, hasPublicPrice } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
-import { canBook } from '@/services/booking.service'
+import { canBook, bookableAt, branchesForService, priceSpanFor } from '@/services/booking.service'
+import { BranchSwitcher } from '@/pages/Partner/components/BranchSwitcher/BranchSwitcher'
+import { useBranchChoice } from '@/pages/Partner/lib/useBranchChoice'
 import { useT, useLocalized } from '@/i18n'
 import s from './TabbedServices.module.scss'
 
 interface Props {
   partner: PublicPartner
-  onBook: (serviceId: string) => void
+  onBook: (serviceId: string, locationId?: string) => void
 }
 
 const ALL = 'All'
@@ -21,7 +23,21 @@ export function TabbedServices({ partner, onBook }: Props) {
   const t = useT()
   const loc = useLocalized()
   const bookable = canBook(partner)
-  const services = useMemo(() => partner.services.filter((sv) => sv.active), [partner])
+  // Branch switcher only when services or prices differ by branch (else null).
+  const branch = useBranchChoice(partner)
+  // With a branch chosen, only what that branch offers (plus menu-only
+  // services, which belong to no branch) — same rule as the classic template.
+  const services = useMemo(
+    () =>
+      partner.services.filter(
+        (sv) =>
+          sv.active &&
+          (!branch.branchId ||
+            bookableAt(partner, sv, branch.branchId) ||
+            branchesForService(partner, sv).length === 0),
+      ),
+    [partner, branch.branchId],
+  )
   // Category chips keep the BASE category as their stable value (used for
   // filtering/grouping), but display the localized label. Build a base→localized
   // label map from the services that carry a category translation.
@@ -37,6 +53,11 @@ export function TabbedServices({ partner, onBook }: Props) {
   const [cat, setCat] = useState(ALL)
   const [query, setQuery] = useState('')
   const [expanded, setExpanded] = useState(false)
+
+  // Another branch may have nothing in the chosen category: fall back to All.
+  useEffect(() => {
+    if (cat !== ALL && !categories.includes(cat)) setCat(ALL)
+  }, [categories, cat])
 
   // Filter by category + free-text search. Search matches the localized name +
   // category (what the visitor sees) as well as the base values.
@@ -60,12 +81,27 @@ export function TabbedServices({ partner, onBook }: Props) {
   // category / typing never leaves a stale "expanded" list.
   useEffect(() => { setExpanded(false) }, [cat, query])
 
+  // Phones: the chips are one swipeable row — keep the chosen one in view
+  // inside it (never moves the page).
+  const railRef = useRef<HTMLDivElement>(null)
+  const pickCategory = (c: string, chip: HTMLButtonElement) => {
+    setCat(c)
+    const rail = railRef.current
+    if (rail && rail.scrollWidth > rail.clientWidth) {
+      rail.scrollTo({ left: chip.offsetLeft - (rail.clientWidth - chip.offsetWidth) / 2, behavior: 'smooth' })
+    }
+  }
+
   const overLimit = filtered.length > INITIAL_LIMIT
   const visible = expanded || !overLimit ? filtered : filtered.slice(0, INITIAL_LIMIT)
   const hiddenCount = filtered.length - INITIAL_LIMIT
 
   return (
     <section className={s.section}>
+      {branch.active && branch.branchId && (
+        <BranchSwitcher branches={branch.branches} value={branch.branchId} onChange={branch.setBranchId} />
+      )}
+
       {/* Search bar */}
       <div className={s.search}>
         <Search size={16} className={s.searchIcon} />
@@ -85,12 +121,13 @@ export function TabbedServices({ partner, onBook }: Props) {
       </div>
 
       {categories.length > 2 && (
-        <div className={s.chips}>
+        <div ref={railRef} className={s.chips}>
           {categories.map((c) => (
             <button
               key={c}
               className={[s.chip, c === cat ? s.chipActive : ''].filter(Boolean).join(' ')}
-              onClick={() => setCat(c)}
+              aria-pressed={c === cat}
+              onClick={(e) => pickCategory(c, e.currentTarget)}
             >
               {catLabel(c)}
             </button>
@@ -105,18 +142,20 @@ export function TabbedServices({ partner, onBook }: Props) {
         </div>
       ) : (
       <div className={s.grid}>
-        {visible.map((sv) => (
+        {visible.map((sv) => {
+          // Exact price when everyone at the branch charges the same, else a span.
+          const span = priceSpanFor(partner, sv, branch.branchId)
+          const showPrice = hasPublicPrice(span)
+          return (
           <div
             key={sv.id}
-            className={[s.card, hasPublicPrice(sv) || bookable ? '' : s.cardFlush]
-              .filter(Boolean)
-              .join(' ')}
+            className={[s.card, showPrice || bookable ? '' : s.cardFlush].filter(Boolean).join(' ')}
           >
             <div className={s.cardBody}>
               <div className={s.name}>{loc(sv.name, sv.nameI18n)}</div>
               <div className={s.meta}>
                 <span className={s.metaItem}>
-                  <Clock size={13} /> {fmtDuration(sv.duration, { min: t('partner.services.min'), h: t('partner.services.hour') })}
+                  <Clock size={13} /> {fmtDurationSpan(span.durationMin, span.durationMax, { min: t('partner.services.min'), h: t('partner.services.hour') })}
                 </span>
                 {sv.category && <span className={s.metaCat}>{loc(sv.category, sv.categoryI18n)}</span>}
               </div>
@@ -124,22 +163,23 @@ export function TabbedServices({ partner, onBook }: Props) {
             {/* Dropped entirely when the price is withheld — same reasoning as
                 the classic template, and the two must behave identically or a
                 salon's page changes shape when it switches template. */}
-            {(hasPublicPrice(sv) || bookable) && (
+            {(showPrice || bookable) && (
               <div
-                className={[s.right, hasPublicPrice(sv) ? '' : s.rightNoPrice]
+                className={[s.right, showPrice ? '' : s.rightNoPrice]
                   .filter(Boolean)
                   .join(' ')}
               >
-                {hasPublicPrice(sv) && <span className={s.price}>{fmtServicePrice(sv, { from: t('partner.services.priceFrom') })}</span>}
+                {showPrice && <span className={s.price}>{fmtServicePrice(span, { from: t('partner.services.priceFrom') })}</span>}
                 {bookable && (
-                  <button className={s.bookBtn} onClick={() => onBook(sv.id)}>
+                  <button className={s.bookBtn} onClick={() => onBook(sv.id, branch.branchId ?? undefined)}>
                     <Plus size={14} /> {t('partner.services.book')}
                   </button>
                 )}
               </div>
             )}
           </div>
-        ))}
+          )
+        })}
       </div>
       )}
 

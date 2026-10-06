@@ -12,8 +12,8 @@ import type { Specialist } from '@reserva/shared'
  */
 export interface TemplateProps {
   partner: PublicPartner
-  /** Open the booking flow, optionally seeded with a service. */
-  onBook: (serviceId?: string) => void
+  /** Open the booking flow, optionally seeded with a service and/or a branch. */
+  onBook: (serviceId?: string, locationId?: string) => void
   /** Open a specialist's detail modal (salons; singles have no team grid). */
   onOpenSpecialist: (specialist: Specialist) => void
 }

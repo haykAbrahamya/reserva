@@ -1,8 +1,12 @@
 import type {
   Partner,
   Service,
+  ServiceBranchSetting,
+  ServicePriceType,
   Specialist,
+  SpecialistBranch,
   SpecialistHours,
+  SpecialistPrice,
   SpecialistTimeOff,
   Location,
   WeekSchedule,
@@ -10,7 +14,38 @@ import type {
   PageParams,
   LocalizedText,
 } from '@/types'
-import http, { apiGet, apiPost, apiPatch, apiDelete } from './http'
+import http, { apiGet, apiPost, apiPatch, apiPut, apiDelete } from './http'
+
+/** A branch's settings for one service, as `/pricing` returns them. */
+export type BranchPriceRow = ServiceBranchSetting & { serviceId: string }
+
+/** The partner's sparse price overrides + whether the feature is switched on. */
+export interface PricingOverrides {
+  enabled: boolean
+  branches: BranchPriceRow[]
+  specialists: SpecialistPrice[]
+}
+
+/** One branch row of a service's price grid (null = inherit). */
+export interface BranchPriceInput {
+  locationId: string
+  offered: boolean
+  priceType: ServicePriceType | null
+  price: number | null
+  priceMax: number | null
+  duration: number | null
+  capacity: number | null
+}
+
+/** One specialist row of a service's price grid (null = inherit). */
+export interface SpecialistPriceInput {
+  specialistId: string
+  locationId: string
+  priceType: ServicePriceType | null
+  price: number | null
+  priceMax: number | null
+  duration: number | null
+}
 
 // ─────────────────────────────────────────────────────────────
 // API client for the partner-scoped backoffice resources. Each resource is
@@ -346,8 +381,42 @@ export const partnersService = {
     const sp = await apiGet<ApiSpecialist>(`/specialists/${specialistId}`)
     return { specialistId, schedule: sp.schedule ?? {} }
   },
+  /** Hours at the specialist's home branch (the single-branch editor). */
   async updateHours(specialistId: string, schedule: WeekSchedule): Promise<void> {
     await apiPatch(`/specialists/${specialistId}`, { schedule })
+  },
+  /**
+   * Hours at every branch a specialist works at, saved together. Sends the
+   * complete branch list (home included), so it also fixes which branches
+   * they work at — pass exactly what the editor shows.
+   */
+  async updateBranchHours(specialistId: string, homeId: string, branches: SpecialistBranch[]): Promise<Specialist> {
+    return toSpecialist(
+      await apiPatch<ApiSpecialist>(`/specialists/${specialistId}`, {
+        locationId: homeId,
+        locations: branches.map((b) => ({ locationId: b.locationId, ...(b.schedule ? { schedule: b.schedule } : {}) })),
+      }),
+    )
+  },
+
+  // ── Branch & specialist pricing ──
+  /** All of the partner's price overrides (sparse) + whether the feature is on. */
+  async getPricing(): Promise<PricingOverrides> {
+    return apiGet<PricingOverrides>('/pricing')
+  },
+  /**
+   * Save a service's price grid. Each list sent replaces that kind of row for
+   * the branches in scope; an omitted list is left alone. `locationId` narrows
+   * the save to one branch (the branch screen).
+   */
+  async saveServicePricing(
+    serviceId: string,
+    body: { branches?: BranchPriceInput[]; specialists?: SpecialistPriceInput[] },
+    locationId?: string,
+  ): Promise<PricingOverrides> {
+    return apiPut<PricingOverrides>(`/pricing/services/${serviceId}`, body, {
+      params: locationId ? { locationId } : undefined,
+    })
   },
 
   // ── Time off (nested under a specialist) ──

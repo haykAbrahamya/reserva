@@ -169,6 +169,10 @@ export async function apiPatch<T>(url: string, body?: unknown): Promise<T> {
   const res = await http.patch(url, body)
   return unwrap<T>(res.data)
 }
+export async function apiPut<T>(url: string, body?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  const res = await http.put(url, body, config)
+  return unwrap<T>(res.data)
+}
 export async function apiDelete(url: string): Promise<void> {
   await http.delete(url)
 }

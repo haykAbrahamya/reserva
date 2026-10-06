@@ -20,6 +20,8 @@ export interface ApiBooking {
   priceAtBooking?: number
   /** Upper bound snapshot for a range-priced booking; null for fixed. */
   priceMaxAtBooking?: number | null
+  /** Price type the booking was made with; null on older bookings. */
+  priceTypeAtBooking?: 'fixed' | 'range' | null
   /** Exact amount charged, captured on completion of a range booking. */
   finalPrice?: number | null
   // Joined display data (see backend BOOKING_INCLUDE).
@@ -60,6 +62,7 @@ export function mapApiBooking(b: ApiBooking): Booking {
     notes: b.notes ?? undefined,
     priceAtBooking: b.priceAtBooking,
     priceMaxAtBooking: b.priceMaxAtBooking,
+    priceTypeAtBooking: b.priceTypeAtBooking ?? null,
     finalPrice: b.finalPrice,
     service: b.service ?? null,
     specialist: b.specialist ?? null,
@@ -84,6 +87,19 @@ export interface PaginatedBookings {
   pageSize: number
   total: number
   pageCount: number
+}
+
+/**
+ * Time a specialist who works at this branch is booked at ANOTHER branch —
+ * shown in the calendar as "busy elsewhere", without any client details.
+ */
+export interface BusyElsewhere {
+  id: string
+  specialistId: string
+  locationId: string
+  startISO: string
+  endISO: string
+  location: { id: string; name: string; nameI18n?: Record<string, string | null> | null } | null
 }
 
 export const bookingsService = {
@@ -123,6 +139,25 @@ export const bookingsService = {
     includePast?: boolean
   }): Promise<string[]> {
     return apiGet<string[]>('/bookings/slots', { params })
+  },
+
+  /**
+   * Bookings of this branch's specialists at OTHER branches in a window (they
+   * can't be here then). A manager always gets their own branch; an admin
+   * passes the branch they are looking at.
+   */
+  async busyElsewhere(from: string, to: string, locationId?: string): Promise<BusyElsewhere[]> {
+    const rows = await apiGet<
+      { id: string; specialistId: string; locationId: string; startAt: string; endAt: string; location: BusyElsewhere['location'] }[]
+    >('/bookings/busy-elsewhere', { params: { from, to, ...(locationId ? { locationId } : {}) } })
+    return rows.map((r) => ({
+      id: r.id,
+      specialistId: r.specialistId,
+      locationId: r.locationId,
+      startISO: r.startAt,
+      endISO: r.endAt,
+      location: r.location,
+    }))
   },
 
   async get(id: string): Promise<Booking | undefined> {

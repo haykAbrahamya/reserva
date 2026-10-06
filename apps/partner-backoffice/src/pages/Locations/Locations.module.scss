@@ -179,3 +179,12 @@
   font-size: 12px;
   color: $danger;
 }
+
+/* Branch & specialist pricing: "Services & prices" entry on each branch card */
+.cardFoot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed $line-2;
+}
