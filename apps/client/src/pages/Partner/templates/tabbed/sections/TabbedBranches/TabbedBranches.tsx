@@ -3,6 +3,7 @@ import { worksAt } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
 import { useI18n, useLocalized } from '@/i18n'
 import { bookableLocations, canBook } from '@/services/booking.service'
+import { track } from '@/services/analytics.service'
 import { summarizeHours } from '../../../../lib/summarizeHours'
 import s from './TabbedBranches.module.scss'
 
@@ -48,6 +49,8 @@ export function TabbedBranches({ partner, onBook }: Props) {
         {bookable.map((loc) => {
           const staffHere = partner.specialists.filter((sp) => sp.active && worksAt(sp, loc.id)).length
           const hours = summarizeHours(loc.hours, t('partner.locations.closed'), dayLabels)
+          // Same section name as the classic Locations, so both templates add up.
+          const directions = () => track('contact_click', { ch: 'directions', from: 'locations', loc: loc.id })
           return (
             <div key={loc.id} className={s.card}>
               <a
@@ -57,16 +60,21 @@ export function TabbedBranches({ partner, onBook }: Props) {
                 rel="noopener noreferrer"
                 style={{ background: `linear-gradient(135deg, ${t1}, ${t2})` }}
                 title={t('partner.locations.openInMaps')}
+                onClick={directions}
               >
                 <span className={s.mapGrid} />
                 <span className={s.mapPin}><MapPin size={20} /></span>
               </a>
               <div className={s.body}>
                 <div className={s.name}>{tr(loc.name, loc.nameI18n)}</div>
-                <a className={s.row} href={mapsUrl(loc)} target="_blank" rel="noopener noreferrer" title={t('partner.locations.openInMaps')}>
+                <a className={s.row} href={mapsUrl(loc)} target="_blank" rel="noopener noreferrer" title={t('partner.locations.openInMaps')} onClick={directions}>
                   <MapPin size={15} /> <span>{loc.address}</span>
                 </a>
-                <a className={s.row} href={`tel:${loc.phone.replace(/\s/g, '')}`}>
+                <a
+                  className={s.row}
+                  href={`tel:${loc.phone.replace(/\s/g, '')}`}
+                  onClick={() => track('contact_click', { ch: 'call', from: 'locations', loc: loc.id })}
+                >
                   <Phone size={15} /> <span>{loc.phone}</span>
                 </a>
                 {hours && <div className={s.row}><Clock size={15} /> <span>{hours}</span></div>}
@@ -75,11 +83,11 @@ export function TabbedBranches({ partner, onBook }: Props) {
                 )}
               </div>
               <div className={s.actions}>
-                <a className={s.directions} href={mapsUrl(loc)} target="_blank" rel="noopener noreferrer">
+                <a className={s.directions} href={mapsUrl(loc)} target="_blank" rel="noopener noreferrer" onClick={directions}>
                   <Navigation size={15} /> {t('partner.locations.directions')}
                 </a>
                 {canBook(partner) && (
-                  <button className={s.bookHere} onClick={() => onBook(loc.id)}>
+                  <button className={s.bookHere} onClick={() => { track('book_click', { from: 'locations', loc: loc.id }); onBook(loc.id) }}>
                     <CalendarCheck size={15} /> {t('partner.locations.bookHere')}
                   </button>
                 )}

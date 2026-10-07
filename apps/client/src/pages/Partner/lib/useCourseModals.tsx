@@ -65,6 +65,7 @@ export function useCourseModals(partner: PublicPartner) {
         <CallLocationModal
           partner={partner}
           locations={callLocations}
+          from="courses"
           onClose={() => setCallOpen(false)}
         />
       )}

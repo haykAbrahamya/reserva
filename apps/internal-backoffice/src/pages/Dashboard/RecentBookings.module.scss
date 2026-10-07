@@ -1,0 +1,182 @@
+@use 'variables' as *;
+
+/* A size container: rows stack by the card's own width, whatever the sidebar
+   or the window does. It sits below everything else on the Dashboard, so it
+   brings its own space above and leaves the existing blocks untouched. */
+.card {
+  container: recent-bookings / inline-size;
+  margin-top: 30px;
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.title { font-size: 16px; font-weight: 600; margin: 0; }
+.sub { font-size: 12.5px; color: $fg-2; margin: 3px 0 0; }
+
+.spin { animation: bo-spin 0.7s linear infinite; }
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  overflow: hidden;
+}
+
+/* when · who · appointment · source + status · price */
+.row {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr) 160px auto 112px;
+  grid-template-areas: 'when who appt badges price';
+  align-items: center;
+  gap: 14px;
+  padding: 11px 16px;
+  border-top: 1px solid $line-1;
+  font-size: 13px;
+
+  &:first-child { border-top: 0; }
+}
+
+/* A booking that arrived on a refresh: a short accent wash that fades out. */
+.fresh { animation: recent-arrived 4s ease-out both; }
+@keyframes recent-arrived {
+  from { background: $accent-soft; }
+  to { background: transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fresh { animation: none; box-shadow: inset 3px 0 0 $accent; }
+}
+
+.when {
+  grid-area: when;
+  font-size: 12.5px;
+  color: $fg-2;
+  white-space: nowrap;
+  cursor: default;
+}
+.who {
+  grid-area: who;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.partner {
+  align-self: flex-start;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: $fg-0;
+
+  &:hover { color: $accent-contrast; text-decoration: underline; text-underline-offset: 3px; }
+}
+.details {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  color: $fg-2;
+}
+.appt {
+  grid-area: appt;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  color: $fg-1;
+
+  svg { color: $fg-3; flex-shrink: 0; }
+}
+.badges {
+  grid-area: badges;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+/* Same anatomy as the shared Badge; online bookings carry the accent, since
+   they are the ones the public site produced. */
+.source {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: $fg-1;
+  background: $bg-3;
+}
+.online { color: $accent-contrast; background: $accent-soft; }
+.plain { font-size: 12px; color: $fg-2; }
+.price {
+  grid-area: price;
+  text-align: right;
+  white-space: nowrap;
+  font-weight: 500;
+  color: $fg-0;
+}
+
+/* Narrow (a phone, or a squeezed window): each booking becomes a small card.
+     Partner .............. 2 min ago
+     Service · specialist · branch
+     Today, 15:30 ........... 15,000 ֏
+     [Online] [Confirmed]                 */
+@container recent-bookings (max-width: 720px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'who when'
+      'appt price'
+      'badges badges';
+    align-items: start;
+    gap: 6px 12px;
+    padding: 12px 14px;
+  }
+  .when { padding-top: 2px; text-align: right; }
+  .details { white-space: normal; }
+}
+
+.moreRow {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.skelRow {
+  height: 58px;
+  border-top: 1px solid $line-1;
+  background: linear-gradient(100deg, $bg-1 30%, $bg-2 50%, $bg-1 70%);
+  background-size: 200% 100%;
+  animation: recent-shimmer 1.3s ease-in-out infinite;
+
+  &:first-child { border-top: 0; }
+}
+@keyframes recent-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .skelRow { animation: none; } }
+
+.error {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  padding: 14px 16px;
+  border-radius: $r-2;
+  border: 1px solid $line-1;
+  background: $danger-soft;
+  color: $danger;
+  font-size: 13px;
+}
+.errorText { flex: 1; min-width: 200px; }

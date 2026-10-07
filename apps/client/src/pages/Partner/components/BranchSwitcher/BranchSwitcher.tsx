@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, typ
 import { MapPin } from 'lucide-react'
 import type { PublicPartner } from '@/mock/partners'
 import { useT, useLocalized } from '@/i18n'
+import { track } from '@/services/analytics.service'
 import { dayKeyOf, nextDayKey, weekState, windowsOfHours } from '../../lib/openHours'
 import s from './BranchSwitcher.module.scss'
 
@@ -78,12 +79,19 @@ export function BranchSwitcher({ branches, value, onChange }: Props) {
     row.scrollTo({ left, behavior: animate ? 'smooth' : 'auto' })
   }, [index, animate])
 
+  // Only clicks and arrow keys get here — the initial branch never does — so
+  // every real change is the visitor's own switch.
+  const pick = (id: string) => {
+    if (id !== value) track('branch_switch', { loc: id })
+    onChange(id)
+  }
+
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     const step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0
     if (!step) return
     e.preventDefault()
     const next = (index + step + branches.length) % branches.length
-    onChange(branches[next].id)
+    pick(branches[next].id)
     tabRefs.current[next]?.focus()
   }
 
@@ -125,7 +133,7 @@ export function BranchSwitcher({ branches, value, onChange }: Props) {
               aria-checked={on}
               tabIndex={on ? 0 : -1}
               className={[s.tab, on ? s.on : ''].filter(Boolean).join(' ')}
-              onClick={() => onChange(b.id)}
+              onClick={() => pick(b.id)}
             >
               {labels[i]}
             </button>

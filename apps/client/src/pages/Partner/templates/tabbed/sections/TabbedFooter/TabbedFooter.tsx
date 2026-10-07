@@ -1,6 +1,7 @@
 import { CalendarCheck } from 'lucide-react'
 import type { PublicPartner } from '@/mock/partners'
 import { canBook } from '@/services/booking.service'
+import { track } from '@/services/analytics.service'
 import { useT } from '@/i18n'
 import s from './TabbedFooter.module.scss'
 
@@ -23,7 +24,7 @@ export function TabbedFooter({ partner, onBook }: Props) {
           <h2 className={s.title}>{t('partner.footer.title')}</h2>
           <p className={s.text}>{t('partner.footer.text')}</p>
           {canBook(partner) ? (
-            <button className={s.cta} onClick={onBook}>
+            <button className={s.cta} onClick={() => { track('book_click', { from: 'footer' }); onBook() }}>
               <CalendarCheck size={18} /> {t('partner.footer.bookNow')}
             </button>
           ) : null}

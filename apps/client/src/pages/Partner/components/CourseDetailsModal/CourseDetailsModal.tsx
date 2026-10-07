@@ -6,6 +6,8 @@ import { partnerBrandVars } from '../../partnerBrand'
 import { useAppSelector } from '@/store/hooks'
 import { ModalShell } from '@/components/ModalShell/ModalShell'
 import { useI18n, useLocalized } from '@/i18n'
+import { primaryLocation } from '@/services/booking.service'
+import { track } from '@/services/analytics.service'
 import {
   fmtCoursePrice,
   courseSeatsLeft,
@@ -58,7 +60,14 @@ export function CourseDetailsModal({ partner, course, onClose, onRegister, onCal
         let action = null
         if (cta.kind === 'register') {
           action = (
-            <button className={s.primary} onClick={() => { onRegister(course); requestClose() }}>
+            <button
+              className={s.primary}
+              onClick={() => {
+                track('course_register_click', { course: course.id })
+                onRegister(course)
+                requestClose()
+              }}
+            >
               {t('courses.register.cta')} <ArrowRight size={17} />
             </button>
           )
@@ -72,7 +81,11 @@ export function CourseDetailsModal({ partner, course, onClose, onRegister, onCal
           )
         } else if (cta.telHref) {
           action = (
-            <a className={s.primary} href={cta.telHref}>
+            <a
+              className={s.primary}
+              href={cta.telHref}
+              onClick={() => track('contact_click', { ch: 'call', from: 'courses', loc: primaryLocation(partner)?.id })}
+            >
               <Phone size={17} /> {t('courses.call')}
             </a>
           )

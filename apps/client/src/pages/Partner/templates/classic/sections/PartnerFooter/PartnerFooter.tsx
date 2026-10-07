@@ -5,6 +5,7 @@ import { Reveal } from '@/components/Reveal/Reveal'
 import { LogoMark } from '@/components/Logo/Logo'
 import { marketingSiteUrl } from '@/hooks/useTenantSlug'
 import { bookableLocations, canBook, partnerTelHref } from '@/services/booking.service'
+import { track } from '@/services/analytics.service'
 import { useT } from '@/i18n'
 import { CallLocationModal } from '../../../../components/CallLocationModal/CallLocationModal'
 import s from './PartnerFooter.module.scss'
@@ -37,7 +38,7 @@ export function PartnerFooter({ partner, onBook }: Props) {
                 {t('partner.footer.text')}
               </p>
               {canBook(partner) ? (
-                <button className={s.bookBtn} onClick={onBook}>
+                <button className={s.bookBtn} onClick={() => { track('book_click', { from: 'footer' }); onBook() }}>
                   <CalendarCheck size={18} /> {t('partner.footer.bookNow')}
                 </button>
               ) : telHref && (
@@ -46,7 +47,11 @@ export function PartnerFooter({ partner, onBook }: Props) {
                     <Phone size={18} /> {t('partner.callNow')}
                   </button>
                 ) : (
-                  <a className={s.bookBtn} href={telHref}>
+                  <a
+                    className={s.bookBtn}
+                    href={telHref}
+                    onClick={() => track('contact_click', { ch: 'call', from: 'footer', loc: loc?.id })}
+                  >
                     <Phone size={18} /> {t('partner.callNow')}
                   </a>
                 )
@@ -57,7 +62,7 @@ export function PartnerFooter({ partner, onBook }: Props) {
       </section>
 
       {callOpen && (
-        <CallLocationModal partner={partner} locations={callLocations} onClose={() => setCallOpen(false)} />
+        <CallLocationModal partner={partner} locations={callLocations} from="footer" onClose={() => setCallOpen(false)} />
       )}
 
       <footer className={s.footer}>

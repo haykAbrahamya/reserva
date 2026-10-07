@@ -4,6 +4,7 @@ import { WhatsappIcon } from '@reserva/ui'
 import { useT, useLocalized } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
 import { bookableLocations, canBook } from '@/services/booking.service'
+import { track } from '@/services/analytics.service'
 import { CallLocationModal } from '../../../../components/CallLocationModal/CallLocationModal'
 import { scrollToSection } from '../../../../lib/scrollToSection'
 import s from './PartnerHero.module.scss'
@@ -163,7 +164,7 @@ export function PartnerHero({ partner, onBook }: Props) {
 
         <div className={s.actions}>
           {canBook(partner) && (
-            <button className={s.bookCta} onClick={onBook}>
+            <button className={s.bookCta} onClick={() => { track('book_click', { from: 'hero' }); onBook() }}>
               <CalendarCheck size={18} /> {t('partner.hero.bookAppointment')}
             </button>
           )}
@@ -173,7 +174,11 @@ export function PartnerHero({ partner, onBook }: Props) {
                 <Phone size={17} /> {t('partner.hero.call')}
               </button>
             ) : (
-              <a className={s.callBtn} href={`tel:${primaryLocation.phone.replace(/\s/g, '')}`}>
+              <a
+                className={s.callBtn}
+                href={`tel:${primaryLocation.phone.replace(/\s/g, '')}`}
+                onClick={() => track('contact_click', { ch: 'call', from: 'hero', loc: primaryLocation.id })}
+              >
                 <Phone size={17} /> {t('partner.hero.call')}
               </a>
             )
@@ -186,17 +191,20 @@ export function PartnerHero({ partner, onBook }: Props) {
           {(p.instagram || p.facebook || p.whatsapp) && (
             <div className={s.socials}>
               {p.instagram && (
-                <a className={s.social} href={p.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                <a className={s.social} href={p.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"
+                  onClick={() => track('contact_click', { ch: 'instagram', from: 'hero' })}>
                   <Instagram size={18} />
                 </a>
               )}
               {p.facebook && (
-                <a className={s.social} href={p.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                <a className={s.social} href={p.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook"
+                  onClick={() => track('contact_click', { ch: 'facebook', from: 'hero' })}>
                   <Facebook size={18} />
                 </a>
               )}
               {p.whatsapp && (
-                <a className={s.social} href={`https://wa.me/${p.whatsapp}`} target="_blank" rel="noopener noreferrer" aria-label={t('partner.hero.whatsapp')}>
+                <a className={s.social} href={`https://wa.me/${p.whatsapp}`} target="_blank" rel="noopener noreferrer" aria-label={t('partner.hero.whatsapp')}
+                  onClick={() => track('contact_click', { ch: 'whatsapp', from: 'hero' })}>
                   <WhatsappIcon size={18} />
                 </a>
               )}
@@ -219,7 +227,7 @@ export function PartnerHero({ partner, onBook }: Props) {
       </button>
 
       {callOpen && (
-        <CallLocationModal partner={partner} locations={locations} onClose={() => setCallOpen(false)} />
+        <CallLocationModal partner={partner} locations={locations} from="hero" onClose={() => setCallOpen(false)} />
       )}
     </section>
   )

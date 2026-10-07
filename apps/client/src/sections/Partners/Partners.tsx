@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { listSalons, type SalonCard } from '@/services/salons.service'
+import { track } from '@/services/analytics.service'
 import { useT } from '@/i18n'
 import s from './Partners.module.scss'
 
@@ -18,8 +19,10 @@ function PartnerChip({ salon }: { salon: SalonCard }) {
       <span className={s.name}>{salon.name}</span>
     </>
   )
-  return salon.slug ? (
-    <a className={s.chip} href={`/p/${salon.slug}`} title={salon.name}>{body}</a>
+  const { slug } = salon
+  // No `pos`: the marquee repeats and scrolls, so a place in it means nothing.
+  return slug ? (
+    <a className={s.chip} href={`/p/${slug}`} title={salon.name} onClick={() => track('salon_click', { slug })}>{body}</a>
   ) : (
     <span className={s.chip}>{body}</span>
   )

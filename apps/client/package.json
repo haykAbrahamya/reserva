@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@noble/ciphers": "^2.4.0",
     "@reduxjs/toolkit": "^2.5.0",
     "@reserva/shared": "workspace:*",
     "@reserva/ui": "workspace:*",

@@ -4,6 +4,7 @@ import { Avatar, Badge, Empty } from '@/components/ui'
 import { useResource } from '@/store/useResource'
 import { statsService } from '@/services/stats.service'
 import { useAuthStore } from '@/store/auth.store'
+import { RecentBookings } from './RecentBookings'
 import s from './Dashboard.module.scss'
 
 export function Dashboard() {
@@ -66,6 +67,8 @@ export function Dashboard() {
           </div>
         )}
       </div>
+
+      <RecentBookings />
     </div>
   )
 }

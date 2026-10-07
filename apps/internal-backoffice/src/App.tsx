@@ -4,6 +4,7 @@ import { ToastProvider } from '@/components/ui'
 import { useAuthStore } from '@/store/auth.store'
 import { authService } from '@/services/auth.service'
 import { tokenStore } from '@/services/http'
+import { markStaffBrowser } from '@/services/staffCookie'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { RequireAuth } from '@/components/auth/RequireAuth'
 import { RequireOwner } from '@/components/auth/RequireOwner'
@@ -15,6 +16,7 @@ import { Staff } from '@/pages/Staff/Staff'
 import { DemoRequests } from '@/pages/DemoRequests/DemoRequests'
 import { PendingRegistrations } from '@/pages/PendingRegistrations/PendingRegistrations'
 import { Visits } from '@/pages/Visits/Visits'
+import { Analytics } from '@/pages/Analytics/Analytics'
 import { Specialties } from '@/pages/Specialties/Specialties'
 import { Areas } from '@/pages/Areas/Areas'
 import { Support } from '@/pages/Support/Support'
@@ -37,6 +39,8 @@ function SessionBootstrap() {
   const setUser = useAuthStore((s) => s.setUser)
   useEffect(() => {
     if (!tokenStore.access) return
+    // A restored session never passes through login(), so flag the browser here too.
+    markStaffBrowser()
     authService.me().then(setUser).catch(() => setUser(null))
   }, [setUser])
   return null
@@ -58,6 +62,7 @@ export default function App() {
             <Route path="support" element={<Support />} />
             <Route path="demo-requests" element={<DemoRequests />} />
             <Route path="pending-registrations" element={<PendingRegistrations />} />
+            <Route path="analytics" element={<Analytics />} />
             <Route path="visits" element={<Visits />} />
             <Route path="specialties" element={<Specialties />} />
             <Route path="areas" element={<Areas />} />

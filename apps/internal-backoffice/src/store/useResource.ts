@@ -44,6 +44,9 @@ export function useResource<T>(
   useEffect(() => {
     let active = true
     setLoading(true)
+    // Each fetch starts clean — otherwise one failure stays reported through
+    // every later successful refetch (e.g. after picking another date range).
+    setError(null)
     fetcherRef
       .current()
       .then((result) => active && setData(result))

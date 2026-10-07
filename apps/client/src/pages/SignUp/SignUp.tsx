@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import {
   ArrowRight, ArrowLeft, Check, CheckCircle2, Eye, EyeOff, AlertCircle,
@@ -10,6 +10,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher
 import { AccentPicker } from '@/components/AccentPicker/AccentPicker'
 import { signupService } from '@/services/signup.service'
 import { friendlyError } from '@/services/errors'
+import { track } from '@/services/analytics.service'
 import { isValidPhone, normalizePhoneInput } from '@reserva/shared'
 import { useScrollToTop } from '@/hooks/useScrollToTop'
 import { useSeo } from '@/hooks/useSeo'
@@ -58,18 +59,37 @@ export function SignUp() {
   const matchValid   = confirm.length > 0 && password === confirm
   const accountValid = nameValid && emailValid && phoneValid && pwValid && matchValid
 
+  // Analytics: the first touch of the form, each step, every attempt and how it
+  // ended. Errors name the field (the first invalid one) or the API code —
+  // never what was typed.
+  const started = useRef(false)
+  const markStarted = () => {
+    if (started.current) return
+    started.current = true
+    track('signup_start')
+  }
+  const invalidField = !nameValid ? 'name' : !emailValid ? 'email' : !phoneValid ? 'phone' : !pwValid ? 'password' : 'confirm'
+
   const goAccount = () => {
     setTouched(true)
-    if (!companyValid) return
+    if (!companyValid) {
+      track('signup_error', { field: company.trim().length > 1 ? 'companyType' : 'company' })
+      return
+    }
     setTouched(false)
+    track('signup_step', { step: 'account' })
     setStep('account')
   }
 
   const handleSubmit = async () => {
     setTouched(true)
     setSubmitError('')
-    if (!accountValid) return
+    if (!accountValid) {
+      track('signup_error', { field: invalidField })
+      return
+    }
     setSubmitting(true)
+    track('signup_submit')
     try {
       await signupService.start({
         companyName: company.trim(),
@@ -82,8 +102,10 @@ export function SignUp() {
         adminPhone: normalizePhoneInput(phone),
         password,
       })
+      track('signup_success')
       setStep('success')
     } catch (err) {
+      track('signup_error', { code: (err as { code?: string } | null)?.code ?? 'UNKNOWN' })
       // Map known backend codes (SLUG_TAKEN, EMAIL_TAKEN, …) to friendly,
       // localized copy; fall back to a generic message for anything else.
       setSubmitError(friendlyError(err, t))
@@ -192,7 +214,8 @@ export function SignUp() {
                   <p className={s.subtitle}>{t('signup.companySubtitle')}</p>
                 </div>
 
-                <div className={s.form}>
+                {/* Typing or clicking anything here is the start (autoFocus isn't). */}
+                <div className={s.form} onInputCapture={markStarted} onClickCapture={markStarted}>
                   {/* Salon (team) vs single (solo) — drives the whole product shape */}
                   <div className={s.kindField}>
                     <label className={s.kindLabel}>{t('signup.kindLabel')}</label>
@@ -263,7 +286,7 @@ export function SignUp() {
             ) : (
               <>
                 <div className={s.heading}>
-                  <button className={s.backLink} onClick={() => setStep('company')}>
+                  <button className={s.backLink} onClick={() => { track('signup_step', { step: 'company' }); setStep('company') }}>
                     <ArrowLeft size={14} /> {t('signup.back')}
                   </button>
                   <h1 className={s.title}>{t('signup.accountTitle')}</h1>

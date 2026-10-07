@@ -3,6 +3,7 @@ import { Plus, Clock, Search, X, ChevronDown } from 'lucide-react'
 import { fmtServicePrice, fmtDurationSpan, hasPublicPrice } from '@reserva/shared'
 import type { PublicPartner } from '@/mock/partners'
 import { canBook, bookableAt, branchesForService, priceSpanFor } from '@/services/booking.service'
+import { track, trackTyped } from '@/services/analytics.service'
 import { BranchSwitcher } from '@/pages/Partner/components/BranchSwitcher/BranchSwitcher'
 import { useBranchChoice } from '@/pages/Partner/lib/useBranchChoice'
 import { useT, useLocalized } from '@/i18n'
@@ -81,10 +82,14 @@ export function TabbedServices({ partner, onBook }: Props) {
   // category / typing never leaves a stale "expanded" list.
   useEffect(() => { setExpanded(false) }, [cat, query])
 
+  // Analytics: what visitors look for, sent once they pause typing.
+  useEffect(() => { trackTyped('service_search', query) }, [query])
+
   // Phones: the chips are one swipeable row — keep the chosen one in view
   // inside it (never moves the page).
   const railRef = useRef<HTMLDivElement>(null)
   const pickCategory = (c: string, chip: HTMLButtonElement) => {
+    if (c !== cat) track('category_select', { cat: c })
     setCat(c)
     const rail = railRef.current
     if (rail && rail.scrollWidth > rail.clientWidth) {
@@ -171,7 +176,13 @@ export function TabbedServices({ partner, onBook }: Props) {
               >
                 {showPrice && <span className={s.price}>{fmtServicePrice(span, { from: t('partner.services.priceFrom') })}</span>}
                 {bookable && (
-                  <button className={s.bookBtn} onClick={() => onBook(sv.id, branch.branchId ?? undefined)}>
+                  <button
+                    className={s.bookBtn}
+                    onClick={() => {
+                      track('book_click', { from: 'services', svc: sv.id, loc: branch.branchId })
+                      onBook(sv.id, branch.branchId ?? undefined)
+                    }}
+                  >
                     <Plus size={14} /> {t('partner.services.book')}
                   </button>
                 )}

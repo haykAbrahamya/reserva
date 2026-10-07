@@ -292,10 +292,14 @@ export function canBook(partner: Pick<PublicPartner, 'bookingsEnabled'>): boolea
   return partner.bookingsEnabled !== false
 }
 
+/** The partner's primary branch (first bookable, else first) — whose phone is "the" phone. */
+export function primaryLocation(partner: PublicPartner): PublicPartner['locations'][number] | undefined {
+  return bookableLocations(partner)[0] ?? partner.locations[0]
+}
+
 /** The partner's primary public phone (first bookable branch, else first branch). */
 export function partnerPhone(partner: PublicPartner): string | null {
-  const loc = bookableLocations(partner)[0] ?? partner.locations[0]
-  return loc?.phone || null
+  return primaryLocation(partner)?.phone || null
 }
 
 /** `tel:` href for the primary phone, or null when no phone is known. */

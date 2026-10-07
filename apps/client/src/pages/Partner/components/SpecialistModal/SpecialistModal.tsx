@@ -9,6 +9,7 @@ import { ModalShell } from '@/components/ModalShell/ModalShell'
 import { ReviewsPanel } from '@/components/ReviewsPanel/ReviewsPanel'
 import { canBook, bookableLocations, priceBookOf } from '@/services/booking.service'
 import { useI18n, useLocalized } from '@/i18n'
+import { track } from '@/services/analytics.service'
 import { WEEK, dayKeyOf, nextDayKey, weekState } from '../../lib/openHours'
 import s from './SpecialistModal.module.scss'
 
@@ -225,7 +226,14 @@ export function SpecialistModal({ partner, specialist, onClose, onBook }: Props)
 
         {canBook(partner) && (
           <div className={s.footer}>
-            <button className={s.bookBtn} onClick={() => { onBook(); requestClose() }}>
+            <button
+              className={s.bookBtn}
+              onClick={() => {
+                track('book_click', { from: 'specialist', sp: specialist.id })
+                onBook()
+                requestClose()
+              }}
+            >
               <CalendarCheck size={17} /> {t('specialistModal.bookWith', { name: firstName })}
             </button>
           </div>

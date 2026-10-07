@@ -1,6 +1,7 @@
 import type { AuthUser } from '@/store/auth.store'
 import { apiPost, apiGet, tokenStore } from './http'
 import { disablePush } from './push.service'
+import { markStaffBrowser } from '@/lib/staffCookie'
 
 // ── API response shapes ──
 interface ApiUser {
@@ -41,6 +42,7 @@ export const authService = {
   async login(login: string, password: string): Promise<LoginResult> {
     const res = await apiPost<AuthResult>('/auth/login', { login, password })
     tokenStore.set(res.accessToken, res.refreshToken)
+    markStaffBrowser()
     return { token: res.accessToken, user: toAuthUser(res.user) }
   },
 
@@ -49,6 +51,7 @@ export const authService = {
   async activate(token: string): Promise<LoginResult> {
     const res = await apiPost<AuthResult>('/public/signup/activate', { token })
     tokenStore.set(res.accessToken, res.refreshToken)
+    markStaffBrowser()
     return { token: res.accessToken, user: toAuthUser(res.user) }
   },
 

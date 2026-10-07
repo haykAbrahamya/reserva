@@ -1,4 +1,5 @@
 import { apiGet, apiPost, tokenStore } from './http'
+import { markStaffBrowser } from './staffCookie'
 import type { PlatformUser } from '@/store/auth.store'
 
 interface AuthResult {
@@ -11,6 +12,7 @@ export const authService = {
   async login(email: string, password: string): Promise<PlatformUser> {
     const res = await apiPost<AuthResult>('/platform/auth/login', { email, password })
     tokenStore.set(res.accessToken, res.refreshToken)
+    markStaffBrowser()
     return res.user
   },
 

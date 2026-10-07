@@ -2,6 +2,8 @@ import { GraduationCap, CalendarClock, Users, ArrowRight, Phone, Info } from 'lu
 import { initials } from '@reserva/shared'
 import type { PublicPartner, PublicCourse } from '@/mock/partners'
 import { useI18n, useLocalized } from '@/i18n'
+import { primaryLocation } from '@/services/booking.service'
+import { track } from '@/services/analytics.service'
 import {
   fmtCoursePrice,
   courseSeatsLeft,
@@ -71,7 +73,7 @@ export function CourseCard({ partner, course, tints, onRegister, onDetails, onCa
         {summary && <p className={s.summary}>{summary}</p>}
 
         {hasDetails && (
-          <button type="button" className={s.moreBtn} onClick={() => onDetails(course)}>
+          <button type="button" className={s.moreBtn} onClick={() => { track('course_open', { course: course.id }); onDetails(course) }}>
             <Info size={14} /> {t('courses.details.cta')}
           </button>
         )}
@@ -106,7 +108,7 @@ export function CourseCard({ partner, course, tints, onRegister, onDetails, onCa
           </div>
 
           {cta.kind === 'register' ? (
-            <button className={s.cta} onClick={() => onRegister(course)}>
+            <button className={s.cta} onClick={() => { track('course_register_click', { course: course.id }); onRegister(course) }}>
               {t('courses.register.cta')} <ArrowRight size={16} />
             </button>
           ) : cta.kind === 'closed' ? (
@@ -116,7 +118,11 @@ export function CourseCard({ partner, course, tints, onRegister, onDetails, onCa
               <Phone size={16} /> {t('courses.call')}
             </button>
           ) : cta.telHref ? (
-            <a className={s.cta} href={cta.telHref}>
+            <a
+              className={s.cta}
+              href={cta.telHref}
+              onClick={() => track('contact_click', { ch: 'call', from: 'courses', loc: primaryLocation(partner)?.id })}
+            >
               <Phone size={16} /> {t('courses.call')}
             </a>
           ) : null}

@@ -4,6 +4,7 @@ import { initials } from '@reserva/shared'
 import { ReviewsPanel } from '@/components/ReviewsPanel/ReviewsPanel'
 import { StarRatingDisplay } from '@/components/StarRating/StarRating'
 import { useT } from '@/i18n'
+import { track } from '@/services/analytics.service'
 import s from './TabbedReviews.module.scss'
 
 interface Props {
@@ -57,7 +58,11 @@ export function TabbedReviews({ partner }: Props) {
                 key={sp.id}
                 ref={(el) => { personRefs.current[sp.id] = el }}
                 className={[s.person, isSel ? s.personActive : ''].filter(Boolean).join(' ')}
-                onClick={() => setSelectedId(sp.id)}
+                onClick={() => {
+                  // This template's only per-specialist view (no team grid / profile popup).
+                  if (!isSel) track('specialist_open', { sp: sp.id })
+                  setSelectedId(sp.id)
+                }}
               >
                 <span className={s.avatar} style={{ background: `linear-gradient(140deg, ${t1}, ${t2})` }}>
                   {initials(sp.name)}

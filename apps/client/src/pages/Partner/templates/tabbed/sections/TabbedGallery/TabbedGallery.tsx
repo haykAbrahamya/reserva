@@ -3,6 +3,7 @@ import type { PublicPartner } from '@/mock/partners'
 import { BeforeAfter } from '@/components/BeforeAfter/BeforeAfter'
 import { Lightbox, type LightboxImage } from '../../../../lib/Lightbox/Lightbox'
 import { useT } from '@/i18n'
+import { track } from '@/services/analytics.service'
 import s from './TabbedGallery.module.scss'
 
 interface Props {
@@ -68,7 +69,11 @@ export function TabbedGallery({ partner }: Props) {
             <button
               key={`ph-${i}`}
               className={[s.tile, s[shape]].join(' ')}
-              onClick={() => setLightboxIndex(photoIndex)}
+              onClick={() => {
+                // One grid here: gallery tiles first, then works.
+                track('gallery_open', { kind: i < (partner.presentation.gallery?.length ?? 0) ? 'gallery' : 'works' })
+                setLightboxIndex(photoIndex)
+              }}
               aria-label={t('partner.gallery.openImage')}
             >
               <img

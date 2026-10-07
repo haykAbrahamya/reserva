@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { ArrowLeft, X, Check, Users, Calendar, Clock, CheckCircle2, ArrowRight, Sparkles, MapPin, Send, AlertCircle, CalendarPlus, Bell, BellRing, Share, UserCheck } from 'lucide-react'
 import {
   fmtServicePrice, fmtDuration, fmtDurationSpan, fmtDateInput, hasPublicPrice, initials, isValidPhone,
@@ -25,6 +25,7 @@ import {
 import { getTelegramConnectLink } from '@/services/telegram.service'
 import { pushSupported, isIosSafari, notificationPermission, enableBookingPush } from '@/services/push.service'
 import { friendlyError } from '@/services/errors'
+import { track, recentBookSource, type BookingStep } from '@/services/analytics.service'
 import { ModalShell } from '@/components/ModalShell/ModalShell'
 import { partnerBrandVars } from '../partnerBrand'
 import { useAppSelector } from '@/store/hooks'
@@ -45,6 +46,11 @@ interface Props {
 }
 
 const ANY_SPECIALIST = '__any__'
+
+/** The flow's steps under their analytics names (the contract calls `location` "branch"). */
+const PULSE_STEP: Record<Exclude<Step, 'success'>, BookingStep> = {
+  location: 'branch', service: 'service', specialist: 'specialist', datetime: 'datetime', details: 'details', confirm: 'confirm',
+}
 
 export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, seedLocationId = null, onClose }: Props) {
   const t = useT()
@@ -147,6 +153,22 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, s
     }
     return 'service'
   })
+
+  // Analytics: the open (with what it was seeded with), each step as it becomes
+  // current, and — when it closes before success — the step it was left on.
+  // Declared before any other effect so booking_open precedes the first step.
+  const stepRef = useRef(step)
+  useEffect(() => {
+    track('booking_open', { from: recentBookSource(), svc: seedServiceId, sp: seedSpecialistId, loc: seedLocationId })
+    return () => {
+      if (stepRef.current !== 'success') track('booking_close', { step: PULSE_STEP[stepRef.current] })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  useEffect(() => {
+    stepRef.current = step
+    if (step !== 'success') track('booking_step', { step: PULSE_STEP[step] })
+  }, [step])
 
   const service = useMemo(
     () => partner.services.find(sv => sv.id === serviceId) ?? null,
@@ -400,6 +422,8 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, s
         !service.hidePrice && currentOffer?.price != null && (!anyMode || isSingle || !!assigned)
           ? currentOffer.price
           : null
+      // `any` = the visitor picked "any available" (a solo pro is auto-assigned, not a choice).
+      track('booking_submit', { svc: service.id, sp: anyMode ? null : specialistId, loc: locationId, any: anyMode && !isSingle })
       const result = await createBooking({
         partner,
         service,
@@ -414,12 +438,14 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, s
         expectedPrice: shownPrice,
         preferredSpecialistId: anyMode && assigned ? assigned.specialistId : null,
       })
+      track('booking_success', { svc: result.serviceId, sp: result.specialistId, loc: result.locationId })
       setBooked(result)
       setStep('success')
       // Offer free Telegram updates for this booking (best-effort, non-blocking).
       getTelegramConnectLink(result.id).then(setTelegramLink)
     } catch (err) {
       const code = (err as { code?: string } | null)?.code
+      track('booking_error', { code: code ?? 'UNKNOWN' })
       setSubmitError(friendlyError(err, t))
       // If the chosen slot (or its price) is no longer valid, bounce back to
       // time selection so the user can immediately pick again (fresh slots).

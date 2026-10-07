@@ -4,6 +4,7 @@ import { WhatsappIcon } from '@reserva/ui'
 import { useT, useLocalized } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
 import { bookableLocations } from '@/services/booking.service'
+import { track } from '@/services/analytics.service'
 import { CallLocationModal } from '../../../../components/CallLocationModal/CallLocationModal'
 import s from './TabbedHero.module.scss'
 
@@ -103,23 +104,27 @@ export function TabbedHero({ partner, onReviewsClick, onBranchesClick }: Props) 
                     <Phone size={17} />
                   </button>
                 ) : (
-                  <a className={s.iconBtn} href={`tel:${primary.phone.replace(/\s/g, '')}`} aria-label={t('partner.hero.call')}>
+                  <a className={s.iconBtn} href={`tel:${primary.phone.replace(/\s/g, '')}`} aria-label={t('partner.hero.call')}
+                    onClick={() => track('contact_click', { ch: 'call', from: 'hero', loc: primary.id })}>
                     <Phone size={17} />
                   </a>
                 )
               )}
               {p.instagram && (
-                <a className={s.iconBtn} href={p.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                <a className={s.iconBtn} href={p.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"
+                  onClick={() => track('contact_click', { ch: 'instagram', from: 'hero' })}>
                   <Instagram size={17} />
                 </a>
               )}
               {p.facebook && (
-                <a className={s.iconBtn} href={p.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                <a className={s.iconBtn} href={p.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook"
+                  onClick={() => track('contact_click', { ch: 'facebook', from: 'hero' })}>
                   <Facebook size={17} />
                 </a>
               )}
               {p.whatsapp && (
-                <a className={s.iconBtn} href={`https://wa.me/${p.whatsapp}`} target="_blank" rel="noopener noreferrer" aria-label={t('partner.hero.whatsapp')}>
+                <a className={s.iconBtn} href={`https://wa.me/${p.whatsapp}`} target="_blank" rel="noopener noreferrer" aria-label={t('partner.hero.whatsapp')}
+                  onClick={() => track('contact_click', { ch: 'whatsapp', from: 'hero' })}>
                   <WhatsappIcon size={17} />
                 </a>
               )}
@@ -129,7 +134,7 @@ export function TabbedHero({ partner, onReviewsClick, onBranchesClick }: Props) 
       </div>
 
       {callOpen && (
-        <CallLocationModal partner={partner} locations={locations} onClose={() => setCallOpen(false)} />
+        <CallLocationModal partner={partner} locations={locations} from="hero" onClose={() => setCallOpen(false)} />
       )}
     </section>
   )

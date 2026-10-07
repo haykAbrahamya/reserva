@@ -4,6 +4,7 @@ import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { BeforeAfter } from '@/components/BeforeAfter/BeforeAfter'
 import { useT } from '@/i18n'
+import { track } from '@/services/analytics.service'
 import { Lightbox, type LightboxImage } from '../../../../lib/Lightbox/Lightbox'
 import s from './PartnerGallery.module.scss'
 
@@ -83,7 +84,7 @@ export function PartnerGallery({ partner, variant = 'gallery', tone = 'cream' }:
                   <button
                     type="button"
                     className={s.tileBtn}
-                    onClick={() => setLightboxIndex(photoIndex)}
+                    onClick={() => { track('gallery_open', { kind: variant }); setLightboxIndex(photoIndex) }}
                     aria-label={t('partner.gallery.openImage')}
                   >
                     <img

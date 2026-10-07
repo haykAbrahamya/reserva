@@ -4,7 +4,8 @@ import { ThemeToggle } from '@/components/ThemeToggle/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher'
 import { LogoMark } from '@/components/Logo/Logo'
 import { marketingSiteUrl } from '@/hooks/useTenantSlug'
-import { canBook, partnerTelHref, bookableLocations } from '@/services/booking.service'
+import { canBook, partnerTelHref, bookableLocations, primaryLocation } from '@/services/booking.service'
+import { track } from '@/services/analytics.service'
 import { useT } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
 import { CallLocationModal } from '../CallLocationModal/CallLocationModal'
@@ -63,7 +64,7 @@ export function PartnerNav({ partner, onBook }: Props) {
           <ThemeToggle />
           {/* Booking is the primary action; contact-only salons get "Call now". */}
           {canBook(partner) ? (
-            <button className={s.bookBtn} onClick={onBook} aria-label={t('partner.bookNow')}>
+            <button className={s.bookBtn} onClick={() => { track('book_click', { from: 'nav' }); onBook() }} aria-label={t('partner.bookNow')}>
               <CalendarCheck size={15} /> <span className={s.bookLabel}>{t('partner.bookNow')}</span>
             </button>
           ) : telHref && (
@@ -72,7 +73,12 @@ export function PartnerNav({ partner, onBook }: Props) {
                 <Phone size={15} /> <span className={s.bookLabel}>{t('partner.callNow')}</span>
               </button>
             ) : (
-              <a className={s.bookBtn} href={telHref} aria-label={t('partner.callNow')}>
+              <a
+                className={s.bookBtn}
+                href={telHref}
+                aria-label={t('partner.callNow')}
+                onClick={() => track('contact_click', { ch: 'call', from: 'nav', loc: primaryLocation(partner)?.id })}
+              >
                 <Phone size={15} /> <span className={s.bookLabel}>{t('partner.callNow')}</span>
               </a>
             )
@@ -81,7 +87,7 @@ export function PartnerNav({ partner, onBook }: Props) {
       </div>
 
       {callOpen && (
-        <CallLocationModal partner={partner} locations={callLocations} onClose={() => setCallOpen(false)} />
+        <CallLocationModal partner={partner} locations={callLocations} from="nav" onClose={() => setCallOpen(false)} />
       )}
     </header>
   )

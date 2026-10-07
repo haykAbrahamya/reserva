@@ -4,6 +4,7 @@ import { fmtServicePrice, fmtDurationSpan, hasPublicPrice } from '@reserva/share
 import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { canBook, bookableAt, branchesForService, priceSpanFor } from '@/services/booking.service'
+import { track, trackTyped } from '@/services/analytics.service'
 import { BranchSwitcher } from '@/pages/Partner/components/BranchSwitcher/BranchSwitcher'
 import { useBranchChoice } from '@/pages/Partner/lib/useBranchChoice'
 import { useT, useLocalized } from '@/i18n'
@@ -82,6 +83,9 @@ export function PartnerServices({ partner, onBook, tone = 'cream' }: Props) {
   // Collapse back to the limit whenever the filter set changes.
   useEffect(() => { setExpanded(false) }, [cat, query])
 
+  // Analytics: what visitors look for, sent once they pause typing.
+  useEffect(() => { trackTyped('service_search', query) }, [query])
+
   // ── Category bar (phones: one swipeable row, pinned under the header) ──
   const sentinelRef = useRef<HTMLDivElement>(null)
   const barRef = useRef<HTMLDivElement>(null)
@@ -103,6 +107,7 @@ export function PartnerServices({ partner, onBook, tone = 'cream' }: Props) {
   }, [])
 
   const pickCategory = (c: string, chip: HTMLButtonElement) => {
+    if (c !== cat) track('category_select', { cat: c })
     setCat(c)
     // Keep the chosen chip in view inside the row — never moves the page.
     const rail = railRef.current
@@ -229,7 +234,13 @@ export function PartnerServices({ partner, onBook, tone = 'cream' }: Props) {
                           <span className={s.price}>{fmtServicePrice(span, { from: t('partner.services.priceFrom') })}</span>
                         )}
                         {bookable && (
-                          <button className={s.bookBtn} onClick={() => onBook(sv.id, branch.branchId ?? undefined)}>
+                          <button
+                            className={s.bookBtn}
+                            onClick={() => {
+                              track('book_click', { from: 'services', svc: sv.id, loc: branch.branchId })
+                              onBook(sv.id, branch.branchId ?? undefined)
+                            }}
+                          >
                             <Plus size={14} /> {t('partner.services.book')}
                           </button>
                         )}

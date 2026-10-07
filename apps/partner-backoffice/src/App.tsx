@@ -39,6 +39,7 @@ import { ToastProvider } from '@/components/ui'
 import { useAppStore, usePartner } from '@/store/app.store'
 import { useAuthStore } from '@/store/auth.store'
 import { partnersService } from '@/services/partners.service'
+import { markStaffBrowser } from '@/lib/staffCookie'
 
 export function useNewBooking() {
   return () => window.dispatchEvent(new CustomEvent('open-new-booking'))
@@ -56,6 +57,9 @@ function DataLoader() {
       setPartner(null)
       return
     }
+    // A session restored from storage never passes through login(), so the
+    // staff-traffic flag is (re)set here as well.
+    markStaffBrowser()
     partnersService.getOwn().then((partner) => {
       setPartner(partner)
       setPartnerId(partner.id)

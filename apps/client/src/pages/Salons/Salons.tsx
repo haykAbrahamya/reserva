@@ -6,6 +6,7 @@ import { Logo } from '@/components/Logo/Logo'
 import { ThemeToggle } from '@/components/ThemeToggle/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher/LanguageSwitcher'
 import { listSalons, type SalonCard as Salon } from '@/services/salons.service'
+import { track, trackTyped } from '@/services/analytics.service'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { ModalShell } from '@/components/ModalShell/ModalShell'
 import { distanceKm, type LatLng } from '@/lib/geo'
@@ -136,6 +137,11 @@ export function Salons() {
   // Debounced search whenever filters change. The input updates instantly; the
   // network call + URL write are debounced together.
   const update = (patch: Partial<Filters>) => {
+    // Analytics: what visitors search and filter by (chips included), sent
+    // once they pause — every user change funnels through here.
+    if (patch.q !== undefined) trackTyped('salons_search', patch.q)
+    if (patch.service !== undefined) trackTyped('salons_filter', patch.service, 'cat')
+    if (patch.location !== undefined) trackTyped('salons_filter', patch.location, 'area')
     setFilters((prev) => {
       const next = { ...prev, ...patch }
       if (debounceRef.current) clearTimeout(debounceRef.current)
@@ -151,8 +157,6 @@ export function Salons() {
     syncUrl(EMPTY)
   }
 
-
-  const openSalon = useCallback((slug: string) => navigate(`/p/${slug}`), [navigate])
 
   // "Near me" reactions: switch to nearest sort once we have a position; revert
   // away from nearest if location is cleared/denied.
@@ -191,6 +195,13 @@ export function Salons() {
     }
     return copy
   }, [salons, sort, distances])
+
+  // `pos` = the card's 0-based place in the list as shown (after sorting).
+  const openSalon = useCallback((slug: string) => {
+    const pos = sortedSalons?.findIndex((sl) => sl.slug === slug) ?? -1
+    track('salon_click', { slug, pos: pos >= 0 ? pos : undefined })
+    navigate(`/p/${slug}`)
+  }, [navigate, sortedSalons])
 
   const count = salons?.length ?? 0
 

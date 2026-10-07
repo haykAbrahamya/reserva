@@ -4,6 +4,7 @@ import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { useI18n, useLocalized } from '@/i18n'
 import { bookableLocations, canBook } from '@/services/booking.service'
+import { track } from '@/services/analytics.service'
 import { summarizeHours } from '../../../../lib/summarizeHours'
 import s from './PartnerLocations.module.scss'
 
@@ -88,6 +89,7 @@ export function PartnerLocations({ partner, onBook, tone = 'cream' }: Props) {
                     target="_blank"
                     rel="noopener noreferrer"
                     title={t('partner.locations.openInMaps')}
+                    onClick={() => track('contact_click', { ch: 'directions', from: 'locations', loc: loc.id })}
                   >
                     <MapPin size={15} />
                     <span>{loc.address}</span>
@@ -111,11 +113,15 @@ export function PartnerLocations({ partner, onBook, tone = 'cream' }: Props) {
 
                   <div className={s.actions}>
                     {canBook(partner) && (
-                      <button className={s.bookBtn} onClick={() => onBook(loc.id)}>
+                      <button className={s.bookBtn} onClick={() => { track('book_click', { from: 'locations', loc: loc.id }); onBook(loc.id) }}>
                         <CalendarCheck size={15} /> {t('partner.locations.bookHere')}
                       </button>
                     )}
-                    <a className={s.callBtn} href={`tel:${loc.phone.replace(/\s/g, '')}`}>
+                    <a
+                      className={s.callBtn}
+                      href={`tel:${loc.phone.replace(/\s/g, '')}`}
+                      onClick={() => track('contact_click', { ch: 'call', from: 'locations', loc: loc.id })}
+                    >
                       <Phone size={15} /> {t('partner.locations.call')}
                     </a>
                     <a
@@ -123,6 +129,7 @@ export function PartnerLocations({ partner, onBook, tone = 'cream' }: Props) {
                       href={mapsUrl(loc)}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={() => track('contact_click', { ch: 'directions', from: 'locations', loc: loc.id })}
                     >
                       <Navigation size={15} /> {t('partner.locations.directions')}
                     </a>

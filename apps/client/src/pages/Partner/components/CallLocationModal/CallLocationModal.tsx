@@ -5,6 +5,7 @@ import { partnerBrandVars } from '../../partnerBrand'
 import { useAppSelector } from '@/store/hooks'
 import { ModalShell } from '@/components/ModalShell/ModalShell'
 import { useI18n, useLocalized } from '@/i18n'
+import { track } from '@/services/analytics.service'
 import s from './CallLocationModal.module.scss'
 
 type CallableLocation = PublicPartner['locations'][number]
@@ -13,6 +14,8 @@ interface Props {
   partner: PublicPartner
   /** Branches to offer — already filtered to bookable/active by the caller. */
   locations: CallableLocation[]
+  /** The section that opened the picker — analytics credits the call to it. */
+  from: string
   onClose: () => void
 }
 
@@ -24,7 +27,7 @@ interface Props {
  * natively and desktop hands off to the OS. Matches the SpecialistModal shell:
  * centered card on desktop, bottom-sheet on mobile, branded gradient header.
  */
-export function CallLocationModal({ partner, locations, onClose }: Props) {
+export function CallLocationModal({ partner, locations, from, onClose }: Props) {
   const [t1, t2] = partner.presentation.heroTints
   const { t } = useI18n()
   const loc = useLocalized()
@@ -67,7 +70,7 @@ export function CallLocationModal({ partner, locations, onClose }: Props) {
                   key={l.id}
                   className={s.row}
                   href={`tel:${l.phone.replace(/\s/g, '')}`}
-                  onClick={requestClose}
+                  onClick={() => { track('contact_click', { ch: 'call', from, loc: l.id }); requestClose() }}
                 >
                   <span className={s.rowIcon}><MapPin size={17} /></span>
                   <span className={s.rowBody}>

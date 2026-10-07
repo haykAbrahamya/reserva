@@ -1,0 +1,159 @@
+@use 'variables' as *;
+
+// Every colour here is a theme token, so the chart follows light and dark with
+// the rest of the console. Series: visitors = accent, page views = info,
+// bookings = success. Text always wears ink tokens, never a series colour.
+
+.root {
+  position: relative;
+  width: 100%;
+  border-radius: $r-1;
+  touch-action: pan-y; // vertical swipes still scroll the page; a horizontal drag scrubs points
+  user-select: none;
+
+  &:focus { outline: none; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 4px; }
+}
+
+.svg { display: block; overflow: visible; }
+
+.grid {
+  stroke: $line-1;
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+.baseline {
+  stroke: $line-2;
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.tick,
+.xTick,
+.xTickLast,
+.caption,
+.endLabel {
+  font-family: $font-sans;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.tick, .xTick { fill: $fg-3; }
+.xTickLast { fill: $fg-1; font-weight: 600; }
+.caption { fill: $fg-2; font-weight: 500; }
+.endLabel { fill: $fg-0; font-weight: 600; }
+
+.area { fill: $accent; opacity: 0.1; }
+
+.lineVisitors,
+.lineViews {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.lineVisitors { stroke: $accent; }
+.lineViews { stroke: $info; }
+/* The last bucket is still filling up (or cut by the range): dashed means
+   "not the whole period yet", not a drop. */
+.tail { stroke-dasharray: 3 4; }
+
+.bar {
+  fill: $success;
+  transition: opacity 0.12s ease;
+}
+
+/* End and hover markers carry a ring in the card colour, so they stay legible
+   where they sit on top of a line or the other marker. */
+.dot { stroke: $bg-1; stroke-width: 2; }
+.dotVisitors { fill: $accent; }
+.dotViews { fill: $info; }
+
+.cross {
+  stroke: $line-strong;
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.hit {
+  fill: transparent;
+  cursor: crosshair;
+}
+
+/* ── Tooltip ── */
+.tooltip {
+  position: absolute;
+  top: 4px;
+  z-index: 2;
+  min-width: 156px;
+  padding: 9px 11px;
+  border-radius: $r-2;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  box-shadow: $shadow-2;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+.ttDate {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 11.5px;
+  color: $fg-1;
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+.ttNote { font-size: 11px; color: $fg-3; }
+/* Value first and strong, name after and quiet — the reader already knows the
+   series, they came for the number. */
+.ttRow {
+  display: grid;
+  grid-template-columns: 12px auto 1fr;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+
+  b {
+    font-weight: 600;
+    color: $fg-0;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    min-width: 3ch;
+  }
+  span:last-child { color: $fg-2; }
+}
+
+/* Short strokes, not boxes: at tooltip size a filled square is ink doing a
+   label's job. An empty key keeps unplotted rows (sessions) aligned. */
+.key {
+  width: 12px;
+  height: 2px;
+  border-radius: 1px;
+}
+.keyVisitors { background: $accent; }
+.keyViews { background: $info; }
+.keyBookings { background: $success; }
+
+/* ── Legend ── */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  font-size: 12px;
+  color: $fg-1;
+}
+.legendItem { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+.legendLine {
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+}
+.legendBar {
+  width: 8px;
+  height: 11px;
+  border-radius: 2px 2px 0 0;
+  background: $success;
+}

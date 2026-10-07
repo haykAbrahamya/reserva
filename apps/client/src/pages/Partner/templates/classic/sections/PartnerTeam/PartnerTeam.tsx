@@ -6,6 +6,7 @@ import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { StarRatingDisplay } from '@/components/StarRating/StarRating'
 import { useI18n, useLocalized } from '@/i18n'
+import { track } from '@/services/analytics.service'
 import s from './PartnerTeam.module.scss'
 
 interface Props {
@@ -92,7 +93,10 @@ export function PartnerTeam({ partner, onSelect, tone = 'plain' }: Props) {
                 role="tab"
                 aria-selected={activeLoc === lt.id}
                 className={[s.chip, activeLoc === lt.id ? s.chipActive : ''].filter(Boolean).join(' ')}
-                onClick={() => setActiveLoc(lt.id)}
+                onClick={() => {
+                  if (activeLoc !== lt.id) track('branch_switch', { loc: lt.id })
+                  setActiveLoc(lt.id)
+                }}
               >
                 <MapPin size={13} className={s.chipIcon} />
                 {lt.name}
@@ -108,7 +112,7 @@ export function PartnerTeam({ partner, onSelect, tone = 'plain' }: Props) {
               <button
                 type="button"
                 className={s.cardBtn}
-                onClick={() => onSelect(sp)}
+                onClick={() => { track('specialist_open', { sp: sp.id }); onSelect(sp) }}
                 aria-label={t('partner.team.viewProfileAria', { name: sp.name })}
               >
                 <div

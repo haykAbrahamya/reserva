@@ -1,0 +1,1367 @@
+@use 'variables' as *;
+
+// ─────────────────────────────────────────────────────────────
+// Analytics — page frame matches Partners / Visits; panels are bordered,
+// unshadowed cards; numbers that line up in columns are tabular (the body
+// font already turns on "tnum").
+// ─────────────────────────────────────────────────────────────
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  /* Never wider than the screen, whatever a child's content wants. */
+  min-width: 0;
+  padding: 28px;
+  animation: rise 0.35s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+
+  @media (max-width: 860px) { padding: 20px 16px; }
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.h1 { font-family: $font-serif; font-size: 30px; letter-spacing: -0.022em; margin: 0 0 4px; }
+.sub { font-size: 13px; color: $fg-2; margin: 0; }
+
+/* ── The bar: the sections as underline tabs (navigation) on the left, what
+   they all look at on the right. Sticky on wider screens so the range stays
+   in view while reading a long table. ── */
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  column-gap: 24px;
+  background: $bg-0;
+  border-bottom: 1px solid $line-1;
+
+  @media (max-width: 860px) {
+    margin-inline: -16px;
+    padding-inline: 16px;
+  }
+  /* Phones: what you're looking at first, the sections under it. Not sticky —
+     two pinned rows under the app bar would take a quarter of the screen. */
+  @media (max-width: 640px) {
+    position: static;
+    flex-direction: column-reverse;
+    /* One line: a wrapping column sizes its line to the widest content (the
+       scrolling tab strip), not to the screen. */
+    flex-wrap: nowrap;
+    align-items: stretch;
+  }
+}
+
+.navTabs {
+  display: flex;
+  min-width: 0;
+  /* Labels line up with the title; the underline sits on the bar's hairline. */
+  margin: 0 0 -1px -12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+
+  @media (max-width: 640px) {
+    margin-inline: -16px;
+    padding-inline: 4px;
+    /* A cut-off last tab fades out: more sections this way. */
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  }
+}
+.navTab {
+  flex: none;
+  padding: 13px 12px 11px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: $fg-2;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover { color: $fg-0; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: -5px; border-radius: $r-1; }
+}
+.navTabOn {
+  color: $fg-0;
+  font-weight: 600;
+  border-bottom-color: $accent;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+
+  @media (max-width: 640px) { padding: 12px 0 10px; }
+}
+.toolActions { display: inline-flex; flex: none; align-items: center; gap: 2px; }
+/* Phones: Data becomes an icon, like refresh beside it. */
+.dataLabel {
+  @media (max-width: 640px) { display: none; }
+}
+
+/* ── The range: one trigger that says what's on screen, and its menu ── */
+.range {
+  position: relative; // anchors the menu
+  min-width: 0;
+
+  /* Phones: take the row's width rather than the label's — otherwise the full
+     dates' natural width stretches the whole page past the screen instead of
+     the dates shortening with an ellipsis. */
+  @media (max-width: 640px) {
+    flex: 1;
+    contain: inline-size;
+  }
+}
+.rangeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  height: 34px;
+  padding: 0 10px 0 11px;
+  border: 1px solid $line-2;
+  border-radius: $r-2;
+  background: $bg-1;
+  color: $fg-0;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover { border-color: $line-strong; }
+  &:focus-visible { outline: 2px solid $accent; outline-offset: 2px; }
+
+  @media (max-width: 640px) { width: 100%; height: 40px; }
+}
+.rangeBtnOpen { border-color: $accent; }
+.rangeIcon { flex: none; color: $fg-2; }
+.rangeLabel { flex: none; font-weight: 600; white-space: nowrap; }
+.rangeDates {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  color: $fg-2;
+}
+/* Staff visits are in the numbers — visible without opening the menu. */
+.rangeTag {
+  flex: none;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: $accent-soft;
+  color: $accent;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+}
+.rangeChevron {
+  flex: none;
+  margin-left: auto;
+  color: $fg-2;
+  transition: transform 0.2s ease;
+  .rangeBtnOpen & { transform: rotate(180deg); }
+}
+
+.popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  width: 336px;
+  max-width: calc(100vw - 32px);
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  background: $bg-1;
+  border: 1px solid $line-2;
+  border-radius: $r-2;
+  box-shadow: $shadow-3;
+  animation: pop 0.14s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+
+  /* Phones: the trigger spans the row, so the menu opens under it, as wide. */
+  @media (max-width: 640px) {
+    left: 0;
+    right: 0;
+    width: auto;
+    max-width: none;
+  }
+}
+.presetList { display: flex; flex-direction: column; gap: 1px; }
+.preset {
+  display: grid;
+  grid-template-columns: 1fr auto 16px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  border: none;
+  border-radius: $r-1;
+  background: none;
+  color: $fg-1;
+  font-family: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover, &:focus-visible { background: $bg-2; color: $fg-0; outline: none; }
+
+  @media (max-width: 640px) { height: 42px; }
+}
+.presetOn {
+  color: $fg-0;
+  .presetName { font-weight: 600; }
+}
+.presetName { white-space: nowrap; }
+.presetDates { font-size: 12px; color: $fg-2; white-space: nowrap; }
+.presetCheck { display: grid; place-items: center; color: $accent; }
+.popDivider { height: 1px; margin: 6px 4px; background: $line-1; }
+
+.customRange {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 6px 6px 4px;
+}
+.popTitle { font-size: 13px; font-weight: 600; color: $fg-0; }
+.popFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+
+  /* Phones: one date per row — side by side, a native date field cuts the year. */
+  @media (max-width: 640px) { grid-template-columns: minmax(0, 1fr); }
+}
+.popField {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: $fg-1;
+
+  input {
+    width: 100%;
+    height: 32px;
+    padding: 0 8px;
+    font-family: inherit;
+    font-size: 13px;
+    color: $fg-0;
+    background: $bg-1;
+    border: 1px solid $line-2;
+    border-radius: $r-1;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+
+    &:focus { border-color: $accent; box-shadow: 0 0 0 3px $accent-soft; }
+
+    @media (max-width: 640px) { height: 40px; font-size: 16px; } // 16px: iOS won't zoom on focus
+  }
+}
+/* A dark native calendar on the dark console. The global rule inverts the
+   picker glyph for light-scheme inputs; with a dark scheme it is already light. */
+:global([data-theme='dark']) .popField input {
+  color-scheme: dark;
+  &::-webkit-calendar-picker-indicator { filter: none; }
+}
+.customFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  /* The shared Button has no disabled look; an Apply that cannot apply must
+     not look like it can. */
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+.popHint, .popError { margin: 0; font-size: 12px; line-height: 1.45; }
+.popHint { color: $fg-2; }
+.popError { color: $danger; }
+
+.staffRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 6px 4px;
+  cursor: pointer;
+  user-select: none;
+}
+.staffText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.staffTitle { font-size: 13px; font-weight: 600; color: $fg-0; }
+.staffHint { font-size: 12px; line-height: 1.4; color: $fg-2; }
+
+/* ── Tab body. A size container, so grids answer to the space they really
+   have (the sidebar comes and goes) rather than to the viewport. ── */
+.body {
+  container-type: inline-size;
+  min-width: 0;
+}
+.tab {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* Refetch keeps the frame: the previous numbers stay, dimmed, until the new
+   ones land — no skeleton flash, no layout jump. */
+.stale { opacity: 0.55; transition: opacity 0.2s ease; }
+.fresh { transition: opacity 0.2s ease; }
+
+.caption {
+  margin: 0;
+  font-size: 12px;
+  color: $fg-2;
+}
+
+/* ── Panels ── */
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+}
+.panelHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  padding: 14px 16px 0;
+}
+.panelHeading { min-width: 0; }
+.panelTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: $fg-0;
+}
+.panelSub {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: $fg-2;
+  line-height: 1.45;
+}
+.panelAction {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.panelBody { padding: 14px 16px 16px; }
+.panelFlush { padding: 10px 0 0; min-width: 0; }
+
+.panelLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
+  padding: 4px 0;
+  background: none;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: $accent-contrast;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover { text-decoration: underline; text-underline-offset: 3px; }
+}
+
+/* ── KPI tiles ── */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@container (min-width: 900px) {
+  .kpiGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 14px 16px;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+}
+.kpiLabel {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px 7px;
+  font-size: 12.5px;
+  color: $fg-2;
+}
+.kpiNote {
+  font-size: 11px;
+  color: $fg-3;
+  white-space: nowrap;
+}
+.kpiValue {
+  font-family: $font-mono;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.1;
+  color: $fg-0;
+  letter-spacing: -0.01em;
+}
+.kpiFoot {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+.kpiPrev {
+  font-size: 11.5px;
+  color: $fg-3;
+  white-space: nowrap;
+}
+
+/* ── Delta chip ── */
+.delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.deltaGlyph { font-size: 8px; line-height: 1; }
+.up, .new { color: $success; background: $success-soft; }
+.down { color: $danger; background: $danger-soft; }
+.flat { color: $fg-2; background: $bg-3; }
+
+/* ── Funnel ── */
+.funnel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 2px 16px 4px;
+  border-left: 1px solid $line-1;
+
+  &:nth-child(odd) { border-left: 0; padding-left: 0; }
+  &:nth-child(n + 3) { border-top: 1px solid $line-1; padding-top: 14px; margin-top: 12px; }
+}
+.stepArrow {
+  position: absolute;
+  top: 50%;
+  left: -9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-top: -9px;
+  border-radius: 50%;
+  border: 1px solid $line-2;
+  background: $bg-1;
+  color: $fg-2;
+}
+.step:nth-child(odd) .stepArrow { display: none; }
+
+@container (min-width: 640px) {
+  .funnel { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .step {
+    &:nth-child(odd) { border-left: 1px solid $line-1; padding-left: 16px; }
+    &:first-child { border-left: 0; padding-left: 0; }
+    &:nth-child(n + 3) { border-top: 0; padding-top: 2px; margin-top: 0; }
+  }
+  .step:nth-child(odd) .stepArrow { display: inline-flex; }
+}
+
+.stepBar {
+  height: 6px;
+  margin-top: 4px;
+  border-radius: 0 3px 3px 0;
+  background: $accent;
+  min-width: 2px;
+}
+.stepBarEmpty { background: $line-2; }
+.stepConv {
+  font-size: 11.5px;
+  color: $fg-2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  b { color: $fg-0; font-weight: 600; }
+}
+
+/* ── Overview lower row ── */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+@container (min-width: 900px) {
+  .split { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
+}
+
+/* ── Bar list ── */
+.bars {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.barRow { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.barHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13px;
+}
+.barIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  flex-shrink: 0;
+  color: $fg-2;
+}
+.barLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: $fg-0;
+}
+.barMeta {
+  font-size: 11.5px;
+  color: $fg-3;
+  white-space: nowrap;
+}
+.barValue {
+  margin-left: auto;
+  font-weight: 600;
+  color: $fg-0;
+  white-space: nowrap;
+}
+.barShare {
+  width: 52px;
+  text-align: right;
+  font-size: 12px;
+  color: $fg-2;
+  white-space: nowrap;
+}
+.barTrack { height: 6px; padding-left: 26px; }
+/* Rounded data end, square foot. A 2px floor keeps a tiny count visible. */
+.barFill {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  border-radius: 0 3px 3px 0;
+  background: $accent;
+}
+
+.code {
+  font-family: $font-mono;
+  font-size: 11px;
+  color: $fg-3;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: $bg-3;
+}
+
+/* ── Tables ── */
+.tbl {
+  font-size: 13px;
+
+  th, td { padding: 9px 12px; }
+  .num { text-align: right; white-space: nowrap; }
+  td.num { color: $fg-1; }
+  .strong { color: $fg-0; font-weight: 600; }
+  .muted { color: $fg-3; }
+}
+.tableScroll {
+  max-height: 340px;
+  overflow-y: auto;
+}
+.cellNote {
+  margin-left: 8px;
+  font-size: 11.5px;
+  color: $fg-3;
+  white-space: nowrap;
+}
+
+.partnerCell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 260px;
+}
+.partnerName {
+  font-weight: 500;
+  color: $fg-0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.partnerSlug {
+  font-family: $font-mono;
+  font-size: 11.5px;
+  color: $fg-3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mono { font-family: $font-mono; font-size: 12px; color: $fg-1; }
+
+/* Sort headers: the whole header is the button, the arrow says which way. */
+.sortBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover { color: $fg-0; }
+}
+.sortActive { color: $fg-0; }
+.sortIdle { opacity: 0.35; }
+
+/* Group row above the Partners columns. */
+.groupTh {
+  padding: 8px 12px 0;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $fg-3;
+  text-align: center;
+  white-space: nowrap;
+  background: $bg-0; // the shared header band
+
+  span {
+    display: block;
+    padding-bottom: 4px;
+    border-bottom: 1px solid $line-2;
+  }
+}
+
+/* The partner column stays put while the numbers scroll sideways. Twelve
+   numeric columns: a touch tighter than other tables so they fit a laptop. */
+.ptable {
+  th, td { padding-inline: 10px; }
+  th { letter-spacing: 0.04em; }
+
+  th:first-child, td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: $bg-1;
+  }
+  /* Above the other (also sticky) headers it slides over. */
+  th:first-child { z-index: 2; background: $bg-0; }
+  tbody tr:hover td:first-child { background: $bg-2; }
+}
+
+.totalRow td {
+  border-top: 1px solid $line-2;
+  border-bottom: 0;
+  background: $bg-2;
+  font-weight: 600;
+  color: $fg-0;
+}
+.ptable .totalRow td:first-child { background: $bg-2; }
+
+.rowGo {
+  color: $fg-3;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+tr:hover .rowGo { opacity: 1; }
+
+/* ── Search (as on Partners) ── */
+.filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.filterSelect { width: 230px; max-width: 100%; }
+.filterCount {
+  margin-left: auto;
+  font-size: 12.5px;
+  color: $fg-2;
+  white-space: nowrap;
+}
+.searchWrap { position: relative; width: 320px; max-width: 100%; }
+.searchIcon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: $fg-3; pointer-events: none; }
+.searchInput {
+  width: 100%;
+  height: 30px; // level with the small Selects in the other tabs' filter rows
+  padding: 0 12px 0 32px;
+  font-size: 13px;
+  color: $fg-0;
+  background: $bg-1;
+  border: 1px solid $line-2;
+  border-radius: $r-1;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:focus { border-color: $accent; box-shadow: 0 0 0 3px $accent-soft; }
+  &::placeholder { color: $fg-3; }
+}
+
+/* ── Sources grid ── */
+.sourcesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+/* ── Events ── */
+.tableWrap {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  overflow: hidden;
+}
+.evTime { white-space: nowrap; color: $fg-1; }
+.evCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  white-space: nowrap;
+}
+.evSummary {
+  color: $fg-2;
+  font-size: 12.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+.path {
+  display: inline-block;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+  font-family: $font-mono;
+  font-size: 12px;
+  color: $fg-2;
+}
+.iconText {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  color: $fg-1;
+
+  svg { color: $fg-2; flex-shrink: 0; }
+}
+.cellMuted { color: $fg-3; }
+.partnerLink {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+/* Event badge — same anatomy as the shared status Badge. */
+.evBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+.evDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+.tone_neutral { color: $fg-1; background: $bg-3; }
+.tone_accent { color: $accent-contrast; background: $accent-soft; }
+.tone_info { color: $info; background: $info-soft; }
+.tone_success { color: $success; background: $success-soft; }
+.tone_warn { color: $warn; background: $warn-soft; }
+.tone_danger { color: $danger; background: $danger-soft; }
+
+.staffTag {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 4px;
+  border: 1px solid $line-2;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: $fg-2;
+  white-space: nowrap;
+}
+
+/* ── Event drawer ── */
+.drawerHead {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.drawerWho { margin-left: auto; font-size: 13px; }
+.section { margin-bottom: 22px; }
+.sectionTitle {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $fg-3;
+}
+.rows { display: flex; flex-direction: column; }
+.row {
+  display: grid;
+  grid-template-columns: 18px 118px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid $line-1;
+  font-size: 13px;
+
+  &:last-child { border-bottom: 0; }
+}
+.rowIcon { display: inline-flex; padding-top: 2px; color: $fg-3; }
+.rowLabel { color: $fg-2; }
+.rowKey {
+  display: block;
+  font-family: $font-mono;
+  font-size: 11px;
+  color: $fg-3;
+}
+.rowValue {
+  min-width: 0;
+  color: $fg-0;
+  overflow-wrap: anywhere;
+}
+/* Ids select whole on one click — staff copy them into support threads. */
+.uuid {
+  font-family: $font-mono;
+  font-size: 12px;
+  color: $fg-1;
+  user-select: all;
+  overflow-wrap: anywhere;
+}
+.noProps { margin: 0; font-size: 13px; color: $fg-3; }
+
+/* ── States ── */
+.skel {
+  border-radius: $r-2;
+  border: 1px solid $line-1;
+  background: linear-gradient(100deg, $bg-1 30%, $bg-2 50%, $bg-1 70%);
+  background-size: 200% 100%;
+  animation: analytics-shimmer 1.3s ease-in-out infinite;
+}
+@keyframes analytics-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.skelLine { width: min(360px, 70%); border-radius: 6px; }
+@media (prefers-reduced-motion: reduce) { .skel { animation: none; } }
+
+.panelEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 26px 16px 22px;
+}
+.panelEmptyIcon { color: $fg-3; margin-bottom: 4px; }
+.panelEmptyTitle { margin: 0; font-size: 13.5px; font-weight: 600; color: $fg-1; }
+.panelEmptyText { margin: 0; max-width: 46ch; font-size: 12.5px; line-height: 1.5; color: $fg-2; }
+
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 48px 20px;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+}
+.errorIcon { color: $danger; margin-bottom: 4px; }
+.errorTitle { margin: 0; font-family: $font-serif; font-size: 20px; color: $fg-0; }
+.errorText { margin: 0 0 8px; max-width: 48ch; font-size: 13px; color: $fg-2; }
+
+/* Empty states for whole tabs sit in a card so the page keeps its frame. */
+.emptyCard {
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+}
+
+/* ── Sessions list ── */
+.filterSelectSm { width: 180px; max-width: 100%; }
+.sourceCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.sourceDetail {
+  max-width: 170px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-left: 19px; // under the label, past the icon
+  font-size: 11.5px;
+  color: $fg-3;
+}
+/* The first steps of a visit as small tinted squares; the tint is the event's
+   badge tone, so a booking or an error stands out in the strip. */
+.journey {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+.journeyChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  flex-shrink: 0;
+}
+.journeyMore {
+  margin-left: 3px;
+  font-size: 11.5px;
+  color: $fg-3;
+}
+
+/* ── Session view ── */
+.backLink {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: -6px;
+  padding: 4px 8px 4px 6px;
+  border: 0;
+  border-radius: $r-1;
+  background: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: $fg-2;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+
+  &:hover { color: $fg-0; background: $bg-2; }
+}
+
+.svHead {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px 18px;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+}
+.svTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+.svTitle {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: $fg-0;
+
+  .vTag { font-size: 16px; }
+  .vPrefix { font-size: 17px; }
+  .vMark { width: 11px; height: 11px; }
+}
+.svTitleSep { color: $fg-3; font-weight: 400; }
+.svBadges { display: inline-flex; align-items: center; gap: 8px; }
+.svMeta { margin: 0; font-size: 12.5px; color: $fg-2; }
+.svFacts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px 20px;
+  margin: 10px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid $line-1;
+}
+.svFact {
+  min-width: 0;
+
+  dt {
+    margin-bottom: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: $fg-3;
+  }
+  dd {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    margin: 0;
+    font-size: 13px;
+    color: $fg-0;
+
+    .iconText { color: $fg-0; white-space: normal; }
+  }
+}
+.svFactSub {
+  padding-left: 19px;
+  font-size: 12px;
+  color: $fg-2;
+  overflow-wrap: anywhere;
+}
+.svMono { font-family: $font-mono; font-size: 12px; overflow-wrap: anywhere; }
+
+.sessionGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+@container (min-width: 960px) {
+  .sessionGrid { grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr); }
+}
+
+/* Timeline: time · node on a rail · sentence. The rail runs through the node
+   column (time 52px + gap 10px + half a 26px node = 75px). */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.tlItem {
+  position: relative;
+  display: grid;
+  grid-template-columns: 52px 26px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 5px 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 74.5px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: $line-2;
+  }
+  &:first-child::before { top: 18px; }
+  &:last-child::before { bottom: calc(100% - 18px); }
+  &:only-child::before { display: none; }
+}
+.tlTime {
+  padding-top: 5px;
+  text-align: right;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: $fg-3;
+  cursor: help;
+}
+.tlNode {
+  position: relative;
+  z-index: 1;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: $bg-1;
+}
+.tlNodeIn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+.tlBody {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  min-width: 0;
+  padding-top: 4px;
+}
+.tlText { font-size: 13.5px; line-height: 1.45; color: $fg-0; }
+/* Outcomes and failures carry weight in the story. */
+.tlItem[data-tone='success'] .tlText,
+.tlItem[data-tone='danger'] .tlText,
+.tlEnd .tlText { font-weight: 600; }
+.tlMeta { font-size: 12px; color: $fg-3; }
+.tlGap {
+  position: relative;
+  padding: 3px 0 3px 98px;
+  font-size: 11.5px;
+  font-style: italic;
+  color: $fg-3;
+
+  /* A broken rail: time passed here. */
+  &::before {
+    content: '';
+    position: absolute;
+    left: 74.5px;
+    top: 0;
+    bottom: 0;
+    border-left: 1px dashed $line-2;
+  }
+}
+
+.otherList { list-style: none; margin: 0; padding: 0 0 4px; }
+.otherRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 16px;
+  border: 0;
+  border-top: 1px solid $line-1;
+  background: none;
+  text-align: left;
+  font-size: 13px;
+  color: $fg-1;
+  cursor: pointer;
+  transition: background 0.12s ease;
+
+  &:hover { background: $bg-2; }
+  &:hover .otherGo { opacity: 1; }
+}
+.otherWhen { min-width: 92px; white-space: nowrap; color: $fg-0; }
+.otherCount { margin-left: auto; white-space: nowrap; font-size: 12px; color: $fg-3; }
+.otherGo { flex-shrink: 0; color: $fg-3; opacity: 0; transition: opacity 0.12s ease; }
+
+/* ── Visitor tag: one anonymous identity across the console ──
+   The three hues are the only categorical steps that stay tellable apart in
+   ANY pair, colour-blind readers included (validated against these card
+   surfaces in both themes); three shapes multiply them to nine marks. The
+   theme has no categorical tokens, hence the hexes — light first, dark below. */
+.visitor {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.visitorBtn {
+  margin: -3px -6px;
+  padding: 3px 6px;
+  border: 0;
+  border-radius: $r-1;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.12s ease;
+
+  &:hover { background: $bg-3; }
+  &:hover .vTag { text-decoration: underline; text-underline-offset: 3px; }
+}
+.vMark {
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+  background: var(--v-color);
+}
+.vShape0 { border-radius: 50%; }
+.vShape1 { border-radius: 2px; }
+.vShape2 { border-radius: 1.5px; transform: rotate(45deg) scale(0.84); }
+.vHue0 { --v-color: #2a78d6; }
+.vHue1 { --v-color: #eb6834; }
+.vHue2 { --v-color: #1baf7a; }
+:global([data-theme='dark']) {
+  .vHue0 { --v-color: #3987e5; }
+  .vHue1 { --v-color: #d95926; }
+  .vHue2 { --v-color: #199e70; }
+}
+.vTag {
+  font-family: $font-mono;
+  font-size: 12px;
+  font-weight: 500;
+  color: $fg-0;
+  letter-spacing: 0.02em;
+}
+.vSuffix { font-size: 12px; color: $fg-3; }
+.vPrefix { font-weight: 600; color: $fg-0; }
+
+/* ── Data dialog (storage + clearing) ── */
+.data {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.dataStats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.dataStat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid $line-1;
+  border-radius: $r-2;
+  background: $bg-2;
+}
+.dataLabel { font-size: 12px; color: $fg-2; }
+.dataValue {
+  font-family: $font-mono;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: $fg-0;
+  overflow-wrap: anywhere;
+}
+.dataSub { font-size: 11.5px; color: $fg-3; }
+.dataNote {
+  margin: -8px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: $fg-3;
+}
+.dataError {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  padding: 12px 14px;
+  border-radius: $r-2;
+  background: $danger-soft;
+  color: $danger;
+  font-size: 13px;
+}
+.ownerHint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 9px 12px;
+  border: 1px solid $line-1;
+  border-radius: $r-1;
+  background: $bg-2;
+  font-size: 12.5px;
+  color: $fg-1;
+
+  svg { color: $fg-2; flex-shrink: 0; }
+}
+.dataSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid $line-1;
+}
+.dataSectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+.dataTitle { margin: 0; font-size: 13.5px; font-weight: 600; color: $fg-0; }
+.dataText { margin: 0; font-size: 12.5px; line-height: 1.5; color: $fg-2; }
+.dataActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  /* The shared Button has no disabled look: a locked delete must read as locked. */
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  button:disabled:hover { background: transparent; border-color: $danger-soft; }
+}
+
+/* What a delete removes and what it leaves, in the confirms. */
+.goesStays {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}
+.gsRow {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 10px;
+
+  dd { margin: 0; font-size: 13px; line-height: 1.5; color: $fg-1; }
+}
+.gsTag {
+  justify-self: start;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.gsGoes { color: $danger; background: $danger-soft; }
+.gsStays { color: $success; background: $success-soft; }
+.confirmWord { margin-top: 12px; }
