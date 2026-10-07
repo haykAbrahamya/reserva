@@ -1,108 +1,107 @@
 @use 'variables' as *;
 
 .wrap {
-  margin-bottom: 24px;
-  min-width: 0;
-}
-
-/* A grid of cards on wide screens. */
-.cards {
-  position: relative; /* offsetParent for scrolling the chosen card into view */
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 10px;
-
-  /* Phones: one swipeable row that runs to the screen edges, so the next card
-     peeks in — the gutter comes from the section (--gutter). */
-  @media (max-width: 600px) {
-    display: flex;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    margin: 0 calc(-1 * var(--gutter, 18px));
-    padding: 2px var(--gutter, 18px);
-    scroll-padding-inline: var(--gutter, 18px);
-    &::-webkit-scrollbar { display: none; }
-  }
-}
-
-.card {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  min-width: 0;
-  padding: 14px 16px 13px;
-  border-radius: 16px;
-  border: 1px solid color-mix(in srgb, $accent 18%, $line-2);
-  background: $bg-1;
-  color: $fg-0;
-  text-align: left;
-  font-family: $font-sans;
-  cursor: pointer;
-  transition: border-color 0.18s, background 0.18s, box-shadow 0.18s, transform 0.12s;
-  -webkit-tap-highlight-color: transparent;
-
-  &:hover { border-color: color-mix(in srgb, $accent 42%, $line-2); }
-  &:active { transform: scale(0.99); }
-  &:focus-visible {
-    outline: 2px solid color-mix(in srgb, $accent 60%, transparent);
-    outline-offset: 2px;
-  }
-
-  @media (max-width: 600px) {
-    flex: 0 0 min(78%, 300px);
-    scroll-snap-align: start;
-  }
-
-  /* Chosen: a crisp accent ring and a soft tint — no glow underneath. */
-  &.on {
-    border-color: $accent;
-    background:
-      linear-gradient(135deg, color-mix(in srgb, $accent 14%, transparent), color-mix(in srgb, $accent 4%, transparent) 70%),
-      $bg-1;
-    box-shadow: inset 0 0 0 1px $accent;
-  }
-}
-
-/* Radio: an empty ring, filled with a tick when chosen. */
-.radio {
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  width: 20px;
-  height: 20px;
-  margin-top: 1px;
-  border-radius: 50%;
-  border: 2px solid color-mix(in srgb, $accent 40%, $line-strong);
-  color: transparent;
-  transition: background 0.18s, border-color 0.18s, color 0.18s;
-
-  .on & {
-    background: $accent;
-    border-color: $accent;
-    color: $fg-on-accent;
-  }
-}
-
-.body {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 10px;
+  margin: -6px 0 26px; /* sits close under the section title it belongs to */
   min-width: 0;
 }
 
-.name {
-  font-size: 15px;
-  font-weight: 650;
-  letter-spacing: -0.01em;
-  color: $fg-0;
-  overflow-wrap: anywhere;
+/* ── Branch names, set like part of the heading ──
+   Serif words in a row: the chosen one in full colour over a short accent
+   underline, the others quieter. No box and no fill, so it can't be mistaken
+   for the pill-shaped search and category chips below it. */
+.tabs {
+  position: relative; /* the underline is placed against it, and scrolls with it */
+  display: flex;
+  gap: 26px;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+
+  @media (max-width: 600px) { gap: 22px; }
+
+  /* Only when names overflow: fade the far edge — "more this way". */
+  &.overflow {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+  }
 }
 
-.address {
-  font-size: 12.5px;
+.tab {
+  flex: none;
+  padding: 2px 0 9px;
+  border: none;
+  background: none;
+  font-family: $font-serif;
+  font-size: 21px;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
   color: $fg-2;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover { color: $fg-1; }
+  &.on { color: $fg-0; }
+  &:focus-visible {
+    outline: 2px solid color-mix(in srgb, $accent 60%, transparent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  @media (max-width: 600px) { font-size: 19px; }
+}
+
+/* The chosen branch's underline — slides from name to name. */
+.ink {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: $accent;
+  pointer-events: none;
+}
+.animate .ink {
+  transition:
+    transform 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+  @media (prefers-reduced-motion: reduce) { transition: none; }
+}
+/* Safety net: if the underline couldn't be measured, draw it on the name itself. */
+.noInk .tab.on { box-shadow: inset 0 -2px 0 $accent; }
+
+/* ── Where it is, and whether it's open — one quiet line ── */
+.info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  min-width: 0;
+  font-size: 13px;
+  color: $fg-2;
+  animation: branch-info-in 0.28s ease both;
+
+  @media (prefers-reduced-motion: reduce) { animation: none; }
+}
+@keyframes branch-info-in {
+  from { opacity: 0; transform: translateY(-3px); }
+}
+
+.where {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  svg { flex-shrink: 0; color: color-mix(in srgb, $accent 70%, $fg-3); }
+}
+.address {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -112,12 +111,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-top: 4px;
-  font-size: 12px;
   font-weight: 500;
-  color: $fg-2;
+  white-space: nowrap;
 }
-
 .statusDot {
   flex-shrink: 0;
   width: 7px;
@@ -125,7 +121,6 @@
   border-radius: 50%;
   background: $fg-3;
 }
-
 .statusOpen {
   color: $success;
   .statusDot {
