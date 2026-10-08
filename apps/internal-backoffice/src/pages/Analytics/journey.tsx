@@ -4,7 +4,7 @@ import {
   Search, Send, SlidersHorizontal, Star, Store, Tag, TriangleAlert, UserPlus, UserRound,
 } from 'lucide-react'
 import type { SessionEvent, SessionRow } from '@/services/analytics.service'
-import { eventDef, humanize, type EventTone } from './catalog'
+import { SIGNUP_STEP_LABELS, eventDef, humanize, type EventTone } from './catalog'
 import { ContactIcon } from './icons'
 import { isUuid } from './format'
 
@@ -200,8 +200,10 @@ export function describeEvent(
     }
     case 'signup_start':
       return line('Started the sign-up form')
-    case 'signup_step':
-      return line(`Sign-up: ${str(p.step) ?? 'next'} step`)
+    case 'signup_step': {
+      const step = str(p.step)
+      return line(`Sign-up: ${step ? (SIGNUP_STEP_LABELS[step] ?? humanize(step)).toLowerCase() : 'next step'}`)
+    }
     case 'signup_submit':
       return line('Sent the sign-up form')
     case 'signup_error':

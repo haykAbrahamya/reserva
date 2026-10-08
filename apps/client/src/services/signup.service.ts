@@ -39,11 +39,24 @@ export interface SignupInput {
 }
 
 export const signupService = {
-  /** Start signup — backend emails an activation link. Returns the email. */
+  /**
+   * Start signup — backend emails an activation link. Returns the email.
+   * Calling it again with the same email replaces the earlier pending signup
+   * and sends a fresh link, which is how "Send again" works.
+   */
   async start(input: SignupInput): Promise<{ email: string }> {
     return api<{ email: string }>('/public/signup', {
       method: 'POST',
       body: JSON.stringify(input),
     })
+  },
+
+  /** Live check while they type: is this page address still free? */
+  async slugAvailable(slug: string, signal?: AbortSignal): Promise<boolean> {
+    const res = await api<{ available: boolean }>(
+      `/public/signup/slug-available?slug=${encodeURIComponent(slug)}`,
+      { signal },
+    )
+    return res.available === true
   },
 }

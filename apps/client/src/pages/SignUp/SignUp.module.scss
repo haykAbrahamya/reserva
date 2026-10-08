@@ -1,5 +1,9 @@
 @use 'variables' as *;
 
+// Sign-up: three short steps on the right, the page being built on the left
+// (desktop). Phones get one column, with the main button pinned to the
+// bottom of the screen.
+
 .page {
   min-height: 100vh;
   min-height: 100dvh;
@@ -7,21 +11,31 @@
   background: $bg-0;
 }
 
-/* ── Left brand panel (desktop) ── */
+// Phones: a focused field scrolls into view above the pinned button, not under it.
+@media (max-width: 959px) {
+  :global(html):has(.page) { scroll-padding-bottom: 132px; }
+}
+
+/* ── Left panel (desktop): live preview of their page ── */
 .panel {
   display: none;
 
   @media (min-width: 960px) {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 46%;
-    max-width: 560px;
+    gap: 28px;
+    width: 44%;
+    max-width: 540px;
+    height: 100vh;
+    height: 100dvh;
     flex-shrink: 0;
+    padding: 40px 48px;
     background: $bg-4;
     border-right: 1px solid $line-1;
-    padding: 48px;
-    position: relative;
     overflow: hidden;
   }
 }
@@ -34,7 +48,7 @@
     linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
   background-size: 40px 40px;
   pointer-events: none;
-  mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, #000 40%, transparent 100%);
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 45%, #000 40%, transparent 100%);
 }
 .panelOrb {
   position: absolute;
@@ -52,61 +66,85 @@
   align-items: center;
   gap: 12px;
   position: relative;
-  text-decoration: none;
   width: fit-content;
+  text-decoration: none;
 }
-.panelLogoMark {
-  width: 38px; height: 38px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
+.panelLogoMark { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .panelLogoName { font-family: $font-serif; font-size: 22px; letter-spacing: -0.015em; color: $fg-0; line-height: 1; }
 .panelLogoTag { font-family: $font-mono; font-size: 9px; color: $fg-3; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 3px; }
 
-.panelMid { position: relative; }
-.panelQuote {
-  font-family: $font-serif;
-  font-size: clamp(26px, 2.6vw, 34px);
-  line-height: 1.22;
-  letter-spacing: -0.02em;
-  color: $fg-0;
-  margin: 0 0 30px;
-  em { font-style: italic; color: $accent; }
-}
-
-.features { display: flex; flex-direction: column; gap: 18px; }
-.feature { display: flex; align-items: center; gap: 14px; }
-.featureIcon {
-  width: 42px; height: 42px;
-  border-radius: 12px;
-  background: $bg-1;
-  border: 1px solid $line-1;
-  box-shadow: $shadow-1;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  color: $accent;
-}
-.featureTitle { font-size: 14px; font-weight: 600; color: $fg-0; line-height: 1.2; }
-.featureDesc { font-size: 12.5px; color: $fg-2; margin-top: 2px; }
-
-.panelBy { position: relative; font-size: 12px; color: $fg-2; margin: 0; }
-
-/* ── Right form area ── */
-.main {
+.panelMid {
+  position: relative;
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px 60px;
-  position: relative;
-  min-width: 0;
+  gap: 14px;
+}
+.previewLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: $font-mono;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $fg-3;
 
-  /* Leave room for the absolutely-positioned corner controls on mobile,
-     where the panel is hidden and there's nothing else up top. */
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: $success;
+    animation: su-pulse 2s ease-in-out infinite;
+  }
+}
+
+.features {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+  // Short laptop screens: the preview matters more.
+  @media (max-height: 820px) { display: none; }
+}
+.feature { display: flex; align-items: center; gap: 12px; }
+.featureIcon {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: $bg-1;
+  border: 1px solid $line-1;
+  color: $accent;
+}
+.featureTitle { display: block; font-size: 13.5px; font-weight: 600; color: $fg-0; line-height: 1.25; }
+.featureDesc { display: block; font-size: 12px; color: $fg-2; margin-top: 1px; }
+
+/* ── Right: the steps ── */
+.main {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px 48px;
+
+  // Phones: start at the top, the logo on the same row as the corner
+  // controls; the pinned button carries the bottom spacing.
   @media (max-width: 959px) {
     justify-content: flex-start;
-    padding-top: 84px;
+    padding: 16px 20px 0;
   }
 }
 
@@ -114,184 +152,305 @@
   position: absolute;
   top: 16px;
   right: 16px;
+  z-index: 5;
   display: flex;
   align-items: center;
   gap: 8px;
-  z-index: 5;
 }
 
 .mobileLogo {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 30px;
-  text-decoration: none;
   align-self: flex-start;
+  min-height: 38px;
+  margin-bottom: 26px;
+  text-decoration: none;
   @media (min-width: 960px) { display: none; }
 }
-.mobileLogoMark {
-  width: 44px; height: 44px;
-  display: flex; align-items: center; justify-content: center;
-}
-.mobileLogoName { font-family: $font-serif; font-size: 24px; letter-spacing: -0.02em; color: $fg-0; }
+.mobileLogoMark { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; }
+.mobileLogoName { font-family: $font-serif; font-size: 21px; letter-spacing: -0.02em; color: $fg-0; }
 
 .card {
   width: 100%;
-  max-width: 440px;
-  animation: su-rise 0.4s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+  max-width: 460px;
+  animation: su-rise 0.38s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+  @media (max-width: 959px) { padding-bottom: 8px; }
 }
 
-/* ── Step indicator ── */
-.steps {
+/* ── Progress ── */
+.progress { display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px; }
+.progressMeta {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 24px;
-}
-.stepDot { display: flex; align-items: center; gap: 8px; }
-.stepCircle {
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px;
-  font-weight: 600;
-  background: $bg-2;
-  border: 1.5px solid $line-2;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  font-weight: 500;
   color: $fg-3;
-  flex-shrink: 0;
-  transition: all 0.2s;
 }
-.stepLabel { font-size: 12.5px; font-weight: 500; color: $fg-3; transition: color 0.2s; }
-.stepActive {
-  .stepCircle { background: $accent; border-color: $accent; color: #fff; box-shadow: 0 0 0 4px $accent-soft; }
-  .stepLabel { color: $fg-0; }
-}
-.stepDone {
-  .stepCircle { background: $accent-soft; border-color: $accent; color: $accent; }
-  .stepLabel { color: $fg-1; }
-}
-.stepBar {
-  flex: 1;
-  height: 2px;
-  border-radius: 2px;
-  background: $line-2;
-  transition: background 0.3s;
-}
-.stepBarDone { background: $accent; }
+.progressLabel { color: $fg-1; font-weight: 600; }
+.progressTrack { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.progressSeg { height: 4px; border-radius: 4px; background: $line-2; transition: background 0.3s; }
+.progressSegOn { background: $accent; }
 
 .planChip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: $accent;
-  background: $accent-soft;
-  border: 1px solid color-mix(in srgb, $accent 28%, transparent);
+  margin-bottom: 16px;
   padding: 5px 11px;
   border-radius: 999px;
-  margin-bottom: 18px;
+  border: 1px solid color-mix(in srgb, $accent 28%, transparent);
+  background: $accent-soft;
+  color: $accent;
+  font-size: 12px;
+  font-weight: 600;
 }
 
-.heading { margin-bottom: 22px; }
+.heading { margin-bottom: 20px; }
 .backLink {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  margin-bottom: 12px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: $fg-2;
   font-size: 12.5px;
   font-weight: 500;
-  color: $fg-2;
-  background: none;
-  border: none;
   cursor: pointer;
-  padding: 0;
-  margin-bottom: 12px;
   transition: color 0.15s;
   &:hover { color: $accent; }
 }
 .title {
+  margin: 0 0 6px;
   font-family: $font-serif;
-  font-size: clamp(26px, 4vw, 32px);
+  font-size: clamp(26px, 6vw, 32px);
+  line-height: 1.1;
   letter-spacing: -0.022em;
   color: $fg-0;
-  margin: 0 0 6px;
-  line-height: 1.1;
+  text-wrap: balance;
+  &:focus { outline: none; }
 }
-.subtitle { font-size: 14px; color: $fg-2; margin: 0; line-height: 1.5; }
+.subtitle { margin: 0; font-size: 14px; line-height: 1.5; color: $fg-2; }
 
-/* ── Form ── */
-.form { display: flex; flex-direction: column; gap: 15px; }
-.accentField { margin-top: 2px; }
-
-/* ── Salon / Single chooser ── */
-.kindField { display: flex; flex-direction: column; gap: 8px; }
-.kindLabel { font-size: 13px; font-weight: 500; color: $fg-1; }
-.kindRow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.kindOption {
+/* ── Step 1: one tap ── */
+.choices { display: flex; flex-direction: column; gap: 12px; }
+.choice {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 3px;
-  padding: 13px 14px;
-  border-radius: $r-2;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 84px;
+  padding: 16px;
+  border-radius: $r-3;
   border: 1.5px solid $line-2;
   background: $bg-1;
-  cursor: pointer;
+  color: inherit;
+  font: inherit;
   text-align: left;
-  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
-  color: $fg-2;
-  svg { color: $fg-3; transition: color 0.15s; }
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s, transform 0.1s;
+
   &:hover { border-color: $line-strong; }
+  &:active { transform: scale(0.99); }
+  &:focus-visible { outline: none; border-color: $accent; box-shadow: 0 0 0 4px $accent-soft; }
 }
-.kindActive {
+.choiceOn {
   border-color: $accent;
   background: $accent-soft;
   box-shadow: 0 0 0 3px $accent-soft;
-  svg { color: $accent; }
 }
-.kindName { font-size: 14px; font-weight: 600; color: $fg-0; }
-.kindHint { font-size: 12px; color: $fg-3; line-height: 1.35; }
-.submitError {
+.choiceIcon {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: $danger;
-  background: $danger-soft;
-  border: 1px solid color-mix(in srgb, $danger 30%, transparent);
-  border-radius: $r-1;
-  padding: 9px 12px;
+  justify-content: center;
+  border-radius: 14px;
+  background: $bg-2;
+  color: $accent;
+  transition: background 0.15s, color 0.15s;
+  .choiceOn & { background: $accent; color: $fg-on-accent; }
 }
-.row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  @media (max-width: 480px) { grid-template-columns: 1fr; }
+.choiceText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.choiceTitle { font-size: 16px; font-weight: 600; color: $fg-0; }
+.choiceHint { font-size: 13px; line-height: 1.4; color: $fg-2; }
+.choiceGo {
+  display: flex;
+  flex-shrink: 0;
+  color: $fg-3;
+  .choiceOn & { color: $accent; }
 }
 
-.field { display: flex; flex-direction: column; gap: 6px; }
-.label { font-size: 12px; font-weight: 500; color: $fg-1; }
-.optional { color: $fg-3; font-weight: 400; }
+.perks {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-size: 12.5px;
+  color: $fg-2;
+  li { display: inline-flex; align-items: center; gap: 6px; }
+  svg { color: $success; flex-shrink: 0; }
+}
 
+.signInRow { margin: 22px 0 0; font-size: 13px; color: $fg-2; }
+.signInLink { color: $accent; font-weight: 600; text-decoration: none; &:hover { text-decoration: underline; } }
+
+/* ── Step 2: the page ── */
+.form { display: flex; flex-direction: column; gap: 18px; }
+.field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.label { font-size: 12.5px; font-weight: 500; color: $fg-1; }
+.labelRow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1.5px solid $line-2;
+  background: $bg-1;
+  color: $fg-1;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  svg { color: $fg-3; flex-shrink: 0; }
+
+  &:hover { border-color: $line-strong; }
+  &:focus-visible { outline: none; border-color: $accent; box-shadow: 0 0 0 3px $accent-soft; }
+}
+.chipOn {
+  border-color: $accent;
+  background: $accent-soft;
+  color: $fg-0;
+  svg { color: $accent; }
+}
+
+// Phones: what you do is one field; the choices open in a bottom sheet.
+.picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 48px;
+  padding: 0 12px 0 13px;
+  border-radius: $r-2;
+  border: 1.5px solid $line-2;
+  background: $bg-1;
+  color: $fg-0;
+  font: inherit;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.18s, box-shadow 0.18s;
+
+  &:hover { border-color: $line-strong; }
+  &:focus-visible { outline: none; border-color: $accent; box-shadow: 0 0 0 4px $accent-soft; }
+  &.hasError { border-color: $danger; }
+}
+.pickerIcon { flex-shrink: 0; color: $fg-3; }
+.pickerText { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pickerPlaceholder { color: $fg-3; }
+.pickerChevron { flex-shrink: 0; color: $fg-2; }
+
+.slugStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 16px;
+  font-size: 12px;
+  color: $fg-3;
+}
+.slugOk { color: $success; }
+.slugBad { color: $danger; }
+
+// The address starts out made for them: dashed = "suggested, tap to change".
+.address {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 48px;
+  padding: 0 12px 0 13px;
+  border-radius: $r-2;
+  border: 1.5px dashed $line-2;
+  background: $bg-1;
+  color: $fg-2;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s;
+
+  &:hover { border-color: $line-strong; }
+  &:focus-visible { outline: none; border-style: solid; border-color: $accent; box-shadow: 0 0 0 4px $accent-soft; }
+}
+.addressBad { border-style: solid; border-color: $danger; }
+.addressIcon { color: $fg-3; flex-shrink: 0; }
+.addressText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: $font-mono;
+  font-size: 13.5px;
+  b { color: $fg-0; font-weight: 600; }
+  b.muted { color: $fg-3; font-weight: 500; }
+}
+.addressEdit {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  color: $accent;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+/* ── Inputs ── */
 .inputWrap { position: relative; display: flex; align-items: center; }
 .inputIcon {
   position: absolute;
   left: 13px;
-  color: $fg-3;
   display: flex;
   align-items: center;
+  color: $fg-3;
+  pointer-events: none;
+}
+.inputPrefix {
+  position: absolute;
+  left: 40px;
+  color: $fg-1;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.inputSuffix {
+  position: absolute;
+  right: 14px;
+  color: $fg-3;
+  font-size: 15px;
   pointer-events: none;
 }
 .input {
   width: 100%;
   height: 48px;
-  padding: 0 42px 0 40px;
-  background: $bg-1;
-  border: 1.5px solid $line-2;
+  padding: 0 14px 0 40px;
   border-radius: $r-2;
+  border: 1.5px solid $line-2;
+  background: $bg-1;
   color: $fg-0;
   font-family: $font-sans;
-  font-size: 15px;
+  font-size: 16px; // under 16px, iPhone Safari zooms the page on focus
   outline: none;
   transition: border-color 0.18s, box-shadow 0.18s;
 
@@ -300,49 +459,240 @@
   &.hasError { border-color: $danger; &:focus { box-shadow: 0 0 0 4px $danger-soft; } }
   &.isValid { border-color: color-mix(in srgb, $success 60%, $line-2); }
 }
+.withPrefix { padding-left: 82px; font-variant-numeric: tabular-nums; }
+.withTrailing { padding-right: 46px; }
+.withSuffix { padding-right: 104px; }
+.inputPlain { padding-left: 14px; margin-top: 4px; }
+
 .eyeBtn {
   position: absolute;
-  right: 12px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: $fg-3;
+  right: 6px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
-  padding: 4px;
-  border-radius: 4px;
-  transition: color 0.15s;
-  &:hover { color: $fg-1; }
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: $fg-3;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+  &:hover { color: $fg-1; background: $bg-2; }
+  &:focus-visible { outline: none; box-shadow: 0 0 0 3px $accent-soft; color: $fg-1; }
 }
 .validIcon {
   position: absolute;
   right: 13px;
-  color: $success;
   display: flex;
   align-items: center;
+  color: $success;
   pointer-events: none;
 }
+
 .fieldError {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 1px;
   font-size: 12.5px;
   line-height: 1.4;
   color: $danger;
-  display: flex;
-  align-items: flex-start;   /* icon hugs the first line on wrapped text */
-  gap: 6px;
-  margin-top: 1px;
   animation: field-err-in 0.18s ease both;
+  svg { flex-shrink: 0; margin-top: 1px; }
+}
+.fieldHint { margin-top: 1px; font-size: 12px; line-height: 1.45; color: $fg-3; }
+.suggest { color: $fg-2; }
+.inlineLink {
+  padding: 0;
+  border: none;
+  background: none;
+  color: $accent;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  &:hover { color: $accent-strong; }
+}
 
-  svg {
-    flex-shrink: 0;
-    margin-top: 1px;          /* optically center against the cap height */
+.pwMeter { display: flex; align-items: center; gap: 10px; }
+.pwBars {
+  display: inline-grid;
+  grid-template-columns: repeat(3, 22px);
+  gap: 4px;
+  i { height: 4px; border-radius: 4px; background: $line-2; transition: background 0.2s; }
+  i.pw1 { background: $warn; }
+  i.pw2, i.pw3 { background: $success; }
+}
+.pwRule {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: $fg-3;
+  svg { color: $success; }
+}
+.pwRuleMet { color: $fg-1; font-weight: 500; }
+
+.submitError {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: $r-1;
+  border: 1px solid color-mix(in srgb, $danger 30%, transparent);
+  background: $danger-soft;
+  color: $danger;
+  font-size: 13px;
+  text-align: left;
+  svg { flex-shrink: 0; }
+}
+
+/* ── Main button: pinned to the bottom on phones ── */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 22px;
+
+  @media (max-width: 959px) {
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+    margin: 18px -20px 0;
+    padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px));
+    background: linear-gradient(to top, $bg-0 72%, transparent);
   }
 }
-.fieldHint {
-  font-size: 12px;
-  line-height: 1.4;
-  color: $fg-3;
-  font-family: $font-mono;
-  margin-top: 1px;
+.form .actions { margin-top: 4px; }
+
+.submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 50px;
+  border: none;
+  border-radius: $r-2;
+  background: $accent;
+  color: $fg-on-accent;
+  font-family: $font-sans;
+  font-size: 15.5px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 1px 2px color-mix(in srgb, $accent 18%, transparent), 0 6px 18px color-mix(in srgb, $accent 22%, transparent);
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+
+  &:hover:not(:disabled) { background: $accent-strong; box-shadow: 0 8px 24px color-mix(in srgb, $accent 30%, transparent); }
+  &:active:not(:disabled) { transform: translateY(1px); }
+  &:focus-visible { outline: none; box-shadow: 0 0 0 4px $accent-soft; }
+  &:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
+  &.loading { cursor: wait; }
+}
+.spinner {
+  width: 17px;
+  height: 17px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: su-spin 0.7s linear infinite;
+}
+.spin { animation: su-spin 0.8s linear infinite; }
+
+.terms { margin: 0; font-size: 11.5px; line-height: 1.5; color: $fg-3; text-align: center; }
+.form .terms { margin-top: -6px; }
+
+/* ── Sent ── */
+.success {
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+  animation: su-rise 0.38s cubic-bezier(0.22, 0.86, 0.23, 1) both;
+  @media (max-width: 959px) { padding-bottom: 32px; }
+}
+.successIcon {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, $success 15%, transparent);
+  color: $success;
+}
+.successTitle {
+  margin: 0 0 8px;
+  font-family: $font-serif;
+  font-size: clamp(26px, 6vw, 32px);
+  letter-spacing: -0.02em;
+  color: $fg-0;
+  &:focus { outline: none; }
+}
+.successText {
+  margin: 0 0 22px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: $fg-2;
+  strong { color: $fg-0; overflow-wrap: anywhere; }
+}
+.successSteps {
+  list-style: none;
+  margin: 22px 0 18px;
+  padding: 4px 16px;
+  border: 1px solid $line-1;
+  border-radius: $r-3;
+  background: $bg-1;
+  text-align: left;
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0;
+    font-size: 13px;
+    color: $fg-2;
+    svg { flex-shrink: 0; color: $fg-3; }
+  }
+  li + li { border-top: 1px solid $line-1; }
+}
+.resend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 6px;
+  margin-bottom: 4px;
+  font-size: 13.5px;
+  color: $fg-2;
+}
+.linkBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 2px;
+  border: none;
+  background: none;
+  color: $accent;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  &:hover:not(:disabled) { text-decoration: underline; }
+  &:disabled { color: $fg-3; cursor: default; }
+}
+.success > .linkBtn { margin: 0 auto; }
+.success .submitError { margin: 8px 0; }
+.footNote { margin: 12px 0 0; font-size: 12px; color: $fg-3; }
+.homeLink {
+  display: inline-block;
+  margin-top: 18px;
+  font-size: 13px;
+  color: $fg-2;
+  text-decoration: none;
+  &:hover { color: $fg-0; }
 }
 
 @keyframes field-err-in {
@@ -350,83 +700,13 @@
   to   { opacity: 1; transform: none; }
 }
 
-/* ── Submit ── */
-.submit {
-  height: 48px;
-  width: 100%;
-  border-radius: $r-2;
-  border: none;
-  background: $accent;
-  color: #fff;
-  font-family: $font-sans;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 6px;
-  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-  box-shadow: 0 1px 2px color-mix(in srgb, $accent 18%, transparent), 0 6px 18px color-mix(in srgb, $accent 22%, transparent);
-
-  &:hover:not(:disabled) { background: $accent-strong; box-shadow: 0 8px 24px color-mix(in srgb, $accent 30%, transparent); }
-  &:active:not(:disabled) { transform: translateY(1px); }
-  &:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
-  &.loading { cursor: wait; }
+@media (prefers-reduced-motion: reduce) {
+  .card, .success, .fieldError { animation: none; }
+  .previewLabel::before { animation: none; }
 }
-.spinner {
-  width: 17px; height: 17px;
-  border: 2px solid rgba(255,255,255,0.35);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: su-spin 0.7s linear infinite;
-}
-
-.terms { font-size: 11.5px; color: $fg-3; text-align: center; margin: 4px 0 0; line-height: 1.5; }
-
-.signInRow { font-size: 13px; color: $fg-2; margin: 20px 0 0; text-align: center; }
-.signInLink { color: $accent; font-weight: 600; text-decoration: none; &:hover { text-decoration: underline; } }
-
-/* ── Success ── */
-.success {
-  width: 100%;
-  max-width: 440px;
-  text-align: center;
-  animation: su-rise 0.4s cubic-bezier(0.22, 0.86, 0.23, 1) both;
-}
-.successIcon {
-  width: 64px; height: 64px;
-  margin: 0 auto 18px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  background: color-mix(in srgb, $success 15%, transparent);
-  color: $success;
-}
-.successTitle { font-family: $font-serif; font-size: clamp(26px, 4vw, 32px); letter-spacing: -0.02em; margin: 0 0 8px; color: $fg-0; }
-.successText { font-size: 14.5px; color: $fg-2; line-height: 1.55; margin: 0 0 24px; }
-.successCard {
-  text-align: left;
-  background: $bg-1;
-  border: 1px solid $line-1;
-  border-radius: $r-3;
-  box-shadow: $shadow-1;
-  padding: 6px 16px;
-  margin-bottom: 24px;
-}
-.successRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 13px 0;
-  & + & { border-top: 1px solid $line-1; }
-}
-.successRowLabel { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: $fg-2; svg { color: $fg-3; } }
-.successRowValue { font-size: 13.5px; font-weight: 600; color: $fg-0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.footNote { font-size: 12px; color: $fg-3; margin: 14px 0 0; }
 
 :global {
   @keyframes su-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
   @keyframes su-spin { to { transform: rotate(360deg); } }
+  @keyframes su-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 }

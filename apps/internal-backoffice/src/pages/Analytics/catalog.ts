@@ -156,6 +156,14 @@ export const REVIEW_ERROR_LABELS: Record<string, string> = {
   UNKNOWN: 'Network or unknown error',
 }
 
+/** Sign-up steps (signup_step `step`): the three-step form, plus the older two-step names. */
+export const SIGNUP_STEP_LABELS: Record<string, string> = {
+  kind: 'Solo or salon',
+  page: 'Page details',
+  account: 'Account details',
+  company: 'Company details',
+}
+
 const BOOKING_STEP_LABELS: Record<string, string> = {
   branch: 'Branch',
   service: 'Service',
@@ -191,7 +199,7 @@ export function eventSummary(name: string, props: Record<string, unknown>): stri
     case 'booking_close':
       return str(props.step) ? `at ${labelFrom(BOOKING_STEP_LABELS, str(props.step))}` : null
     case 'signup_step':
-      return str(props.step)
+      return str(props.step) ? labelFrom(SIGNUP_STEP_LABELS, str(props.step)) : null
     case 'booking_error':
     case 'signup_error':
       return [str(props.field), str(props.code)].filter(Boolean).join(' · ') || null
