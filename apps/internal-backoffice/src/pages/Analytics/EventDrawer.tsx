@@ -35,6 +35,7 @@ function PropValue({ name, value }: { name: string; value: unknown }) {
     )
   }
   if (name === 'pt' && typeof value === 'string') return <>{labelFrom(PAGE_TYPE_LABELS, value)}</>
+  if (name === 'stars' && typeof value === 'number') return <>{value} ★</>
   if (typeof value === 'boolean') return <>{value ? 'Yes' : 'No'}</>
   if (typeof value === 'number') return <>{fmtInt(value)}</>
   if (typeof value === 'string') return <>{value || '—'}</>

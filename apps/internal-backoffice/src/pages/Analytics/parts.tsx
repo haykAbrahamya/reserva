@@ -180,7 +180,7 @@ export const ALL = '__all__'
 
 /**
  * Partner choices for the filters: every partner (100 is the API's page cap and
- * covers the roster, as on the Visits page). A drilled-into partner missing
+ * covers the roster). A drilled-into partner missing
  * from that list still gets a readable option instead of a blank trigger.
  */
 export function usePartnerOptions(selectedId: string, fallbackName?: string | null): SelectOption[] {

@@ -28,6 +28,7 @@ const OUTCOME_OPTIONS: SelectOption[] = [
   { value: 'booked', label: 'Booked' },
   { value: 'contacted', label: 'Contacted', sub: 'Call, WhatsApp, Instagram, directions…' },
   { value: 'signup', label: 'Signed up' },
+  { value: 'reviewed', label: 'Left a review' },
   { value: 'bookclick', label: 'Clicked Book', sub: 'Clicked Book or opened the booking' },
   { value: 'bounced', label: 'Bounced', sub: 'One page view and nothing else' },
 ]

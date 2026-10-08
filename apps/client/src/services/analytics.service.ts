@@ -59,6 +59,11 @@ export interface PulseEvents {
   gallery_open: { kind?: 'gallery' | 'works' }
   course_open: { course: string }
   course_register_click: { course: string }
+  // Reviews — the stars only, never the author or the text
+  reviews_open: { from: 'hero' | 'tab' }
+  review_form_open: { sp: string }
+  review_success: { sp: string; stars: number }
+  review_error: { sp?: Id; code: string }
   // Booking flow
   booking_open: { from?: string; svc?: Id; sp?: Id; loc?: Id }
   booking_step: { step: BookingStep }
@@ -337,7 +342,7 @@ function cleanProps(props?: object): Record<string, unknown> | undefined {
       if (UUID_KEYS.has(k) && !UUID_RE.test(v)) continue
       out[k] = v.slice(0, MAX_LEN[k] ?? 80)
     } else if (typeof v === 'number') {
-      // `pos` is the only number in the catalog: an int in 0..1000.
+      // The catalog's numbers are `pos` (0..1000) and `stars` (1..5): ints in 0..1000.
       if (Number.isFinite(v)) out[k] = Math.min(1000, Math.max(0, Math.round(v)))
     } else if (typeof v === 'boolean') {
       out[k] = v

@@ -11,7 +11,7 @@
 // children; a specialty carries a second name column).
 // ─────────────────────────────────────────────────────────────
 
-/// The console's page frame — same padding and entrance as Partners/Staff/Visits.
+/// The console's page frame — same padding and entrance as Partners/Staff.
 @mixin page {
   display: flex;
   flex-direction: column;

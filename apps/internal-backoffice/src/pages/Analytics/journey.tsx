@@ -1,7 +1,7 @@
 import {
   BadgeCheck, CalendarCheck, CalendarDays, CalendarPlus, ChevronsRight, Circle, FileText, GraduationCap, Home,
-  Images, LayoutGrid, ListChecks, LogOut, MapPin, PenLine, Search, Send, SlidersHorizontal, Store, Tag,
-  TriangleAlert, UserPlus, UserRound,
+  Images, LayoutGrid, ListChecks, LogOut, MapPin, MessageSquareHeart, MessageSquarePlus, MessageSquareWarning, PenLine,
+  Search, Send, SlidersHorizontal, Star, Store, Tag, TriangleAlert, UserPlus, UserRound,
 } from 'lucide-react'
 import type { SessionEvent, SessionRow } from '@/services/analytics.service'
 import { eventDef, humanize, type EventTone } from './catalog'
@@ -38,6 +38,10 @@ export function EventIcon({ name, props, size = 14 }: { name: string; props?: Re
     case 'gallery_open': return <Images size={size} />
     case 'course_open':
     case 'course_register_click': return <GraduationCap size={size} />
+    case 'reviews_open': return <Star size={size} />
+    case 'review_form_open': return <MessageSquarePlus size={size} />
+    case 'review_success': return <MessageSquareHeart size={size} />
+    case 'review_error': return <MessageSquareWarning size={size} />
     case 'booking_open': return <CalendarDays size={size} />
     case 'booking_step':
     case 'signup_step': return <ChevronsRight size={size} />
@@ -156,6 +160,22 @@ export function describeEvent(
       return line(`Opened course ${named(p.course, 'a course') ?? ''}`.trim())
     case 'course_register_click':
       return line(`Clicked Sign up for ${named(p.course, 'a course') ?? 'a course'}`)
+    case 'reviews_open':
+      switch (str(p.from)) {
+        case 'hero': return line('Clicked the rating to see the reviews')
+        case 'tab': return line('Opened the Reviews tab')
+        default: return line('Opened the reviews')
+      }
+    case 'review_form_open':
+      return line(`Opened the review form${sp ? ` for ${sp}` : ''}`)
+    case 'review_success': {
+      const stars = typeof p.stars === 'number' ? `${p.stars}★ ` : ''
+      return line(`Left a ${stars}review${sp ? ` for ${sp}` : ''} ✓`)
+    }
+    case 'review_error':
+      return str(p.code) === 'no_stars'
+        ? line('Tried to send the review without choosing stars')
+        : line(`Review not sent${str(p.code) ? ` (${str(p.code)})` : ''}`)
     case 'booking_open':
       return line(`Opened booking${svc ? ` for ${svc}` : ''}${withAt}${fromText}`)
     case 'booking_step': {
@@ -211,6 +231,7 @@ export function describeEvent(
 export function sessionOutcome(row: SessionRow): { label: string; tone: EventTone; title: string } {
   if (row.outcome.booked) return { label: 'Booked', tone: 'success', title: 'Completed a booking' }
   if (row.outcome.signedUp) return { label: 'Signed up', tone: 'success', title: 'Finished the partner sign-up' }
+  if (row.outcome.reviewed) return { label: 'Reviewed', tone: 'success', title: 'Left a review for a specialist' }
   if (row.outcome.contacted) {
     return { label: 'Contacted', tone: 'accent', title: 'Tapped call, WhatsApp, Instagram, directions or another contact link' }
   }
@@ -218,6 +239,6 @@ export function sessionOutcome(row: SessionRow): { label: string; tone: EventTon
   return {
     label: 'Left',
     tone: 'neutral',
-    title: row.eventCount <= 1 ? 'Left after one page' : 'Left without booking, contacting or signing up',
+    title: row.eventCount <= 1 ? 'Left after one page' : 'Left without booking, contacting, reviewing or signing up',
   }
 }

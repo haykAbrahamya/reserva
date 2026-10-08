@@ -29,6 +29,9 @@ export interface AnalyticsOverview {
     signupStarts: Kpi    // signup_start
     signups: Kpi         // DB: pending_registrations created in range
     activations: Kpi     // DB: pending_registrations consumed in range
+    // Optional: a backend from before review tracking leaves them out.
+    reviewForms?: Kpi    // review_form_open
+    reviews?: Kpi        // DB: specialist_reviews created in range
   }
   /** Every day in range, zeros filled, ascending. */
   series: { date: string; visitors: number; sessions: number; pageViews: number; bookings: number }[]
@@ -108,14 +111,15 @@ export interface SessionRow {
   pageViews: number
   /** Touched, first-seen order, ≤ 5. */
   partners: { id: string; name: string; slug: string | null }[]
-  outcome: { booked: boolean; contacted: boolean; signedUp: boolean; bookClicked: boolean }
+  /** `reviewed` is missing from a backend that predates review tracking. */
+  outcome: { booked: boolean; contacted: boolean; signedUp: boolean; reviewed?: boolean; bookClicked: boolean }
   /** First ≤ 12 event names in order (for the preview chips). */
   journey: string[]
   /** All sessions of this visitorId (all time, bots excluded) — the "returning" hint. */
   visitorSessions: number
 }
 
-export type SessionOutcome = 'booked' | 'contacted' | 'signup' | 'bookclick' | 'bounced'
+export type SessionOutcome = 'booked' | 'contacted' | 'signup' | 'reviewed' | 'bookclick' | 'bounced'
 
 export interface SessionEvent {
   id: string

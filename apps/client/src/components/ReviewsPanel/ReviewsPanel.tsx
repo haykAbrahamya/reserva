@@ -6,6 +6,7 @@ import {
   createSpecialistReview,
   type SpecialistReview,
 } from '@/services/booking.service'
+import { track } from '@/services/analytics.service'
 import { useI18n } from '@/i18n'
 import s from './ReviewsPanel.module.scss'
 
@@ -68,8 +69,18 @@ export function ReviewsPanel({ slug, specialistId, emptyName, layout = 'list' }:
     }
   }
 
+  const openForm = () => {
+    track('review_form_open', { sp: specialistId })
+    setFormOpen(true)
+    setJustSubmitted(false)
+  }
+
   const submitReview = async () => {
-    if (stars < 1) { setError(t('specialistModal.review.pickStars')); return }
+    if (stars < 1) {
+      track('review_error', { sp: specialistId, code: 'no_stars' })
+      setError(t('specialistModal.review.pickStars'))
+      return
+    }
     setSubmitting(true)
     setError('')
     try {
@@ -78,11 +89,14 @@ export function ReviewsPanel({ slug, specialistId, emptyName, layout = 'list' }:
         rating: stars,
         text: text.trim() || undefined,
       })
+      // The stars only: the name and the text never leave for analytics.
+      track('review_success', { sp: specialistId, stars })
       setReviews(prev => [created, ...(prev ?? [])])
       setJustSubmitted(true)
       setFormOpen(false)
       setStars(0); setAuthor(''); setText('')
-    } catch {
+    } catch (err) {
+      track('review_error', { sp: specialistId, code: (err as { code?: string } | null)?.code ?? 'UNKNOWN' })
       setError(t('specialistModal.review.failed'))
     } finally {
       setSubmitting(false)
@@ -108,7 +122,7 @@ export function ReviewsPanel({ slug, specialistId, emptyName, layout = 'list' }:
       <div className={s.reviewsHead}>
         <p className={s.sectionLabel}>{t('specialistModal.whatClientsSay')}</p>
         {!formOpen && (
-          <button className={s.writeBtn} onClick={() => { setFormOpen(true); setJustSubmitted(false) }}>
+          <button className={s.writeBtn} onClick={openForm}>
             <MessageSquarePlus size={15} /> {t('specialistModal.review.write')}
           </button>
         )}
@@ -184,7 +198,7 @@ export function ReviewsPanel({ slug, specialistId, emptyName, layout = 'list' }:
           <span className={s.emptyIcon}><MessagesSquare size={26} strokeWidth={1.5} /></span>
           <div className={s.emptyTitle}>{t('specialistModal.review.emptyTitle')}</div>
           <p className={s.emptyText}>{t('specialistModal.review.emptyText', { name: emptyName })}</p>
-          <button className={s.emptyCta} onClick={() => setFormOpen(true)}>
+          <button className={s.emptyCta} onClick={openForm}>
             <MessageSquarePlus size={15} /> {t('specialistModal.review.beFirst')}
           </button>
         </div>

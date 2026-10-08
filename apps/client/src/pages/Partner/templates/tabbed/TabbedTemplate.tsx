@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useEffect, type ReactElement } from 'react'
 import { Sparkles, Star, Images, MapPin, GraduationCap } from 'lucide-react'
 import { useT } from '@/i18n'
+import { track } from '@/services/analytics.service'
 import type { TemplateProps } from '../types'
 import { TabbedHero } from './sections/TabbedHero/TabbedHero'
 import { TabbedServices } from './sections/TabbedServices/TabbedServices'
@@ -52,6 +53,7 @@ export function TabbedTemplate({ partner, onBook }: TemplateProps) {
   // area into view (the tab bar is sticky, so without this the switch can happen
   // off-screen if the user has scrolled). Only offered when a Reviews tab exists.
   const goToReviews = () => {
+    track('reviews_open', { from: 'hero' })
     setActive('reviews')
     panelsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
@@ -97,7 +99,10 @@ export function TabbedTemplate({ partner, onBook }: TemplateProps) {
                   role="tab"
                   aria-selected={active === tab.key}
                   className={[s.tab, active === tab.key ? s.tabActive : ''].filter(Boolean).join(' ')}
-                  onClick={() => setActive(tab.key)}
+                  onClick={() => {
+                    if (tab.key === 'reviews' && active !== 'reviews') track('reviews_open', { from: 'tab' })
+                    setActive(tab.key)
+                  }}
                 >
                   {tab.icon}
                   <span>{tab.label}</span>

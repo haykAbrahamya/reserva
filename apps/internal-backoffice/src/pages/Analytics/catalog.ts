@@ -7,7 +7,7 @@
 // event shipped by the public site shows up before this file catches up.
 // ─────────────────────────────────────────────────────────────
 
-export type EventGroup = 'site' | 'partner' | 'booking' | 'signup' | 'marketplace'
+export type EventGroup = 'site' | 'partner' | 'reviews' | 'booking' | 'signup' | 'marketplace'
 
 /** Badge colour. Errors and successes use the status tones because they ARE a
  *  status; the rest only separate the flows from one another. */
@@ -23,6 +23,7 @@ export interface EventDef {
 export const EVENT_GROUP_LABEL: Record<EventGroup, string> = {
   site: 'Everywhere',
   partner: 'Partner page',
+  reviews: 'Reviews',
   booking: 'Booking flow',
   signup: 'Sign-up',
   marketplace: 'Marketplace',
@@ -41,6 +42,11 @@ export const EVENT_CATALOG: EventDef[] = [
   { name: 'gallery_open', label: 'Gallery opened', group: 'partner', tone: 'neutral' },
   { name: 'course_open', label: 'Course opened', group: 'partner', tone: 'neutral' },
   { name: 'course_register_click', label: 'Course sign-up click', group: 'partner', tone: 'accent' },
+
+  { name: 'reviews_open', label: 'Reviews opened', group: 'reviews', tone: 'neutral' },
+  { name: 'review_form_open', label: 'Review form opened', group: 'reviews', tone: 'info' },
+  { name: 'review_success', label: 'Review left', group: 'reviews', tone: 'success' },
+  { name: 'review_error', label: 'Review not sent', group: 'reviews', tone: 'warn' },
 
   { name: 'booking_open', label: 'Booking opened', group: 'booking', tone: 'info' },
   { name: 'booking_step', label: 'Booking step', group: 'booking', tone: 'info' },
@@ -91,6 +97,7 @@ export const PROP_LABELS: Record<string, string> = {
   area: 'Area',
   slug: 'Salon',
   pos: 'Position in list',
+  stars: 'Stars',
 }
 
 export const PAGE_TYPE_LABELS: Record<string, string> = {
@@ -135,6 +142,18 @@ export const TRAFFIC_CHANNEL_HINTS: Record<string, string> = {
   search: 'Bing, Yandex, DuckDuckGo or Yahoo',
   campaign: 'A link tagged with utm_source',
   other: 'Any other website',
+}
+
+/** Where a visitor went to the reviews from (reviews_open `from`). */
+export const REVIEWS_FROM_LABELS: Record<string, string> = {
+  hero: 'Rating at the top',
+  tab: 'Reviews tab',
+}
+
+/** Why a review was not sent, when the code alone says little. */
+export const REVIEW_ERROR_LABELS: Record<string, string> = {
+  no_stars: 'No stars chosen',
+  UNKNOWN: 'Network or unknown error',
 }
 
 const BOOKING_STEP_LABELS: Record<string, string> = {
@@ -187,6 +206,12 @@ export function eventSummary(name: string, props: Record<string, unknown>): stri
       return str(props.slug)
     case 'gallery_open':
       return str(props.kind)
+    case 'reviews_open':
+      return str(props.from) ? labelFrom(REVIEWS_FROM_LABELS, str(props.from)) : null
+    case 'review_success':
+      return typeof props.stars === 'number' ? `${props.stars} ★` : null
+    case 'review_error':
+      return str(props.code) ? labelFrom(REVIEW_ERROR_LABELS, str(props.code)) : null
     default:
       return null
   }

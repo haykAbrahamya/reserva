@@ -73,6 +73,14 @@ export function OverviewTab({ range, includeStaff, refreshKey, onOpenPartner, on
     { label: 'Submitted', kpi: k.signups, of: 'starts', note: 'from registrations' },
     { label: 'Activated', kpi: k.activations, of: 'submitted', note: 'from registrations' },
   ]
+  // A backend from before review tracking sends neither number: no panel then.
+  const reviewFunnel: FunnelStep[] | null = k.reviewForms && k.reviews
+    ? [
+        // One number from each source, each saying so.
+        { label: 'Review form opened', kpi: k.reviewForms, note: 'from the tracker' },
+        { label: 'Reviews left', kpi: k.reviews, of: 'forms', note: 'from reviews' },
+      ]
+    : null
 
   return (
     <div className={[s.tab, loading ? s.stale : s.fresh].join(' ')} aria-busy={loading}>
@@ -103,6 +111,15 @@ export function OverviewTab({ range, includeStaff, refreshKey, onOpenPartner, on
       >
         <Funnel steps={funnel} baseline={baseline} />
       </Panel>
+
+      {reviewFunnel && (
+        <Panel
+          title="Reviews"
+          sub="From opening the review form to a published review. Reviews left are counted from the reviews themselves, not from the tracker."
+        >
+          <Funnel steps={reviewFunnel} baseline={baseline} pair />
+        </Panel>
+      )}
 
       <Panel
         title={copy.title}
@@ -213,10 +230,10 @@ export function OverviewTab({ range, includeStaff, refreshKey, onOpenPartner, on
  * Steps side by side with the drop between them. Each bar is the step against
  * the widest one, so the funnel's shape reads before any number does.
  */
-function Funnel({ steps, baseline }: { steps: FunnelStep[]; baseline: string | null }) {
+function Funnel({ steps, baseline, pair = false }: { steps: FunnelStep[]; baseline: string | null; pair?: boolean }) {
   const max = Math.max(1, ...steps.map((st) => st.kpi.value))
   return (
-    <div className={s.funnel}>
+    <div className={pair ? `${s.funnel} ${s.funnelPair}` : s.funnel}>
       {steps.map((st, i) => {
         const prev = i > 0 ? steps[i - 1].kpi.value : 0
         const conv = prev > 0 ? st.kpi.value / prev : null
@@ -295,6 +312,7 @@ function OverviewSkeleton() {
       <div className={s.kpiGrid}>
         {Array.from({ length: 8 }, (_, i) => <Skeleton key={i} height={96} />)}
       </div>
+      <Skeleton height={168} />
       <Skeleton height={168} />
       <Skeleton height={372} />
       <div className={s.split}>

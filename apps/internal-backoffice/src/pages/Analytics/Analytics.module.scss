@@ -1,7 +1,7 @@
 @use 'variables' as *;
 
 // ─────────────────────────────────────────────────────────────
-// Analytics — page frame matches Partners / Visits; panels are bordered,
+// Analytics — page frame matches Partners / Staff; panels are bordered,
 // unshadowed cards; numbers that line up in columns are tabular (the body
 // font already turns on "tnum").
 // ─────────────────────────────────────────────────────────────
@@ -495,6 +495,8 @@
 
 @container (min-width: 640px) {
   .funnel { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  /* A two-step funnel (reviews) shares the row at every width. */
+  .funnel.funnelPair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .step {
     &:nth-child(odd) { border-left: 1px solid $line-1; padding-left: 16px; }
     &:first-child { border-left: 0; padding-left: 0; }

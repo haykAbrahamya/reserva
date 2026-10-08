@@ -7,7 +7,7 @@ import {
 export type AnalyticsTab = 'overview' | 'partners' | 'sources' | 'sessions' | 'events'
 
 const TABS: readonly AnalyticsTab[] = ['overview', 'partners', 'sources', 'sessions', 'events']
-const OUTCOMES: readonly SessionOutcome[] = ['booked', 'contacted', 'signup', 'bookclick', 'bounced']
+const OUTCOMES: readonly SessionOutcome[] = ['booked', 'contacted', 'signup', 'reviewed', 'bookclick', 'bounced']
 
 type ParamKey = 'tab' | 'range' | 'from' | 'to' | 'staff' | 'event' | 'partner' | 'session' | 'channel' | 'outcome' | 'page'
 

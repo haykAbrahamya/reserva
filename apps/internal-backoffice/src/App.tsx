@@ -15,7 +15,6 @@ import { PartnerDetailPage } from '@/pages/Partners/PartnerDetail'
 import { Staff } from '@/pages/Staff/Staff'
 import { DemoRequests } from '@/pages/DemoRequests/DemoRequests'
 import { PendingRegistrations } from '@/pages/PendingRegistrations/PendingRegistrations'
-import { Visits } from '@/pages/Visits/Visits'
 import { Analytics } from '@/pages/Analytics/Analytics'
 import { Specialties } from '@/pages/Specialties/Specialties'
 import { Areas } from '@/pages/Areas/Areas'
@@ -63,7 +62,8 @@ export default function App() {
             <Route path="demo-requests" element={<DemoRequests />} />
             <Route path="pending-registrations" element={<PendingRegistrations />} />
             <Route path="analytics" element={<Analytics />} />
-            <Route path="visits" element={<Visits />} />
+            {/* The old Visits page is gone; its bookmarks land on the visits list that replaced it. */}
+            <Route path="visits" element={<Navigate to="/analytics?tab=sessions" replace />} />
             <Route path="specialties" element={<Specialties />} />
             <Route path="areas" element={<Areas />} />
             <Route path="staff" element={<RequireOwner><Staff /></RequireOwner>} />

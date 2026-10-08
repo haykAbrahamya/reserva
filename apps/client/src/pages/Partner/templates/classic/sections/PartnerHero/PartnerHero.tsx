@@ -55,7 +55,9 @@ export function PartnerHero({ partner, onBook }: Props) {
   const showReviews = isSingle && partner.specialists.length > 0
   const ratingTargetId = showTeam ? 'team' : showReviews ? 'reviews' : null
   const scrollToReviews = () => {
-    if (ratingTargetId) scrollToSection(ratingTargetId)
+    if (!ratingTargetId) return
+    track('reviews_open', { from: 'hero' })
+    scrollToSection(ratingTargetId)
   }
 
   // The academy is worth a jump link of its own, but only when this salon

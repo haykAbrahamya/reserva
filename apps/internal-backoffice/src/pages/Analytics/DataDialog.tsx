@@ -30,8 +30,8 @@ const plural = (n: number, one: string, many: string) => `${fmtInt(n)} ${n === 1
  *
  * Deleting is owner-only on the server; everyone else still sees the numbers,
  * with the actions visibly locked rather than hidden, so they know who to ask.
- * Mirrors Visits' "Clear history": a themed confirm that says exactly what
- * goes and what stays, then a toast with what was removed.
+ * A themed confirm that says exactly what goes and what stays, then a toast
+ * with what was removed.
  */
 export function DataDialog({ open, onClose, onDeleted }: {
   open: boolean
@@ -96,7 +96,7 @@ export function DataDialog({ open, onClose, onDeleted }: {
         open={open}
         onClose={onClose}
         title="Analytics data"
-        subtitle="What the site tracker has stored. Clearing it never touches Visits, bookings or partners."
+        subtitle="What the site tracker has stored. Clearing it never touches bookings, reviews or partners."
         size="md"
       >
         <div className={s.data}>
@@ -205,7 +205,7 @@ export function DataDialog({ open, onClose, onDeleted }: {
       >
         <GoesStays
           goes={`Tracked events recorded before ${day(before)} (Yerevan time), and the sessions left with no events.`}
-          stays={`The last ${days} days (${fmtSpan(before, today)}) — plus the legacy Visits list, bookings, partners and everything else in Reserva.`}
+          stays={`The last ${days} days (${fmtSpan(before, today)}) — plus bookings, reviews, partners and everything else in Reserva.`}
         />
       </ConfirmDialog>
 
@@ -224,7 +224,7 @@ export function DataDialog({ open, onClose, onDeleted }: {
           goes={storage
             ? `All ${plural(storage.events, 'tracked event', 'tracked events')} and ${plural(storage.sessions, 'session', 'sessions')} — every analytics number restarts from zero.`
             : 'Every tracked event and session — every analytics number restarts from zero.'}
-          stays="The legacy Visits list, bookings, partners and everything else in Reserva."
+          stays="Bookings, reviews, partners and everything else in Reserva."
         />
         {/* A form so Enter submits; the check lives in run(), and the Button
             component has no disabled look of its own to lean on. */}

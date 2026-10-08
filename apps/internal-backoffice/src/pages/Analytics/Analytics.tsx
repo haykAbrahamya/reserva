@@ -36,9 +36,9 @@ export function Analytics() {
 }
 
 /**
- * Site analytics from the new public-site tracker. (The legacy raw page-view
- * list stays on Visits.) One toolbar scopes every tab, so the numbers on all
- * four always describe the same days and the same audience.
+ * Site analytics from the public-site tracker. One toolbar scopes every tab,
+ * so the numbers on all of them always describe the same days and the same
+ * audience.
  */
 function AnalyticsScreen() {
   const p = useAnalyticsParams()
