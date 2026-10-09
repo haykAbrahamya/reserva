@@ -178,8 +178,8 @@ export function Select({
   )
 }
 
-/** Bold the matching substring inside an option label. */
-function highlight(text: string, query: string, enabled: boolean): React.ReactNode {
+/** Bold the matching substring inside an option label. Shared with MultiSelect. */
+export function highlight(text: string, query: string, enabled: boolean): React.ReactNode {
   const q = query.trim()
   if (!enabled || !q) return text
   const idx = text.toLowerCase().indexOf(q.toLowerCase())

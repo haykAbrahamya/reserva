@@ -1,10 +1,45 @@
 import { fmtAMD } from '@reserva/shared'
 import type { LocalizedText } from '@reserva/shared'
 import type { PublicCourse, PublicPartner } from '@/mock/partners'
-import { canBook, bookableLocations, partnerTelHref } from '@/services/booking.service'
+import { canBook, bookableLocations, partnerTelHref, primaryLocation } from '@/services/booking.service'
 
 /** Signature of the `useLocalized()` result — a base string + optional i18n blob. */
 type Localizer = (base: string, i18n?: LocalizedText | null) => string
+
+type Branch = PublicPartner['locations'][number]
+
+/**
+ * Where a course is held: its current run's branch — or, when the run names
+ * none, the salon's only branch (a one-branch salon can't be anywhere else).
+ * Undefined when that isn't knowable: several branches and none picked.
+ * Looked up among ALL branches, not just bookable ones — a training room may
+ * have no one taking appointments.
+ */
+export function courseLocation(partner: PublicPartner, course: PublicCourse): Branch | undefined {
+  const id = course.currentCohort?.locationId
+  if (id) return partner.locations.find((l) => l.id === id)
+  return partner.locations.length === 1 ? partner.locations[0] : undefined
+}
+
+/**
+ * The "where" line for a course. `short` fits the card; `full` adds the street
+ * for the details popup. A one-branch salon's branch name tells a visitor
+ * nothing, so it reads as the address there.
+ */
+export function courseWhere(
+  partner: PublicPartner,
+  course: PublicCourse,
+  loc: Localizer,
+): { short: string; full: string } | null {
+  const place = courseLocation(partner, course)
+  if (!place) return null
+  const name = loc(place.name, place.nameI18n)
+  if (partner.locations.length === 1) {
+    const where = place.address || name
+    return { short: where, full: where }
+  }
+  return { short: name, full: place.address ? `${name} · ${place.address}` : name }
+}
 
 /** Course price by mode: null for 'hidden' (show nothing), the localized "Free"
  *  label for 'free', else the AMD amount for 'paid'. */
@@ -78,20 +113,26 @@ export function courseTutor(course: PublicCourse, loc: Localizer): {
  * and the details popup can never disagree:
  *   - `register` → online sign-up is open
  *   - `call`     → contact-only partner (booking disabled); dial `telHref`, or
- *                  open the branch picker first when `pickBranch` is true
+ *                  open the branch picker first when `pickBranch` is true.
+ *                  A course held at a known branch dials THAT branch.
  *   - `closed`   → bookable partner but the run takes no more sign-ups
  */
 export type CourseCta =
   | { kind: 'register' }
-  | { kind: 'call'; telHref: string | null; pickBranch: boolean }
+  | { kind: 'call'; telHref: string | null; pickBranch: boolean; locationId?: string }
   | { kind: 'closed' }
 
 export function courseCta(partner: PublicPartner, course: PublicCourse): CourseCta {
   if (!canBook(partner)) {
+    const place = courseLocation(partner, course)
+    if (place?.phone) {
+      return { kind: 'call', telHref: `tel:${place.phone.replace(/\s/g, '')}`, pickBranch: false, locationId: place.id }
+    }
     return {
       kind: 'call',
       telHref: partnerTelHref(partner),
       pickBranch: bookableLocations(partner).length > 1,
+      locationId: primaryLocation(partner)?.id,
     }
   }
   return courseIsOpen(course) ? { kind: 'register' } : { kind: 'closed' }

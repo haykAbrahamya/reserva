@@ -3,7 +3,7 @@ import { MapPin, Phone, Instagram, Facebook, Star } from 'lucide-react'
 import { WhatsappIcon } from '@reserva/ui'
 import { useT, useLocalized } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
-import { bookableLocations } from '@/services/booking.service'
+import { bookableLocations, whatsappContact } from '@/services/booking.service'
 import { track } from '@/services/analytics.service'
 import { CallLocationModal } from '../../../../components/CallLocationModal/CallLocationModal'
 import s from './TabbedHero.module.scss'
@@ -32,6 +32,9 @@ export function TabbedHero({ partner, onReviewsClick, onBranchesClick }: Props) 
   const primary = locations[0]
   const multiLocation = locations.length > 1
   const [callOpen, setCallOpen] = useState(false)
+  // WhatsApp gets the same picker when several branches have their own number.
+  const wa = whatsappContact(partner)
+  const [waOpen, setWaOpen] = useState(false)
   const t1 = p.heroTints[0] ?? partner.accent
   const t2 = p.heroTints[1] ?? `color-mix(in srgb, ${partner.accent} 55%, #7c3aed)`
 
@@ -96,7 +99,7 @@ export function TabbedHero({ partner, onReviewsClick, onBranchesClick }: Props) 
           {/* Contact + social links, inline under the profile. The primary
               "Book" action is the persistent top-nav button, so it's not
               repeated here. */}
-          {(primary || p.instagram || p.facebook || p.whatsapp) && (
+          {(primary || p.instagram || p.facebook || wa) && (
             <div className={s.socials}>
               {primary && (
                 multiLocation ? (
@@ -122,11 +125,17 @@ export function TabbedHero({ partner, onReviewsClick, onBranchesClick }: Props) 
                   <Facebook size={17} />
                 </a>
               )}
-              {p.whatsapp && (
-                <a className={s.iconBtn} href={`https://wa.me/${p.whatsapp}`} target="_blank" rel="noopener noreferrer" aria-label={t('partner.hero.whatsapp')}
-                  onClick={() => track('contact_click', { ch: 'whatsapp', from: 'hero' })}>
-                  <WhatsappIcon size={17} />
-                </a>
+              {wa && (
+                wa.kind === 'pick' ? (
+                  <button type="button" className={s.iconBtn} onClick={() => setWaOpen(true)} aria-label={t('partner.hero.whatsapp')}>
+                    <WhatsappIcon size={17} />
+                  </button>
+                ) : (
+                  <a className={s.iconBtn} href={`https://wa.me/${wa.number}`} target="_blank" rel="noopener noreferrer" aria-label={t('partner.hero.whatsapp')}
+                    onClick={() => track('contact_click', { ch: 'whatsapp', from: 'hero', loc: wa.locationId })}>
+                    <WhatsappIcon size={17} />
+                  </a>
+                )
               )}
             </div>
           )}
@@ -135,6 +144,9 @@ export function TabbedHero({ partner, onReviewsClick, onBranchesClick }: Props) 
 
       {callOpen && (
         <CallLocationModal partner={partner} locations={locations} from="hero" onClose={() => setCallOpen(false)} />
+      )}
+      {waOpen && wa?.kind === 'pick' && (
+        <CallLocationModal partner={partner} locations={wa.locations} from="hero" channel="whatsapp" onClose={() => setWaOpen(false)} />
       )}
     </section>
   )

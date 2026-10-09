@@ -31,6 +31,9 @@ export interface CourseInput {
   tutorTitle?: string
   level?: CourseLevel | null
   active?: boolean
+  /** Branch it's held at — saved onto the course's current run (null = none,
+   *  omitted = unchanged). */
+  locationId?: string | null
 }
 
 /** Editable fields of a run (never its status — use the transition endpoint). */

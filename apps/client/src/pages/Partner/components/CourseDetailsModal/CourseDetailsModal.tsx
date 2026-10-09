@@ -1,12 +1,11 @@
 import { useMemo } from 'react'
-import { X, GraduationCap, CalendarClock, Users, ArrowRight, Phone, BookOpen } from 'lucide-react'
+import { X, GraduationCap, CalendarClock, Users, ArrowRight, Phone, BookOpen, MapPin } from 'lucide-react'
 import { initials } from '@reserva/shared'
 import type { PublicPartner, PublicCourse } from '@/mock/partners'
 import { partnerBrandVars } from '../../partnerBrand'
 import { useAppSelector } from '@/store/hooks'
 import { ModalShell } from '@/components/ModalShell/ModalShell'
 import { useI18n, useLocalized } from '@/i18n'
-import { primaryLocation } from '@/services/booking.service'
 import { track } from '@/services/analytics.service'
 import {
   fmtCoursePrice,
@@ -15,6 +14,7 @@ import {
   courseTutor,
   courseDescription,
   courseCta,
+  courseWhere,
 } from '../../lib/courseDisplay'
 import s from './CourseDetailsModal.module.scss'
 
@@ -50,6 +50,7 @@ export function CourseDetailsModal({ partner, course, onClose, onRegister, onCal
   const dateLabel = courseDateLabel(course, locale)
   const seatsLeft = courseSeatsLeft(course)
   const cta = courseCta(partner, course)
+  const where = courseWhere(partner, course, loc)
   const titleId = `course-details-${course.id}`
 
   return (
@@ -84,7 +85,7 @@ export function CourseDetailsModal({ partner, course, onClose, onRegister, onCal
             <a
               className={s.primary}
               href={cta.telHref}
-              onClick={() => track('contact_click', { ch: 'call', from: 'courses', loc: primaryLocation(partner)?.id })}
+              onClick={() => track('contact_click', { ch: 'call', from: 'courses', loc: cta.locationId })}
             >
               <Phone size={17} /> {t('courses.call')}
             </a>
@@ -141,6 +142,9 @@ export function CourseDetailsModal({ partner, course, onClose, onRegister, onCal
                   )}
                   {dateLabel && (
                     <span className={s.metaChip}><CalendarClock size={14} /> {dateLabel}</span>
+                  )}
+                  {where && (
+                    <span className={s.metaChip}><MapPin size={14} /> {where.full}</span>
                   )}
                   {seatsLeft != null && (
                     seatsLeft === 0

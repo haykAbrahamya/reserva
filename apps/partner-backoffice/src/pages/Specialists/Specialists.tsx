@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Plus, User, Pencil, MapPin } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
+import { Plus, User, Pencil, MapPin, Search } from 'lucide-react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
 import { Button, Toggle, Modal, Input, Select, Avatar, Empty, Badge, Chip, FieldError, useToast } from '@/components/ui'
@@ -12,10 +13,13 @@ import { errorMessage } from '@/utils/errors'
 import { useScopedLocationId } from '@/store/auth.hooks'
 import { useBranchPricing } from '@/hooks/useBranchPricing'
 import { useI18n } from '@/i18n'
+import { useLocalized } from '@/i18n/useLocalized'
 import { useSpotlight } from '@/components/onboarding/useSpotlight'
 import { notifyProfileUpdated } from '@/components/onboarding/useProfileCompletion'
 import { I18nField } from '@/components/i18n/I18nField/I18nField'
 import type { Specialist, LocalizedText, Location } from '@/types'
+import { SpecialistsFilterBar } from './SpecialistsFilterBar'
+import { filterSpecialists, rosterCategories, type SpecialistFilter } from './specialistFilters'
 import s from './Specialists.module.scss'
 
 /** Branch names a specialist works at, home first ("Kentron · Komitas"). */
@@ -56,6 +60,7 @@ export function Specialists() {
   const scopedLocationId = useScopedLocationId()
   const branchPricing = useBranchPricing()
   const { t }       = useI18n()
+  const loc         = useLocalized()
   const toast       = useToast()
   useSpotlight()
 
@@ -63,6 +68,17 @@ export function Specialists() {
   // fetched once and paginated locally (no per-page round-trips).
   const PAGE_STEP = 12
   const [visible, setVisible] = useState(PAGE_STEP)
+
+  // Filters. Branch + categories live in the URL (deep-linkable, survive a
+  // reload), as on Bookings; the name search is local. All three narrow the
+  // roster in memory — it's already fully loaded.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [query, setQuery] = useState('')
+  const branchParam    = searchParams.get('branch') ?? ''
+  const categoryParams = searchParams.getAll('category')
+  // A new filter starts again from the first page of results.
+  const categoriesKey = categoryParams.join('|')
+  useEffect(() => { setVisible(PAGE_STEP) }, [query, branchParam, categoriesKey])
 
   // Full roster, fetched once. Managers are scoped to their own branch server-side.
   const { data: allSpecialists, reload } = useResource(
@@ -93,9 +109,34 @@ export function Specialists() {
 
   if (!partner) return null
 
+  // Filter choices. A manager's roster is already one branch, so no branch
+  // filter for them; categories are only those someone on the roster does.
+  const branchOptions = scopedLocationId
+    ? []
+    : locations.map(l => ({ value: l.id, label: loc(l.name, l.nameI18n) }))
+  const categoryOptions = rosterCategories(allSpecialists, services)
+    .map(svc => ({ value: svc.category.trim(), label: loc(svc.category, svc.categoryI18n) }))
+  // A filter with fewer than two choices is hidden, so it must not filter
+  // either; URL values naming nothing here (a deleted branch) are dropped too.
+  const filter: SpecialistFilter = {
+    query,
+    branchId: branchOptions.length > 1 && branchOptions.some(o => o.value === branchParam) ? branchParam : '',
+    categories: categoryOptions.length > 1 ? categoryParams.filter(c => categoryOptions.some(o => o.value === c)) : [],
+  }
+  const setUrlFilters = (branch: string, categories: string[]) => {
+    const next = new URLSearchParams(searchParams)
+    next.delete('branch')
+    next.delete('category')
+    if (branch) next.set('branch', branch)
+    categories.forEach(c => next.append('category', c))
+    setSearchParams(next, { replace: true })
+  }
+  const clearFilters = () => { setQuery(''); setUrlFilters('', []) }
+
   const total       = allSpecialists.length
-  const specialists = allSpecialists.slice(0, visible)
-  const hasMore     = visible < total
+  const matching    = filterSpecialists(allSpecialists, services, filter)
+  const specialists = matching.slice(0, visible)
+  const hasMore     = visible < matching.length
 
   // Managers can't reassign branches — lock the location select to their branch.
   const lockedLocation = scopedLocationId
@@ -186,9 +227,9 @@ export function Specialists() {
 
 
   // Local "load more" footer — shared by the mobile list + desktop card grid.
-  const loadMore = total > 0 && (
+  const loadMore = matching.length > 0 && (
     <div className={s.loadMore}>
-      <span className={s.loadMoreCount}>{t('specialists.showingCount', { shown: specialists.length, total })}</span>
+      <span className={s.loadMoreCount}>{t('specialists.showingCount', { shown: specialists.length, total: matching.length })}</span>
       {hasMore && (
         <Button variant="ghost" onClick={() => setVisible(v => v + PAGE_STEP)}>
           {t('specialists.loadMore')}
@@ -209,9 +250,27 @@ export function Specialists() {
         </span>
       </div>
 
+      {/* Hidden only when there's nobody to filter; stays on a no-match result
+          so the filters can be adjusted or cleared. */}
+      {total > 0 && (
+        <SpecialistsFilterBar
+          filter={filter}
+          onQueryChange={setQuery}
+          onBranchChange={id => setUrlFilters(id, filter.categories)}
+          onCategoriesChange={cats => setUrlFilters(filter.branchId, cats)}
+          onClear={clearFilters}
+          branches={branchOptions}
+          categories={categoryOptions}
+        />
+      )}
+
       {total === 0 ? (
         <Empty icon={User} title={t('specialists.emptyTitle')} description={t('specialists.emptyDesc')}
           action={<span data-spotlight="addSpecialist" style={{ display: 'inline-flex' }}><Button variant="accent" onClick={openNew}><Plus size={14} /> {t('specialists.addSpecialist')}</Button></span>}
+        />
+      ) : matching.length === 0 ? (
+        <Empty icon={Search} title={t('specialists.filter.noMatchTitle')} description={t('specialists.filter.noMatchDesc')}
+          action={<Button variant="ghost" onClick={clearFilters}>{t('specialists.filter.clear')}</Button>}
         />
       ) : isMobile ? (
         /* ── Mobile: cards ── */

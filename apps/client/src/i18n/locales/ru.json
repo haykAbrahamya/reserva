@@ -276,6 +276,10 @@
       "subtitle": "Выберите филиал для звонка",
       "close": "Закрыть"
     },
+    "whatsappModal": {
+      "title": "Напишите нам в WhatsApp",
+      "subtitle": "Выберите филиал, чтобы написать"
+    },
     "services": {
       "eyebrow": "Меню",
       "title": "Услуги и цены",

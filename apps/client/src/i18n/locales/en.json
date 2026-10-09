@@ -276,6 +276,10 @@
       "subtitle": "Choose a branch to call",
       "close": "Close"
     },
+    "whatsappModal": {
+      "title": "Message us on WhatsApp",
+      "subtitle": "Choose a branch to message"
+    },
     "services": {
       "eyebrow": "Menu",
       "title": "Services & pricing",

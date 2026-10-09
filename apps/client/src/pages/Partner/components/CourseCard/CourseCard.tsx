@@ -1,8 +1,7 @@
-import { GraduationCap, CalendarClock, Users, ArrowRight, Phone, Info } from 'lucide-react'
+import { GraduationCap, CalendarClock, Users, ArrowRight, Phone, Info, MapPin } from 'lucide-react'
 import { initials } from '@reserva/shared'
 import type { PublicPartner, PublicCourse } from '@/mock/partners'
 import { useI18n, useLocalized } from '@/i18n'
-import { primaryLocation } from '@/services/booking.service'
 import { track } from '@/services/analytics.service'
 import {
   fmtCoursePrice,
@@ -11,6 +10,7 @@ import {
   courseTutor,
   courseDescription,
   courseCta,
+  courseWhere,
 } from '../../lib/courseDisplay'
 import s from './CourseCard.module.scss'
 
@@ -47,6 +47,7 @@ export function CourseCard({ partner, course, tints, onRegister, onDetails, onCa
   const dateLabel = courseDateLabel(course, locale)
   const seatsLeft = courseSeatsLeft(course)
   const full = seatsLeft === 0
+  const where = courseWhere(partner, course, loc)
 
   // Only offer "see more info" when the salon actually wrote a description —
   // otherwise the popup would just repeat what the card already shows.
@@ -78,7 +79,7 @@ export function CourseCard({ partner, course, tints, onRegister, onDetails, onCa
           </button>
         )}
 
-        {(tutor.name || dateLabel) && (
+        {(tutor.name || dateLabel || where) && (
           <div className={s.info}>
             {tutor.name && (
               <div className={s.tutor}>
@@ -93,6 +94,9 @@ export function CourseCard({ partner, course, tints, onRegister, onDetails, onCa
             )}
             {dateLabel && (
               <span className={s.date}><CalendarClock size={14} /> {dateLabel}</span>
+            )}
+            {where && (
+              <span className={s.date} title={where.full}><MapPin size={14} /> {where.short}</span>
             )}
           </div>
         )}
@@ -121,7 +125,7 @@ export function CourseCard({ partner, course, tints, onRegister, onDetails, onCa
             <a
               className={s.cta}
               href={cta.telHref}
-              onClick={() => track('contact_click', { ch: 'call', from: 'courses', loc: primaryLocation(partner)?.id })}
+              onClick={() => track('contact_click', { ch: 'call', from: 'courses', loc: cta.locationId })}
             >
               <Phone size={16} /> {t('courses.call')}
             </a>

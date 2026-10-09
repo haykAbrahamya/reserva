@@ -1,4 +1,4 @@
-import { Pencil, Trash2, Users, GraduationCap } from 'lucide-react'
+import { Pencil, Trash2, Users, GraduationCap, MapPin } from 'lucide-react'
 import { useI18n, useDateLocale } from '@/i18n'
 
 import type { Course } from '@/types'
@@ -9,6 +9,8 @@ import { uploadUrl } from '@/services/http'
 
 interface Props {
   course: Course
+  /** The current run's branch name — only passed when the salon has several. */
+  branchName?: string
   onOpen: () => void
   onEdit: () => void
   onDelete: () => void
@@ -16,7 +18,7 @@ interface Props {
 
 /** One course tile: cover, title, price/level, tutor, and its current run's
  *  status + member count. The whole card opens the manage view. */
-export function CourseCard({ course, onOpen, onEdit, onDelete }: Props) {
+export function CourseCard({ course, branchName, onOpen, onEdit, onDelete }: Props) {
   const { t } = useI18n()
   const dateLocale = useDateLocale()
   const cover = uploadUrl(course.coverUrl)
@@ -50,6 +52,7 @@ export function CourseCard({ course, onOpen, onEdit, onDelete }: Props) {
         </div>
 
         {tutor && <div className={s.tutor}>{t('courses.card.by', { name: tutor })}</div>}
+        {branchName && <div className={s.branch}><MapPin size={12} /> {branchName}</div>}
 
         <div className={s.runRow}>
           {run ? (

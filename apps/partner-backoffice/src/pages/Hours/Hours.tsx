@@ -278,20 +278,22 @@ export function Hours() {
         {/* Left: Specialist list */}
         <div className={s.spList}>
           <div className={s.spListTitle}>{t('hours.specialists')}</div>
-          {teamSpecialists.map(sp => (
-            <div
-              key={sp.id}
-              className={[s.spItem, sp.id === selectedId ? s.active : ''].filter(Boolean).join(' ')}
-              onClick={() => setSelectedId(sp.id)}
-            >
-              <Avatar name={sp.name} color={partner.accent} size="md" />
-              <div className={s.spMeta}>
-                <div className={s.spName}>{sp.name}</div>
-                <div className={s.spTitle}>{sp.title}</div>
+          <div className={s.spListBody}>
+            {teamSpecialists.map(sp => (
+              <div
+                key={sp.id}
+                className={[s.spItem, sp.id === selectedId ? s.active : ''].filter(Boolean).join(' ')}
+                onClick={() => setSelectedId(sp.id)}
+              >
+                <Avatar name={sp.name} color={partner.accent} size="md" />
+                <div className={s.spMeta}>
+                  <div className={s.spName}>{sp.name}</div>
+                  <div className={s.spTitle}>{sp.title}</div>
+                </div>
+                <span className={[s.spStatus, sp.active ? s.active : s.inactive].filter(Boolean).join(' ')} />
               </div>
-              <span className={[s.spStatus, sp.active ? s.active : s.inactive].filter(Boolean).join(' ')} />
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* Right: Schedule panel */}

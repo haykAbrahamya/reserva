@@ -1,0 +1,75 @@
+@use '../../styles/variables' as *;
+
+/* Trigger, panel, search and option geometry come from Select.module.scss —
+   these are only what a many-values control adds. */
+
+/* «Hair +2»: one line always — the first pick (or the placeholder) truncates,
+   the count never does. */
+.summary {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.first {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.more {
+  flex-shrink: 0;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: $accent-soft;
+  color: $accent-strong;
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A ticked option reads by its box and weight, not a fill — with several
+   ticked, a column of accent rows would shout. */
+.option { gap: 10px; }
+.on .label { font-weight: 600; color: $fg-0; }
+
+.box {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid $line-2;
+  border-radius: 4px;
+  background: $bg-1;
+  color: var(--fg-on-accent, #fff);
+  transition: background 0.12s, border-color 0.12s;
+
+  .on & {
+    background: $accent;
+    border-color: $accent;
+  }
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+  padding: 6px 4px 2px;
+  border-top: 1px solid $line-1;
+}
+.clear {
+  border: none;
+  background: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-family: $font-sans;
+  font-size: 12px;
+  font-weight: 600;
+  color: $fg-2;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  &:hover { background: $bg-2; color: $fg-0; }
+}

@@ -1,0 +1,127 @@
+@use 'variables' as *;
+
+// Phone: search on its own row, the two dropdowns split the next one.
+// Wider: one compact, left-aligned row on a fixed rhythm — a name box sized
+// for a name, and two equal dropdowns whose open panel is exactly as wide as
+// the field it drops from.
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+// ── Search row: the field, plus — on a phone — the square clear-filters icon. ──
+.searchRow {
+  display: flex;
+  gap: 10px;
+  flex: 0 1 300px;
+  min-width: 0;
+
+  @media (max-width: 559px) { flex-basis: 100%; }
+}
+
+// ── Search field: an icon-padded input matching the design-system field. ──
+.searchField {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: $fg-3;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  min-height: $row-h;
+  // Room for the leading icon and the trailing clear button.
+  padding: $pad-y 38px $pad-y 38px;
+  background: $bg-1;
+  border: 1px solid $line-2;
+  border-radius: $r-1;
+  color: $fg-0;
+  font-family: $font-sans;
+  font-size: $text-md;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &::placeholder { color: $fg-3; }
+  &:focus {
+    border-color: $accent;
+    box-shadow: 0 0 0 3px $accent-soft;
+  }
+  // Hide the native search "×" so only our themed clear button shows.
+  &::-webkit-search-decoration,
+  &::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+}
+
+.clearBtn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: $r-1;
+  background: none;
+  color: $fg-3;
+  cursor: pointer;
+  transition: color 0.14s ease, background 0.14s ease;
+
+  &:hover { color: $fg-1; background: $bg-2; }
+}
+
+// ── Dropdowns: one fixed width on desktop, half a row each on a phone. ──
+// The panel takes the trigger's width (no panelMinWidth), so field and list
+// always line up edge to edge.
+.field {
+  flex: 0 0 220px;
+  min-width: 0;
+
+  // A real half-row BASIS (half the row minus half the 10px gap), not a
+  // shrinkable 0: two dropdowns then fill the row exactly, so "Clear filters"
+  // can't squeeze in beside them and crush them to bare icons — it wraps to a
+  // line of its own. A lone dropdown still grows into the free space.
+  @media (max-width: 559px) {
+    flex: 1 1 calc(50% - 5px);
+  }
+}
+
+// ── Clear filters: labelled at the end of the bar on desktop; on a phone a
+// square icon at the end of the search row instead, so it never takes a line.
+.reset {
+  flex: none;
+  // `.bar` lifts specificity over the shared Button's own `display`.
+  @media (max-width: 559px) { .bar & { display: none; } }
+}
+
+.resetIcon {
+  display: none;
+
+  @media (max-width: 559px) {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: $row-h; // square: the row stretches it to the search field's height
+    padding: 0;
+    border: 1px solid $line-2;
+    border-radius: $r-1;
+    background: $bg-1;
+    color: $fg-1;
+    cursor: pointer;
+    transition: color 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+    -webkit-tap-highlight-color: transparent;
+
+    &:hover { color: $accent; border-color: $accent; background: $accent-soft; }
+  }
+}

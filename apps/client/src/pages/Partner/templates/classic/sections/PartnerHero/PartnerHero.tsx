@@ -3,7 +3,7 @@ import { CalendarCheck, MapPin, Phone, ChevronDown, Instagram, Facebook, Star, G
 import { WhatsappIcon } from '@reserva/ui'
 import { useT, useLocalized } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
-import { bookableLocations, canBook } from '@/services/booking.service'
+import { bookableLocations, canBook, whatsappContact } from '@/services/booking.service'
 import { track } from '@/services/analytics.service'
 import { CallLocationModal } from '../../../../components/CallLocationModal/CallLocationModal'
 import { scrollToSection } from '../../../../lib/scrollToSection'
@@ -31,6 +31,9 @@ export function PartnerHero({ partner, onBook }: Props) {
 
   // "Which branch?" call picker — only used when the partner has >1 location.
   const [callOpen, setCallOpen] = useState(false)
+  // Same picker for WhatsApp — only when several branches have their own number.
+  const wa = whatsappContact(partner)
+  const [waOpen, setWaOpen] = useState(false)
 
   // Hide the scroll hint once the user starts scrolling.
   const [showHint, setShowHint] = useState(true)
@@ -190,7 +193,7 @@ export function PartnerHero({ partner, onBook }: Props) {
               <GraduationCap size={18} /> {t('courses.title')}
             </button>
           )}
-          {(p.instagram || p.facebook || p.whatsapp) && (
+          {(p.instagram || p.facebook || wa) && (
             <div className={s.socials}>
               {p.instagram && (
                 <a className={s.social} href={p.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"
@@ -204,11 +207,17 @@ export function PartnerHero({ partner, onBook }: Props) {
                   <Facebook size={18} />
                 </a>
               )}
-              {p.whatsapp && (
-                <a className={s.social} href={`https://wa.me/${p.whatsapp}`} target="_blank" rel="noopener noreferrer" aria-label={t('partner.hero.whatsapp')}
-                  onClick={() => track('contact_click', { ch: 'whatsapp', from: 'hero' })}>
-                  <WhatsappIcon size={18} />
-                </a>
+              {wa && (
+                wa.kind === 'pick' ? (
+                  <button type="button" className={s.social} onClick={() => setWaOpen(true)} aria-label={t('partner.hero.whatsapp')}>
+                    <WhatsappIcon size={18} />
+                  </button>
+                ) : (
+                  <a className={s.social} href={`https://wa.me/${wa.number}`} target="_blank" rel="noopener noreferrer" aria-label={t('partner.hero.whatsapp')}
+                    onClick={() => track('contact_click', { ch: 'whatsapp', from: 'hero', loc: wa.locationId })}>
+                    <WhatsappIcon size={18} />
+                  </a>
+                )
               )}
             </div>
           )}
@@ -230,6 +239,9 @@ export function PartnerHero({ partner, onBook }: Props) {
 
       {callOpen && (
         <CallLocationModal partner={partner} locations={locations} from="hero" onClose={() => setCallOpen(false)} />
+      )}
+      {waOpen && wa?.kind === 'pick' && (
+        <CallLocationModal partner={partner} locations={wa.locations} from="hero" channel="whatsapp" onClose={() => setWaOpen(false)} />
       )}
     </section>
   )

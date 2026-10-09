@@ -29,11 +29,16 @@
 }
 .count { font-size: 12.5px; color: $fg-2; }
 
-.loading { padding: 24px 0; text-align: center; font-size: 13px; color: $fg-2; }
+.loading { grid-column: 1 / -1; padding: 24px 0; text-align: center; font-size: 13px; color: $fg-2; }
 
+/* One grid for the whole table, every row a subgrid of it, so each column is
+   as wide as its widest cell in ANY row. That lets the toggle column size to
+   its header ("Offered here" wraps to its longest word) instead of a fixed
+   width that the Armenian / Russian label overflowed into the Price column. */
 .list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(160px, 1.4fr) min-content minmax(160px, 1.2fr) auto;
+  column-gap: 14px;
   border: 1px solid $line-1;
   border-radius: $r-2;
   overflow: hidden;
@@ -41,7 +46,8 @@
 }
 .row {
   display: grid;
-  grid-template-columns: minmax(160px, 1.4fr) 64px minmax(160px, 1.2fr) auto;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
   align-items: center;
   gap: 10px 14px;
   padding: 10px 14px;
@@ -54,6 +60,7 @@
   background: $bg-2;
   font-size: 10.5px;
   font-weight: 600;
+  line-height: 1.35;
   letter-spacing: 0.07em;
   text-transform: uppercase;
   color: $fg-2;
@@ -106,6 +113,8 @@
 
 @media (max-width: 640px) {
   .head { display: none; }
+  // Stacked cards on phones: no shared columns, each row lays itself out.
+  .list { display: flex; flex-direction: column; }
   .row { grid-template-columns: 1fr auto; }
   .name { grid-column: 1; }
   .toggle { grid-column: 2; grid-row: 1; }

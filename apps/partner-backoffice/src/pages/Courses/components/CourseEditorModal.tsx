@@ -3,7 +3,7 @@ import { Modal, Button, Input, Select, Toggle, SegmentedFilter } from '@/compone
 import { I18nField } from '@/components/i18n/I18nField/I18nField'
 import { useI18n } from '@/i18n'
 
-import type { Course, CourseLevel, CoursePriceMode, LocalizedText, Specialist } from '@/types'
+import type { Course, CourseLevel, CoursePriceMode, LocalizedText, Location, Specialist } from '@/types'
 import type { CourseInput } from '@/services/courses.service'
 import { CoverPicker } from './CoverPicker'
 import { TutorField, type TutorValue } from './TutorField'
@@ -14,6 +14,8 @@ interface Props {
   /** Course being edited, or null for a new one. */
   course: Course | null
   specialists: Specialist[]
+  /** Branches to hold the course at. One or none → no picker (nothing to choose). */
+  locations: Location[]
   saving: boolean
   onClose: () => void
   /** Persist the course fields + staged cover intent. Parent handles the API. */
@@ -32,6 +34,8 @@ interface FormState {
   level: '' | CourseLevel
   active: boolean
   tutor: TutorValue
+  /** The current run's branch; '' = no specific branch. */
+  locationId: string
 }
 
 function fromCourse(course: Course | null): FormState {
@@ -52,6 +56,7 @@ function fromCourse(course: Course | null): FormState {
       guestName: course?.tutorSpecialistId ? '' : (course?.tutorName ?? ''),
       guestTitle: course?.tutorSpecialistId ? '' : (course?.tutorTitle ?? ''),
     },
+    locationId: course?.currentCohort?.locationId ?? '',
   }
 }
 
@@ -59,7 +64,7 @@ const LEVELS: CourseLevel[] = ['beginner', 'intermediate', 'advanced']
 
 /** Create/edit a course's template fields. Cover is staged and committed by the
  *  parent after the course id exists. Kept presentational — no API calls here. */
-export function CourseEditorModal({ course, specialists, saving, onClose, onSubmit }: Props) {
+export function CourseEditorModal({ course, specialists, locations, saving, onClose, onSubmit }: Props) {
   const { t } = useI18n()
   const [form, setForm] = useState<FormState>(() => fromCourse(course))
   const [errs, setErrs] = useState<Record<string, string>>({})
@@ -76,6 +81,13 @@ export function CourseEditorModal({ course, specialists, saving, onClose, onSubm
   const levelOptions = [
     { value: '', label: t('courses.level.none') },
     ...LEVELS.map((l) => ({ value: l, label: t(`courses.level.${l}`) })),
+  ]
+
+  // A one-branch salon has nothing to pick — its page shows that branch anyway.
+  const pickBranch = locations.length > 1
+  const branchOptions = [
+    { value: '', label: t('courses.run.noBranch') },
+    ...locations.map((l) => ({ value: l.id, label: l.name, sub: l.address || undefined })),
   ]
 
   const submit = () => {
@@ -105,6 +117,8 @@ export function CourseEditorModal({ course, specialists, saving, onClose, onSubm
       tutorSpecialistId: form.tutor.specialistId || null,
       tutorName: form.tutor.specialistId ? '' : form.tutor.guestName.trim(),
       tutorTitle: form.tutor.specialistId ? '' : form.tutor.guestTitle.trim(),
+      // Only sent when there was a choice to make; otherwise leave the run alone.
+      ...(pickBranch && { locationId: form.locationId || null }),
     }
     onSubmit(data, { file: coverFile, cleared: coverCleared })
   }
@@ -193,7 +207,7 @@ export function CourseEditorModal({ course, specialists, saving, onClose, onSubm
               />
             </div>
           )}
-          <span className={s.priceHint}>{t(`courses.editor.priceMode.${form.priceMode}Hint`)}</span>
+          <span className={s.hint}>{t(`courses.editor.priceMode.${form.priceMode}Hint`)}</span>
         </div>
 
         <div>
@@ -205,6 +219,18 @@ export function CourseEditorModal({ course, specialists, saving, onClose, onSubm
             placeholder={t('courses.level.none')}
           />
         </div>
+
+        {pickBranch && (
+          <div>
+            <label className={s.fieldLabel}>{t('courses.run.branch')}</label>
+            <Select
+              value={form.locationId}
+              onChange={(v) => set('locationId', v)}
+              options={branchOptions}
+              placeholder={t('courses.run.noBranch')}
+            />
+          </div>
+        )}
 
         <div className={s.full}>
           <TutorField value={form.tutor} onChange={(v) => set('tutor', v)} specialists={specialists} />

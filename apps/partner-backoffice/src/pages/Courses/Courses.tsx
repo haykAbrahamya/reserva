@@ -90,6 +90,11 @@ export function Courses() {
             <CourseCard
               key={course.id}
               course={course}
+              branchName={
+                locations.length > 1
+                  ? locations.find((l) => l.id === course.currentCohort?.locationId)?.name
+                  : undefined
+              }
               onOpen={() => setDetail(course)}
               onEdit={() => openEdit(course)}
               onDelete={() => setConfirmDel(course)}
@@ -102,6 +107,7 @@ export function Courses() {
         <CourseEditorModal
           course={editing}
           specialists={specialists}
+          locations={locations}
           saving={saving}
           onClose={() => { setEditorOpen(false); setEditing(null) }}
           onSubmit={saveCourse}

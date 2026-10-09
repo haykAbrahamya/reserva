@@ -492,6 +492,17 @@
     "noServices": "Нет услуг",
     "loadMore": "Показать ещё",
     "showingCount": "Показано {shown} из {total}",
+    "filter": {
+      "searchPlaceholder": "Поиск по имени…",
+      "allBranches": "Все филиалы",
+      "branch": "Филиал",
+      "categories": "Категории",
+      "searchCategory": "Поиск категории…",
+      "noCategory": "Категории не найдены",
+      "clear": "Сбросить фильтры",
+      "noMatchTitle": "Нет подходящих специалистов",
+      "noMatchDesc": "Попробуйте другое имя, филиал или категорию."
+    },
     "picker": {
       "searchPlaceholder": "Поиск услуг…",
       "selectAll": "Выбрать все",
@@ -659,6 +670,8 @@
       "mapHint": "Найдите или нажмите / перетащите маркер, чтобы указать точное место",
       "phoneLabel": "Телефон",
       "phonePlaceholder": "+374 10 …",
+      "whatsappLabel": "WhatsApp",
+      "whatsappHint": "Необязательно. Посетители пишут напрямую этому филиалу, а не на WhatsApp салона. Если номер указан у нескольких филиалов, они выбирают, куда написать.",
       "hoursLabel": "Часы работы",
       "presetEveryDay": "Каждый день",
       "presetExceptSun": "Пн–Сб",

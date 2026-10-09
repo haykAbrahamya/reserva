@@ -3,7 +3,7 @@ import { MapPin, Plus, Pencil, Trash2, Phone, Clock, Tags } from 'lucide-react'
 import { useMemo } from 'react'
 import { usePartner } from '@/store/app.store'
 import { useResource } from '@/store/useResource'
-import { Button, Modal, Input, Select, Empty, TimePicker, Toggle, useToast } from '@/components/ui'
+import { Button, Modal, Input, Select, Empty, TimePicker, Toggle, useToast, WhatsappIcon } from '@/components/ui'
 import { partnersService } from '@/services/partners.service'
 import { areasService } from '@/services/areas.service'
 import { errorMessage } from '@/utils/errors'
@@ -29,6 +29,8 @@ interface LocationForm {
   nameI18n: LocalizedText | null
   address: string
   phone: string
+  /** As typed; saved as digits only. '' = use the salon-wide WhatsApp. */
+  whatsapp: string
   hours: WeekSchedule
   lat: number | null
   lng: number | null
@@ -36,7 +38,7 @@ interface LocationForm {
   areaKey: string
 }
 const EMPTY_FORM: LocationForm = {
-  name: '', nameI18n: null, address: '', phone: '', hours: DEFAULT_LOCATION_HOURS as WeekSchedule,
+  name: '', nameI18n: null, address: '', phone: '', whatsapp: '', hours: DEFAULT_LOCATION_HOURS as WeekSchedule,
   lat: null, lng: null, areaKey: '',
 }
 
@@ -111,6 +113,7 @@ export function Locations() {
     setErrs({})
     setForm({
       name: loc.name, nameI18n: loc.nameI18n ?? null, address: loc.address, phone: loc.phone,
+      whatsapp: loc.whatsapp ? `+${loc.whatsapp}` : '',
       hours: loc.hours ?? DEFAULT_LOCATION_HOURS,
       lat: loc.lat ?? null, lng: loc.lng ?? null,
       areaKey: loc.areaKey ?? '',
@@ -127,11 +130,14 @@ export function Locations() {
     if (!form.name.trim()) e.name = t('errors.required')
     if (!form.address.trim()) e.address = t('errors.required')
     if (!editing && !form.areaKey) e.areaKey = t('errors.required')
+    // WhatsApp is digits only (we strip formatting); 7–15 per E.164, or empty.
+    const waDigits = form.whatsapp.replace(/\D/g, '')
+    if (waDigits && (waDigits.length < 7 || waDigits.length > 15)) e.whatsapp = t('storefront.social.whatsappError')
     setErrs(e)
     if (Object.keys(e).length) { toast(t('errors.fixFields')); return }
     setSaving(true)
     try {
-      const payload = { ...form, areaKey: form.areaKey || null }
+      const payload = { ...form, whatsapp: waDigits, areaKey: form.areaKey || null }
       if (editing) await partnersService.updateLocation(editing.id, payload)
       else await partnersService.createLocation(payload)
       await reload()
@@ -216,6 +222,12 @@ export function Locations() {
                     <div className={s.metaRow}>
                       <Phone size={12} />
                       {loc.phone}
+                    </div>
+                  )}
+                  {loc.whatsapp && (
+                    <div className={s.metaRow}>
+                      <WhatsappIcon size={12} />
+                      +{loc.whatsapp}
                     </div>
                   )}
                   {loc.hours && (
@@ -317,6 +329,19 @@ export function Locations() {
             onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
             placeholder={t('locations.modal.phonePlaceholder')}
           />
+
+          {/* A solo pro's one WhatsApp lives on the Storefront page — a second
+              field here would only compete with it. */}
+          {!isSingle && (
+            <Input
+              label={t('locations.modal.whatsappLabel')}
+              value={form.whatsapp}
+              onChange={e => { setForm(f => ({ ...f, whatsapp: e.target.value })); setErrs(x => ({ ...x, whatsapp: '' })) }}
+              placeholder="+374 91 234567"
+              help={t('locations.modal.whatsappHint')}
+              error={errs.whatsapp || undefined}
+            />
+          )}
 
           {/* Working hours */}
           <div className={s.hoursSection}>

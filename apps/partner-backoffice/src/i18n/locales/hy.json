@@ -492,6 +492,17 @@
     "noServices": "Ծառայություններ չկան",
     "loadMore": "Ցույց տալ ավելին",
     "showingCount": "Ցուցադրվում է {shown}-ը {total}-ից",
+    "filter": {
+      "searchPlaceholder": "Որոնել ըստ անվան…",
+      "allBranches": "Բոլոր մասնաճյուղերը",
+      "branch": "Մասնաճյուղ",
+      "categories": "Կատեգորիաներ",
+      "searchCategory": "Որոնել կատեգորիա…",
+      "noCategory": "Կատեգորիաներ չեն գտնվել",
+      "clear": "Մաքրել զտիչները",
+      "noMatchTitle": "Համապատասխան մասնագետներ չկան",
+      "noMatchDesc": "Փորձեք այլ անուն, մասնաճյուղ կամ կատեգորիա։"
+    },
     "picker": {
       "searchPlaceholder": "Փնտրել ծառայություններ…",
       "selectAll": "Ընտրել բոլորը",
@@ -659,6 +670,8 @@
       "mapHint": "Փնտրեք կամ սեղմեք/քաշեք նշիչը՝ ճշգրիտ տեղը նշելու համար",
       "phoneLabel": "Հեռախոս",
       "phonePlaceholder": "+374 10 …",
+      "whatsappLabel": "WhatsApp",
+      "whatsappHint": "Ոչ պարտադիր։ Այցելուները կգրեն անմիջապես այս մասնաճյուղին՝ սրահի WhatsApp-ի փոխարեն։ Եթե մի քանի մասնաճյուղ ունի համար, նրանք կընտրեն, թե որին գրել։",
       "hoursLabel": "Աշխատանքային ժամեր",
       "presetEveryDay": "Ամեն օր",
       "presetExceptSun": "Երկ–Շբթ",

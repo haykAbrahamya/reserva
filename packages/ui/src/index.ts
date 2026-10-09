@@ -23,6 +23,7 @@ export { Pagination } from './components/Pagination/Pagination'
 export { usePagination } from './components/Pagination/usePagination'
 export { Select } from './components/Select/Select'
 export type { SelectOption } from './components/Select/Select'
+export { MultiSelect } from './components/MultiSelect/MultiSelect'
 export { SegmentedFilter } from './components/SegmentedFilter/SegmentedFilter'
 export type { SegmentOption } from './components/SegmentedFilter/SegmentedFilter'
 export { Chip } from './components/Chip/Chip'
@@ -48,6 +49,9 @@ export { useScrollLock } from './hooks/useScrollLock'
    an app-level combobox gets the same escape-the-overflow behaviour instead of
    an absolutely-positioned panel that a modal body clips. */
 export { useAnchoredDropdown } from './components/common/useAnchoredDropdown'
+/* Number fields change by typing only (no wheel / ↑↓ stepping) — call once in
+   each app's main.tsx. */
+export { disableNumberInputStepping } from './utils/numberInputStepping'
 
 // Re-export `initials` for convenience (originally lived alongside Avatar).
 export { initials } from '@reserva/shared'

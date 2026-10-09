@@ -49,8 +49,11 @@
 
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  .placeholder { color: $fg-3; }
+  /* Both stay on one line: a trigger is a single-row control, so a long label
+     truncates rather than doubling the field's height. */
+  .placeholder,
   .text        { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+  .placeholder { color: $fg-3; }
 
   /* The accent is what makes a glyph read as this control's subject rather
      than as decoration attached to the border. */

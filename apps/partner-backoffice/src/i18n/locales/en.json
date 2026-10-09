@@ -492,6 +492,17 @@
     "noServices": "No services assigned",
     "loadMore": "Load more",
     "showingCount": "Showing {shown} of {total}",
+    "filter": {
+      "searchPlaceholder": "Search by name…",
+      "allBranches": "All branches",
+      "branch": "Branch",
+      "categories": "Categories",
+      "searchCategory": "Search categories…",
+      "noCategory": "No categories found",
+      "clear": "Clear filters",
+      "noMatchTitle": "No specialists match",
+      "noMatchDesc": "Try another name, branch or category."
+    },
     "picker": {
       "searchPlaceholder": "Search services…",
       "selectAll": "Select all",
@@ -659,6 +670,8 @@
       "mapHint": "Search, or click / drag the pin to set the exact spot",
       "phoneLabel": "Phone",
       "phonePlaceholder": "+374 10 …",
+      "whatsappLabel": "WhatsApp",
+      "whatsappHint": "Optional. Visitors message this branch directly instead of the salon's WhatsApp. With several branches set, they choose which one to write to.",
       "hoursLabel": "Working hours",
       "presetEveryDay": "Every day",
       "presetExceptSun": "Mon–Sat",

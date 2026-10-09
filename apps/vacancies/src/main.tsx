@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import { ToastProvider } from '@reserva/ui'
+import { ToastProvider, disableNumberInputStepping } from '@reserva/ui'
 
 // Order matters. The design system's tokens come first, then this app's theme
 // overrides the accent, then the app's own base styles. Reversing any two would
@@ -41,6 +41,9 @@ document.documentElement.setAttribute('data-theme', initialTheme())
  * that will read the real DOM instead.
  */
 document.getElementById('seo-content')?.remove()
+
+// Number fields change by typing only — scrolling a form must never change a value.
+disableNumberInputStepping()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

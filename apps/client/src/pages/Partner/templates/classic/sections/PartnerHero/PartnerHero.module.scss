@@ -296,6 +296,8 @@ button.rating {
   color: $fg-1;
   border: 1px solid $line-2;
   box-shadow: $shadow-1;
+  padding: 0;
+  cursor: pointer; /* WhatsApp renders as a <button> when several branches have one */
   transition: color 0.15s, border-color 0.15s, background 0.15s, transform 0.1s;
   &:hover {
     color: $accent;

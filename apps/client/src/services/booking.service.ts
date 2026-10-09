@@ -213,6 +213,25 @@ export function bookableLocations(partner: PublicPartner): PublicPartner['locati
   )
 }
 
+export type WhatsappContact =
+  /** Two or more branches have their own number — the visitor picks one. */
+  | { kind: 'pick'; locations: PublicPartner['locations'] }
+  /** One number to open straight away; `locationId` when it's a branch's. */
+  | { kind: 'direct'; number: string; locationId?: string }
+
+/**
+ * Where the WhatsApp button leads. A branch's own number beats the partner-wide
+ * one: with several such branches the visitor picks, with exactly one the button
+ * goes straight to it, and with none it uses the partner's number. Null = no
+ * WhatsApp at all. Same bookable branches as the Call picker.
+ */
+export function whatsappContact(partner: PublicPartner): WhatsappContact | null {
+  const branches = bookableLocations(partner).filter((loc) => loc.whatsapp)
+  if (branches.length > 1) return { kind: 'pick', locations: branches }
+  if (branches.length === 1) return { kind: 'direct', number: branches[0].whatsapp!, locationId: branches[0].id }
+  return partner.presentation.whatsapp ? { kind: 'direct', number: partner.presentation.whatsapp } : null
+}
+
 /**
  * Can the service be booked at this branch? The branch must offer it, and a
  * person-based service needs someone there who does it.

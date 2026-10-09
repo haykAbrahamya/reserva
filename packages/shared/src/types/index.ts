@@ -45,6 +45,9 @@ export interface Location {
   nameI18n?: LocalizedText | null
   address: string
   phone: string
+  /** The branch's own WhatsApp, digits only ("37491234567"). Empty/absent = not
+   *  set — the public page falls back to the partner-wide WhatsApp. */
+  whatsapp?: string
   /** Opening hours per weekday. Optional — older locations may not have it set. */
   hours?: WeekSchedule
   /** Geo coordinates from the map picker. Null/absent until an owner sets a pin. */

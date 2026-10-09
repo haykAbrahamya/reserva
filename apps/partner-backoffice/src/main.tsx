@@ -1,11 +1,14 @@
 import { createRoot } from 'react-dom/client'
 import '@reserva/ui/styles'
+import { disableNumberInputStepping } from '@reserva/ui'
 import { I18nProvider } from '@/i18n'
 import { initSentry, Sentry } from '@/monitoring/sentry'
 import { ErrorFallback } from '@/monitoring/ErrorFallback'
 import App from './App'
 
 initSentry()
+// Number fields change by typing only — scrolling a form must never change a price.
+disableNumberInputStepping()
 
 // Register the service worker on load (independently of push setup). A
 // registered SW + the web manifest are what make the app installable, so this
