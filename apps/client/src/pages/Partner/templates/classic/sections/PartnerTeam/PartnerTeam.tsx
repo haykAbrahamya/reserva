@@ -113,15 +113,16 @@ export function PartnerTeam({ partner, onSelect, tone = 'plain' }: Props) {
                 type="button"
                 className={s.cardBtn}
                 onClick={() => { track('specialist_open', { sp: sp.id }); onSelect(sp) }}
-                aria-label={t('partner.team.viewProfileAria', { name: sp.name })}
+                aria-label={t('partner.team.viewProfileAria', { name: loc(sp.name, sp.nameI18n) })}
               >
                 <div
                   className={s.avatar}
                   style={{ background: `linear-gradient(140deg, ${t1}, ${t2})` }}
                 >
+                  {/* Initials from the SHOWN name, so the letters match it in every language. */}
                   {sp.avatarUrl
-                    ? <img src={sp.avatarUrl} alt={sp.name} className={s.avatarImg} />
-                    : initials(sp.name)}
+                    ? <img src={sp.avatarUrl} alt={loc(sp.name, sp.nameI18n)} className={s.avatarImg} />
+                    : initials(loc(sp.name, sp.nameI18n))}
                 </div>
                 <div className={s.spName}>{loc(sp.name, sp.nameI18n)}</div>
                 <div className={s.spTitle}>{loc(sp.title, sp.titleI18n)}</div>

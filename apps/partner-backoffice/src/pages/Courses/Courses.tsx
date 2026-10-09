@@ -7,6 +7,7 @@ import { partnersService } from '@/services/partners.service'
 import { coursesService, type CourseInput } from '@/services/courses.service'
 import { errorMessage } from '@/utils/errors'
 import { useI18n } from '@/i18n'
+import { useLocalized } from '@/i18n/useLocalized'
 import type { Course } from '@/types'
 import { CourseCard } from './components/CourseCard'
 import { CourseEditorModal } from './components/CourseEditorModal'
@@ -21,6 +22,7 @@ import s from './Courses.module.scss'
 export function Courses() {
   const partner = usePartner()
   const { t, tp } = useI18n()
+  const loc = useLocalized()
   const toast = useToast()
 
   const { data: courses, reload } = useResource(() => coursesService.list(true), [], [])
@@ -90,11 +92,11 @@ export function Courses() {
             <CourseCard
               key={course.id}
               course={course}
-              branchName={
-                locations.length > 1
-                  ? locations.find((l) => l.id === course.currentCohort?.locationId)?.name
-                  : undefined
-              }
+              branchName={(() => {
+                if (locations.length < 2) return undefined
+                const l = locations.find((x) => x.id === course.currentCohort?.locationId)
+                return l ? loc(l.name, l.nameI18n) : undefined
+              })()}
               onOpen={() => setDetail(course)}
               onEdit={() => openEdit(course)}
               onDelete={() => setConfirmDel(course)}

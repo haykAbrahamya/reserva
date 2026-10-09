@@ -3,7 +3,7 @@ import type { PublicPartner } from '@/mock/partners'
 import { initials } from '@reserva/shared'
 import { ReviewsPanel } from '@/components/ReviewsPanel/ReviewsPanel'
 import { StarRatingDisplay } from '@/components/StarRating/StarRating'
-import { useT } from '@/i18n'
+import { useT, useLocalized } from '@/i18n'
 import { track } from '@/services/analytics.service'
 import s from './TabbedReviews.module.scss'
 
@@ -19,6 +19,7 @@ interface Props {
  */
 export function TabbedReviews({ partner }: Props) {
   const t = useT()
+  const loc = useLocalized()
   const team = useMemo(
     () => partner.specialists.filter((sp) => sp.active),
     [partner],
@@ -64,11 +65,12 @@ export function TabbedReviews({ partner }: Props) {
                   setSelectedId(sp.id)
                 }}
               >
+                {/* Name in the page language; initials from that same name. */}
                 <span className={s.avatar} style={{ background: `linear-gradient(140deg, ${t1}, ${t2})` }}>
-                  {initials(sp.name)}
+                  {initials(loc(sp.name, sp.nameI18n))}
                 </span>
                 <span className={s.personInfo}>
-                  <span className={s.personName}>{sp.name}</span>
+                  <span className={s.personName}>{loc(sp.name, sp.nameI18n)}</span>
                   {(sp.rating ?? 0) > 0 && (sp.reviewCount ?? 0) > 0 && (
                     <span className={s.personRating}>
                       <StarRatingDisplay value={sp.rating!} size={11} compact />

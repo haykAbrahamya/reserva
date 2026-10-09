@@ -6,7 +6,7 @@ import { LogoMark } from '@/components/Logo/Logo'
 import { marketingSiteUrl } from '@/hooks/useTenantSlug'
 import { canBook, partnerTelHref, bookableLocations, primaryLocation } from '@/services/booking.service'
 import { track } from '@/services/analytics.service'
-import { useT } from '@/i18n'
+import { useT, useLocalized } from '@/i18n'
 import type { PublicPartner } from '@/mock/partners'
 import { CallLocationModal } from '../CallLocationModal/CallLocationModal'
 import s from './PartnerNav.module.scss'
@@ -20,6 +20,9 @@ export function PartnerNav({ partner, onBook }: Props) {
   const [scrolled, setScrolled] = useState(false)
   const [t1, t2] = partner.presentation.heroTints
   const t = useT()
+  const loc = useLocalized()
+  // Same localized name as the hero below, so the nav never switches language.
+  const name = loc(partner.name, partner.nameI18n)
   const telHref = partnerTelHref(partner)
   // With multiple branches, "Call now" opens a branch picker instead of dialing
   // the primary number directly.
@@ -41,13 +44,13 @@ export function PartnerNav({ partner, onBook }: Props) {
             partner's logo when set (matching the hero), else a gradient letter. */}
         <div className={[s.salon, scrolled ? s.show : ''].filter(Boolean).join(' ')}>
           {partner.presentation.logoUrl ? (
-            <img src={partner.presentation.logoUrl} className={[s.salonMark, s.salonMarkImg].join(' ')} alt={partner.name} />
+            <img src={partner.presentation.logoUrl} className={[s.salonMark, s.salonMarkImg].join(' ')} alt={name} />
           ) : (
             <span className={s.salonMark} style={{ background: `linear-gradient(140deg, ${t1}, ${t2})` }}>
-              {partner.name.charAt(0)}
+              {name.charAt(0)}
             </span>
           )}
-          <span className={s.salonName}>{partner.name}</span>
+          <span className={s.salonName}>{name}</span>
         </div>
 
         {/* Reserva back-link → the marketing site (apex), not the tenant page.

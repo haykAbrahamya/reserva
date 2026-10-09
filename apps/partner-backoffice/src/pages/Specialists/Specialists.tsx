@@ -22,11 +22,12 @@ import { SpecialistsFilterBar } from './SpecialistsFilterBar'
 import { filterSpecialists, rosterCategories, type SpecialistFilter } from './specialistFilters'
 import s from './Specialists.module.scss'
 
-/** Branch names a specialist works at, home first ("Kentron · Komitas"). */
-function branchNames(sp: Specialist, locations: Location[]): string {
+/** Branch names a specialist works at, home first ("Kentron · Komitas"), in the UI language. */
+function branchNames(sp: Specialist, locations: Location[], loc: ReturnType<typeof useLocalized>): string {
   const names = specialistBranchIds(sp)
-    .map((id) => locations.find((l) => l.id === id)?.name)
-    .filter(Boolean)
+    .map((id) => locations.find((l) => l.id === id))
+    .filter((l): l is Location => !!l)
+    .map((l) => loc(l.name, l.nameI18n))
   return names.length ? names.join(' · ') : '—'
 }
 
@@ -276,17 +277,20 @@ export function Specialists() {
         /* ── Mobile: cards ── */
         <div className={s.cardList}>
           {specialists.map(sp => {
-            const where = branchNames(sp, locations)
+            const where = branchNames(sp, locations, loc)
+            // Name (and so the avatar initials) + title in the UI language.
+            const name = loc(sp.name, sp.nameI18n)
+            const title = loc(sp.title, sp.titleI18n)
             const uniqueSvcs = Array.from(new Set(sp.services))
             const visibleSvcs = uniqueSvcs.slice(0, 3)
             const extra = uniqueSvcs.length - visibleSvcs.length
             return (
               <div key={sp.id} className={s.spCard} onClick={() => setDashboardSp(sp)}>
                 <div className={s.spCardTop}>
-                  <Avatar name={sp.name} src={sp.avatarUrl} color={partner.accent} size="lg" />
+                  <Avatar name={name} src={sp.avatarUrl} color={partner.accent} size="lg" />
                   <div className={s.spCardInfo}>
-                    <div className={s.spCardName}>{sp.name}</div>
-                    <div className={s.spCardTitle}>{sp.title}</div>
+                    <div className={s.spCardName}>{name}</div>
+                    <div className={s.spCardTitle}>{title}</div>
                   </div>
                   <div className={s.spCardRight}>
                     <Badge variant={sp.active ? 'active' : 'inactive'} label={sp.active ? t('common.active') : t('common.inactive')} />
@@ -303,7 +307,7 @@ export function Specialists() {
                   <div className={s.spCardSvcs}>
                     {visibleSvcs.map(sid => {
                       const svc = services.find(sv => sv.id === sid)
-                      return svc ? <span key={sid} className={s.svcPill}>{svc.name}</span> : null
+                      return svc ? <span key={sid} className={s.svcPill}>{loc(svc.name, svc.nameI18n)}</span> : null
                     })}
                     {extra > 0 && <span className={[s.svcPill, s.more].join(' ')}>{t('common.more', { count: extra })}</span>}
                   </div>
@@ -318,7 +322,10 @@ export function Specialists() {
         <div className={s.gridWrap}>
           <div className={s.grid}>
             {specialists.map(sp => {
-              const where = branchNames(sp, locations)
+              const where = branchNames(sp, locations, loc)
+              // Name (and so the avatar initials) + title in the UI language.
+              const name = loc(sp.name, sp.nameI18n)
+              const title = loc(sp.title, sp.titleI18n)
               // Dedupe defensively — a specialist can carry duplicate service ids
               // from the join, and we never want the same tag rendered twice.
               const uniqueSvcs = Array.from(new Set(sp.services))
@@ -335,10 +342,10 @@ export function Specialists() {
                   </button>
 
                   <div className={s.cardHead}>
-                    <Avatar name={sp.name} src={sp.avatarUrl} color={partner.accent} size="lg" className={s.cardAvatar} />
+                    <Avatar name={name} src={sp.avatarUrl} color={partner.accent} size="lg" className={s.cardAvatar} />
                     <div className={s.cardIdentity}>
-                      <div className={s.cardName}>{sp.name}</div>
-                      {sp.title && <div className={s.cardTitle}>{sp.title}</div>}
+                      <div className={s.cardName}>{name}</div>
+                      {title && <div className={s.cardTitle}>{title}</div>}
                       <Badge
                         variant={sp.active ? 'active' : 'inactive'}
                         label={sp.active ? t('common.active') : t('common.inactive')}
@@ -358,7 +365,7 @@ export function Specialists() {
                       <>
                         {shownSvcs.map(sid => {
                           const svc = services.find(sv => sv.id === sid)
-                          return svc ? <span key={sid} className={s.svcTag}>{svc.name}</span> : null
+                          return svc ? <span key={sid} className={s.svcTag}>{loc(svc.name, svc.nameI18n)}</span> : null
                         })}
                         {extra > 0 && <span className={[s.svcTag, s.svcTagMore].join(' ')}>+{extra}</span>}
                       </>

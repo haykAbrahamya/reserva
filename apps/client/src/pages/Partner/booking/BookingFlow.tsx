@@ -573,15 +573,16 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, s
     setStep('confirm')
   }
 
-  /** Avatar circle for a specialist (photo, else initials on the brand tint). */
+  /** Avatar circle for a specialist (photo, else initials on the brand tint).
+   *  Initials come from the shown (localized) name so the letters match it. */
   const avatar = (sp: Specialist, small = false) => (
     <span
       className={[s.optAvatar, small ? s.optAvatarSm : ''].filter(Boolean).join(' ')}
       style={{ background: `linear-gradient(140deg, ${t1}, ${t2})` }}
     >
       {sp.avatarUrl
-        ? <img src={sp.avatarUrl} alt={sp.name} className={s.optAvatarImg} />
-        : initials(sp.name)}
+        ? <img src={sp.avatarUrl} alt={loc(sp.name, sp.nameI18n)} className={s.optAvatarImg} />
+        : initials(loc(sp.name, sp.nameI18n))}
     </span>
   )
 

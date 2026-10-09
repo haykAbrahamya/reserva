@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Modal, Button, Input, Select, Toggle, SegmentedFilter } from '@/components/ui'
 import { I18nField } from '@/components/i18n/I18nField/I18nField'
 import { useI18n } from '@/i18n'
+import { useLocalized } from '@/i18n/useLocalized'
 
 import type { Course, CourseLevel, CoursePriceMode, LocalizedText, Location, Specialist } from '@/types'
 import type { CourseInput } from '@/services/courses.service'
@@ -66,6 +67,7 @@ const LEVELS: CourseLevel[] = ['beginner', 'intermediate', 'advanced']
  *  parent after the course id exists. Kept presentational — no API calls here. */
 export function CourseEditorModal({ course, specialists, locations, saving, onClose, onSubmit }: Props) {
   const { t } = useI18n()
+  const loc = useLocalized()
   const [form, setForm] = useState<FormState>(() => fromCourse(course))
   const [errs, setErrs] = useState<Record<string, string>>({})
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => {
@@ -87,7 +89,7 @@ export function CourseEditorModal({ course, specialists, locations, saving, onCl
   const pickBranch = locations.length > 1
   const branchOptions = [
     { value: '', label: t('courses.run.noBranch') },
-    ...locations.map((l) => ({ value: l.id, label: l.name, sub: l.address || undefined })),
+    ...locations.map((l) => ({ value: l.id, label: loc(l.name, l.nameI18n), sub: l.address || undefined })),
   ]
 
   const submit = () => {

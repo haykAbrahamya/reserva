@@ -54,7 +54,7 @@ export function TabbedHero({ partner, onReviewsClick, onBranchesClick }: Props) 
           <img src={p.logoUrl} className={s.logo} alt={partner.name} />
         ) : (
           <div className={s.logo} style={{ background: `linear-gradient(140deg, ${t1}, ${t2})` }}>
-            {partner.name.charAt(0)}
+            {loc(partner.name, partner.nameI18n).charAt(0)}
           </div>
         )}
 

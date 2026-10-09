@@ -8,6 +8,7 @@ import { BookingBadge } from '@/components/ui'
 import { SpecialistReviews } from '@/components/specialists/SpecialistReviews/SpecialistReviews'
 import { fmtAMD, fmtTime, fmtDateShort, initials, bookingAmount, specialistBranchIds } from '@/utils/format'
 import { useT } from '@/i18n'
+import { useLocalized } from '@/i18n/useLocalized'
 import type { Specialist } from '@/types'
 import s from './SpecialistDashboard.module.scss'
 
@@ -39,6 +40,11 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
   )
   const isMobile  = useIsMobile()
   const t         = useT()
+  const loc       = useLocalized()
+  // Name (and so the initials), title and branches in the UI language — the
+  // same as the Specialists card this drawer opened from.
+  const name  = loc(sp.name, sp.nameI18n)
+  const title = loc(sp.title, sp.titleI18n)
 
   // Review summary (avg + count) bubbled up from the shared SpecialistReviews
   // component, used for the hero + section header badges.
@@ -66,8 +72,9 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
 
   // Every branch they work at, home first ("Kentron · Komitas").
   const branchLabel = specialistBranchIds(sp)
-    .map(id => locations.find(l => l.id === id)?.name)
-    .filter(Boolean)
+    .map(id => locations.find(l => l.id === id))
+    .filter((l): l is NonNullable<typeof l> => !!l)
+    .map(l => loc(l.name, l.nameI18n))
     .join(' · ')
 
   // ── Stats ── (bookings already scoped to this specialist) ──
@@ -145,12 +152,12 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
         <div className={s.heroBody}>
           <div className={s.heroAvatar} style={{ background: sp.avatarUrl ? undefined : accentColor }}>
             {sp.avatarUrl
-              ? <img src={sp.avatarUrl} alt={sp.name} className={s.heroAvatarImg} />
-              : initials(sp.name)}
+              ? <img src={sp.avatarUrl} alt={name} className={s.heroAvatarImg} />
+              : initials(name)}
           </div>
           <div className={s.heroInfo}>
-            <div className={s.heroName}>{sp.name}</div>
-            <div className={s.heroTitle}>{sp.title}</div>
+            <div className={s.heroName}>{name}</div>
+            <div className={s.heroTitle}>{title}</div>
             <div className={s.heroBadges}>
               <span className={[s.heroBadge, sp.active ? s.active : s.inactive].join(' ')}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'currentColor' }} />
