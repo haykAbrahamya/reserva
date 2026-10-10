@@ -155,6 +155,8 @@ export type PartnerProfileResponse = Omit<Partner, 'slug'> & {
   supportWidget?: SupportWidgetMode
   /** Default language for the public client page (first-time visitors). */
   defaultLocale?: PartnerLocale
+  /** Specialist names are typed surname first → shown given-name first everywhere. */
+  specialistNamesSurnameFirst?: boolean
   /** Featured in the public marketplace (/salons). Read-only here — curated by
    *  Reserva platform staff from the internal console. */
   marketplaceListed?: boolean
@@ -179,6 +181,7 @@ export interface PartnerSettingsPatch {
   template?: PartnerTemplate
   supportWidget?: SupportWidgetMode
   defaultLocale?: PartnerLocale
+  specialistNamesSurnameFirst?: boolean
   presentation?: PartnerPresentationFields
 }
 

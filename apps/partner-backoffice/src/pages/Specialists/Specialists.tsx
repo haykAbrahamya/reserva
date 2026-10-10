@@ -14,6 +14,7 @@ import { useScopedLocationId } from '@/store/auth.hooks'
 import { useBranchPricing } from '@/hooks/useBranchPricing'
 import { useI18n } from '@/i18n'
 import { useLocalized } from '@/i18n/useLocalized'
+import { useSpecialistName } from '@/i18n/useSpecialistName'
 import { useSpotlight } from '@/components/onboarding/useSpotlight'
 import { notifyProfileUpdated } from '@/components/onboarding/useProfileCompletion'
 import { I18nField } from '@/components/i18n/I18nField/I18nField'
@@ -62,6 +63,7 @@ export function Specialists() {
   const branchPricing = useBranchPricing()
   const { t }       = useI18n()
   const loc         = useLocalized()
+  const spName      = useSpecialistName()
   const toast       = useToast()
   useSpotlight()
 
@@ -278,8 +280,9 @@ export function Specialists() {
         <div className={s.cardList}>
           {specialists.map(sp => {
             const where = branchNames(sp, locations, loc)
-            // Name (and so the avatar initials) + title in the UI language.
-            const name = loc(sp.name, sp.nameI18n)
+            // Name (and so the avatar initials) in the UI language + the
+            // salon's name order; title in the UI language.
+            const name = spName(sp)
             const title = loc(sp.title, sp.titleI18n)
             const uniqueSvcs = Array.from(new Set(sp.services))
             const visibleSvcs = uniqueSvcs.slice(0, 3)
@@ -323,8 +326,9 @@ export function Specialists() {
           <div className={s.grid}>
             {specialists.map(sp => {
               const where = branchNames(sp, locations, loc)
-              // Name (and so the avatar initials) + title in the UI language.
-              const name = loc(sp.name, sp.nameI18n)
+              // Name (and so the avatar initials) in the UI language + the
+              // salon's name order; title in the UI language.
+              const name = spName(sp)
               const title = loc(sp.title, sp.titleI18n)
               // Dedupe defensively — a specialist can carry duplicate service ids
               // from the join, and we never want the same tag rendered twice.

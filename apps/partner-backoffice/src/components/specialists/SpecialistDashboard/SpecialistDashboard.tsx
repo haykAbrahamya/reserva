@@ -9,6 +9,7 @@ import { SpecialistReviews } from '@/components/specialists/SpecialistReviews/Sp
 import { fmtAMD, fmtTime, fmtDateShort, initials, bookingAmount, specialistBranchIds } from '@/utils/format'
 import { useT } from '@/i18n'
 import { useLocalized } from '@/i18n/useLocalized'
+import { useSpecialistName } from '@/i18n/useSpecialistName'
 import type { Specialist } from '@/types'
 import s from './SpecialistDashboard.module.scss'
 
@@ -41,9 +42,10 @@ export function SpecialistDashboard({ specialist: sp, onClose }: Props) {
   const isMobile  = useIsMobile()
   const t         = useT()
   const loc       = useLocalized()
-  // Name (and so the initials), title and branches in the UI language — the
-  // same as the Specialists card this drawer opened from.
-  const name  = loc(sp.name, sp.nameI18n)
+  const spName    = useSpecialistName()
+  // Name (and so the initials) in the UI language + the salon's name order;
+  // title and branches in the UI language — same as the card it opened from.
+  const name  = spName(sp)
   const title = loc(sp.title, sp.titleI18n)
 
   // Review summary (avg + count) bubbled up from the shared SpecialistReviews

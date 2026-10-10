@@ -9,6 +9,7 @@ import { ModalShell } from '@/components/ModalShell/ModalShell'
 import { ReviewsPanel } from '@/components/ReviewsPanel/ReviewsPanel'
 import { canBook, bookableLocations, priceBookOf } from '@/services/booking.service'
 import { useI18n, useLocalized } from '@/i18n'
+import { useSpecialistName } from '../../lib/useSpecialistName'
 import { track } from '@/services/analytics.service'
 import { WEEK, dayKeyOf, nextDayKey, weekState } from '../../lib/openHours'
 import s from './SpecialistModal.module.scss'
@@ -24,11 +25,13 @@ export function SpecialistModal({ partner, specialist, onClose, onBook }: Props)
   const [t1, t2] = partner.presentation.heroTints
   const { t } = useI18n()
   const loc = useLocalized()
+  const spName = useSpecialistName(partner)
   const theme = useAppSelector((st) => st.theme.theme)
   const brandVars = useMemo(() => partnerBrandVars(partner, theme === 'dark'), [partner, theme])
 
   // Localized display name + its first word (for "Book with …" / reviews empty).
-  const displayName = loc(specialist.name, specialist.nameI18n)
+  // Page language + the salon's name order; first name / initials derive from it.
+  const displayName = spName(specialist)
   const firstName = displayName.split(' ')[0]
 
   // Services this specialist offers.

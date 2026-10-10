@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Select, Input } from '@/components/ui'
 import { useI18n } from '@/i18n'
+import { useSpecialistName } from '@/i18n/useSpecialistName'
 import type { Specialist } from '@/types'
 import s from './TutorField.module.scss'
 
@@ -28,6 +29,7 @@ const NONE = ''
  */
 export function TutorField({ value, onChange, specialists }: Props) {
   const { t } = useI18n()
+  const spName = useSpecialistName()
 
   // Mode is EXPLICIT state (not derived from values) so choosing "Guest" shows
   // the inputs even before anything is typed. Seed from the initial value.
@@ -38,7 +40,7 @@ export function TutorField({ value, onChange, specialists }: Props) {
   const options = [
     { value: NONE, label: t('courses.tutor.none') },
     { value: GUEST, label: t('courses.tutor.guest') },
-    ...specialists.map((sp) => ({ value: sp.id, label: sp.name, sub: sp.title || undefined })),
+    ...specialists.map((sp) => ({ value: sp.id, label: spName(sp), sub: sp.title || undefined })),
   ]
 
   const onModeChange = (v: string) => {

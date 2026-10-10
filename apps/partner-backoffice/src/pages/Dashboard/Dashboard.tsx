@@ -12,6 +12,7 @@ import { ProfileChecklist } from '@/components/onboarding/ProfileChecklist'
 import { fmtAMD, fmtTime, isSameDay, bookingAmount } from '@/utils/format'
 import { useScopedLocationId } from '@/store/auth.hooks'
 import { useI18n, useDateLocale } from '@/i18n'
+import { useSpecialistName } from '@/i18n/useSpecialistName'
 import type { Booking } from '@/types'
 import s from './Dashboard.module.scss'
 
@@ -46,6 +47,7 @@ export function Dashboard() {
   const isMobile       = useIsMobile()
   const scopedLocationId = useScopedLocationId()
   const { t }          = useI18n()
+  const spName = useSpecialistName()
   const dateLocale     = useDateLocale()
   const now            = new Date()
   const firstName      = authUser?.name.split(' ')[0] ?? t('dashboard.fallbackName')
@@ -215,8 +217,8 @@ export function Dashboard() {
               <div className={s.staff}>
                 {todayStaff.slice(0, 4).map(sp => (
                   <div key={sp.id} className={s.staffMember}>
-                    <Avatar name={sp.name} color={partner.accent} size="sm" />
-                    <span>{sp.name.split(' ')[0]}</span>
+                    <Avatar name={spName(sp)} color={partner.accent} size="sm" />
+                    <span>{spName(sp).split(' ')[0]}</span>
                   </div>
                 ))}
               </div>
@@ -242,6 +244,7 @@ function BookingRow({ booking, compact, onClick }: {
   compact?: boolean
   onClick: () => void
 }) {
+  const spName = useSpecialistName()
   return (
     <div
       className={[s.bookingRow, compact ? s.compact : ''].filter(Boolean).join(' ')}
@@ -252,7 +255,7 @@ function BookingRow({ booking, compact, onClick }: {
       </div>
       <div style={{ minWidth: 0 }}>
         <div className={s.clientName}>{booking.clientName}</div>
-        <div className={s.clientSub}>{booking.service?.name ?? '—'} · {booking.specialist?.name.split(' ')[0] ?? '—'}</div>
+        <div className={s.clientSub}>{booking.service?.name ?? '—'} · {booking.specialist ? spName(booking.specialist).split(' ')[0] : '—'}</div>
       </div>
       <div className={s.price}>{bookingAmount(booking) != null ? fmtAMD(bookingAmount(booking)!) : ''}</div>
       <BookingBadge status={booking.status} />

@@ -9,6 +9,7 @@ import { partnersService } from '@/services/partners.service'
 import { fmtDateInput, fmtDuration, fmtServicePrice, PriceBook, worksAt, type Offer } from '@/utils/format'
 import { errorMessage } from '@/utils/errors'
 import { useT, useDateLocale, useDatePickerLabels } from '@/i18n'
+import { useSpecialistName } from '@/i18n/useSpecialistName'
 import { SlotPicker } from '../SlotPicker/SlotPicker'
 import s from './NewBookingModal.module.scss'
 
@@ -33,6 +34,7 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
   const toast         = useToast()
   const scopedLocationId = useScopedLocationId()
   const t             = useT()
+  const spName = useSpecialistName()
   const dateLocale    = useDateLocale()
   const dateLabels    = useDatePickerLabels()
   const today         = fmtDateInput(new Date())
@@ -288,7 +290,7 @@ export function NewBookingModal({ open, onClose, initialDate, initialTime, onCre
               onChange={v => { setSpecialistId(v); setTime(''); clearErr('specialistId') }}
               options={specialists.map(sp => ({
                 value: sp.id,
-                label: sp.name,
+                label: spName(sp),
                 // With a service chosen, show what THIS specialist charges here.
                 sub: selectedService && locationId
                   ? [sp.title, optionSub(book.offer(selectedService, locationId, sp.id))].filter(Boolean).join(' · ')

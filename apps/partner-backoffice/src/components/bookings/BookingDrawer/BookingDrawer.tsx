@@ -7,6 +7,7 @@ import { useToast } from '@/components/ui'
 import { bookingsService } from '@/services/bookings.service'
 import { fmtAMD, fmtServicePrice, fmtDateTime, fmtDuration, bookingMinutes, bookingPriceType } from '@/utils/format'
 import { useT } from '@/i18n'
+import { useSpecialistName } from '@/i18n/useSpecialistName'
 import type { BookingStatus } from '@/types'
 import { RescheduleModal } from '../RescheduleModal/RescheduleModal'
 import s from './BookingDrawer.module.scss'
@@ -98,6 +99,7 @@ export function BookingDrawer({ bookingId, onClose, sheet, onChanged }: Props) {
   const { data: booking, reload } = useResource(() => bookingsService.get(bookingId), [bookingId])
   const toast         = useToast()
   const t             = useT()
+  const spName = useSpecialistName()
   const [closing, setClosing] = useState(false)
   const [rescheduling, setRescheduling] = useState(false)
   // Final-price dialog: 'complete' captures the price then completes the booking;
@@ -247,9 +249,9 @@ export function BookingDrawer({ bookingId, onClose, sheet, onChanged }: Props) {
         <div className={s.section}>
           <div className={s.label}>{t('bookingDrawer.specialist')}</div>
           <div className={s.spRow}>
-            <Avatar name={sp.name} color={partner.accent} size="md" />
+            <Avatar name={spName(sp)} color={partner.accent} size="md" />
             <div>
-              <div className={s.value}>{sp.name}</div>
+              <div className={s.value}>{spName(sp)}</div>
               <div className={s.sub}>{sp.title}</div>
             </div>
           </div>

@@ -12,6 +12,7 @@ import { useNewBooking } from '@/App'
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
 import { useScopedLocationId } from '@/store/auth.hooks'
 import { useI18n, useDateLocale, useDateRangeLabels } from '@/i18n'
+import { useSpecialistName } from '@/i18n/useSpecialistName'
 import type { Booking } from '@/types'
 import s from './Bookings.module.scss'
 
@@ -42,6 +43,7 @@ export function Bookings() {
   const isMobile       = useIsMobile()
   const scopedLocationId = useScopedLocationId()
   const { t, tp }      = useI18n()
+  const spName = useSpecialistName()
   const dateLocale     = useDateLocale()
   const rangeLabels    = useDateRangeLabels()
   // Open-ended range wording ("from 5,000 ֏"), handed to the shared formatter.
@@ -177,7 +179,7 @@ export function Bookings() {
             onChange={v => patchParams({ specialist: v })}
             options={[
               { value: 'all', label: t('bookings.allSpecialists') },
-              ...branchSpecialists.map(sp => ({ value: sp.id, label: sp.name, sub: sp.title })),
+              ...branchSpecialists.map(sp => ({ value: sp.id, label: spName(sp), sub: sp.title })),
             ]}
           />
 
@@ -245,7 +247,7 @@ export function Bookings() {
                     <div className={s.cardMeta}>
                       <div style={{ minWidth: 0 }}>
                         <div className={s.cardSvc}>{b.service?.name ?? '—'}</div>
-                        <div className={s.cardSpec}>{b.specialist?.name ?? '—'} · {fmtDuration(bookingMinutes(b))}</div>
+                        <div className={s.cardSpec}>{b.specialist ? spName(b.specialist) : '—'} · {fmtDuration(bookingMinutes(b))}</div>
                       </div>
                       {b.service && <div className={s.cardPrice}>{effectivePrice(b, priceLabels)}</div>}
                     </div>
@@ -297,7 +299,7 @@ export function Bookings() {
                       <div className={s.svcName}>{b.service?.name ?? '—'}</div>
                       <div className={s.svcDur}>{fmtDuration(bookingMinutes(b))}</div>
                     </Td>
-                    <Td><span className={s.specialistName}>{b.specialist?.name ?? '—'}</span></Td>
+                    <Td><span className={s.specialistName}>{b.specialist ? spName(b.specialist) : '—'}</span></Td>
                     <Td style={{ whiteSpace: 'nowrap' }}>{fmtDateTime(b.startISO)}</Td>
                     <Td><span className={s.price}>{effectivePrice(b, priceLabels)}</span></Td>
                     <Td><BookingBadge status={b.status} /></Td>

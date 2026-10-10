@@ -30,6 +30,7 @@ import { ModalShell } from '@/components/ModalShell/ModalShell'
 import { partnerBrandVars } from '../partnerBrand'
 import { useAppSelector } from '@/store/hooks'
 import { useT, useI18n, useLocalized, LOCALE_META } from '@/i18n'
+import { useSpecialistName } from '../lib/useSpecialistName'
 import { addToCalendar } from '@/lib/ics'
 import s from './BookingFlow.module.scss'
 
@@ -54,6 +55,8 @@ const PULSE_STEP: Record<Exclude<Step, 'success'>, BookingStep> = {
 
 export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, seedLocationId = null, onClose }: Props) {
   const t = useT()
+  // Specialist names as the salon shows them (page language + name order).
+  const nameOf = useSpecialistName(partner)
   const { locale } = useI18n()
   const loc = useLocalized()
   // The modal portals to <body>, escaping the page's brand-scoped vars — so
@@ -491,7 +494,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, s
     const end = new Date(start.getTime() + (bookedMinutes || service.duration) * 60_000)
 
     const who = bookedSpecialist ?? chosenSpecialist
-    const spName = who ? loc(who.name, who.nameI18n) : undefined
+    const spName = who ? nameOf(who) : undefined
     const svcName = loc(service.name, service.nameI18n)
     const title = t('booking.ics.title', { service: svcName, salon: partner.name })
     const description = t('booking.ics.description', {
@@ -581,8 +584,8 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, s
       style={{ background: `linear-gradient(140deg, ${t1}, ${t2})` }}
     >
       {sp.avatarUrl
-        ? <img src={sp.avatarUrl} alt={loc(sp.name, sp.nameI18n)} className={s.optAvatarImg} />
-        : initials(loc(sp.name, sp.nameI18n))}
+        ? <img src={sp.avatarUrl} alt={nameOf(sp)} className={s.optAvatarImg} />
+        : initials(nameOf(sp))}
     </span>
   )
 
@@ -665,9 +668,9 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, s
                     isFacility || isSingle
                       ? null
                       : bookedSpecialist
-                        ? loc(bookedSpecialist.name, bookedSpecialist.nameI18n)
+                        ? nameOf(bookedSpecialist)
                         : chosenSpecialist
-                          ? loc(chosenSpecialist.name, chosenSpecialist.nameI18n)
+                          ? nameOf(chosenSpecialist)
                           : t('booking.summary.anyAvailable')
                   }
                   location={partnerMultiBranch && bookedLocation ? loc(bookedLocation.name, bookedLocation.nameI18n) : null}
@@ -848,7 +851,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, s
                           >
                             {avatar(sp)}
                             <div className={s.optBody}>
-                              <div className={s.optName}>{loc(sp.name, sp.nameI18n)}</div>
+                              <div className={s.optName}>{nameOf(sp)}</div>
                               <div className={s.optMeta}>
                                 <span>{loc(sp.title, sp.titleI18n)}</span>
                                 {(sp.rating ?? 0) > 0 && (sp.reviewCount ?? 0) > 0 && (
@@ -942,7 +945,7 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, s
                       {avatar(assignedSpecialist, true)}
                       <div className={s.assignedBody}>
                         <div className={s.assignedLabel}><UserCheck size={13} /> {t('booking.assignedLabel', { time: assigned.time })}</div>
-                        <div className={s.assignedName}>{loc(assignedSpecialist.name, assignedSpecialist.nameI18n)}</div>
+                        <div className={s.assignedName}>{nameOf(assignedSpecialist)}</div>
                       </div>
                       {currentOffer && fmtPrice(currentOffer) && (
                         <div className={s.assignedPrice}>
@@ -997,9 +1000,9 @@ export function BookingFlow({ partner, seedServiceId, seedSpecialistId = null, s
                       isFacility || isSingle
                         ? null
                         : chosenSpecialist
-                          ? loc(chosenSpecialist.name, chosenSpecialist.nameI18n)
+                          ? nameOf(chosenSpecialist)
                           : assignedSpecialist
-                            ? loc(assignedSpecialist.name, assignedSpecialist.nameI18n)
+                            ? nameOf(assignedSpecialist)
                             : t('booking.summary.anyAvailable')
                     }
                     location={partnerMultiBranch && chosenLocation ? loc(chosenLocation.name, chosenLocation.nameI18n) : null}

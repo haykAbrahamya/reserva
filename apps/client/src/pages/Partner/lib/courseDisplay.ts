@@ -1,4 +1,4 @@
-import { fmtAMD } from '@reserva/shared'
+import { fmtAMD, displayPersonName } from '@reserva/shared'
 import type { LocalizedText } from '@reserva/shared'
 import type { PublicCourse, PublicPartner } from '@/mock/partners'
 import { canBook, bookableLocations, partnerTelHref, primaryLocation } from '@/services/booking.service'
@@ -92,7 +92,7 @@ export function courseDescription(course: PublicCourse, loc: Localizer): string 
 
 /** The course tutor for display: a linked specialist wins over the free-text
  *  guest fields. `name` is empty when the course has no tutor at all. */
-export function courseTutor(course: PublicCourse, loc: Localizer): {
+export function courseTutor(course: PublicCourse, loc: Localizer, surnameFirst?: boolean | null): {
   name: string
   title: string
   avatarUrl?: string
@@ -100,7 +100,8 @@ export function courseTutor(course: PublicCourse, loc: Localizer): {
   const sp = course.tutorSpecialist
   if (sp) {
     return {
-      name: loc(sp.name, sp.nameI18n),
+      // A linked specialist follows the salon's name order, like everywhere else.
+      name: displayPersonName(loc(sp.name, sp.nameI18n), surnameFirst),
       title: loc(sp.title, sp.titleI18n),
       avatarUrl: sp.avatarUrl,
     }

@@ -43,7 +43,7 @@ export function CourseCard({ partner, course, tints, onRegister, onDetails, onCa
   const priceLabel = fmtCoursePrice(course, t('courses.free'))
   const title = loc(course.title, course.titleI18n)
   const summary = loc(course.summary, course.summaryI18n)
-  const tutor = courseTutor(course, loc)
+  const tutor = courseTutor(course, loc, partner.specialistNamesSurnameFirst)
   const dateLabel = courseDateLabel(course, locale)
   const seatsLeft = courseSeatsLeft(course)
   const full = seatsLeft === 0

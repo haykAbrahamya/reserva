@@ -12,6 +12,7 @@ import {
 import { errorMessage } from '@/utils/errors'
 import { fmtDuration, fmtServicePrice, worksAt } from '@/utils/format'
 import { useI18n } from '@/i18n'
+import { useSpecialistName } from '@/i18n/useSpecialistName'
 import type { Service, ServicePriceType } from '@/types'
 import s from './ServicePricesModal.module.scss'
 
@@ -50,6 +51,7 @@ interface Props {
  */
 export function ServicePricesModal({ open, service, onClose, onSaved }: Props) {
   const { t } = useI18n()
+  const spName = useSpecialistName()
   const toast = useToast()
   const partner = usePartner()
   const scopedLocationId = useScopedLocationId()
@@ -94,7 +96,7 @@ export function ServicePricesModal({ open, service, onClose, onSaved }: Props) {
     service
       ? specialists
           .filter(sp => worksAt(sp, locationId) && sp.services.includes(service.id))
-          .sort((a, b) => Number(b.active) - Number(a.active) || a.name.localeCompare(b.name))
+          .sort((a, b) => Number(b.active) - Number(a.active) || spName(a).localeCompare(spName(b)))
       : []
 
   // Seed the drafts from the saved rows whenever the data arrives.
@@ -441,8 +443,8 @@ export function ServicePricesModal({ open, service, onClose, onSaved }: Props) {
                         <div key={key} className={s.row}>
                           <div className={s.who}>
                             <div className={s.person}>
-                              <Avatar name={sp.name} src={sp.avatarUrl} color={partner.accent} size="sm" />
-                              <span className={s.whoName}>{sp.name}</span>
+                              <Avatar name={spName(sp)} src={sp.avatarUrl} color={partner.accent} size="sm" />
+                              <span className={s.whoName}>{spName(sp)}</span>
                               {!sp.active && <span className={s.inactive}>{t('common.inactive')}</span>}
                             </div>
                             <span className={[s.whoHint, own ? s.ownHint : ''].join(' ')}>

@@ -45,7 +45,7 @@ export function CourseDetailsModal({ partner, course, onClose, onRegister, onCal
   const title = loc(course.title, course.titleI18n)
   const summary = loc(course.summary, course.summaryI18n)
   const description = courseDescription(course, loc)
-  const tutor = courseTutor(course, loc)
+  const tutor = courseTutor(course, loc, partner.specialistNamesSurnameFirst)
   const priceLabel = fmtCoursePrice(course, t('courses.free'))
   const dateLabel = courseDateLabel(course, locale)
   const seatsLeft = courseSeatsLeft(course)

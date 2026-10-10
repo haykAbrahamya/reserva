@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSpotlight } from '@/components/onboarding/useSpotlight'
 import { notifyProfileUpdated } from '@/components/onboarding/useProfileCompletion'
-import { CheckCircle2, Lock, Globe, ExternalLink, Download, Share, CheckCircle, Store, Image, Trash2, Upload, CalendarCheck, Copy } from 'lucide-react'
+import { CheckCircle2, Lock, Globe, ExternalLink, Download, Share, CheckCircle, Store, Image, Trash2, Upload, CalendarCheck, Copy, UserRound } from 'lucide-react'
 import { Toggle, Button, Input, SegmentedFilter, useToast } from '@/components/ui'
 import { useAppStore } from '@/store/app.store'
 import { useIsAdmin } from '@/store/auth.hooks'
@@ -57,24 +57,28 @@ export function Settings() {
   const [bookingsOn, setBookingsOn] = useState(true)
   const [fabMode, setFabMode] = useState<'support' | 'book' | 'hidden'>('support')
   const [defaultLocale, setDefaultLocale] = useState<'hy' | 'en' | 'ru'>('hy')
+  const [surnameFirst, setSurnameFirst] = useState(false)
 
   const savedSlug = profile?.slug ?? ''
   const savedAuto = profile?.autoConfirmBookings ?? false
   const savedBookingsOn = profile?.bookingsEnabled ?? true
   const savedFab = profile?.supportWidget ?? 'support'
   const savedLocale = profile?.defaultLocale ?? 'hy'
+  const savedSurnameFirst = profile?.specialistNamesSurnameFirst ?? false
 
   useEffect(() => { setSlug(savedSlug) }, [savedSlug])
   useEffect(() => { setAutoConfirm(savedAuto) }, [savedAuto])
   useEffect(() => { setBookingsOn(savedBookingsOn) }, [savedBookingsOn])
   useEffect(() => { setFabMode(savedFab) }, [savedFab])
   useEffect(() => { setDefaultLocale(savedLocale) }, [savedLocale])
+  useEffect(() => { setSurnameFirst(savedSurnameFirst) }, [savedSurnameFirst])
 
   const [slugSaving, setSlugSaving] = useState(false)
   const [autoSaving, setAutoSaving] = useState(false)
   const [bookingsSaving, setBookingsSaving] = useState(false)
   const [fabSaving, setFabSaving] = useState(false)
   const [localeSaving, setLocaleSaving] = useState(false)
+  const [nameOrderSaving, setNameOrderSaving] = useState(false)
 
   // ── Brand logo ──
   const logoInputRef = useRef<HTMLInputElement>(null)
@@ -185,6 +189,29 @@ export function Settings() {
       toast(errorMessage(err, t))
     } finally {
       setLocaleSaving(false)
+    }
+  }
+
+  // ── Specialist name order ──
+  // Optimistic like the language switch: the store updates first, so every
+  // name on every screen flips at once; a failed save puts it back.
+  const changeNameOrder = async (next: boolean) => {
+    if (!isAdmin || nameOrderSaving || next === surnameFirst) return
+    setNameOrderSaving(true)
+    const prev = surnameFirst
+    setSurnameFirst(next)
+    const current = useAppStore.getState().partner
+    if (current) setPartner({ ...current, specialistNamesSurnameFirst: next })
+    try {
+      await partnersService.updateProfile({ specialistNamesSurnameFirst: next })
+      toast(t('settings.nameOrder.saved'))
+    } catch (err) {
+      setSurnameFirst(prev)
+      const cur = useAppStore.getState().partner
+      if (cur) setPartner({ ...cur, specialistNamesSurnameFirst: prev })
+      toast(errorMessage(err, t))
+    } finally {
+      setNameOrderSaving(false)
     }
   }
 
@@ -426,6 +453,31 @@ export function Settings() {
             ]}
           />
           <div className={s.statusLine}>{t('settings.clientLanguage.hint')}</div>
+        </div>
+      </section>
+
+      {/* ── Specialist name order (display-only; stored names never change) ── */}
+      <section className={s.card}>
+        <div className={s.cardHead}>
+          <span className={s.cardIcon}><UserRound size={18} /></span>
+          <div className={s.cardHeadText}>
+            <h2 className={s.cardTitle}>{t('settings.nameOrder.title')}</h2>
+            <p className={s.cardDesc}>{t('settings.nameOrder.desc')}</p>
+          </div>
+          {adminLock}
+        </div>
+        <div className={s.cardBody}>
+          <SegmentedFilter<'given' | 'surname'>
+            value={surnameFirst ? 'surname' : 'given'}
+            onChange={v => changeNameOrder(v === 'surname')}
+            options={[
+              { value: 'given', label: t('settings.nameOrder.given') },
+              { value: 'surname', label: t('settings.nameOrder.surname') },
+            ]}
+          />
+          <div className={s.statusLine}>
+            {t(surnameFirst ? 'settings.nameOrder.hint_surname' : 'settings.nameOrder.hint_given')}
+          </div>
         </div>
       </section>
 

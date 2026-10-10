@@ -71,6 +71,8 @@ interface ApiPartner {
   bookingsEnabled?: boolean
   kind?: 'salon' | 'single'
   template?: 'classic' | 'tabbed'
+  defaultLocale?: 'hy' | 'en' | 'ru'
+  specialistNamesSurnameFirst?: boolean
   locations: PublicPartner['locations']
   services: Service[]
   specialists: ApiSpecialist[]
@@ -128,6 +130,10 @@ function toPublicPartner(p: ApiPartner): PublicPartner {
     kind: p.kind === 'single' ? 'single' : 'salon',
     // Unknown/missing template → classic (safe fallback for old payloads/rollback).
     template: p.template === 'tabbed' ? 'tabbed' : 'classic',
+    // Was never mapped, so the salon's "default page language" setting never
+    // reached PartnerPage. Unknown values are ignored there (isLocale).
+    defaultLocale: p.defaultLocale,
+    specialistNamesSurnameFirst: p.specialistNamesSurnameFirst === true,
     locations: p.locations,
     services: p.services.map((sv) => ({ ...sv, priceType: sv.priceType, priceMax: sv.priceMax })),
     specialists: p.specialists.map(({ serviceIds, ...rest }) => ({ ...rest, services: serviceIds })),
