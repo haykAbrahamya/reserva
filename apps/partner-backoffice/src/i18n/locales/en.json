@@ -903,15 +903,6 @@
       "hint": "New visitors see your page in this language by default.",
       "saved": "Default language updated"
     },
-    "nameOrder": {
-      "title": "Specialist names",
-      "desc": "How you type your team's names. Clients and staff always see the first name first.",
-      "given": "Name Surname",
-      "surname": "Surname Name",
-      "hint_given": "Names are shown exactly as you type them.",
-      "hint_surname": "Typed like “Aghajanyan Mari”, shown as “Mari Aghajanyan” everywhere.",
-      "saved": "Name order updated"
-    },
     "online": {
       "title": "Online booking",
       "desc": "Whether clients can book online from your public page.",

@@ -104,9 +104,6 @@ export type PublicPartner = Partner & {
   /** Default page language for first-time visitors. Optional in mock; API
    *  defaults to 'hy'. A visitor's own saved choice always wins. */
   defaultLocale?: 'hy' | 'en' | 'ru'
-  /** The salon types specialist names surname first → show them given-name
-   *  first ("Mari Aghajanyan"). Read through `useSpecialistName`. */
-  specialistNamesSurnameFirst?: boolean
   /** Published courses (academy). Optional in mock; API provides them. */
   courses?: PublicCourse[]
 }

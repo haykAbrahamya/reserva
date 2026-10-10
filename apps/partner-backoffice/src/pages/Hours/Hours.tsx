@@ -13,7 +13,6 @@ import { errorMessage } from '@/utils/errors'
 import { fmtTime, fmtDateInput } from '@/utils/format'
 import { worksAt } from '@reserva/shared'
 import { useI18n, useDateLocale } from '@/i18n'
-import { useSpecialistName } from '@/i18n/useSpecialistName'
 import { useSpotlight } from '@/components/onboarding/useSpotlight'
 import { notifyProfileUpdated } from '@/components/onboarding/useProfileCompletion'
 import type { WeekSchedule, WorkingDay, SpecialistTimeOff, Specialist, SpecialistBranch } from '@/types'
@@ -75,7 +74,6 @@ export function Hours() {
   const toast = useToast()
   const navigate = useNavigate()
   const { t } = useI18n()
-  const spName = useSpecialistName()
   const dateLocale = useDateLocale()
   useSpotlight()
 
@@ -287,9 +285,9 @@ export function Hours() {
                 className={[s.spItem, sp.id === selectedId ? s.active : ''].filter(Boolean).join(' ')}
                 onClick={() => setSelectedId(sp.id)}
               >
-                <Avatar name={spName(sp)} color={partner.accent} size="md" />
+                <Avatar name={sp.name} color={partner.accent} size="md" />
                 <div className={s.spMeta}>
-                  <div className={s.spName}>{spName(sp)}</div>
+                  <div className={s.spName}>{sp.name}</div>
                   <div className={s.spTitle}>{sp.title}</div>
                 </div>
                 <span className={[s.spStatus, sp.active ? s.active : s.inactive].filter(Boolean).join(' ')} />
@@ -312,7 +310,7 @@ export function Hours() {
               <>
                 <div className={s.scheduleHead}>
                   <div>
-                    <div className={s.scheduleTitle}>{spName(selectedSp)}</div>
+                    <div className={s.scheduleTitle}>{selectedSp.name}</div>
                     <div className={s.scheduleSub}>{selectedSp.title}</div>
                   </div>
                 </div>
@@ -439,7 +437,7 @@ export function Hours() {
         open={!!deleteTarget}
         variant="danger"
         title={t('timeOff.deleteTitle')}
-        message={t('timeOff.deleteBody', { name: selectedSp ? spName(selectedSp) : '' })}
+        message={t('timeOff.deleteBody', { name: selectedSp?.name ?? '' })}
         confirmLabel={t('common.remove')}
         cancelLabel={t('common.cancel')}
         loading={deleting}

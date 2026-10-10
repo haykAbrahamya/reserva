@@ -6,7 +6,6 @@ import type { PublicPartner } from '@/mock/partners'
 import { Reveal } from '@/components/Reveal/Reveal'
 import { StarRatingDisplay } from '@/components/StarRating/StarRating'
 import { useI18n, useLocalized } from '@/i18n'
-import { useSpecialistName } from '../../../../lib/useSpecialistName'
 import { track } from '@/services/analytics.service'
 import s from './PartnerTeam.module.scss'
 
@@ -21,7 +20,6 @@ const ALL = '__all__'
 export function PartnerTeam({ partner, onSelect, tone = 'plain' }: Props) {
   const { t, tp } = useI18n()
   const loc = useLocalized()
-  const spName = useSpecialistName(partner)
   const [t1, t2] = partner.presentation.heroTints
 
   const team = useMemo(() => partner.specialists.filter(sp => sp.active), [partner.specialists])
@@ -115,7 +113,7 @@ export function PartnerTeam({ partner, onSelect, tone = 'plain' }: Props) {
                 type="button"
                 className={s.cardBtn}
                 onClick={() => { track('specialist_open', { sp: sp.id }); onSelect(sp) }}
-                aria-label={t('partner.team.viewProfileAria', { name: spName(sp) })}
+                aria-label={t('partner.team.viewProfileAria', { name: loc(sp.name, sp.nameI18n) })}
               >
                 <div
                   className={s.avatar}
@@ -123,10 +121,10 @@ export function PartnerTeam({ partner, onSelect, tone = 'plain' }: Props) {
                 >
                   {/* Initials from the SHOWN name, so the letters match it in every language. */}
                   {sp.avatarUrl
-                    ? <img src={sp.avatarUrl} alt={spName(sp)} className={s.avatarImg} />
-                    : initials(spName(sp))}
+                    ? <img src={sp.avatarUrl} alt={loc(sp.name, sp.nameI18n)} className={s.avatarImg} />
+                    : initials(loc(sp.name, sp.nameI18n))}
                 </div>
-                <div className={s.spName}>{spName(sp)}</div>
+                <div className={s.spName}>{loc(sp.name, sp.nameI18n)}</div>
                 <div className={s.spTitle}>{loc(sp.title, sp.titleI18n)}</div>
                 {/* Rating, then where they work — each on its own line. */}
                 {(hasRating(sp) || branchesOf(sp)) && (

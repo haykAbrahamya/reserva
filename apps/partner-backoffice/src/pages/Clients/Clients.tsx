@@ -7,7 +7,6 @@ import { fmtAMD, fmtDateTime, fmtDateShort } from '@/utils/format'
 import { clientsService } from '@/services/clients.service'
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
 import { useI18n } from '@/i18n'
-import { useSpecialistName } from '@/i18n/useSpecialistName'
 import s from './Clients.module.scss'
 
 function useIsMobile() {
@@ -24,7 +23,6 @@ export function Clients() {
   const partner  = usePartner()
   const isMobile = useIsMobile()
   const { t, tp } = useI18n()
-  const spName = useSpecialistName()
 
   const [query, setQuery] = useState('')
   const [debounced, setDebounced] = useState('')
@@ -181,7 +179,7 @@ export function Clients() {
               <div key={b.id} className={s.historyRow} onClick={() => setOpenBkId(b.id)} style={{ cursor: 'pointer' }}>
                 <div style={{ minWidth: 0, flex: 1 }}>
                   <div className={s.histName}>{b.service?.name ?? '—'}</div>
-                  <div className={s.histSub}>{fmtDateTime(b.startISO)}{b.specialist ? ` · ${spName(b.specialist).split(' ')[0]}` : ''}</div>
+                  <div className={s.histSub}>{fmtDateTime(b.startISO)}{b.specialist ? ` · ${b.specialist.name.split(' ')[0]}` : ''}</div>
                 </div>
                 <BookingBadge status={b.status} />
               </div>

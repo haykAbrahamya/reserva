@@ -12,7 +12,6 @@ import { useToast } from '@/components/ui'
 import { BookingDrawer } from '@/components/bookings/BookingDrawer/BookingDrawer'
 import { useScopedLocationId } from '@/store/auth.hooks'
 import { useT, useDateLocale } from '@/i18n'
-import { useSpecialistName } from '@/i18n/useSpecialistName'
 import type { Booking, SpecialistTimeOff } from '@/types'
 import s from './CalendarPage.module.scss'
 
@@ -37,7 +36,6 @@ export function CalendarPage() {
   const toast          = useToast()
   const scopedLocationId = useScopedLocationId()
   const t              = useT()
-  const spName = useSpecialistName()
   const dateLocale     = useDateLocale()
 
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768)
@@ -115,8 +113,7 @@ export function CalendarPage() {
     [busyAway, visibleSpecialists],
   )
   const busyLabel = (b: BusyElsewhere) => {
-    const found = allSpecialists.find(sp => sp.id === b.specialistId)
-    const who = found ? spName(found).split(' ')[0] : ''
+    const who = allSpecialists.find(sp => sp.id === b.specialistId)?.name.split(' ')[0] ?? ''
     return `${who ? who + ' · ' : ''}${t('branchPricing.calendar.busyAt', { branch: b.location?.name ?? '' })}`
   }
 
@@ -293,7 +290,7 @@ export function CalendarPage() {
                 )}
                 <div className={s.mobEventName}>{b.clientName}</div>
                 <div className={s.mobEventSub}>
-                  {b.service?.name ?? '—'} · {t('calendar.with')} {b.specialist ? spName(b.specialist).split(' ')[0] : '—'}
+                  {b.service?.name ?? '—'} · {t('calendar.with')} {b.specialist?.name.split(' ')[0] ?? '—'}
                   {bookingAmount(b) != null && <span> · {fmtAMD(bookingAmount(b)!)}</span>}
                 </div>
               </div>
@@ -323,7 +320,7 @@ export function CalendarPage() {
           className={s.filterSelect}
           value={filterSp}
           onChange={setFilterSp}
-          options={[{ value: 'all', label: t('calendar.allSpecialists') }, ...branchSpecialists.map(sp => ({ value: sp.id, label: spName(sp), sub: sp.title }))]}
+          options={[{ value: 'all', label: t('calendar.allSpecialists') }, ...branchSpecialists.map(sp => ({ value: sp.id, label: sp.name, sub: sp.title }))]}
           size="sm"
         />
         <div className={s.viewToggle}>
@@ -440,7 +437,7 @@ export function CalendarPage() {
           }}>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--fg-2)' }}>{newTimeStr}</div>
             <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--fg-0)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b?.clientName}</div>
-            {svc && <div style={{ fontSize: 10, color: 'var(--fg-2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{svc.name}{sp ? ` · ${spName(sp).split(' ')[0]}` : ''}</div>}
+            {svc && <div style={{ fontSize: 10, color: 'var(--fg-2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{svc.name}{sp ? ` · ${sp.name.split(' ')[0]}` : ''}</div>}
           </div>
         )
       })()}
@@ -466,7 +463,6 @@ function CalEvent({ booking, isDragging, conflict, onMouseDown, onTouchStart }: 
 
   const svc     = booking.service
   const sp      = booking.specialist
-  const spName = useSpecialistName()
   const timeStr = `${start.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}–${end.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`
 
   return (
@@ -479,7 +475,7 @@ function CalEvent({ booking, isDragging, conflict, onMouseDown, onTouchStart }: 
     >
       {height > 28 && <div className={s.eventTime}>{timeStr}</div>}
       <div className={s.eventName}>{booking.clientName}</div>
-      {height > 44 && svc && <div className={s.eventSvc}>{svc.name}{sp ? ` · ${spName(sp).split(' ')[0]}` : ''}</div>}
+      {height > 44 && svc && <div className={s.eventSvc}>{svc.name}{sp ? ` · ${sp.name.split(' ')[0]}` : ''}</div>}
     </div>
   )
 }

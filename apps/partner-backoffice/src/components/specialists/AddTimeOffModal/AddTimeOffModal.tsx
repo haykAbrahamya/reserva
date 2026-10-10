@@ -7,7 +7,6 @@ import { partnersService } from '@/services/partners.service'
 import { fmtDateInput, fmtTime } from '@/utils/format'
 import { findConflictingBookings } from '@/utils/timeOff'
 import { useI18n, useDateLocale, useDatePickerLabels } from '@/i18n'
-import { useSpecialistName } from '@/i18n/useSpecialistName'
 import type { Specialist, SpecialistTimeOff, Booking } from '@/types'
 import s from './AddTimeOffModal.module.scss'
 
@@ -59,7 +58,6 @@ export function AddTimeOffModal({ open, specialist, bookings, editing, initialDr
   const toast    = useToast()
   const navigate = useNavigate()
   const { t, tp } = useI18n()
-  const spName = useSpecialistName()
   const dateLocale = useDateLocale()
   const dateLabels = useDatePickerLabels()
   const today    = fmtDateInput(new Date())
@@ -215,7 +213,7 @@ export function AddTimeOffModal({ open, specialist, bookings, editing, initialDr
           <div className={s.conflictBanner}>
             <span className={s.conflictIcon}><AlertTriangle size={18} /></span>
             <p className={s.conflictText}>
-              {tp('timeOff.conflictBody', conflicts.length, { name: spName(specialist), count: conflicts.length })}
+              {tp('timeOff.conflictBody', conflicts.length, { name: specialist.name, count: conflicts.length })}
             </p>
           </div>
 
@@ -250,7 +248,7 @@ export function AddTimeOffModal({ open, specialist, bookings, editing, initialDr
       open={open}
       onClose={onClose}
       title={editing ? t('timeOff.modalEditTitle') : t('timeOff.modalTitle')}
-      subtitle={t('timeOff.modalSubtitle', { name: spName(specialist) })}
+      subtitle={t('timeOff.modalSubtitle', { name: specialist.name })}
       size="sm"
       footer={
         <>

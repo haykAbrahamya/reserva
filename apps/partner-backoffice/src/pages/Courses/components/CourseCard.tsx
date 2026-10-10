@@ -1,6 +1,5 @@
 import { Pencil, Trash2, Users, GraduationCap, MapPin } from 'lucide-react'
 import { useI18n, useDateLocale } from '@/i18n'
-import { useSpecialistName } from '@/i18n/useSpecialistName'
 
 import type { Course } from '@/types'
 import { StatusPill } from './StatusPill'
@@ -21,11 +20,10 @@ interface Props {
  *  status + member count. The whole card opens the manage view. */
 export function CourseCard({ course, branchName, onOpen, onEdit, onDelete }: Props) {
   const { t } = useI18n()
-  const spName = useSpecialistName()
   const dateLocale = useDateLocale()
   const cover = uploadUrl(course.coverUrl)
   const run = course.currentCohort
-  const tutor = (course.tutorSpecialist ? spName(course.tutorSpecialist) : '') || course.tutorName
+  const tutor = course.tutorSpecialist?.name || course.tutorName
   const lvl = levelKey(course.level)
 
   const memberLabel =

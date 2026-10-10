@@ -37,8 +37,6 @@ export type PartnerProfile = Omit<Partner, 'locations' | 'services' | 'specialis
   supportWidget?: 'support' | 'book' | 'hidden'
   /** Default language for the public client page (first-time visitors). */
   defaultLocale?: 'hy' | 'en' | 'ru'
-  /** Specialist names are typed surname first → shown given-name first everywhere. */
-  specialistNamesSurnameFirst?: boolean
   /** Whether the Courses feature is enabled (platform-curated, read-only). */
   coursesEnabled?: boolean
   /**
