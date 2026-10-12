@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useId, useMemo } from 'react'
 import { Copy, ExternalLink, MessageCircle, Send } from 'lucide-react'
 import { Button, WhatsappIcon, useToast } from '@reserva/ui'
 import { useT } from '@/i18n'
@@ -22,6 +22,7 @@ export function ShareActions({ visit, complete }: Props) {
   const t = useT()
   const toast = useToast()
   const words = useCalendarWords()
+  const headingId = useId()
   const canShare = useMemo(() => typeof navigator !== 'undefined' && 'share' in navigator, [])
 
   const url = complete ? visitUrl(visit) : ''
@@ -45,7 +46,11 @@ export function ShareActions({ visit, complete }: Props) {
   }
 
   return (
-    <div className={s.share}>
+    <div className={s.share} role="group" aria-labelledby={headingId}>
+      <p id={headingId} className={s.heading}>
+        {t('appointmentCard.share.heading')}
+      </p>
+
       <Button variant="accent" className={s.primary} disabled={!complete} onClick={canShare ? share : copy}>
         {canShare ? <Send size={16} /> : <Copy size={16} />}
         {canShare ? t('appointmentCard.share.send') : t('appointmentCard.share.copy')}

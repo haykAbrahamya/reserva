@@ -25,6 +25,7 @@
     "hour": "h"
   },
   "share": {
+    "heading": "Card link",
     "send": "Send to client",
     "copy": "Copy link",
     "copied": "Link copied",

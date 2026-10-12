@@ -10,6 +10,24 @@
   gap: 8px;
 }
 
+/* The card's own buttons ran straight into these, so a labelled rule splits
+   the client's card from the salon's way of sending it. */
+.heading {
+  @include a.eyebrow;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0 6px;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: $line-2;
+  }
+}
+
 .primary {
   justify-content: center;
   gap: 7px;
