@@ -1,0 +1,175 @@
+@use '../../../styles/vars' as *;
+@use '../../../styles/app' as a;
+
+.card {
+  @include a.surface;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 0.22s cubic-bezier(0.2, 0.7, 0.1, 1),
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+
+  @include a.focus-ring;
+}
+
+a.card:hover {
+  /* ToolIcon's documented hook — the icon lifts with the card. */
+  --tool-icon-transform: translateY(-3px) rotate(-4deg);
+
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--tool) 34%, var(--line-1));
+  box-shadow: $shadow-2;
+
+  .rings { transform: scale(1.08); opacity: 1; }
+  .arrow { transform: translate(2px, -2px); }
+}
+
+/* ── Artwork: the tool's hue as light falling on paper, rings radiating from
+   the icon. Layers of CSS, no image, re-themes with the tokens. ── */
+.art {
+  --tool-icon-size: 68px;
+
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-bottom: 1px solid $line-1;
+  background:
+    radial-gradient(120% 140% at 100% 0%, var(--tool-soft), transparent 62%),
+    radial-gradient(90% 120% at 0% 100%, var(--tool-soft), transparent 58%),
+    $bg-2;
+}
+
+.rings {
+  position: absolute;
+  inset: -30%;
+  pointer-events: none;
+  opacity: 0.85;
+  background: repeating-radial-gradient(
+    circle at 50% 50%,
+    transparent 0 26px,
+    color-mix(in srgb, var(--tool) 20%, transparent) 26px 27px
+  );
+  mask-image: radial-gradient(circle at 50% 50%, #000 12%, transparent 58%);
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.1, 1), opacity 0.3s ease;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  padding: 18px 20px 20px;
+  min-width: 0;
+}
+
+/* Neutral text with a hue dot: a tool hue is decoration, and at 11px it would
+   not pass contrast as text on its own. */
+.tag {
+  @include a.eyebrow;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--tool);
+    flex-shrink: 0;
+  }
+}
+
+.title {
+  margin: 2px 0 0;
+  font-family: $font-serif;
+  font-size: 21px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  color: $fg-0;
+}
+
+.description {
+  @include a.clamp-lines(3);
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: $fg-2;
+}
+
+.foot {
+  margin-top: auto;
+  padding-top: 12px;
+  display: flex;
+}
+
+.open {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: $accent-contrast;
+}
+
+.arrow {
+  transition: transform 0.22s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+
+.soon {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: $bg-3;
+  color: $fg-2;
+}
+
+.muted {
+  cursor: default;
+
+  .art { filter: saturate(0.55); }
+  .title { color: $fg-1; }
+}
+
+/* Phones: a compact row — artwork as a square on the left, text beside it —
+   so five tools are a short scroll instead of five screen-tall cards. */
+@media (max-width: 560px) {
+  .card { flex-direction: row; }
+
+  .art {
+    --tool-icon-size: 48px;
+
+    width: 96px;
+    aspect-ratio: auto;
+    flex-shrink: 0;
+    border-bottom: 0;
+    border-right: 1px solid $line-1;
+  }
+
+  .rings { inset: -60%; }
+
+  .body {
+    padding: 14px 16px;
+    gap: 4px;
+  }
+
+  .title { font-size: 18px; }
+
+  .description {
+    @include a.clamp-lines(2);
+    font-size: 13px;
+  }
+
+  .foot { padding-top: 8px; }
+}

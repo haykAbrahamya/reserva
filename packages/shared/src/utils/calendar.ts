@@ -1,8 +1,9 @@
 // ─────────────────────────────────────────────────────────────
-// Minimal, dependency-free iCalendar (.ics) builder for booking
-// confirmations. The generated event carries its own VALARM, so the
-// customer's phone reminds them at a chosen offset (e.g. 1 hour before) —
-// a free, no-opt-in reminder that works on every calendar app.
+// Minimal, dependency-free iCalendar (.ics) builder — used by the client's
+// booking confirmation and the tools' appointment card. The generated event
+// carries its own VALARM, so the customer's phone reminds them at a chosen
+// offset (e.g. 1 hour before) — a free, no-opt-in reminder that works on
+// every calendar app.
 // ─────────────────────────────────────────────────────────────
 
 export interface IcsEvent {

@@ -1,0 +1,44 @@
+@use '../../../../styles/vars' as *;
+
+/* Equal columns from the space available, so the times line up as a
+   timetable rather than a ragged cloud of chips. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 8px;
+
+  > button {
+    justify-content: center;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.custom {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid $line-1;
+}
+
+.customLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: $fg-1;
+  margin-right: 2px;
+}
+
+.custom .time {
+  flex: 0 1 170px;
+}
+
+.add { gap: 6px; }
+
+.hint {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: $fg-3;
+}

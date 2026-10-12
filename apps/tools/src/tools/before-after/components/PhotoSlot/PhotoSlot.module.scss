@@ -1,0 +1,102 @@
+@use '../../../../styles/vars' as *;
+@use '../../../../styles/app' as a;
+
+.slot {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.title {
+  @include a.eyebrow;
+}
+
+/* ── Empty: the drop zone ── */
+.drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 210px;
+  padding: 20px 14px;
+  border: 1.5px dashed $line-strong;
+  border-radius: $r-3;
+  background: $bg-2;
+  color: $fg-2;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.14s ease, background 0.14s ease, color 0.14s ease;
+
+  &:hover,
+  &.over {
+    border-color: $accent;
+    background: $accent-soft;
+    color: $accent-contrast;
+  }
+
+  @include a.focus-ring;
+}
+
+.dropTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: $fg-0;
+}
+
+.dropHint {
+  font-size: 12px;
+  color: $fg-3;
+}
+
+/* ── Filled: crop view and controls ── */
+.crop {
+  width: 100%;
+  margin-inline: auto;
+  border-radius: $r-2;
+  overflow: hidden;
+  border: 1px solid $line-2;
+  background: $bg-3;
+}
+
+.cropCanvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  cursor: grab;
+  // The finger drags the photo, not the page.
+  touch-action: none;
+
+  &:active { cursor: grabbing; }
+
+  @include a.focus-ring;
+}
+
+.zoom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: $fg-2;
+
+  input {
+    flex: 1;
+    min-width: 0;
+    accent-color: $accent;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.action {
+  flex: 1;
+  justify-content: center;
+  gap: 6px;
+}

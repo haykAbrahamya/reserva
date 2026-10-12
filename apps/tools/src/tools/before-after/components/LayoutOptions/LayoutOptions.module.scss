@@ -1,0 +1,33 @@
+@use '../../../../styles/vars' as *;
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+}
+
+.option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: $fg-1;
+}
+
+.hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: $fg-3;
+}

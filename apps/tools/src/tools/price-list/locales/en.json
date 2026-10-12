@@ -1,0 +1,31 @@
+{
+  "headingPlaceholder": "Price list",
+  "sections": {
+    "services": "Services"
+  },
+  "fields": {
+    "serviceName": "Service",
+    "serviceNamePlaceholder": "Service name",
+    "servicePrice": "Price",
+    "servicePricePlaceholder": "5000"
+  },
+  "services": {
+    "count": "{count} of {max}",
+    "add": "Add service",
+    "remove": "Remove {name}",
+    "removeUnnamed": "Remove service",
+    "limit": "That's the most that fits on one story: {max} services.",
+    "priceHint": "Type just the number and we'll format it, e.g. 5000 or 5000-8000.",
+    "clear": "Clear list",
+    "clearTitle": "Clear the list?",
+    "clearBody": "All services will be removed. Your style and details stay.",
+    "clearConfirm": "Clear",
+    "cancel": "Cancel"
+  },
+  "preview": "Your price list as an Instagram story",
+  "format": "Instagram story · 1080 × 1920 · PNG",
+  "pitch": {
+    "title": "Your price list can take bookings too",
+    "body": "The services and prices you just entered are all a Reserva booking page needs. Clients pick a time and book themselves, day and night."
+  }
+}

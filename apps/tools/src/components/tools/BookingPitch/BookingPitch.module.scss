@@ -1,0 +1,79 @@
+@use '../../../styles/vars' as *;
+@use '../../../styles/app' as a;
+
+.pitch {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 22px;
+  border: 1px solid $accent-line;
+  border-radius: $r-3;
+  background:
+    radial-gradient(120% 160% at 100% 0%, $accent-soft, transparent 60%),
+    $bg-1;
+
+  @media (max-width: 720px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 18px;
+  }
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: $accent-soft;
+  color: $accent-contrast;
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-family: $font-serif;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  color: $fg-0;
+}
+
+.body {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: $fg-2;
+  max-width: 62ch;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 16px 0 18px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: $accent;
+  color: $fg-on-accent;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.14s ease;
+
+  &:hover { background: $accent-strong; }
+
+  @include a.focus-ring;
+
+  @media (max-width: 720px) { width: 100%; }
+}

@@ -1,0 +1,9 @@
+@use '../../styles/app' as a;
+
+.page {
+  @include a.page-x;
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding-block: 64px;
+}

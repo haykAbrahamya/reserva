@@ -1,0 +1,77 @@
+/*
+  This app's tokens, on top of @reserva/ui's tokens.css.
+
+  The ACCENT is deliberately not set here. These tools are Reserva itself, not a
+  sub-product, so they inherit the platform's own brand colour from the design
+  system — the same bronze reserva.am and the backoffice use — and pick up any
+  brand change without a line of work. Every decorative tint below is mixed
+  live from `--accent` for the same reason.
+*/
+
+:root {
+  /* ── Accent-derived decoration ── */
+  --accent-wash: color-mix(in srgb, var(--accent) 7%, transparent);
+  --accent-line: color-mix(in srgb, var(--accent) 24%, transparent);
+
+  /* ── Ground ── A touch deeper than the design system's paper so white cards
+     have an edge against it. */
+  --bg-0: #F4F2ED;
+  --page-grain: rgba(20, 17, 14, 0.022);
+
+  /*
+    ── Tool identity ──
+
+    Each tool has a hue for its card artwork, so the grid reads as a set of
+    distinct things rather than one card repeated. Muted beauty-trade tones that
+    sit beside the bronze accent without competing with it.
+  */
+  --tool-rose: #B0707E;
+  --tool-rose-soft: rgba(176, 112, 126, 0.13);
+  --tool-sage: #5E8466;
+  --tool-sage-soft: rgba(94, 132, 102, 0.13);
+  --tool-sky: #4F7495;
+  --tool-sky-soft: rgba(79, 116, 149, 0.13);
+  --tool-sand: #A8784B;
+  --tool-sand-soft: rgba(168, 120, 75, 0.13);
+  --tool-plum: #7D5F8E;
+  --tool-plum-soft: rgba(125, 95, 142, 0.13);
+
+  /* ── Layout ── */
+  --page-max: 1180px;
+  --header-h: 60px;
+  /* The fixed header's full height: its bar plus the notch area above it,
+     which the page draws under (viewport-fit=cover). Everything that sits
+     below the header offsets by this. */
+  --header-offset: calc(var(--header-h) + env(safe-area-inset-top, 0px));
+  /* The gutter as a token, so anything that bleeds to the edge can read it. */
+  --page-gutter: 28px;
+}
+
+@media (max-width: 900px) {
+  :root { --page-gutter: 20px; }
+}
+
+@media (max-width: 560px) {
+  :root { --page-gutter: 16px; }
+}
+
+[data-theme='dark'] {
+  --accent-wash: color-mix(in srgb, var(--accent) 9%, transparent);
+  --accent-line: color-mix(in srgb, var(--accent) 28%, transparent);
+
+  /* The page drops below the card surface, so cards read as lifted. */
+  --bg-0: #0E0D0C;
+  --page-grain: rgba(243, 239, 231, 0.016);
+
+  /* Every hue lifts on charcoal, or it turns to mud. */
+  --tool-rose: #D49AA7;
+  --tool-rose-soft: rgba(212, 154, 167, 0.15);
+  --tool-sage: #8DB794;
+  --tool-sage-soft: rgba(141, 183, 148, 0.15);
+  --tool-sky: #86AACB;
+  --tool-sky-soft: rgba(134, 170, 203, 0.15);
+  --tool-sand: #D6A972;
+  --tool-sand-soft: rgba(214, 169, 114, 0.15);
+  --tool-plum: #B79AC8;
+  --tool-plum-soft: rgba(183, 154, 200, 0.15);
+}

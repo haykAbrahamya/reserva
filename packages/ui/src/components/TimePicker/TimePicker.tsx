@@ -14,10 +14,16 @@ interface TimePickerProps {
   /** Last selectable hour (inclusive). Default 23. */
   maxHour?: number
   className?: string
+  /**
+   * `compact` (default) is the dense 34px control the schedule grids use;
+   * `field` is the same box as Input and DatePicker, for a time that sits in
+   * a form row beside them.
+   */
+  variant?: 'compact' | 'field'
 }
 
 export function TimePicker({
-  value, onChange, disabled, step = 30, minHour = 0, maxHour = 23, className = '',
+  value, onChange, disabled, step = 30, minHour = 0, maxHour = 23, className = '', variant = 'compact',
 }: TimePickerProps) {
   const { open, setOpen, triggerRef, panelRef, renderPanel } = useAnchoredDropdown('trigger')
 
@@ -47,11 +53,11 @@ export function TimePicker({
       <button
         type="button"
         disabled={disabled}
-        className={[s.trigger, open ? s.open : ''].filter(Boolean).join(' ')}
+        className={[s.trigger, variant === 'field' ? s.field : '', open ? s.open : ''].filter(Boolean).join(' ')}
         onClick={() => !disabled && setOpen(o => !o)}
       >
         <span className={s.val}>{value}</span>
-        <Clock size={13} className={s.clock} />
+        <Clock size={variant === 'field' ? 16 : 13} className={s.clock} />
       </button>
 
       {renderPanel(

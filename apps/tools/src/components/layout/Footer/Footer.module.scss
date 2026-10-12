@@ -1,0 +1,81 @@
+@use '../../../styles/vars' as *;
+@use '../../../styles/app' as a;
+
+.footer {
+  margin-top: auto;
+  border-top: 1px solid $line-1;
+  background: color-mix(in srgb, var(--bg-1) 55%, transparent);
+}
+
+.inner {
+  @include a.page-x;
+  padding-block: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.name {
+  font-family: $font-serif;
+  font-size: 18px;
+  color: $fg-0;
+  line-height: 1.2;
+}
+
+.pitch {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: $fg-2;
+}
+
+/* Outlined, not filled: on a tool page the booking card right above carries
+   the same action as the page's primary button, and two identical filled
+   buttons in a row read as a mistake. */
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 16px 0 18px;
+  border: 1px solid $accent-line;
+  border-radius: 999px;
+  background: $accent-soft;
+  color: $accent-contrast;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease, transform 0.14s ease;
+
+  &:hover {
+    background: $accent;
+    border-color: $accent;
+    color: $fg-on-accent;
+  }
+
+  &:active { transform: translateY(1px); }
+
+  @include a.focus-ring;
+
+  /* A full-width tap target on a phone, where it is the header's link too. */
+  @media (max-width: 560px) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.legal {
+  @include a.page-x;
+  padding-block: 0 24px;
+  font-size: 12px;
+  color: $fg-3;
+}

@@ -1,0 +1,44 @@
+@use '../../../styles/vars' as *;
+@use '../../../styles/app' as a;
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  overflow: hidden;
+  text-decoration: none;
+  border-radius: $r-2;
+
+  @include a.focus-ring;
+}
+
+.name {
+  font-family: $font-serif;
+  font-size: 21px;
+  letter-spacing: -0.015em;
+  color: $fg-0;
+  line-height: 1;
+}
+
+/* Sans, not mono: the pill carries «Գործիքներ» and «Инструменты». */
+.product {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: $accent-soft;
+  color: $accent-contrast;
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The mark and the pill still say "Reserva Tools" on a narrow phone; the
+   wordmark is what gives way first. */
+@media (max-width: 420px) {
+  .name { display: none; }
+}

@@ -1,0 +1,82 @@
+@use '../../../../styles/vars' as *;
+@use '../../../../styles/app' as a;
+
+/*
+  Row layout follows the width of the FORM, not the window: on a desktop the
+  editor shares its row with the preview, so a viewport breakpoint would give
+  the wrong answer at most sizes.
+
+    wide    [ name ............ ][ price ][×]
+    narrow  [ name ..................... ][×]
+            [ price ]
+*/
+.container {
+  container-type: inline-size;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 132px 30px;
+  gap: 8px;
+  margin-bottom: 6px;
+
+  span { @include a.eyebrow; }
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 132px 30px;
+  grid-template-areas: 'name price remove';
+  gap: 8px;
+  align-items: center;
+}
+
+.name { grid-area: name; min-width: 0; }
+.price { grid-area: price; min-width: 0; }
+.remove { grid-area: remove; }
+
+@container (max-width: 380px) {
+  .columns { display: none; }
+
+  .row {
+    grid-template-columns: minmax(0, 1fr) 30px;
+    grid-template-areas:
+      'name remove'
+      'price .';
+    gap: 6px 8px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid $line-1;
+  }
+
+  .row:last-child { border-bottom: 0; padding-bottom: 0; }
+
+  .price { max-width: 160px; }
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-top: 14px;
+}
+
+.add { gap: 6px; }
+
+.hint {
+  flex: 1;
+  min-width: 200px;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: $fg-3;
+}

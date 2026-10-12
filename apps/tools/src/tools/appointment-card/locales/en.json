@@ -1,0 +1,55 @@
+{
+  "sections": {
+    "visit": "The visit",
+    "salon": "Your salon",
+    "note": "Note for the client"
+  },
+  "salonHint": "Filled in once — remembered for every card.",
+  "fields": {
+    "service": "Service",
+    "servicePlaceholder": "e.g. Gel manicure",
+    "date": "Date",
+    "today": "Today",
+    "time": "Time",
+    "duration": "Duration",
+    "salon": "Salon or your name",
+    "salonPlaceholder": "e.g. Anna Beauty",
+    "address": "Address",
+    "addressPlaceholder": "Street, building, city",
+    "phone": "Phone",
+    "phonePlaceholder": "+374 …",
+    "notePlaceholder": "e.g. Please come 5 minutes early (optional)"
+  },
+  "units": {
+    "min": "min",
+    "hour": "h"
+  },
+  "share": {
+    "send": "Send to client",
+    "copy": "Copy link",
+    "copied": "Link copied",
+    "open": "Open the card",
+    "missing": "Add the date, time and salon name first.",
+    "message": "Your appointment at {salon}: {date}, {time}."
+  },
+  "card": {
+    "eyebrow": "Your appointment",
+    "addToCalendar": "Add to calendar",
+    "directions": "Directions",
+    "call": "Call",
+    "passed": "This visit has already passed",
+    "made": "Made with Reserva Tools",
+    "madeHint": "Free tools for beauty pros"
+  },
+  "visit": {
+    "title": "Your appointment",
+    "invalidTitle": "This link doesn’t open an appointment",
+    "invalidBody": "It may have been cut short when it was copied. Ask the salon to send it again.",
+    "invalidAction": "Make your own card"
+  },
+  "preview": "How your client will see it",
+  "pitch": {
+    "title": "Let every booking send its own card",
+    "body": "When clients book on your Reserva page, they get the date, the address and an add-to-calendar reminder automatically — no typing, no mistakes."
+  }
+}

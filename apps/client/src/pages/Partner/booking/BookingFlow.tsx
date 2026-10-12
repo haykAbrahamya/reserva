@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { ArrowLeft, X, Check, Users, Calendar, Clock, CheckCircle2, ArrowRight, Sparkles, MapPin, Send, AlertCircle, CalendarPlus, Bell, BellRing, Share, UserCheck } from 'lucide-react'
 import {
-  fmtServicePrice, fmtDuration, fmtDurationSpan, fmtDateInput, hasPublicPrice, initials, isValidPhone,
-  spanOf, worksAt, type Offer, type PricedService,
+  addToCalendar, fmtServicePrice, fmtDuration, fmtDurationSpan, fmtDateInput, hasPublicPrice, initials,
+  isValidPhone, spanOf, worksAt, type Offer, type PricedService,
 } from '@reserva/shared'
 import { StarRatingDisplay } from '@/components/StarRating/StarRating'
 import { DatePicker } from '@reserva/ui'
@@ -30,7 +30,6 @@ import { ModalShell } from '@/components/ModalShell/ModalShell'
 import { partnerBrandVars } from '../partnerBrand'
 import { useAppSelector } from '@/store/hooks'
 import { useT, useI18n, useLocalized, LOCALE_META } from '@/i18n'
-import { addToCalendar } from '@/lib/ics'
 import s from './BookingFlow.module.scss'
 
 type Step = 'location' | 'service' | 'specialist' | 'datetime' | 'details' | 'confirm' | 'success'

@@ -44,6 +44,11 @@ interface DatePickerProps {
   ariaLabel?: string
   /** Localized calendar strings; English fallbacks when omitted. */
   labels?: DatePickerLabels
+  /**
+   * Offer "Clear" in the panel (default). Off for a REQUIRED date, where
+   * clearing would leave the field in a state the form cannot accept.
+   */
+  clearable?: boolean
 }
 
 function parseDate(s: string): Date | null {
@@ -66,7 +71,7 @@ function buildCalendar(year: number, month: number): (Date | null)[] {
   return cells
 }
 
-export function DatePicker({ value, onChange, min, max, label, ariaLabel, placeholder = 'Select date', className = '', variant = 'field', labels }: DatePickerProps) {
+export function DatePicker({ value, onChange, min, max, label, ariaLabel, placeholder = 'Select date', className = '', variant = 'field', labels, clearable = true }: DatePickerProps) {
   const selected = parseDate(value)
   const today    = new Date(); today.setHours(0,0,0,0)
 
@@ -192,7 +197,7 @@ export function DatePicker({ value, onChange, min, max, label, ariaLabel, placeh
           {/* Footer */}
           <div className={s.footer}>
             <button type="button" className={s.todayBtn} onClick={goToday}>{todayLabel}</button>
-            {value && <button type="button" className={s.clearBtn} onClick={clear}>{clearLabel}</button>}
+            {clearable && value && <button type="button" className={s.clearBtn} onClick={clear}>{clearLabel}</button>}
           </div>
         </>,
         s.popover,

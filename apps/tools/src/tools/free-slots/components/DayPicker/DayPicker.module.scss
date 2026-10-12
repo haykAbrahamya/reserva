@@ -1,0 +1,15 @@
+@use '../../../../styles/vars' as *;
+
+.day {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.chosen {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: $fg-1;
+}

@@ -1,0 +1,12 @@
+@use '../../styles/vars' as *;
+@use '../../styles/app' as a;
+
+.tools {
+  @include a.page-x;
+  padding-bottom: clamp(48px, 7vw, 88px);
+}
+
+.heading {
+  @include a.eyebrow;
+  margin: 0 0 16px;
+}

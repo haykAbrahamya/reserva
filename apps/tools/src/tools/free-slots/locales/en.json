@@ -1,0 +1,31 @@
+{
+  "headingPlaceholder": "Free slots",
+  "sections": {
+    "day": "Day",
+    "slots": "Free times"
+  },
+  "day": {
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "other": "Other date",
+    "pick": "Pick a date"
+  },
+  "slots": {
+    "count": "{count} of {max}",
+    "custom": "Another time",
+    "add": "Add",
+    "clear": "Clear",
+    "hint": "Tap the times you're free.",
+    "limit": "That's the most that fits on one story: {max} times."
+  },
+  "note": {
+    "label": "How to book",
+    "placeholder": "DM to book"
+  },
+  "preview": "Your free slots as an Instagram story",
+  "format": "Instagram story · 1080 × 1920 · PNG",
+  "pitch": {
+    "title": "Let clients take these slots themselves",
+    "body": "A Reserva booking page shows your free times live. Clients pick one and book in seconds, without a single message."
+  }
+}

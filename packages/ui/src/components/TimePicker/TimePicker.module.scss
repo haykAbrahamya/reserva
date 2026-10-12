@@ -45,6 +45,20 @@
   &.open .clock { color: $accent; }
 }
 
+/* `variant="field"`: the same box as Input and DatePicker — row height,
+   card background, the sans face with even-width digits — so a time in a
+   form row matches the fields beside it instead of the dense schedule look. */
+.trigger.field {
+  height: auto;
+  min-height: $row-h;
+  padding: 0 $pad-x;
+  background: $bg-1;
+  border-width: 1.5px;
+  font-family: $font-sans;
+  font-size: $text-md;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Positioned by useAnchoredDropdown (fixed, portalled to body). */
 .dropdown {
   max-height: 240px;

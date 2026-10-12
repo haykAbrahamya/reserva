@@ -1,0 +1,159 @@
+{
+  "app": {
+    "name": "Reserva",
+    "product": "Tools"
+  },
+  "nav": {
+    "theme": "Theme",
+    "language": "Language",
+    "cta": "Online booking"
+  },
+  "home": {
+    "seoTitle": "Free tools for beauty professionals — Reserva",
+    "seoDescription": "Price lists, free-slot stories, before/after collages and more — free design tools for beauty specialists and salons. No sign-up.",
+    "eyebrow": "Free · No sign-up",
+    "title": "Tools that make your beauty work shine",
+    "lead": "Create price lists, stories and client-ready images in a minute — in your colours, ready for Instagram.",
+    "perks": {
+      "free": "Free forever",
+      "noSignup": "No sign-up",
+      "mobile": "Made for your phone"
+    },
+    "gridTitle": "Choose a tool"
+  },
+  "tool": {
+    "open": "Open tool",
+    "soon": "Soon",
+    "back": "All tools",
+    "building": "We're building this tool",
+    "buildingBody": "It will be ready very soon."
+  },
+  "tools": {
+    "priceList": {
+      "title": "Price list maker",
+      "tag": "Instagram story",
+      "description": "Turn your services and prices into a beautiful story image in your brand colours."
+    },
+    "freeSlots": {
+      "title": "Free slots story",
+      "tag": "Instagram story",
+      "description": "Tap your open times and share a story your clients can book from."
+    },
+    "beforeAfter": {
+      "title": "Before & after",
+      "tag": "Post · Story",
+      "description": "Two photos, one clean labelled collage. Your photos never leave your phone."
+    },
+    "appointmentCard": {
+      "title": "Appointment card",
+      "tag": "WhatsApp · Viber",
+      "description": "Send clients a neat visit card with the date, address and a call button."
+    },
+    "giftCertificate": {
+      "title": "Gift certificate",
+      "tag": "Image · PDF",
+      "description": "Design gift cards for the holidays and send them in seconds."
+    }
+  },
+  "workspace": {
+    "label": "View",
+    "edit": "Edit",
+    "preview": "Preview"
+  },
+  "editor": {
+    "style": "Style",
+    "details": "Your details"
+  },
+  "brand": {
+    "title": "Your name or salon",
+    "titlePlaceholder": "e.g. Anna Beauty",
+    "heading": "Heading",
+    "contact": "Phone or Instagram",
+    "contactPlaceholder": "@yourname or +374 …"
+  },
+  "themes": {
+    "mocha": "Mocha",
+    "cream": "Cream",
+    "noir": "Noir",
+    "blush": "Blush",
+    "sage": "Sage",
+    "lavender": "Lavender"
+  },
+  "calendar": {
+    "months": {
+      "0": "January",
+      "1": "February",
+      "2": "March",
+      "3": "April",
+      "4": "May",
+      "5": "June",
+      "6": "July",
+      "7": "August",
+      "8": "September",
+      "9": "October",
+      "10": "November",
+      "11": "December"
+    },
+    "monthsOf": {
+      "0": "January",
+      "1": "February",
+      "2": "March",
+      "3": "April",
+      "4": "May",
+      "5": "June",
+      "6": "July",
+      "7": "August",
+      "8": "September",
+      "9": "October",
+      "10": "November",
+      "11": "December"
+    },
+    "weekdays": {
+      "0": "Monday",
+      "1": "Tuesday",
+      "2": "Wednesday",
+      "3": "Thursday",
+      "4": "Friday",
+      "5": "Saturday",
+      "6": "Sunday"
+    },
+    "weekdaysShort": {
+      "0": "Mo",
+      "1": "Tu",
+      "2": "We",
+      "3": "Th",
+      "4": "Fr",
+      "5": "Sa",
+      "6": "Su"
+    },
+    "dayLong": "{weekday}, {day} {month}",
+    "dateFull": "{day} {month} {year}"
+  },
+  "preview": {
+    "open": "View full size",
+    "close": "Close",
+    "prev": "Previous",
+    "next": "Next"
+  },
+  "export": {
+    "share": "Share",
+    "download": "Download",
+    "saved": "Image saved",
+    "failed": "Couldn’t create the image. Please try again.",
+    "pdf": "Download PDF",
+    "pdfSaved": "PDF saved"
+  },
+  "pitch": {
+    "cta": "Create my booking page"
+  },
+  "footer": {
+    "pitch": "Online booking for salons and beauty specialists.",
+    "cta": "Create your booking page",
+    "rights": "© {year} Reserva"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "This tool doesn't exist or has moved.",
+    "action": "All tools"
+  }
+}

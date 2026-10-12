@@ -1,4 +1,4 @@
-import { forwardRef, useState, type ReactNode } from 'react'
+import { forwardRef, useId, useState, type ReactNode } from 'react'
 import { AlertCircle, Eye, EyeOff } from 'lucide-react'
 import s from './Input.module.scss'
 
@@ -31,23 +31,34 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, help, error, trailing, className = '', ...props }, ref) => (
-    <div className={s.wrap}>
-      {label && <label className={s.label}>{label}</label>}
-      <div className={s.control}>
-        <input
-          ref={ref}
-          className={[s.field, error ? s.error : '', trailing ? s.hasTrailing : '', className]
-            .filter(Boolean)
-            .join(' ')}
-          {...props}
-        />
-        {trailing && <span className={s.trailing}>{trailing}</span>}
+  ({ label, help, error, trailing, className = '', id, ...props }, ref) => {
+    // The label is tied to its field, so a click on it focuses the field and a
+    // screen reader announces it as the field's name. A caller's own id wins.
+    const autoId = useId()
+    const fieldId = id ?? autoId
+    return (
+      <div className={s.wrap}>
+        {label && (
+          <label className={s.label} htmlFor={fieldId}>
+            {label}
+          </label>
+        )}
+        <div className={s.control}>
+          <input
+            ref={ref}
+            id={fieldId}
+            className={[s.field, error ? s.error : '', trailing ? s.hasTrailing : '', className]
+              .filter(Boolean)
+              .join(' ')}
+            {...props}
+          />
+          {trailing && <span className={s.trailing}>{trailing}</span>}
+        </div>
+        {error && <ErrorMsg message={error} />}
+        {help && !error && <span className={s.help}>{help}</span>}
       </div>
-      {error && <ErrorMsg message={error} />}
-      {help && !error && <span className={s.help}>{help}</span>}
-    </div>
-  )
+    )
+  },
 )
 Input.displayName = 'Input'
 
@@ -105,17 +116,27 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
 }
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ label, help, error, className = '', ...props }, ref) => (
-    <div className={s.wrap}>
-      {label && <label className={s.label}>{label}</label>}
-      <textarea
-        ref={ref}
-        className={[s.field, s.textarea, error ? s.error : '', className].filter(Boolean).join(' ')}
-        {...props}
-      />
-      {error && <ErrorMsg message={error} />}
-      {help && !error && <span className={s.help}>{help}</span>}
-    </div>
-  )
+  ({ label, help, error, className = '', id, ...props }, ref) => {
+    // Same label wiring as Input.
+    const autoId = useId()
+    const fieldId = id ?? autoId
+    return (
+      <div className={s.wrap}>
+        {label && (
+          <label className={s.label} htmlFor={fieldId}>
+            {label}
+          </label>
+        )}
+        <textarea
+          ref={ref}
+          id={fieldId}
+          className={[s.field, s.textarea, error ? s.error : '', className].filter(Boolean).join(' ')}
+          {...props}
+        />
+        {error && <ErrorMsg message={error} />}
+        {help && !error && <span className={s.help}>{help}</span>}
+      </div>
+    )
+  },
 )
 Textarea.displayName = 'Textarea'

@@ -1,0 +1,43 @@
+@use '../../../styles/vars' as *;
+
+.toggle {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid $line-2;
+  border-radius: 999px;
+  background: $bg-1;
+  color: $fg-1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.14s ease, color 0.14s ease, background 0.14s ease;
+
+  &:hover {
+    border-color: $line-strong;
+    color: $fg-0;
+  }
+}
+
+/* Both icons occupy the same 15px box; only opacity and rotation change, so the
+   control's size is constant across themes. */
+.icons {
+  position: relative;
+  width: 15px;
+  height: 15px;
+}
+
+.icon {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+
+.sun  { opacity: 1; transform: rotate(0deg) scale(1); }
+.moon { opacity: 0; transform: rotate(-70deg) scale(0.7); }
+
+.dark {
+  .sun  { opacity: 0; transform: rotate(70deg) scale(0.7); }
+  .moon { opacity: 1; transform: rotate(0deg) scale(1); }
+}

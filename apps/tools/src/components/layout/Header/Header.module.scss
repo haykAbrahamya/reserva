@@ -1,0 +1,66 @@
+@use '../../../styles/vars' as *;
+@use '../../../styles/app' as a;
+
+.header {
+  /* Fixed, not sticky: it must hold its place whatever scrolls the page,
+     and everything under it (the Edit/Preview bar, the sticky preview)
+     lines up against --header-offset. SiteLayout reserves its space. */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: color-mix(in srgb, var(--bg-0) 92%, transparent);
+  backdrop-filter: blur(12px) saturate(1.4);
+  border-bottom: 1px solid $line-1;
+}
+
+/* Without color-mix the header would be see-through and text would scroll
+   visibly underneath it. */
+@supports not (background: color-mix(in srgb, red 50%, blue)) {
+  .header { background: $bg-0; }
+}
+
+.inner {
+  @include a.page-x;
+  height: $header-h;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 34px;
+  padding: 0 12px 0 14px;
+  border: 1px solid $accent-line;
+  border-radius: 999px;
+  background: $accent-soft;
+  color: $accent-contrast;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.14s ease, border-color 0.14s ease;
+
+  &:hover {
+    background: $accent;
+    border-color: $accent;
+    color: $fg-on-accent;
+  }
+
+  @include a.focus-ring;
+
+  @media (max-width: 640px) { display: none; }
+}

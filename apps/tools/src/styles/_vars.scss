@@ -1,0 +1,21 @@
+// ─────────────────────────────────────────────────────────────
+// This app's SCSS token surface: the design system's aliases plus the tokens
+// styles/theme.css adds. Every module uses this, never `variables` directly,
+// so a typo in an app token fails the build instead of rendering nothing.
+// ─────────────────────────────────────────────────────────────
+
+@forward 'variables';
+
+// Accent-derived decoration.
+$accent-wash: var(--accent-wash);
+$accent-line: var(--accent-line);
+
+// Layout metrics.
+$page-gutter: var(--page-gutter);
+$page-max: var(--page-max);
+$header-h: var(--header-h);
+$header-offset: var(--header-offset);
+
+/// Tool identity hues, by name. A tool picks one in its registry entry and the
+/// card reads both values through `--tool` / `--tool-soft`.
+$tool-hues: (rose, sage, sky, sand, plum);

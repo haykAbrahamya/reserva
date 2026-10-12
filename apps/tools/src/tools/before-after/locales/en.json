@@ -1,0 +1,44 @@
+{
+  "sections": {
+    "photos": "Photos",
+    "layout": "Layout",
+    "labels": "Labels"
+  },
+  "photos": {
+    "add": "Add photo",
+    "addHint": "From your gallery or camera",
+    "replace": "Replace",
+    "remove": "Remove photo",
+    "drag": "Drag the photo to frame it",
+    "zoom": "Zoom",
+    "private": "Your photos stay on your device — nothing is uploaded.",
+    "failed": "This photo can’t be opened here. Try a JPG or PNG."
+  },
+  "layout": {
+    "format": "Format",
+    "post": "Post",
+    "story": "Story",
+    "arrangement": "Arrangement",
+    "side": "Side by side",
+    "stacked": "One above the other",
+    "hint": "Portrait photos look best side by side, landscape ones one above the other."
+  },
+  "fields": {
+    "beforeLabel": "Before label",
+    "afterLabel": "After label",
+    "handle": "Your Instagram",
+    "handlePlaceholder": "@yourname"
+  },
+  "defaults": {
+    "before": "Before",
+    "after": "After"
+  },
+  "needPhotos": "Add both photos to download",
+  "preview": "Your before and after",
+  "formatPost": "Instagram post · {width} × {height} · PNG",
+  "formatStory": "Instagram story · 1080 × 1920 · PNG",
+  "pitch": {
+    "title": "Show your work where clients book",
+    "body": "A Reserva booking page has a gallery for exactly these photos — clients see your results and book the same service in a tap."
+  }
+}

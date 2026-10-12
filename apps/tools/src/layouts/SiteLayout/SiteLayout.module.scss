@@ -1,0 +1,24 @@
+@use '../../styles/vars' as *;
+
+/*
+  Room for the fixed header, so nothing starts underneath it.
+
+  `flex: 1 0 auto`, not just min-height: the design system pins #root to
+  exactly one screen (height: 100%), and a flex child with an explicit
+  min-height may shrink to it — leaving this box one screen tall while the page
+  overflows it. Anything held inside the box (a sticky header was) then let go
+  after one screen of scrolling. The shell must grow with its content.
+*/
+.shell {
+  flex: 1 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding-top: $header-offset;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}

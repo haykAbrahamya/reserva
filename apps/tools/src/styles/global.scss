@@ -1,0 +1,59 @@
+@use './vars' as *;
+
+/* App-wide base. Everything structural comes from @reserva/ui's tokens.css;
+   this covers only what a public page needs on top of it. */
+
+#root {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/*
+  The page ground: a faint repeating grain on body (scrolls with the page —
+  a fixed repeating layer repaints the whole viewport every scroll frame), and
+  one soft accent bloom on a fixed pseudo-element, which composites for free.
+*/
+body {
+  position: relative;
+  background-color: $bg-0;
+  background-image: radial-gradient(var(--page-grain) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(1100px 620px at 10% -12%, $accent-wash, transparent 70%);
+}
+
+/* The theme flip in one frame — useTheme sets this class for two frames while
+   the tokens change, so nothing fades at its own speed. */
+html.theme-switching,
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Anchor targets clear the fixed header. */
+[id] { scroll-margin-top: calc(#{$header-offset} + 16px); }
+
+::selection {
+  background: $accent-soft;
+  color: $fg-0;
+}

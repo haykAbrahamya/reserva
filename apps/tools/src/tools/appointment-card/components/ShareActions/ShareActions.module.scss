@@ -1,0 +1,59 @@
+@use '../../../../styles/vars' as *;
+@use '../../../../styles/app' as a;
+
+.share {
+  width: 100%;
+  max-width: 440px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.primary {
+  justify-content: center;
+  gap: 7px;
+  height: 46px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+}
+
+.button {
+  flex: 1;
+  justify-content: center;
+  gap: 7px;
+  height: 42px;
+}
+
+/* Copy is the odd one out: an icon, not a destination. */
+.iconButton {
+  flex: 0 0 48px;
+  justify-content: center;
+  height: 42px;
+}
+
+.open {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 500;
+  color: $accent-contrast;
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
+
+  @include a.focus-ring;
+}
+
+.missing {
+  margin: 2px 0 0;
+  text-align: center;
+  font-size: 12px;
+  color: $fg-3;
+}

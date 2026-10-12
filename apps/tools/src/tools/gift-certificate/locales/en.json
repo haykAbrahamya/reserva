@@ -1,0 +1,35 @@
+{
+  "headingPlaceholder": "Gift certificate",
+  "sections": {
+    "gift": "The gift",
+    "terms": "Validity and number"
+  },
+  "fields": {
+    "value": "Amount or service",
+    "valuePlaceholder": "20000 or Manicure + pedicure",
+    "valueHint": "A number is shown as an amount in ֏.",
+    "recipient": "For",
+    "recipientPlaceholder": "Recipient's name",
+    "sender": "From",
+    "senderPlaceholder": "Optional",
+    "message": "Message",
+    "messagePlaceholder": "A few warm words (optional)",
+    "validUntil": "Valid until",
+    "validUntilPlaceholder": "No expiry date",
+    "today": "Today",
+    "noExpiry": "No expiry",
+    "code": "Certificate number",
+    "newCode": "New number"
+  },
+  "card": {
+    "for": "For",
+    "from": "From",
+    "validUntil": "Valid until {date}"
+  },
+  "preview": "Your gift certificate",
+  "format": "1600 × 1000 · PNG, or PDF to print at 16 × 10 cm",
+  "pitch": {
+    "title": "Let the gift be booked in one tap",
+    "body": "When the recipient is ready to come in, they pick a time themselves on your Reserva booking page — day or night, no calls needed."
+  }
+}

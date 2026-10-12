@@ -1,0 +1,15 @@
+@use '../../../../styles/vars' as *;
+
+/* The shared pickers carry no label of their own; this matches Input's. */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: $fg-1;
+}

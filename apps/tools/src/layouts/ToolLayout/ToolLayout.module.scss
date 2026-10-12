@@ -1,0 +1,66 @@
+@use '../../styles/vars' as *;
+@use '../../styles/app' as a;
+
+.page {
+  @include a.page-x;
+  padding-block: 20px 64px;
+
+  @media (max-width: 560px) { padding-block: 14px 40px; }
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px 0 9px;
+  margin-left: -9px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: $fg-2;
+  text-decoration: none;
+  transition: color 0.14s ease, background 0.14s ease;
+
+  &:hover {
+    color: $fg-0;
+    background: $bg-2;
+  }
+
+  @include a.focus-ring;
+}
+
+.head {
+  --tool-icon-size: 56px;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  margin: 18px 0 30px;
+
+  @media (max-width: 560px) {
+    --tool-icon-size: 44px;
+
+    gap: 14px;
+    margin: 12px 0 22px;
+  }
+}
+
+.headText {
+  min-width: 0;
+}
+
+.tag {
+  @include a.eyebrow;
+}
+
+.title {
+  @include a.display(26px, 3.6vw, 40px);
+  margin-top: 4px;
+}
+
+.description {
+  @include a.lead;
+  margin-top: 8px;
+  max-width: 62ch;
+}

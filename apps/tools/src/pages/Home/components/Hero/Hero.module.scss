@@ -1,0 +1,83 @@
+@use '../../../../styles/vars' as *;
+@use '../../../../styles/app' as a;
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding-block: clamp(40px, 8vw, 92px) clamp(28px, 4.5vw, 52px);
+}
+
+/* Hairline arcs radiating from above the heading — the same motif as the card
+   artwork, so the page and its tools read as one design. */
+.rings {
+  position: absolute;
+  left: 50%;
+  top: -340px;
+  width: 1100px;
+  height: 1100px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: repeating-radial-gradient(
+    circle at 50% 50%,
+    transparent 0 46px,
+    $accent-line 46px 47px
+  );
+  mask-image: radial-gradient(circle at 50% 50%, #000 18%, transparent 62%);
+  opacity: 0.55;
+}
+
+.inner {
+  @include a.page-x;
+  position: relative;
+  max-width: 820px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border: 1px solid $accent-line;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-1) 70%, transparent);
+  color: $accent-contrast;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.title {
+  @include a.display(32px, 6vw, 58px);
+  margin-top: 18px;
+}
+
+.lead {
+  @include a.lead;
+  margin-top: 16px;
+  max-width: 58ch;
+}
+
+.perks {
+  list-style: none;
+  margin: 22px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 18px;
+}
+
+.perk {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: $fg-1;
+
+  svg { color: $accent; }
+}

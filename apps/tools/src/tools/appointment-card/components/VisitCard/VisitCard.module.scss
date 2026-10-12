@@ -1,0 +1,180 @@
+@use '../../../../styles/vars' as *;
+@use '../../../../styles/app' as a;
+
+.card {
+  @include a.surface;
+  width: 100%;
+  max-width: 440px;
+  margin-inline: auto;
+  padding: 22px;
+  box-shadow: $shadow-2;
+  background:
+    radial-gradient(120% 90% at 100% 0%, $accent-soft, transparent 55%),
+    $bg-1;
+
+  @media (max-width: 400px) { padding: 18px; }
+}
+
+/* ── Date tile + salon ── */
+.head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.tile {
+  width: 62px;
+  height: 66px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: $bg-1;
+  border: 1px solid $accent-line;
+  box-shadow: 0 8px 18px -12px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+
+.month {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $accent-contrast;
+}
+
+.day {
+  font-family: $font-serif;
+  font-size: 28px;
+  line-height: 1;
+  color: $fg-0;
+}
+
+.headText {
+  min-width: 0;
+}
+
+.eyebrow {
+  @include a.eyebrow;
+}
+
+.salon {
+  margin: 2px 0 0;
+  font-family: $font-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: $fg-0;
+  overflow-wrap: anywhere;
+}
+
+.passed {
+  margin: 14px 0 0;
+  padding: 8px 12px;
+  border-radius: $r-2;
+  background: $warn-soft;
+  color: $fg-1;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* ── Details ── */
+.details {
+  margin: 18px 0 0;
+  padding: 0;
+  border-top: 1px solid $line-1;
+}
+
+.detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid $line-1;
+}
+
+.detailLabel {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-top: -4px;
+  border-radius: 10px;
+  background: $accent-soft;
+  color: $accent-contrast;
+}
+
+.detailValue {
+  margin: 0;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: $fg-0;
+  overflow-wrap: anywhere;
+}
+
+.quiet {
+  color: $fg-2;
+  font-weight: 400;
+}
+
+.srOnly {
+  @include a.sr-only;
+}
+
+.note {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border-radius: $r-2;
+  background: $bg-2;
+  font-size: 14px;
+  line-height: 1.55;
+  color: $fg-1;
+  white-space: pre-line;
+}
+
+/* ── Actions ── */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.primary {
+  justify-content: center;
+  gap: 7px;
+  height: 46px;
+}
+
+.secondary {
+  display: flex;
+  gap: 8px;
+}
+
+.link {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 42px;
+  border: 1px solid $line-2;
+  border-radius: $r-1;
+  background: $bg-1;
+  color: $fg-0;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: border-color 0.14s ease, background 0.14s ease;
+
+  &:hover {
+    border-color: $accent-line;
+    background: $accent-soft;
+  }
+
+  @include a.focus-ring;
+}

@@ -1,0 +1,35 @@
+@use '../../../styles/vars' as *;
+
+.tile {
+  --size: var(--tool-icon-size, 56px);
+
+  width: var(--size);
+  height: var(--size);
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  /* A squircle-ish radius that scales with the tile. */
+  border-radius: calc(var(--size) * 0.3);
+  background: $bg-1;
+  color: var(--tool, #{$accent});
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--tool, #{$accent}) 22%, transparent),
+    0 10px 24px -12px color-mix(in srgb, var(--tool, #{$accent}) 55%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  /* A parent can move the tile (the card lifts it on hover) without knowing
+     its markup. */
+  transform: var(--tool-icon-transform, none);
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+
+[data-theme='dark'] .tile {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--tool, #{$accent}) 30%, transparent),
+    0 10px 24px -12px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.glyph {
+  width: 46%;
+  height: 46%;
+}

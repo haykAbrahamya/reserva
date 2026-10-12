@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="hy">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- The main Reserva icon set, same files as reserva.am. SVG for modern
+         browsers; raster PNGs for Google Search (its favicon crawler ignores
+         SVG-only icons and prefers a square ≥48px raster). -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- --bg-0 in the light theme (styles/theme.css). useTheme rewrites it from
+         the live token on a theme change; this is what paints before React. -->
+    <meta name="theme-color" content="#F4F2ED" />
+
+    <title>Անվճար գործիքներ գեղեցկության մասնագետների համար — Reserva</title>
+    <meta
+      name="description"
+      content="Գնացուցակներ, ազատ ժամերի սթորիներ, «առաջ և հետո» կոլաժներ և ավելին՝ անվճար դիզայն-գործիքներ գեղեցկության մասնագետների և սրահների համար։ Առանց գրանցման։"
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+    <!-- canonical and hreflang are set per route at runtime by useSeo(): this
+         one shell serves every route, so a static canonical would be wrong on
+         all of them but one. -->
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Reserva" />
+    <meta property="og:locale" content="hy_AM" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale:alternate" content="ru_RU" />
+    <meta property="og:url" content="https://tools.reserva.am/" />
+    <meta property="og:title" content="Անվճար գործիքներ գեղեցկության մասնագետների համար — Reserva" />
+    <meta
+      property="og:description"
+      content="Գնացուցակներ, սթորիներ և գեղեցիկ նկարներ հաճախորդների համար՝ մեկ րոպեում, անվճար։"
+    />
+    <meta property="og:image" content="https://reserva.am/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://reserva.am/og-image.png" />
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <noscript>
+      <div style="padding: 24px; font-family: system-ui, sans-serif; line-height: 1.6">
+        <h1 style="font-size: 20px">Reserva — գործիքներ</h1>
+        <p>
+          Գործիքներից օգտվելու համար միացրեք JavaScript-ը, կամ այցելեք
+          <a href="https://reserva.am">reserva.am</a>։
+        </p>
+      </div>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

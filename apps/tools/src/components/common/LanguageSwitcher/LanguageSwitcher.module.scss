@@ -1,0 +1,7 @@
+/* Nothing to style but the shrink: the control is the shared Select at compact
+   size, which is already round, already themed and already the same 34px as the
+   icon buttons beside it. */
+
+.wrap {
+  flex-shrink: 0;
+}

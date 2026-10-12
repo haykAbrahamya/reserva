@@ -1,0 +1,94 @@
+@use '../../styles/vars' as *;
+
+.workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+
+  @media (max-width: 900px) { gap: 16px; }
+}
+
+.panes {
+  /*
+    The widest the preview may be while the whole of it — image plus export
+    buttons — still fits the viewport under the sticky header. Read by
+    CanvasPreview and ExportActions, so on a short laptop screen the story
+    shrinks to fit rather than pushing the buttons out of reach.
+  */
+  --canvas-max-w: calc((100dvh - #{$header-offset} - 190px) * var(--preview-aspect));
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
+  grid-template-areas: 'editor preview';
+  gap: 28px;
+  align-items: start;
+}
+
+/* A landscape result (a gift card) needs a wider preview column to be legible. */
+.panes[data-landscape] {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 520px);
+}
+
+.switch { display: none; }
+
+.editor {
+  grid-area: editor;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.preview {
+  grid-area: preview;
+  position: sticky;
+  top: calc(#{$header-offset} + 20px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* Portrait tablets and phones: one pane at a time behind the switch. */
+@media (max-width: 900px) {
+  .panes {
+    --canvas-max-w: calc((100dvh - #{$header-offset} - 230px) * var(--preview-aspect));
+
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'switch'
+      'editor'
+      'preview';
+    gap: 16px;
+  }
+
+  /* Pinned under the header so the other view is one tap away from anywhere
+     in a long form. Its own ground, so the form does not show through it. */
+  .switch {
+    grid-area: switch;
+    display: flex;
+    justify-content: center;
+    position: sticky;
+    top: $header-offset;
+    z-index: 5;
+    margin-inline: calc(-1 * #{$page-gutter});
+    padding: 10px $page-gutter;
+    background: color-mix(in srgb, var(--bg-0) 92%, transparent);
+    backdrop-filter: blur(12px) saturate(1.4);
+  }
+
+  .preview {
+    position: static;
+    width: 100%;
+    max-width: 420px;
+    margin-inline: auto;
+  }
+
+  .panes[data-landscape] { grid-template-columns: minmax(0, 1fr); }
+  .panes[data-landscape] .preview { max-width: 640px; }
+
+  .panes[data-pane='edit'] .preview,
+  .panes[data-pane='preview'] .editor {
+    display: none;
+  }
+}
