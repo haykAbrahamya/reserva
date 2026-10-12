@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { FileDown } from 'lucide-react'
 import { Button, useToast } from '@reserva/ui'
 import { useT } from '@/i18n'
+import type { ExportDetails } from '@/lib/analytics/pulse'
+import { useToolEvents } from '@/lib/analytics/useToolEvents'
 import { canvasToBlob, downloadFile, renderCanvas } from '@/lib/canvas/exportFile'
 import { jpegToPdf } from '@/lib/pdf'
 import s from './PdfButton.module.scss'
@@ -16,6 +18,8 @@ interface Props {
   draw: (ctx: CanvasRenderingContext2D) => void
   prepare?: () => Promise<void>
   fileName: string
+  /** What the result was made with, for analytics. */
+  details?: ExportDetails
 }
 
 /**
@@ -23,9 +27,10 @@ interface Props {
  * a salon that hands out printed gift cards rather than sending an image.
  * Rendered on demand: a PDF is the occasional export, not the common one.
  */
-export function PdfButton({ width, height, widthMm, heightMm, draw, prepare, fileName }: Props) {
+export function PdfButton({ width, height, widthMm, heightMm, draw, prepare, fileName, details }: Props) {
   const t = useT()
   const toast = useToast()
+  const events = useToolEvents()
   const [busy, setBusy] = useState(false)
 
   const run = async () => {
@@ -36,8 +41,10 @@ export function PdfButton({ width, height, widthMm, heightMm, draw, prepare, fil
       const jpeg = new Uint8Array(await jpegBlob.arrayBuffer())
       const pdf = jpegToPdf({ jpeg, pixelWidth: width, pixelHeight: height, widthMm, heightMm })
       downloadFile(new File([pdf], fileName, { type: 'application/pdf' }))
+      events?.exported('pdf', details)
       toast(t('export.pdfSaved'))
     } catch {
+      events?.failed('pdf')
       toast(t('export.failed'))
     } finally {
       setBusy(false)

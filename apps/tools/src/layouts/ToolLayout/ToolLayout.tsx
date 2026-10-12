@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react'
 import { useT } from '@/i18n'
 import { ToolIcon } from '@/components/tools/ToolIcon/ToolIcon'
 import { useSeo } from '@/lib/useSeo'
+import { CurrentToolContext } from '@/tools/currentTool'
 import { toolHueStyle, type Tool } from '@/tools/registry'
 import s from './ToolLayout.module.scss'
 
@@ -53,7 +54,7 @@ export function ToolLayout({ tool, children }: Props) {
         </div>
       </header>
 
-      {children}
+      <CurrentToolContext.Provider value={tool.id}>{children}</CurrentToolContext.Provider>
     </div>
   )
 }

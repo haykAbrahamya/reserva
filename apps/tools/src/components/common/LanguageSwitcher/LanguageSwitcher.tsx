@@ -1,6 +1,7 @@
 import { Globe } from 'lucide-react'
 import { Select } from '@reserva/ui'
 import { LOCALES, LOCALE_META, useI18n, useT, type Locale } from '@/i18n'
+import { track } from '@/lib/analytics/pulse'
 import s from './LanguageSwitcher.module.scss'
 
 /**
@@ -26,7 +27,10 @@ export function LanguageSwitcher() {
     <div className={s.wrap} role="group" aria-label={t('nav.language')}>
       <Select
         value={locale}
-        onChange={(v) => setLocale(v as Locale, true)}
+        onChange={(v) => {
+          if (v !== locale) track('pref_change', { what: 'lang', v })
+          setLocale(v as Locale, true)
+        }}
         options={LOCALES.map((l: Locale) => ({
           value: l,
           label: LOCALE_META[l].native,

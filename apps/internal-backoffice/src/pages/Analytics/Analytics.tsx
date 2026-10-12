@@ -1,8 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { Database, RefreshCw } from 'lucide-react'
-import { Button } from '@/components/ui'
+import { Button, SegmentedFilter } from '@/components/ui'
 import { useResource } from '@/store/useResource'
-import { analyticsService } from '@/services/analytics.service'
+import { analyticsService, type Site } from '@/services/analytics.service'
 import { useAnalyticsParams, type AnalyticsTab } from './useAnalyticsParams'
 import { resolveRange, yerevanToday } from './range'
 import { RangeControl } from './RangeControl'
@@ -15,15 +15,32 @@ import { SourcesTab } from './SourcesTab'
 import { SessionsTab } from './SessionsTab'
 import { SessionView } from './SessionView'
 import { EventsTab } from './EventsTab'
+import { ToolsOverview } from './ToolsOverview'
 import s from './Analytics.module.scss'
 
-const TAB_OPTIONS: { value: AnalyticsTab; label: string }[] = [
+const ALL_TABS: { value: AnalyticsTab; label: string }[] = [
   { value: 'overview', label: 'Overview' },
   { value: 'partners', label: 'Partners' },
   { value: 'sources', label: 'Sources' },
   { value: 'sessions', label: 'Sessions' },
   { value: 'events', label: 'Events' },
 ]
+
+/** The tools have no partners: their overview counts tools instead. */
+const TAB_OPTIONS: Record<Site, { value: AnalyticsTab; label: string }[]> = {
+  web: ALL_TABS,
+  tools: ALL_TABS.filter((t) => t.value !== 'partners'),
+}
+
+const SITE_OPTIONS: { value: Site; label: string }[] = [
+  { value: 'web', label: 'reserva.am' },
+  { value: 'tools', label: 'Tools' },
+]
+
+const SITE_SUB: Record<Site, string> = {
+  web: 'How people find and use reserva.am — the marketplace, sign-up and every partner page.',
+  tools: 'How beauty pros use tools.reserva.am — what they open, make and send, and how many go on to Reserva.',
+}
 
 /** The route element: the page inside a boundary, so a bug here can never
  *  blank the rest of the console. */
@@ -51,12 +68,13 @@ function AnalyticsScreen() {
   const waitingForBounds = p.selection.key === 'all' && !bounds && !boundsError
   const range = waitingForBounds ? null : resolveRange(p.selection, today, bounds ? bounds.first : undefined)
 
-  const common = range && { range, includeStaff: p.includeStaff, refreshKey }
+  const common = range && { range, includeStaff: p.includeStaff, refreshKey, site: p.site }
+  const tabs = TAB_OPTIONS[p.site]
 
   // Section tabs: arrow keys move between them (the tablist pattern), and on a
   // phone, where they scroll sideways, the open one is kept in view.
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
-  const tabIndex = TAB_OPTIONS.findIndex((t) => t.value === p.tab)
+  const tabIndex = tabs.findIndex((t) => t.value === p.tab)
   useEffect(() => {
     tabRefs.current[tabIndex]?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
   }, [tabIndex])
@@ -64,8 +82,8 @@ function AnalyticsScreen() {
     const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0
     if (!step) return
     e.preventDefault()
-    const next = (tabIndex + step + TAB_OPTIONS.length) % TAB_OPTIONS.length
-    p.setTab(TAB_OPTIONS[next].value)
+    const next = (tabIndex + step + tabs.length) % tabs.length
+    p.setTab(tabs[next].value)
     tabRefs.current[next]?.focus()
   }
 
@@ -89,8 +107,15 @@ function AnalyticsScreen() {
       <div className={s.head}>
         <div>
           <h1 className={s.h1}>Analytics</h1>
-          <p className={s.sub}>How people find and use reserva.am — the marketplace, sign-up and every partner page.</p>
+          <p className={s.sub}>{SITE_SUB[p.site]}</p>
         </div>
+        {/* Two sites, never mixed: everything below reads the one picked here. */}
+        <SegmentedFilter<Site>
+          ariaLabel="Site"
+          value={p.site}
+          onChange={p.setSite}
+          options={SITE_OPTIONS}
+        />
       </div>
 
       {/* One bar: the sections as underline tabs (navigation) on the left, what
@@ -98,7 +123,7 @@ function AnalyticsScreen() {
           here, giving a filter the same weight as the page's navigation. */}
       <div className={s.toolbar}>
         <div className={s.navTabs} role="tablist" aria-label="Analytics sections" onKeyDown={onTabKey}>
-          {TAB_OPTIONS.map((t, i) => {
+          {tabs.map((t, i) => {
             const on = t.value === p.tab
             return (
               <button
@@ -153,7 +178,7 @@ function AnalyticsScreen() {
 
       <div className={s.body}>
         {/* Keyed on tab + range + visit: moving on clears a caught error by itself. */}
-        <AnalyticsBoundary resetKey={`${p.tab}|${range?.from}|${range?.to}|${p.sessionId}`}>
+        <AnalyticsBoundary resetKey={`${p.site}|${p.tab}|${range?.from}|${range?.to}|${p.sessionId}`}>
           {p.tab === 'sessions' && p.sessionId ? (
             // A visit is not bound to the toolbar's window: a link to it keeps working.
             <SessionView
@@ -164,6 +189,8 @@ function AnalyticsScreen() {
             />
           ) : !common ? (
             <Skeleton height={420} />
+          ) : p.tab === 'overview' && p.site === 'tools' ? (
+            <ToolsOverview {...common} onOpenTool={p.openToolEvents} />
           ) : p.tab === 'overview' ? (
             <OverviewTab {...common} onOpenPartner={p.openPartnerEvents} onShowPartners={() => p.goToTab('partners')} />
           ) : p.tab === 'partners' ? (
@@ -189,8 +216,10 @@ function AnalyticsScreen() {
               {...common}
               eventName={p.eventName}
               partnerId={p.partnerId}
+              tool={p.tool}
               onEventChange={p.setEventName}
               onPartnerChange={p.setPartnerId}
+              onToolChange={p.setTool}
               onClearFilters={p.clearEventFilters}
               onOpenSession={p.openSession}
             />

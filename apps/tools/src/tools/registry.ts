@@ -76,6 +76,11 @@ export function toolById(id: ToolId): Tool {
   return tool
 }
 
+/** The live tool at this path, if it is one ('/price-list' → the price list). */
+export function toolForPath(path: string): LiveTool | undefined {
+  return TOOLS.filter(isLive).find((t) => t.path === path)
+}
+
 /** The two custom properties every tool-coloured surface reads. */
 export function toolHueStyle(hue: ToolHue): CSSProperties {
   return {

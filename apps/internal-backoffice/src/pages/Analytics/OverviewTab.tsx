@@ -2,10 +2,10 @@ import { useMemo, useState } from 'react'
 import { ArrowRight, Building2, ChartLine, ChevronRight, MessageCircle } from 'lucide-react'
 import { SegmentedFilter, Table, Th, Td, Tr } from '@/components/ui'
 import { useResource } from '@/store/useResource'
-import { analyticsService, type Kpi } from '@/services/analytics.service'
+import { analyticsService, type Site } from '@/services/analytics.service'
 import { TrafficChart, TrafficLegend } from './TrafficChart'
 import { bucketSeries, granularityFor, type ChartPoint, type Granularity } from './buckets'
-import { BarList, DeltaChip, ErrorState, KpiTile, Panel, PanelEmpty, Skeleton } from './parts'
+import { BarList, ErrorState, Funnel, KpiTile, Panel, PanelEmpty, Skeleton, type FunnelStep } from './parts'
 import { CONTACT_CHANNEL_LABELS, labelFrom } from './catalog'
 import { ContactIcon } from './icons'
 import { fmtInt, fmtPct } from './format'
@@ -17,14 +17,8 @@ export interface TabProps {
   includeStaff: boolean
   /** Bumped by the toolbar's refresh button. */
   refreshKey: number
-}
-
-interface FunnelStep {
-  label: string
-  kpi: Kpi
-  /** The previous step, as the denominator reads: "40.2% of starts". */
-  of?: string
-  note?: string
+  /** The site the toolbar is on: every tab reads that one only. */
+  site: Site
 }
 
 const CHART_COPY: Record<Granularity, { title: string; sub: string }> = {
@@ -222,50 +216,6 @@ export function OverviewTab({ range, includeStaff, refreshKey, onOpenPartner, on
           )}
         </Panel>
       </div>
-    </div>
-  )
-}
-
-/**
- * Steps side by side with the drop between them. Each bar is the step against
- * the widest one, so the funnel's shape reads before any number does.
- */
-function Funnel({ steps, baseline, pair = false }: { steps: FunnelStep[]; baseline: string | null; pair?: boolean }) {
-  const max = Math.max(1, ...steps.map((st) => st.kpi.value))
-  return (
-    <div className={pair ? `${s.funnel} ${s.funnelPair}` : s.funnel}>
-      {steps.map((st, i) => {
-        const prev = i > 0 ? steps[i - 1].kpi.value : 0
-        const conv = prev > 0 ? st.kpi.value / prev : null
-        return (
-          <div key={st.label} className={s.step}>
-            {i > 0 && <span className={s.stepArrow} aria-hidden="true"><ChevronRight size={11} /></span>}
-            <div className={s.kpiLabel}>
-              {st.label}
-              {st.note && <span className={s.kpiNote}>{st.note}</span>}
-            </div>
-            <div className={s.kpiValue}>{fmtInt(st.kpi.value)}</div>
-            {baseline && (
-              <div className={s.kpiFoot}>
-                <DeltaChip kpi={st.kpi} baseline={baseline} />
-                <span className={s.kpiPrev}>vs {fmtInt(st.kpi.prev)}</span>
-              </div>
-            )}
-            <div
-              className={[s.stepBar, st.kpi.value === 0 ? s.stepBarEmpty : ''].filter(Boolean).join(' ')}
-              style={{ width: `${(st.kpi.value / max) * 100}%` }}
-            />
-            {/* Steps are counted independently over the same days, so a step
-                can pass 100% — e.g. activations of sign-ups from before the range. */}
-            <div
-              className={s.stepConv}
-              title={i > 0 ? 'Share of the previous step over the same days. Steps are counted separately, so this can pass 100%.' : undefined}
-            >
-              {i === 0 ? ' ' : <><b>{fmtPct(conv)}</b> of {st.of}</>}
-            </div>
-          </div>
-        )
-      })}
     </div>
   )
 }

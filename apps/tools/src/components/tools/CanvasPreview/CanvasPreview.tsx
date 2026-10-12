@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Maximize2 } from 'lucide-react'
 import { Lightbox } from '@reserva/ui'
 import { useT } from '@/i18n'
+import { useToolEvents } from '@/lib/analytics/useToolEvents'
 import s from './CanvasPreview.module.scss'
 
 interface Props {
@@ -25,6 +26,7 @@ interface Props {
  */
 export function CanvasPreview({ width, height, draw, prepare, label }: Props) {
   const t = useT()
+  const events = useToolEvents()
   const ref = useRef<HTMLCanvasElement>(null)
   const [zoomUrl, setZoomUrl] = useState<string | null>(null)
 
@@ -64,6 +66,7 @@ export function CanvasPreview({ width, height, draw, prepare, label }: Props) {
   }, [zoomUrl])
 
   const openZoom = () => {
+    events?.action('zoom')
     ref.current?.toBlob((blob) => {
       if (blob) setZoomUrl(URL.createObjectURL(blob))
     }, 'image/png')

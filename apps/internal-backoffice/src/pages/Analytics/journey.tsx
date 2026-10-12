@@ -1,10 +1,16 @@
 import {
-  BadgeCheck, CalendarCheck, CalendarDays, CalendarPlus, ChevronsRight, Circle, FileText, GraduationCap, Home,
-  Images, LayoutGrid, ListChecks, LogOut, MapPin, MessageSquareHeart, MessageSquarePlus, MessageSquareWarning, PenLine,
-  Search, Send, SlidersHorizontal, Star, Store, Tag, TriangleAlert, UserPlus, UserRound,
+  ArrowUpRight, BadgeCheck, CalendarCheck, CalendarClock, CalendarDays, CalendarPlus, ChevronsRight, Circle, Columns2,
+  Copy, Crop, Download, Eraser, ExternalLink, FileDown, FileText, Gift, Globe, GraduationCap, Hash, Home, ImageMinus,
+  ImagePlus, Images, LayoutGrid, ListChecks, LogOut, MapPin, Maximize2, MessageCircle, MessageSquareHeart,
+  MessageSquarePlus, MessageSquareWarning, Minus, MousePointerClick, Navigation, Palette, PenLine, Phone, Plus,
+  ReceiptText, RectangleVertical, Search, Send, Share2, SlidersHorizontal, Smartphone, Sparkles, Star, Store, SunMoon,
+  Tag, TriangleAlert, UserPlus, UserRound, Wrench, type LucideIcon,
 } from 'lucide-react'
 import type { SessionEvent, SessionRow } from '@/services/analytics.service'
-import { SIGNUP_STEP_LABELS, eventDef, humanize, type EventTone } from './catalog'
+import {
+  CTA_FROM_LABELS, SIGNUP_STEP_LABELS, TOOL_ERROR_LABELS, TOOL_LABELS, UI_LANGUAGE_LABELS, eventDef, humanize, labelFrom,
+  toolValueLabel, type EventTone,
+} from './catalog'
 import { ContactIcon } from './icons'
 import { isUuid } from './format'
 
@@ -16,6 +22,47 @@ import { isUuid } from './format'
 
 const str = (v: unknown): string | null => (typeof v === 'string' && v.trim() ? v.trim() : null)
 
+/** Each tool's own glyph — the one its card wears on tools.reserva.am. */
+const TOOL_ICON: Record<string, LucideIcon> = {
+  priceList: ReceiptText,
+  freeSlots: CalendarClock,
+  beforeAfter: Columns2,
+  appointmentCard: CalendarCheck,
+  giftCertificate: Gift,
+}
+
+const TOOL_ACT_ICON: Record<string, LucideIcon> = {
+  theme: Palette,
+  add: Plus,
+  remove: Minus,
+  clear: Eraser,
+  day: CalendarDays,
+  photo: ImagePlus,
+  photo_remove: ImageMinus,
+  adjust: Crop,
+  format: RectangleVertical,
+  layout: Columns2,
+  code: Hash,
+  open: ExternalLink,
+  preview: Smartphone,
+  zoom: Maximize2,
+}
+
+const EXPORT_ICON: Record<string, LucideIcon> = {
+  share: Share2,
+  download: Download,
+  pdf: FileDown,
+  viber: MessageCircle,
+  copy: Copy,
+}
+
+const VISIT_ICON: Record<string, LucideIcon> = {
+  calendar: CalendarPlus,
+  directions: Navigation,
+  call: Phone,
+  made: Sparkles,
+}
+
 /** One glyph per event (and per page type / contact channel when props are
  *  known), shared by the journey preview chips and the timeline. */
 export function EventIcon({ name, props, size = 14 }: { name: string; props?: Record<string, unknown>; size?: number }) {
@@ -26,6 +73,12 @@ export function EventIcon({ name, props, size = 14 }: { name: string; props?: Re
         case 'marketplace': return <LayoutGrid size={size} />
         case 'signup': return <UserPlus size={size} />
         case 'home': return <Home size={size} />
+        case 'tools': return <Wrench size={size} />
+        case 'visit': return <CalendarCheck size={size} />
+        case 'tool': {
+          const Icon = TOOL_ICON[str(props?.tool) ?? ''] ?? Wrench
+          return <Icon size={size} />
+        }
         default: return <FileText size={size} />
       }
     case 'book_click': return <CalendarPlus size={size} />
@@ -55,6 +108,24 @@ export function EventIcon({ name, props, size = 14 }: { name: string; props?: Re
     case 'signup_start': return <PenLine size={size} />
     case 'salons_filter': return <SlidersHorizontal size={size} />
     case 'salon_click': return <Store size={size} />
+    case 'tool_select': return <MousePointerClick size={size} />
+    case 'tool_edit': return <PenLine size={size} />
+    case 'tool_action': {
+      const Icon = TOOL_ACT_ICON[str(props?.act) ?? ''] ?? MousePointerClick
+      return <Icon size={size} />
+    }
+    case 'tool_export': {
+      if (str(props?.via) === 'whatsapp') return <ContactIcon channel="whatsapp" size={size} />
+      const Icon = EXPORT_ICON[str(props?.via) ?? ''] ?? Download
+      return <Icon size={size} />
+    }
+    case 'tool_error': return <TriangleAlert size={size} />
+    case 'cta_click': return <ArrowUpRight size={size} />
+    case 'visit_action': {
+      const Icon = VISIT_ICON[str(props?.act) ?? ''] ?? CalendarCheck
+      return <Icon size={size} />
+    }
+    case 'pref_change': return str(props?.what) === 'lang' ? <Globe size={size} /> : <SunMoon size={size} />
     default: return name.endsWith('_step') ? <ListChecks size={size} /> : <Circle size={size - 4} />
   }
 }
@@ -129,6 +200,9 @@ export function describeEvent(
   const from = str(p.from)
   const fromText = from ? ` (${FROM[from] ?? from})` : ''
   const withAt = `${sp ? ` with ${sp}` : ''}${loc ? ` at ${loc}` : ''}`
+  // tools.reserva.am: the tool by name — as a sentence's subject, and inside one.
+  const toolName = labelFrom(TOOL_LABELS, str(p.tool))
+  const tool = toolName.toLowerCase()
   const line = (text: string, extra: Partial<StoryLine> = {}): StoryLine => ({ text, tone, ...extra })
 
   switch (ev.name) {
@@ -138,6 +212,9 @@ export function describeEvent(
         case 'home': return line('Opened the home page')
         case 'marketplace': return line('Opened the salons list')
         case 'signup': return line('Opened the sign-up page')
+        case 'tools': return line('Opened the tools home')
+        case 'tool': return line(`Opened the ${tool} tool`)
+        case 'visit': return line('A client opened an appointment card')
         default: return line(`Opened ${ev.path || 'a page'}`)
       }
     case 'book_click':
@@ -224,6 +301,65 @@ export function describeEvent(
       const pos = typeof p.pos === 'number' ? ` (#${p.pos + 1} in the list)` : ''
       return line(`Opened ${name} from the salons list${pos}`)
     }
+    case 'tool_select': {
+      const pos = typeof p.pos === 'number' ? ` (card ${p.pos + 1})` : ''
+      return line(`Picked the ${tool} tool on the home grid${pos}`)
+    }
+    case 'tool_edit':
+      return line(`Started filling in the ${tool}`)
+    case 'tool_action': {
+      const v = str(p.v)
+      const act = str(p.act)
+      const choice = v ? toolValueLabel(v) : null
+      // 'the before photo', or just 'the photo'.
+      const side = choice ? `${choice.toLowerCase()} ` : ''
+      switch (act) {
+        case 'theme': return line(`${toolName}: picked ${choice ? `the ${choice}` : 'a'} style`)
+        case 'add': return line(`${toolName}: added a row`)
+        case 'remove': return line(`${toolName}: removed a row`)
+        case 'clear': return line(`${toolName}: cleared the list`)
+        case 'day': return line(`${toolName}: picked ${choice?.toLowerCase() ?? 'a day'}`)
+        case 'photo': return line(`${toolName}: added the ${side}photo`)
+        case 'photo_remove': return line(`${toolName}: removed the ${side}photo`)
+        case 'adjust': return line(`${toolName}: framed the ${side}photo`)
+        case 'format': return line(`${toolName}: switched to ${choice ?? 'another format'}`)
+        case 'layout': return line(`${toolName}: switched to ${choice?.toLowerCase() ?? 'another layout'}`)
+        case 'code': return line(`${toolName}: took a new card number`)
+        case 'open': return line(`${toolName}: opened the page the client will see`)
+        case 'preview': return line(`${toolName}: looked at the preview on a phone`)
+        case 'zoom': return line(`${toolName}: opened the result full size`)
+        default: return line(`${toolName}: ${humanize(act ?? 'an action').toLowerCase()}${choice ? ` (${choice})` : ''}`)
+      }
+    }
+    case 'tool_export': {
+      const how: Record<string, string> = {
+        share: `Shared the ${tool} from the share sheet`,
+        download: `Downloaded the ${tool}`,
+        pdf: `Downloaded the ${tool} as a PDF`,
+        whatsapp: `Sent the ${tool} on WhatsApp`,
+        viber: `Sent the ${tool} on Viber`,
+        copy: `Copied the ${tool} link`,
+      }
+      const style = str(p.theme) ? ` · ${toolValueLabel(str(p.theme))} style` : ''
+      const items = typeof p.n === 'number' ? ` · ${p.n} ${p.n === 1 ? 'item' : 'items'}` : ''
+      return line(`${how[str(p.via) ?? ''] ?? `Took the ${tool} away`} ✓${style}${items}`)
+    }
+    case 'tool_error':
+      return line(`${str(p.tool) ? `${toolName}: ` : ''}${labelFrom(TOOL_ERROR_LABELS, str(p.code)).toLowerCase()}`)
+    case 'cta_click':
+      return line(`Clicked through to reserva.am — ${labelFrom(CTA_FROM_LABELS, str(p.from)).toLowerCase()}`)
+    case 'visit_action':
+      switch (str(p.act)) {
+        case 'calendar': return line('The client added it to their calendar')
+        case 'directions': return line('The client opened the directions')
+        case 'call': return line('The client called the salon')
+        case 'made': return line('The client opened Reserva Tools from the card')
+        default: return line('The client used the card')
+      }
+    case 'pref_change':
+      return str(p.what) === 'lang'
+        ? line(`Switched the language to ${labelFrom(UI_LANGUAGE_LABELS, str(p.v))}`)
+        : line(`Switched to the ${str(p.v) ?? 'other'} theme`)
     default:
       return line(humanize(ev.name))
   }
@@ -238,9 +374,13 @@ export function sessionOutcome(row: SessionRow): { label: string; tone: EventTon
     return { label: 'Contacted', tone: 'accent', title: 'Tapped call, WhatsApp, Instagram, directions or another contact link' }
   }
   if (row.outcome.bookClicked) return { label: 'Clicked Book', tone: 'info', title: 'Started to book, did not finish' }
-  return {
-    label: 'Left',
-    tone: 'neutral',
-    title: row.eventCount <= 1 ? 'Left after one page' : 'Left without booking, contacting, reviewing or signing up',
+  // tools.reserva.am: going on to reserva.am is the step that matters most, then a result taken away.
+  if (row.outcome.ctaClicked) return { label: 'To Reserva', tone: 'accent', title: 'Clicked through to reserva.am' }
+  if (row.outcome.exported) {
+    return { label: 'Exported', tone: 'success', title: 'Took a result away: shared, downloaded, printed or sent' }
   }
+  const what = row.site === 'tools'
+    ? 'Left without taking a result away'
+    : 'Left without booking, contacting, reviewing or signing up'
+  return { label: 'Left', tone: 'neutral', title: row.eventCount <= 1 ? 'Left after one page' : what }
 }

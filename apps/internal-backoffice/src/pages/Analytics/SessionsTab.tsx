@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { Footprints, X } from 'lucide-react'
 import { Button, Empty, Pagination, Select, Table, Th, Td, Tr, type SelectOption } from '@/components/ui'
 import { useResource } from '@/store/useResource'
-import { analyticsService, type SessionOutcome, type SessionRow } from '@/services/analytics.service'
+import { analyticsService, type SessionOutcome, type SessionRow, type Site } from '@/services/analytics.service'
 import { ALL, ErrorState, Skeleton, StaffTag, usePartnerOptions } from './parts'
 import { TRAFFIC_CHANNEL_LABELS, eventDef, labelFrom } from './catalog'
 import { ChannelIcon, DeviceIcon } from './icons'
@@ -23,18 +23,26 @@ const CHANNEL_OPTIONS: SelectOption[] = [
   ...Object.entries(TRAFFIC_CHANNEL_LABELS).map(([value, label]) => ({ value, label })),
 ]
 
-const OUTCOME_OPTIONS: SelectOption[] = [
-  { value: ALL, label: 'Any outcome' },
-  { value: 'booked', label: 'Booked' },
-  { value: 'contacted', label: 'Contacted', sub: 'Call, WhatsApp, Instagram, directions…' },
-  { value: 'signup', label: 'Signed up' },
-  { value: 'reviewed', label: 'Left a review' },
-  { value: 'bookclick', label: 'Clicked Book', sub: 'Clicked Book or opened the booking' },
-  { value: 'bounced', label: 'Bounced', sub: 'One page view and nothing else' },
-]
+const OUTCOME_OPTIONS: Record<Site, SelectOption[]> = {
+  web: [
+    { value: ALL, label: 'Any outcome' },
+    { value: 'booked', label: 'Booked' },
+    { value: 'contacted', label: 'Contacted', sub: 'Call, WhatsApp, Instagram, directions…' },
+    { value: 'signup', label: 'Signed up' },
+    { value: 'reviewed', label: 'Left a review' },
+    { value: 'bookclick', label: 'Clicked Book', sub: 'Clicked Book or opened the booking' },
+    { value: 'bounced', label: 'Bounced', sub: 'One page view and nothing else' },
+  ],
+  tools: [
+    { value: ALL, label: 'Any outcome' },
+    { value: 'exported', label: 'Exported', sub: 'Shared, downloaded, printed or sent a result' },
+    { value: 'cta', label: 'Went to Reserva', sub: 'Clicked through to reserva.am' },
+    { value: 'bounced', label: 'Bounced', sub: 'One page view and nothing else' },
+  ],
+}
 
 export function SessionsTab({
-  range, includeStaff, refreshKey, page, partnerId, channel, outcome,
+  range, includeStaff, refreshKey, site, page, partnerId, channel, outcome,
   onPageChange, onPartnerChange, onChannelChange, onOutcomeChange, onClearFilters, onOpen,
 }: TabProps & {
   page: number
@@ -53,13 +61,14 @@ export function SessionsTab({
       from: range.from,
       to: range.to,
       includeInternal: includeStaff,
+      site,
       page,
       pageSize: PAGE_SIZE,
       partnerId: partnerId || undefined,
       channel: channel || undefined,
       outcome: outcome || undefined,
     }),
-    [range.from, range.to, includeStaff, page, partnerId, channel, outcome, refreshKey],
+    [range.from, range.to, includeStaff, site, page, partnerId, channel, outcome, refreshKey],
   )
 
   // A page that no longer exists (fewer visits since) falls back to the first.
@@ -78,16 +87,18 @@ export function SessionsTab({
 
   const filters = (
     <div className={s.filters}>
-      <Select
-        className={s.filterSelect}
-        size="sm"
-        value={partnerId || ALL}
-        onChange={(v) => onPartnerChange(v === ALL ? '' : v)}
-        options={partnerOptions}
-        searchable
-        searchPlaceholder="Search partner…"
-        panelMinWidth={260}
-      />
+      {site === 'web' && (
+        <Select
+          className={s.filterSelect}
+          size="sm"
+          value={partnerId || ALL}
+          onChange={(v) => onPartnerChange(v === ALL ? '' : v)}
+          options={partnerOptions}
+          searchable
+          searchPlaceholder="Search partner…"
+          panelMinWidth={260}
+        />
+      )}
       <Select
         className={s.filterSelectSm}
         size="sm"
@@ -102,7 +113,7 @@ export function SessionsTab({
         size="sm"
         value={outcome || ALL}
         onChange={(v) => onOutcomeChange(v === ALL ? '' : (v as SessionOutcome))}
-        options={OUTCOME_OPTIONS}
+        options={OUTCOME_OPTIONS[site]}
         searchable={false}
         panelMinWidth={240}
       />
@@ -169,7 +180,7 @@ export function SessionsTab({
                 <Th>Visitor</Th>
                 <Th>Source</Th>
                 <Th>Device · Country</Th>
-                <Th>Partner</Th>
+                {site === 'web' && <Th>Partner</Th>}
                 <Th>Journey</Th>
                 <Th>Outcome</Th>
                 <Th className={s.num}>Duration</Th>
@@ -198,7 +209,7 @@ export function SessionsTab({
                       {row.country && <span className={s.cellMuted}>· {row.country}</span>}
                     </span>
                   </Td>
-                  <Td><PartnersCell partners={row.partners} /></Td>
+                  {site === 'web' && <Td><PartnersCell partners={row.partners} /></Td>}
                   <Td><JourneyPreview row={row} /></Td>
                   <Td><OutcomeBadge row={row} /></Td>
                   <Td className={s.num}>

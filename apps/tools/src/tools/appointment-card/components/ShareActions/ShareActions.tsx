@@ -2,10 +2,13 @@ import { useId, useMemo } from 'react'
 import { Copy, ExternalLink, MessageCircle, Send } from 'lucide-react'
 import { Button, WhatsappIcon, useToast } from '@reserva/ui'
 import { useT } from '@/i18n'
+import { toolEvents } from '@/lib/analytics/pulse'
 import { copyText } from '@/lib/clipboard'
 import { formatLongDay, useCalendarWords } from '@/lib/dates'
 import { viberShareUrl, visitUrl, whatsAppShareUrl, type Visit } from '../../visitLink'
 import s from './ShareActions.module.scss'
+
+const events = toolEvents('appointmentCard')
 
 interface Props {
   visit: Visit
@@ -34,15 +37,24 @@ export function ShareActions({ visit, complete }: Props) {
   const text = `${message}\n${url}`
 
   const copy = async () => {
-    toast(t((await copyText(url)) ? 'appointmentCard.share.copied' : 'export.failed'))
+    const copied = await copyText(url)
+    if (copied) events.exported('copy')
+    else events.failed('copy')
+    toast(t(copied ? 'appointmentCard.share.copied' : 'export.failed'))
   }
 
   const share = async () => {
     try {
       await navigator.share({ text: message, url })
+      events.exported('share')
     } catch {
       // Dismissed — nothing to do.
     }
+  }
+
+  const sendWith = (via: 'whatsapp' | 'viber', open: () => void) => () => {
+    events.exported(via)
+    open()
   }
 
   return (
@@ -60,12 +72,16 @@ export function ShareActions({ visit, complete }: Props) {
         <Button
           className={s.button}
           disabled={!complete}
-          onClick={() => window.open(whatsAppShareUrl(text), '_blank', 'noopener,noreferrer')}
+          onClick={sendWith('whatsapp', () => window.open(whatsAppShareUrl(text), '_blank', 'noopener,noreferrer'))}
         >
           <WhatsappIcon size={16} />
           WhatsApp
         </Button>
-        <Button className={s.button} disabled={!complete} onClick={() => (window.location.href = viberShareUrl(text))}>
+        <Button
+          className={s.button}
+          disabled={!complete}
+          onClick={sendWith('viber', () => (window.location.href = viberShareUrl(text)))}
+        >
           <MessageCircle size={16} />
           Viber
         </Button>
@@ -83,7 +99,13 @@ export function ShareActions({ visit, complete }: Props) {
       </div>
 
       {complete ? (
-        <a className={s.open} href={url} target="_blank" rel="noopener noreferrer">
+        <a
+          className={s.open}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => events.action('open')}
+        >
           <ExternalLink size={13} />
           {t('appointmentCard.share.open')}
         </a>

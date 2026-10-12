@@ -1,6 +1,7 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import type { Locale } from '@/i18n'
-import { today } from '@/lib/dates'
+import { toolEvents } from '@/lib/analytics/pulse'
+import { addDays, today } from '@/lib/dates'
 import type { BrandField } from '@/lib/story/brand'
 import type { StoryThemeId } from '@/lib/story/themes'
 import { useStoredDraft } from '@/lib/useStoredDraft'
@@ -9,14 +10,26 @@ import { sampleDraft } from './samples'
 import { sortTimes } from './time'
 
 const STORAGE_KEY = 'reserva-tools:free-slots:v1'
+const events = toolEvents('freeSlots')
+
+/** Which day the story is for, as analytics keeps it: never the date itself. */
+function dayKind(date: string): string {
+  const now = today()
+  return date === now ? 'today' : date === addDays(now, 1) ? 'tomorrow' : 'later'
+}
 
 /** The free-slots draft and every edit to it, remembered in this browser. */
 export function useFreeSlotsDraft(locale: Locale) {
-  const [draft, setDraft] = useStoredDraft(
+  const [draft, setStored] = useStoredDraft(
     STORAGE_KEY,
     (value) => parseDraft(value, today()),
     () => sampleDraft(locale, today()),
   )
+  // Every change goes through here, so the first one in a page view is counted.
+  const setDraft: typeof setStored = useCallback((next) => {
+    events.edited()
+    setStored(next)
+  }, [setStored])
 
   const actions = useMemo(
     () => ({
@@ -26,10 +39,12 @@ export function useFreeSlotsDraft(locale: Locale) {
 
       setTheme(themeId: StoryThemeId) {
         setDraft((d) => ({ ...d, themeId }))
+        events.action('theme', themeId)
       },
 
       setDate(date: string) {
         setDraft((d) => ({ ...d, date }))
+        events.action('day', dayKind(date))
       },
 
       setNote(note: string) {
@@ -47,6 +62,7 @@ export function useFreeSlotsDraft(locale: Locale) {
 
       clearSlots() {
         setDraft((d) => ({ ...d, slots: [] }))
+        events.action('clear')
       },
     }),
     [setDraft],

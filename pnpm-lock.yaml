@@ -298,6 +298,10 @@ importers:
         version: 5.8.3
 
   packages/shared:
+    dependencies:
+      '@noble/ciphers':
+        specifier: ^2.4.0
+        version: 2.4.0
     devDependencies:
       typescript:
         specifier: ~5.8.3

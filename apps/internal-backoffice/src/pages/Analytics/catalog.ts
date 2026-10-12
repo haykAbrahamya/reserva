@@ -7,7 +7,9 @@
 // event shipped by the public site shows up before this file catches up.
 // ─────────────────────────────────────────────────────────────
 
-export type EventGroup = 'site' | 'partner' | 'reviews' | 'booking' | 'signup' | 'marketplace'
+import type { Site } from '@/services/analytics.service'
+
+export type EventGroup = 'site' | 'partner' | 'reviews' | 'booking' | 'signup' | 'marketplace' | 'tools' | 'visit'
 
 /** Badge colour. Errors and successes use the status tones because they ARE a
  *  status; the rest only separate the flows from one another. */
@@ -27,6 +29,14 @@ export const EVENT_GROUP_LABEL: Record<EventGroup, string> = {
   booking: 'Booking flow',
   signup: 'Sign-up',
   marketplace: 'Marketplace',
+  tools: 'Tools',
+  visit: 'Appointment card · client',
+}
+
+/** The event groups each site sends — what its Events filter offers. */
+export const SITE_EVENT_GROUPS: Record<Site, readonly EventGroup[]> = {
+  web: ['site', 'partner', 'reviews', 'booking', 'signup', 'marketplace'],
+  tools: ['site', 'tools', 'visit'],
 }
 
 /** In catalog order — also the order of the event filter. */
@@ -64,6 +74,16 @@ export const EVENT_CATALOG: EventDef[] = [
   { name: 'salons_search', label: 'Salon search', group: 'marketplace', tone: 'neutral' },
   { name: 'salons_filter', label: 'Salon filter', group: 'marketplace', tone: 'neutral' },
   { name: 'salon_click', label: 'Salon click', group: 'marketplace', tone: 'neutral' },
+
+  { name: 'tool_select', label: 'Tool picked', group: 'tools', tone: 'neutral' },
+  { name: 'tool_edit', label: 'Tool edited', group: 'tools', tone: 'info' },
+  { name: 'tool_action', label: 'Tool action', group: 'tools', tone: 'neutral' },
+  { name: 'tool_export', label: 'Result exported', group: 'tools', tone: 'success' },
+  { name: 'tool_error', label: 'Tool error', group: 'tools', tone: 'danger' },
+  { name: 'cta_click', label: 'Clicked to Reserva', group: 'tools', tone: 'accent' },
+  { name: 'pref_change', label: 'Preference changed', group: 'tools', tone: 'neutral' },
+
+  { name: 'visit_action', label: 'Card used by client', group: 'visit', tone: 'accent' },
 ]
 
 const BY_NAME = new Map(EVENT_CATALOG.map((e) => [e.name, e]))
@@ -98,6 +118,15 @@ export const PROP_LABELS: Record<string, string> = {
   slug: 'Salon',
   pos: 'Position in list',
   stars: 'Stars',
+  tool: 'Tool',
+  act: 'Action',
+  v: 'Choice',
+  via: 'Sent as',
+  theme: 'Style',
+  fmt: 'Format',
+  n: 'Items',
+  lng: 'Language',
+  what: 'Preference',
 }
 
 export const PAGE_TYPE_LABELS: Record<string, string> = {
@@ -106,6 +135,9 @@ export const PAGE_TYPE_LABELS: Record<string, string> = {
   partner: 'Partner page',
   signup: 'Sign-up',
   other: 'Other page',
+  tools: 'Tools home',
+  tool: 'Tool',
+  visit: 'Appointment card (client)',
 }
 
 export const CONTACT_CHANNEL_LABELS: Record<string, string> = {
@@ -173,6 +205,102 @@ const BOOKING_STEP_LABELS: Record<string, string> = {
   confirm: 'Confirm',
 }
 
+// ── tools.reserva.am ──
+
+/** The tools, by registry id. */
+export const TOOL_LABELS: Record<string, string> = {
+  priceList: 'Price list',
+  freeSlots: 'Free slots',
+  beforeAfter: 'Before & after',
+  appointmentCard: 'Appointment card',
+  giftCertificate: 'Gift certificate',
+}
+
+/** How a result left (tool_export `via`). */
+export const EXPORT_VIA_LABELS: Record<string, string> = {
+  share: 'Share sheet',
+  download: 'Download',
+  pdf: 'PDF',
+  whatsapp: 'WhatsApp',
+  viber: 'Viber',
+  copy: 'Copied link',
+}
+
+/** Main actions inside a tool (tool_action `act`). */
+export const TOOL_ACT_LABELS: Record<string, string> = {
+  theme: 'Style picked',
+  add: 'Row added',
+  remove: 'Row removed',
+  clear: 'List cleared',
+  day: 'Day picked',
+  photo: 'Photo added',
+  photo_remove: 'Photo removed',
+  adjust: 'Photo framed',
+  format: 'Format picked',
+  layout: 'Layout picked',
+  code: 'New card number',
+  open: 'Opened the client’s card',
+  preview: 'Preview tab (phone)',
+  zoom: 'Opened full size',
+}
+
+/** The values an action, a format or a style can take. */
+export const TOOL_VALUE_LABELS: Record<string, string> = {
+  mocha: 'Mocha', cream: 'Cream', noir: 'Noir', blush: 'Blush', sage: 'Sage', lavender: 'Lavender',
+  today: 'Today', tomorrow: 'Tomorrow', later: 'A later day',
+  before: 'Before', after: 'After',
+  post: 'Post', story: 'Story',
+  side: 'Side by side', stacked: 'Stacked',
+}
+
+/** 'post-side' → 'Post · Side by side'. */
+export function toolValueLabel(v: string | null | undefined): string {
+  if (!v) return '—'
+  return v.split('-').map((part) => labelFrom(TOOL_VALUE_LABELS, part)).join(' · ')
+}
+
+/** What a client did with an appointment card (visit_action `act`). */
+export const VISIT_ACT_LABELS: Record<string, string> = {
+  calendar: 'Added to calendar',
+  directions: 'Opened directions',
+  call: 'Called the salon',
+  made: 'Opened Reserva Tools',
+}
+
+/** Where a link into reserva.am sat (cta_click `from`). */
+export const CTA_FROM_LABELS: Record<string, string> = {
+  pitch: 'Booking-page pitch',
+  header: 'Header',
+  footer: 'Footer',
+}
+
+/** The spot that sent a visitor to reserva.am (utm_content of the tools’ links). */
+export const TOOLS_SPOT_LABELS: Record<string, string> = {
+  header: 'Header',
+  footer: 'Footer',
+  'price-list': 'Price list · pitch',
+  'free-slots': 'Free slots · pitch',
+  'before-after': 'Before & after · pitch',
+  'appointment-card': 'Appointment card · pitch',
+  'gift-certificate': 'Gift certificate · pitch',
+  other: 'Other',
+}
+
+export const TOOL_ERROR_LABELS: Record<string, string> = {
+  share: 'Share failed',
+  download: 'Download failed',
+  pdf: 'PDF failed',
+  copy: 'Copy failed',
+  photo: 'Photo would not open',
+  bad_link: 'Broken card link',
+}
+
+export const UI_LANGUAGE_LABELS: Record<string, string> = {
+  hy: 'Armenian',
+  ru: 'Russian',
+  en: 'English',
+}
+
 export function labelFrom(map: Record<string, string>, key: string | null | undefined): string {
   if (!key) return '—'
   return map[key] ?? humanize(key)
@@ -187,8 +315,11 @@ const str = (v: unknown): string | null => (typeof v === 'string' && v.trim() ? 
  */
 export function eventSummary(name: string, props: Record<string, unknown>): string | null {
   switch (name) {
-    case 'page_view':
-      return str(props.pt) ? labelFrom(PAGE_TYPE_LABELS, str(props.pt)) : null
+    case 'page_view': {
+      if (!str(props.pt)) return null
+      const page = labelFrom(PAGE_TYPE_LABELS, str(props.pt))
+      return str(props.tool) ? `${page} · ${labelFrom(TOOL_LABELS, str(props.tool))}` : page
+    }
     case 'contact_click':
       return str(props.ch) ? labelFrom(CONTACT_CHANNEL_LABELS, str(props.ch)) : null
     case 'book_click':
@@ -220,6 +351,29 @@ export function eventSummary(name: string, props: Record<string, unknown>): stri
       return typeof props.stars === 'number' ? `${props.stars} ★` : null
     case 'review_error':
       return str(props.code) ? labelFrom(REVIEW_ERROR_LABELS, str(props.code)) : null
+    case 'tool_select':
+      return [labelFrom(TOOL_LABELS, str(props.tool)), typeof props.pos === 'number' ? `card ${props.pos + 1}` : null]
+        .filter(Boolean).join(' · ')
+    case 'tool_edit':
+      return labelFrom(TOOL_LABELS, str(props.tool))
+    case 'tool_action': {
+      const v = str(props.v)
+      return `${labelFrom(TOOL_LABELS, str(props.tool))} · ${labelFrom(TOOL_ACT_LABELS, str(props.act))}${v ? `: ${toolValueLabel(v)}` : ''}`
+    }
+    case 'tool_export':
+      return `${labelFrom(TOOL_LABELS, str(props.tool))} · ${labelFrom(EXPORT_VIA_LABELS, str(props.via))}`
+    case 'tool_error':
+      return [str(props.tool) ? labelFrom(TOOL_LABELS, str(props.tool)) : null, labelFrom(TOOL_ERROR_LABELS, str(props.code))]
+        .filter(Boolean).join(' · ')
+    case 'cta_click':
+      return [labelFrom(CTA_FROM_LABELS, str(props.from)), str(props.tool) ? labelFrom(TOOL_LABELS, str(props.tool)) : null]
+        .filter(Boolean).join(' · ')
+    case 'visit_action':
+      return str(props.act) ? labelFrom(VISIT_ACT_LABELS, str(props.act)) : null
+    case 'pref_change':
+      return str(props.what) === 'lang'
+        ? `Language: ${labelFrom(UI_LANGUAGE_LABELS, str(props.v))}`
+        : `Theme: ${labelFrom({ dark: 'Dark', light: 'Light' }, str(props.v))}`
     default:
       return null
   }

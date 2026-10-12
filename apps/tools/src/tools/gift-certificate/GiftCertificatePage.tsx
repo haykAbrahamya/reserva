@@ -92,6 +92,7 @@ export function GiftCertificatePage() {
               ready={ready}
               shareTitle={draft.heading.trim() || t('tools.giftCertificate.title')}
               format={t('giftCertificate.format')}
+              details={{ theme: draft.themeId }}
             >
               <PdfButton
                 width={GIFT_CARD.width}
@@ -101,6 +102,7 @@ export function GiftCertificatePage() {
                 draw={draw}
                 prepare={prepare}
                 fileName={fileNameFor('gift-certificate', draft.title, 'pdf')}
+                details={{ theme: draft.themeId }}
               />
             </ExportActions>
           </>

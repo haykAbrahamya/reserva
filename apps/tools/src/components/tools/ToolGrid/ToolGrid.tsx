@@ -6,9 +6,9 @@ import s from './ToolGrid.module.scss'
 export function ToolGrid({ tools }: { tools: readonly Tool[] }) {
   return (
     <ul className={s.grid}>
-      {tools.map((tool) => (
+      {tools.map((tool, i) => (
         <li key={tool.id} className={s.item}>
-          <ToolCard tool={tool} />
+          <ToolCard tool={tool} pos={i} />
         </li>
       ))}
     </ul>

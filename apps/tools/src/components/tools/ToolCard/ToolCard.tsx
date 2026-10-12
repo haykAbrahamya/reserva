@@ -2,15 +2,22 @@ import { Link } from 'react-router-dom'
 import { ArrowUpRight } from 'lucide-react'
 import { useT } from '@/i18n'
 import { ToolIcon } from '@/components/tools/ToolIcon/ToolIcon'
+import { track } from '@/lib/analytics/pulse'
 import { isLive, toolHueStyle, type Tool } from '@/tools/registry'
 import s from './ToolCard.module.scss'
+
+interface Props {
+  tool: Tool
+  /** Its place on the grid, from 0. */
+  pos: number
+}
 
 /**
  * One tool on the home grid. A live tool is a single link — the whole card is
  * the tap target. A tool still being built renders the same card, muted and
  * inert, with a "soon" label instead of the call to action.
  */
-export function ToolCard({ tool }: { tool: Tool }) {
+export function ToolCard({ tool, pos }: Props) {
   const t = useT()
   const live = isLive(tool)
 
@@ -41,7 +48,12 @@ export function ToolCard({ tool }: { tool: Tool }) {
   )
 
   return live ? (
-    <Link to={tool.path} className={s.card} style={toolHueStyle(tool.hue)}>
+    <Link
+      to={tool.path}
+      className={s.card}
+      style={toolHueStyle(tool.hue)}
+      onClick={() => track('tool_select', { tool: tool.id, pos })}
+    >
       {body}
     </Link>
   ) : (

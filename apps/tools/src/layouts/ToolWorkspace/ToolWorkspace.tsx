@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { SegmentedFilter } from '@reserva/ui'
 import { useT } from '@/i18n'
+import { useToolEvents } from '@/lib/analytics/useToolEvents'
 import s from './ToolWorkspace.module.scss'
 
 type Pane = 'edit' | 'preview'
@@ -35,6 +36,7 @@ interface Props {
  */
 export function ToolWorkspace({ editor, preview, footer, previewAspect = 9 / 16 }: Props) {
   const t = useT()
+  const events = useToolEvents()
   const [pane, setPane] = useState<Pane>('edit')
   const panesRef = useRef<HTMLDivElement>(null)
   const editScroll = useRef(0)
@@ -42,6 +44,7 @@ export function ToolWorkspace({ editor, preview, footer, previewAspect = 9 / 16 
 
   const switchTo = (next: Pane) => {
     if (next === pane) return
+    if (next === 'preview') events?.action('preview')
     if (pane === 'edit') editScroll.current = window.scrollY
     switched.current = true
     setPane(next)

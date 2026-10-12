@@ -94,6 +94,7 @@ export function FreeSlotsPage() {
               ready={ready}
               shareTitle={draft.title.trim() || t('tools.freeSlots.title')}
               format={t('freeSlots.format')}
+              details={{ theme: draft.themeId, n: draft.slots.length }}
             />
           </>
         }

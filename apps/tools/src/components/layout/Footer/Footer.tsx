@@ -1,6 +1,8 @@
 import { ArrowUpRight } from 'lucide-react'
 import { LogoMark } from '@reserva/ui'
 import { useT } from '@/i18n'
+import { track } from '@/lib/analytics/pulse'
+import { useToolAtPath } from '@/lib/analytics/useToolAtPath'
 import { platformUrl } from '@/lib/links'
 import s from './Footer.module.scss'
 
@@ -10,6 +12,7 @@ import s from './Footer.module.scss'
  */
 export function Footer() {
   const t = useT()
+  const tool = useToolAtPath()
 
   return (
     <footer className={s.footer}>
@@ -22,7 +25,11 @@ export function Footer() {
           </div>
         </div>
 
-        <a className={s.cta} href={platformUrl('/signup', 'footer')}>
+        <a
+          className={s.cta}
+          href={platformUrl('/signup', 'footer')}
+          onClick={() => track('cta_click', { from: 'footer', tool })}
+        >
           {t('footer.cta')}
           <ArrowUpRight size={15} />
         </a>

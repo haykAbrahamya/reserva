@@ -9,7 +9,7 @@ import { countryName, deviceLabel, fmtInt, fmtShare, languageName } from './form
 import type { TabProps } from './OverviewTab'
 import s from './Analytics.module.scss'
 
-export function SourcesTab({ range, includeStaff, refreshKey, partnerId, onPartnerChange }: TabProps & {
+export function SourcesTab({ range, includeStaff, refreshKey, site, partnerId, onPartnerChange }: TabProps & {
   partnerId: string
   onPartnerChange: (id: string) => void
 }) {
@@ -19,23 +19,27 @@ export function SourcesTab({ range, includeStaff, refreshKey, partnerId, onPartn
       from: range.from,
       to: range.to,
       includeInternal: includeStaff,
+      site,
       partnerId: partnerId || undefined,
     }),
-    [range.from, range.to, includeStaff, refreshKey, partnerId],
+    [range.from, range.to, includeStaff, refreshKey, site, partnerId],
   )
 
   const filter = (
     <div className={s.filters}>
-      <Select
-        className={s.filterSelect}
-        size="sm"
-        value={partnerId || ALL}
-        onChange={(v) => onPartnerChange(v === ALL ? '' : v)}
-        options={partnerOptions}
-        searchable
-        searchPlaceholder="Search partner…"
-        panelMinWidth={260}
-      />
+      {/* Partners live on reserva.am; the tools have none. */}
+      {site === 'web' && (
+        <Select
+          className={s.filterSelect}
+          size="sm"
+          value={partnerId || ALL}
+          onChange={(v) => onPartnerChange(v === ALL ? '' : v)}
+          options={partnerOptions}
+          searchable
+          searchPlaceholder="Search partner…"
+          panelMinWidth={260}
+        />
+      )}
       {data && (
         <span className={s.filterCount}>
           {fmtInt(sum(data.channels.map((c) => c.sessions)))} {partnerId ? 'sessions with this partner' : 'sessions'}

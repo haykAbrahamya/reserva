@@ -16,7 +16,7 @@ import { themeById } from '@/lib/story/themes'
 import { toolById } from '@/tools/registry'
 import { ServiceList } from './components/ServiceList/ServiceList'
 import { PRICE_LIST_FONTS, drawPriceList } from './drawPriceList'
-import { draftText } from './model'
+import { draftText, isFilled } from './model'
 import { usePriceListDraft } from './usePriceListDraft'
 
 const tool = toolById('priceList')
@@ -84,6 +84,7 @@ export function PriceListPage() {
               ready={ready}
               shareTitle={draft.title.trim() || t('tools.priceList.title')}
               format={t('priceList.format')}
+              details={{ theme: draft.themeId, n: draft.items.filter(isFilled).length }}
             />
           </>
         }

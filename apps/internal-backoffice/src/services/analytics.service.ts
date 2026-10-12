@@ -11,6 +11,10 @@ import http, { apiGet } from './http'
  *  before `from` — the base of every delta chip. */
 export interface Kpi { value: number; prev: number }
 
+/** Which Reserva site a report covers: reserva.am with its partner pages, or
+ *  tools.reserva.am. The API never mixes the two. */
+export type Site = 'web' | 'tools'
+
 /** The resolved window, Yerevan calendar days, both ends inclusive. */
 export interface Range { from: string; to: string; days: number }
 
@@ -74,6 +78,55 @@ export interface AnalyticsSources {
   languages: { language: string; sessions: number }[]                   // top 10, primary subtag ('hy','ru','en')
 }
 
+/** How results left a tool, by tool_export `via`. */
+export interface ToolExportsBy { share: number; download: number; pdf: number; whatsapp: number; viber: number; copy: number }
+
+export interface ToolRow {
+  /** The tool's registry id, e.g. 'priceList'. */
+  tool: string
+  views: number          // page views of the tool
+  visitors: number       // distinct visitorId with any event of the tool
+  edits: number          // tool_edit — page views in which the form changed
+  exports: number        // tool_export — results taken away
+  /** Sessions that took a result away ÷ sessions that opened the tool (0..1); null when none opened it. */
+  exportRate: number | null
+  exportsBy: ToolExportsBy
+  ctaClicks: number      // clicks into reserva.am made on the tool's page
+  errors: number
+}
+
+/** GET /platform/analytics/tools — tools.reserva.am on its own. */
+export interface AnalyticsTools {
+  range: Range
+  kpis: {
+    visitors: Kpi; sessions: Kpi
+    toolViews: Kpi       // page views of a tool
+    edits: Kpi           // tool_edit
+    exports: Kpi         // tool_export
+    cardViews: Kpi       // appointment cards opened by clients (the visit page)
+    ctaClicks: Kpi       // clicks into reserva.am
+  }
+  /** Every day in range, zeros filled, ascending. */
+  series: { date: string; visitors: number; sessions: number; toolViews: number; exports: number }[]
+  /** Most views first. */
+  tools: ToolRow[]
+  exportsBy: { via: string; count: number }[]
+  /** Styles of the exported results. */
+  themes: { theme: string; count: number }[]
+  /** Top 40 actions per tool, with the value chosen most. */
+  actions: { tool: string; act: string; count: number; topValue: string | null; topCount: number }[]
+  /** What clients did on the cards they were sent. */
+  visit: { act: string; count: number }[]
+  /** Page views by interface language. */
+  languages: { language: string; views: number }[]
+  errors: { tool: string | null; code: string; count: number }[]
+  /** Booking-site sessions the tools sent (utm_source=reserva-tools), and their sign-ups (tracked). */
+  toPlatform: {
+    visits: Kpi; signupStarts: Kpi; signups: Kpi
+    bySpot: { spot: string; visits: number; signups: number }[]
+  }
+}
+
 export interface AnalyticsEventRow {
   id: string
   name: string
@@ -107,19 +160,26 @@ export interface SessionRow {
   landingPath: string | null
   landingHost: string | null
   isInternal: boolean
+  /** Missing from a backend that predates the tools. */
+  site?: Site
   eventCount: number
   pageViews: number
   /** Touched, first-seen order, ≤ 5. */
   partners: { id: string; name: string; slug: string | null }[]
-  /** `reviewed` is missing from a backend that predates review tracking. */
-  outcome: { booked: boolean; contacted: boolean; signedUp: boolean; reviewed?: boolean; bookClicked: boolean }
+  /** `reviewed` is missing from a backend that predates review tracking, and
+   *  `exported` / `ctaClicked` (the tools) from one that predates the tools. */
+  outcome: {
+    booked: boolean; contacted: boolean; signedUp: boolean; reviewed?: boolean; bookClicked: boolean
+    exported?: boolean; ctaClicked?: boolean
+  }
   /** First ≤ 12 event names in order (for the preview chips). */
   journey: string[]
   /** All sessions of this visitorId (all time, bots excluded) — the "returning" hint. */
   visitorSessions: number
 }
 
-export type SessionOutcome = 'booked' | 'contacted' | 'signup' | 'reviewed' | 'bookclick' | 'bounced'
+export type SessionOutcome =
+  | 'booked' | 'contacted' | 'signup' | 'reviewed' | 'bookclick' | 'exported' | 'cta' | 'bounced'
 
 export interface SessionEvent {
   id: string
@@ -171,6 +231,8 @@ export interface AnalyticsQuery {
   to: string
   /** Include staff sessions (rsv_staff cookie). Excluded by default. */
   includeInternal?: boolean
+  /** reserva.am unless said otherwise. */
+  site?: Site
 }
 
 export interface AnalyticsEventsQuery extends AnalyticsQuery {
@@ -179,12 +241,19 @@ export interface AnalyticsEventsQuery extends AnalyticsQuery {
   pageSize?: number
   name?: string
   partnerId?: string
+  /** Events of one tool (tools.reserva.am), by its registry id. */
+  tool?: string
 }
 
 /** The API parses `includeInternal` as the literal strings 'true' | 'false', so
  *  send it spelled out rather than trusting how a boolean gets serialized. */
 function windowParams(q: AnalyticsQuery) {
-  return { from: q.from, to: q.to, includeInternal: q.includeInternal ? 'true' : 'false' }
+  return {
+    from: q.from,
+    to: q.to,
+    includeInternal: q.includeInternal ? 'true' : 'false',
+    ...(q.site && q.site !== 'web' ? { site: q.site } : {}),
+  }
 }
 
 export const analyticsService = {
@@ -217,6 +286,11 @@ export const analyticsService = {
 
   partners(q: AnalyticsQuery): Promise<AnalyticsPartners> {
     return apiGet<AnalyticsPartners>('/platform/analytics/partners', { params: windowParams(q) })
+  },
+
+  /** tools.reserva.am: what was opened, made and sent, and the sign-ups it led to. */
+  tools(q: AnalyticsQuery): Promise<AnalyticsTools> {
+    return apiGet<AnalyticsTools>('/platform/analytics/tools', { params: windowParams({ ...q, site: undefined }) })
   },
 
   /** `partnerId` narrows to sessions that had an event on that partner. */
@@ -255,6 +329,7 @@ export const analyticsService = {
         pageSize: q.pageSize ?? 25,
         ...(q.name ? { name: q.name } : {}),
         ...(q.partnerId ? { partnerId: q.partnerId } : {}),
+        ...(q.tool ? { tool: q.tool } : {}),
       },
     })
   },

@@ -65,7 +65,26 @@ function barPath(cx: number, w: number, top: number, base: number): string {
  * line segment is dashed and its bar faded, so a half-counted period does not
  * read as a collapse.
  */
-export function TrafficChart({ points, label }: { points: ChartPoint[]; label: string }) {
+/** What each mark stands for. The booking site's by default; the tools plot their own. */
+export interface TrafficLabels {
+  visitors: string
+  pageViews: string
+  sessions: string
+  bookings: string
+}
+
+export const TRAFFIC_LABELS: TrafficLabels = {
+  visitors: 'Visitors',
+  pageViews: 'Page views',
+  sessions: 'Sessions',
+  bookings: 'Bookings',
+}
+
+export function TrafficChart({ points, label, labels = TRAFFIC_LABELS }: {
+  points: ChartPoint[]
+  label: string
+  labels?: TrafficLabels
+}) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
   const width = useWidth(wrapRef)
@@ -194,7 +213,7 @@ export function TrafficChart({ points, label }: { points: ChartPoint[]; label: s
           ))}
 
           {/* Bookings band: its own scale, captioned so nobody reads it against the axis above */}
-          <text x={geo.left} y={geo.barTop - 9} className={s.caption}>Bookings</text>
+          <text x={geo.left} y={geo.barTop - 9} className={s.caption}>{labels.bookings}</text>
           {geo.barTicks.map((t) => (
             <g key={`b${t}`}>
               <line
@@ -284,10 +303,10 @@ export function TrafficChart({ points, label }: { points: ChartPoint[]; label: s
             {point.title}
             {point.note && <span className={s.ttNote}>{point.note}</span>}
           </div>
-          <div className={s.ttRow}><span className={`${s.key} ${s.keyVisitors}`} /><b>{fmtInt(point.visitors)}</b><span>Visitors</span></div>
-          <div className={s.ttRow}><span className={`${s.key} ${s.keyViews}`} /><b>{fmtInt(point.pageViews)}</b><span>Page views</span></div>
-          <div className={s.ttRow}><span className={s.key} /><b>{fmtInt(point.sessions)}</b><span>Sessions</span></div>
-          <div className={s.ttRow}><span className={`${s.key} ${s.keyBookings}`} /><b>{fmtInt(point.bookings)}</b><span>Bookings</span></div>
+          <div className={s.ttRow}><span className={`${s.key} ${s.keyVisitors}`} /><b>{fmtInt(point.visitors)}</b><span>{labels.visitors}</span></div>
+          <div className={s.ttRow}><span className={`${s.key} ${s.keyViews}`} /><b>{fmtInt(point.pageViews)}</b><span>{labels.pageViews}</span></div>
+          <div className={s.ttRow}><span className={s.key} /><b>{fmtInt(point.sessions)}</b><span>{labels.sessions}</span></div>
+          <div className={s.ttRow}><span className={`${s.key} ${s.keyBookings}`} /><b>{fmtInt(point.bookings)}</b><span>{labels.bookings}</span></div>
         </div>
       )}
     </div>
@@ -295,12 +314,12 @@ export function TrafficChart({ points, label }: { points: ChartPoint[]; label: s
 }
 
 /** Mirrors the marks: a stroke for each line, a block for the bars. */
-export function TrafficLegend() {
+export function TrafficLegend({ labels = TRAFFIC_LABELS }: { labels?: TrafficLabels }) {
   return (
     <div className={s.legend}>
-      <span className={s.legendItem}><span className={`${s.legendLine} ${s.keyVisitors}`} />Visitors</span>
-      <span className={s.legendItem}><span className={`${s.legendLine} ${s.keyViews}`} />Page views</span>
-      <span className={s.legendItem}><span className={s.legendBar} />Bookings</span>
+      <span className={s.legendItem}><span className={`${s.legendLine} ${s.keyVisitors}`} />{labels.visitors}</span>
+      <span className={s.legendItem}><span className={`${s.legendLine} ${s.keyViews}`} />{labels.pageViews}</span>
+      <span className={s.legendItem}><span className={s.legendBar} />{labels.bookings}</span>
     </div>
   )
 }

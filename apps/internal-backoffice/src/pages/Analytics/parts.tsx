@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
-import { RefreshCw, TriangleAlert } from 'lucide-react'
+import { ChevronRight, RefreshCw, TriangleAlert } from 'lucide-react'
 import { Button, type SelectOption } from '@/components/ui'
 import { useResource } from '@/store/useResource'
 import { ApiError } from '@/services/http'
@@ -8,7 +8,7 @@ import { errorMessage } from '@/services/errors'
 import { partnersService } from '@/services/partners.service'
 import type { Kpi } from '@/services/analytics.service'
 import { eventDef } from './catalog'
-import { fmtInt, fmtShare, kpiDelta } from './format'
+import { fmtInt, fmtPct, fmtShare, kpiDelta } from './format'
 import s from './Analytics.module.scss'
 
 const cx = (...c: (string | false | null | undefined)[]) => c.filter(Boolean).join(' ')
@@ -78,6 +78,58 @@ export function KpiTile({ label, note, kpi, baseline }: {
           <span className={s.kpiPrev}>vs {fmtInt(kpi.prev)}</span>
         </div>
       )}
+    </div>
+  )
+}
+
+export interface FunnelStep {
+  label: string
+  kpi: Kpi
+  /** The previous step, as the denominator reads: "40.2% of starts". */
+  of?: string
+  note?: string
+}
+
+/**
+ * Steps side by side with the drop between them. Each bar is the step against
+ * the widest one, so the funnel's shape reads before any number does.
+ */
+export function Funnel({ steps, baseline, pair = false }: { steps: FunnelStep[]; baseline: string | null; pair?: boolean }) {
+  const max = Math.max(1, ...steps.map((st) => st.kpi.value))
+  return (
+    <div className={pair ? `${s.funnel} ${s.funnelPair}` : s.funnel}>
+      {steps.map((st, i) => {
+        const prev = i > 0 ? steps[i - 1].kpi.value : 0
+        const conv = prev > 0 ? st.kpi.value / prev : null
+        return (
+          <div key={st.label} className={s.step}>
+            {i > 0 && <span className={s.stepArrow} aria-hidden="true"><ChevronRight size={11} /></span>}
+            <div className={s.kpiLabel}>
+              {st.label}
+              {st.note && <span className={s.kpiNote}>{st.note}</span>}
+            </div>
+            <div className={s.kpiValue}>{fmtInt(st.kpi.value)}</div>
+            {baseline && (
+              <div className={s.kpiFoot}>
+                <DeltaChip kpi={st.kpi} baseline={baseline} />
+                <span className={s.kpiPrev}>vs {fmtInt(st.kpi.prev)}</span>
+              </div>
+            )}
+            <div
+              className={[s.stepBar, st.kpi.value === 0 ? s.stepBarEmpty : ''].filter(Boolean).join(' ')}
+              style={{ width: `${(st.kpi.value / max) * 100}%` }}
+            />
+            {/* Steps are counted independently over the same days, so a step
+                can pass 100% — e.g. activations of sign-ups from before the range. */}
+            <div
+              className={s.stepConv}
+              title={i > 0 ? 'Share of the previous step over the same days. Steps are counted separately, so this can pass 100%.' : undefined}
+            >
+              {i === 0 ? ' ' : <><b>{fmtPct(conv)}</b> of {st.of}</>}
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }

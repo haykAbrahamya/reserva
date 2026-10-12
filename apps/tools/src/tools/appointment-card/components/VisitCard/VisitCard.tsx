@@ -3,11 +3,18 @@ import { CalendarDays, CalendarPlus, Clock, MapPin, Navigation, Phone, Sparkles,
 import { addToCalendar, fmtDuration } from '@reserva/shared'
 import { Button } from '@reserva/ui'
 import { useT } from '@/i18n'
+import type { VisitAct } from '@/lib/analytics/pulse'
 import { formatLongDay, parseDay, useCalendarWords } from '@/lib/dates'
 import { fileNameFor } from '@/lib/fileName'
 import { endTime } from '../../model'
 import { isPast, mapsUrl, telUrl, visitEvent, type Visit } from '../../visitLink'
 import s from './VisitCard.module.scss'
+
+interface Props {
+  visit: Visit
+  /** The client used the card — on the visit page only, never the salon trying its own preview. */
+  onAction?: (act: VisitAct) => void
+}
 
 /**
  * The appointment as the client sees it — on the card page, and live in the
@@ -15,7 +22,7 @@ import s from './VisitCard.module.scss'
  * Everything the client needs on the day is one tap: the calendar, the way
  * there, the phone.
  */
-export function VisitCard({ visit }: { visit: Visit }) {
+export function VisitCard({ visit, onAction }: Props) {
   const t = useT()
   const words = useCalendarWords()
   const date = parseDay(visit.date)
@@ -73,7 +80,10 @@ export function VisitCard({ visit }: { visit: Visit }) {
         <Button
           variant="accent"
           className={s.primary}
-          onClick={() => addToCalendar(visitEvent(visit), fileNameFor('visit', visit.salon, 'ics'))}
+          onClick={() => {
+            onAction?.('calendar')
+            addToCalendar(visitEvent(visit), fileNameFor('visit', visit.salon, 'ics'))
+          }}
         >
           <CalendarPlus size={16} />
           {t('appointmentCard.card.addToCalendar')}
@@ -81,13 +91,19 @@ export function VisitCard({ visit }: { visit: Visit }) {
         {(address || phone) && (
           <div className={s.secondary}>
             {address && (
-              <a className={s.link} href={mapsUrl(address)} target="_blank" rel="noopener noreferrer">
+              <a
+                className={s.link}
+                href={mapsUrl(address)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => onAction?.('directions')}
+              >
                 <Navigation size={15} />
                 {t('appointmentCard.card.directions')}
               </a>
             )}
             {phone && (
-              <a className={s.link} href={telUrl(phone)}>
+              <a className={s.link} href={telUrl(phone)} onClick={() => onAction?.('call')}>
                 <Phone size={15} />
                 {t('appointmentCard.card.call')}
               </a>

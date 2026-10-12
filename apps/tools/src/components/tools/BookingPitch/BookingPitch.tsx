@@ -1,6 +1,8 @@
 import { ArrowUpRight, CalendarCheck } from 'lucide-react'
 import { useT } from '@/i18n'
+import { track } from '@/lib/analytics/pulse'
 import { platformUrl } from '@/lib/links'
+import { useCurrentTool } from '@/tools/currentTool'
 import s from './BookingPitch.module.scss'
 
 interface Props {
@@ -17,6 +19,7 @@ interface Props {
  */
 export function BookingPitch({ title, body, source }: Props) {
   const t = useT()
+  const tool = useCurrentTool()
 
   return (
     <aside className={s.pitch}>
@@ -27,7 +30,11 @@ export function BookingPitch({ title, body, source }: Props) {
         <h2 className={s.title}>{title}</h2>
         <p className={s.body}>{body}</p>
       </div>
-      <a className={s.cta} href={platformUrl('/signup', source)}>
+      <a
+        className={s.cta}
+        href={platformUrl('/signup', source)}
+        onClick={() => track('cta_click', { from: 'pitch', ...(tool ? { tool } : {}) })}
+      >
         {t('pitch.cta')}
         <ArrowUpRight size={15} />
       </a>

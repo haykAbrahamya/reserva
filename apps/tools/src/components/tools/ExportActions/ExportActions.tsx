@@ -2,6 +2,8 @@ import { useMemo, useState, type ReactNode } from 'react'
 import { Download, Share2 } from 'lucide-react'
 import { Button, useToast } from '@reserva/ui'
 import { useT } from '@/i18n'
+import type { ExportDetails } from '@/lib/analytics/pulse'
+import { useToolEvents } from '@/lib/analytics/useToolEvents'
 import { canShareFiles, downloadFile, shareFile } from '@/lib/canvas/exportFile'
 import s from './ExportActions.module.scss'
 
@@ -14,6 +16,8 @@ interface Props {
   shareTitle: string
   /** Size line under the buttons, e.g. "1080 × 1920 · PNG". */
   format: string
+  /** What the result was made with, for analytics: its style, layout, row count. */
+  details?: ExportDetails
   /** More ways out, under the main two — e.g. a print-ready PDF. */
   children?: ReactNode
 }
@@ -24,9 +28,10 @@ type Action = 'share' | 'download'
  * Share (where the phone can — that sheet is where Instagram Stories lives)
  * and Download. On a browser that cannot share files, Download is the primary.
  */
-export function ExportActions({ getFile, ready, shareTitle, format, children }: Props) {
+export function ExportActions({ getFile, ready, shareTitle, format, details, children }: Props) {
   const t = useT()
   const toast = useToast()
+  const events = useToolEvents()
   const [busy, setBusy] = useState<Action | null>(null)
   const sharable = useMemo(canShareFiles, [])
 
@@ -35,12 +40,15 @@ export function ExportActions({ getFile, ready, shareTitle, format, children }: 
     try {
       const file = await getFile()
       if (action === 'share') {
-        await shareFile(file, shareTitle)
+        // A dismissed share sheet is no export, and no error either.
+        if (await shareFile(file, shareTitle)) events?.exported('share', details)
       } else {
         downloadFile(file)
+        events?.exported('download', details)
         toast(t('export.saved'))
       }
     } catch {
+      events?.failed(action)
       toast(t('export.failed'))
     } finally {
       setBusy(null)

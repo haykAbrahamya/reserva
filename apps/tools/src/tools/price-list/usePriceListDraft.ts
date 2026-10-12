@@ -1,5 +1,6 @@
-import { useMemo, useRef } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import type { Locale } from '@/i18n'
+import { toolEvents } from '@/lib/analytics/pulse'
 import type { BrandField } from '@/lib/story/brand'
 import type { StoryThemeId } from '@/lib/story/themes'
 import { useStoredDraft } from '@/lib/useStoredDraft'
@@ -7,10 +8,16 @@ import { LIMITS, newItem, parseDraft, type PriceItem } from './model'
 import { sampleDraft } from './samples'
 
 const STORAGE_KEY = 'reserva-tools:price-list:v1'
+const events = toolEvents('priceList')
 
 /** The price list draft and every edit to it, remembered in this browser. */
 export function usePriceListDraft(locale: Locale) {
-  const [draft, setDraft] = useStoredDraft(STORAGE_KEY, parseDraft, () => sampleDraft(locale))
+  const [draft, setStored] = useStoredDraft(STORAGE_KEY, parseDraft, () => sampleDraft(locale))
+  // Every change goes through here, so the first one in a page view is counted.
+  const setDraft: typeof setStored = useCallback((next) => {
+    events.edited()
+    setStored(next)
+  }, [setStored])
 
   // The latest draft, for the one action that must answer synchronously
   // (addItem). A state updater cannot: React runs it later, during render.
@@ -25,6 +32,7 @@ export function usePriceListDraft(locale: Locale) {
 
       setTheme(themeId: StoryThemeId) {
         setDraft((d) => ({ ...d, themeId }))
+        events.action('theme', themeId)
       },
 
       updateItem(id: string, patch: Partial<Omit<PriceItem, 'id'>>) {
@@ -36,6 +44,7 @@ export function usePriceListDraft(locale: Locale) {
         if (draftRef.current.items.length >= LIMITS.items) return null
         const item = newItem()
         setDraft((d) => (d.items.length >= LIMITS.items ? d : { ...d, items: [...d.items, item] }))
+        events.action('add')
         return item.id
       },
 
@@ -45,10 +54,12 @@ export function usePriceListDraft(locale: Locale) {
           const items = d.items.filter((item) => item.id !== id)
           return { ...d, items: items.length ? items : [newItem()] }
         })
+        events.action('remove')
       },
 
       clearItems() {
         setDraft((d) => ({ ...d, items: [newItem()] }))
+        events.action('clear')
       },
     }),
     [setDraft],

@@ -3,11 +3,16 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { CalendarX2, Sparkles } from 'lucide-react'
 import { Button, Empty } from '@reserva/ui'
 import { hasExplicitChoice, useI18n, useT } from '@/i18n'
+import { toolEvents, track, type VisitAct } from '@/lib/analytics/pulse'
 import { useSeo } from '@/lib/useSeo'
 import { toolById } from '@/tools/registry'
 import { VisitCard } from './components/VisitCard/VisitCard'
 import { decodeVisit } from './visitLink'
 import s from './VisitPage.module.scss'
+
+const visitAction = (act: VisitAct) => track('visit_action', { act })
+/** The broken link last reported — StrictMode runs effects twice in development. */
+let reportedBadLink: string | null = null
 
 /**
  * The page a client opens from the salon's message. It reads the visit from
@@ -26,6 +31,13 @@ export function VisitPage() {
     if (visit && visit.locale !== locale && !hasExplicitChoice()) setLocale(visit.locale)
   }, [visit, locale, setLocale])
 
+  // A link that opens nothing — cut short when it was copied, or edited by hand.
+  useEffect(() => {
+    if (visit || reportedBadLink === hash) return
+    reportedBadLink = hash
+    toolEvents('appointmentCard').failed('bad_link')
+  }, [visit, hash])
+
   useSeo({
     title: visit
       ? `${t('appointmentCard.visit.title')} — ${visit.salon}`
@@ -36,7 +48,7 @@ export function VisitPage() {
   return (
     <div className={s.page}>
       {visit ? (
-        <VisitCard visit={visit} />
+        <VisitCard visit={visit} onAction={visitAction} />
       ) : (
         <Empty
           icon={CalendarX2}
@@ -51,7 +63,7 @@ export function VisitPage() {
       )}
 
       {/* The one line that turns a client who is also a pro into a visitor. */}
-      <Link to="/" className={s.made}>
+      <Link to="/" className={s.made} onClick={() => visitAction('made')}>
         <span className={s.madeLine}>
           <Sparkles size={13} />
           {t('appointmentCard.card.made')}

@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { Activity, X } from 'lucide-react'
 import { Button, Empty, Pagination, Select, Table, Th, Td, Tr, type SelectOption } from '@/components/ui'
 import { useResource } from '@/store/useResource'
-import { analyticsService, type AnalyticsEventRow } from '@/services/analytics.service'
+import { analyticsService, type AnalyticsEventRow, type Site } from '@/services/analytics.service'
 import { ALL, ErrorState, EventBadge, Skeleton, StaffTag, usePartnerOptions } from './parts'
-import { EVENT_CATALOG, EVENT_GROUP_LABEL, TRAFFIC_CHANNEL_LABELS, eventDef, eventSummary, labelFrom } from './catalog'
+import {
+  EVENT_CATALOG, EVENT_GROUP_LABEL, SITE_EVENT_GROUPS, TOOL_LABELS, TRAFFIC_CHANNEL_LABELS, eventDef, eventSummary, labelFrom,
+} from './catalog'
 import { ChannelIcon, DeviceIcon } from './icons'
 import { deviceLabel, fmtEventTime, fmtEventTimeFull, fmtInt } from './format'
 import { EventDrawer } from './EventDrawer'
@@ -12,21 +14,40 @@ import { VisitorTag } from './visitor'
 import type { TabProps } from './OverviewTab'
 import s from './Analytics.module.scss'
 
-const EVENT_OPTIONS: SelectOption[] = [
-  { value: ALL, label: 'All events' },
-  // The raw name rides along as a keyword, so "book_click" finds "Book click".
-  ...EVENT_CATALOG.map((e) => ({ value: e.name, label: e.label, sub: EVENT_GROUP_LABEL[e.group], keywords: [e.name] })),
+/** Each site's events — a filter never offers what its site cannot send. */
+const EVENT_OPTIONS: Record<Site, SelectOption[]> = {
+  web: eventOptions('web'),
+  tools: eventOptions('tools'),
+}
+
+function eventOptions(site: Site): SelectOption[] {
+  return [
+    { value: ALL, label: 'All events' },
+    // The raw name rides along as a keyword, so "book_click" finds "Book click".
+    ...EVENT_CATALOG
+      .filter((e) => SITE_EVENT_GROUPS[site].includes(e.group))
+      .map((e) => ({ value: e.name, label: e.label, sub: EVENT_GROUP_LABEL[e.group], keywords: [e.name] })),
+  ]
+}
+
+const TOOL_OPTIONS: SelectOption[] = [
+  { value: ALL, label: 'All tools' },
+  ...Object.entries(TOOL_LABELS).map(([value, label]) => ({ value, label })),
 ]
 
 export function EventsTab({
-  range, includeStaff, refreshKey, eventName, partnerId, onEventChange, onPartnerChange, onClearFilters, onOpenSession,
+  range, includeStaff, refreshKey, site, eventName, partnerId, tool, onEventChange, onPartnerChange, onToolChange,
+  onClearFilters, onOpenSession,
 }: TabProps & {
   /** The visit an event belongs to, as a journey. */
   onOpenSession: (sessionId: string) => void
   eventName: string
   partnerId: string
+  /** One tool's events (the tools only). */
+  tool: string
   onEventChange: (name: string) => void
   onPartnerChange: (id: string) => void
+  onToolChange: (tool: string) => void
   onClearFilters: () => void
 }) {
   const [pageSize, setPageSize] = useState(25)
@@ -34,7 +55,7 @@ export function EventsTab({
 
   // Page 1 whenever the window or a filter changes. Keyed state instead of an
   // effect that resets it, which would fetch the stale page first.
-  const filterKey = [range.from, range.to, includeStaff, eventName, partnerId, pageSize].join('|')
+  const filterKey = [range.from, range.to, includeStaff, site, eventName, partnerId, tool, pageSize].join('|')
   const [paging, setPaging] = useState({ key: filterKey, page: 1 })
   const page = paging.key === filterKey ? paging.page : 1
   const setPage = (p: number) => setPaging({ key: filterKey, page: p })
@@ -44,21 +65,24 @@ export function EventsTab({
       from: range.from,
       to: range.to,
       includeInternal: includeStaff,
+      site,
       page,
       pageSize,
       name: eventName || undefined,
       partnerId: partnerId || undefined,
+      tool: tool || undefined,
     }),
-    [range.from, range.to, includeStaff, eventName, partnerId, page, pageSize, refreshKey],
+    [range.from, range.to, includeStaff, site, eventName, partnerId, tool, page, pageSize, refreshKey],
   )
 
   const items = data?.items ?? []
   const partnerName = items.find((e) => e.partner?.id === partnerId)?.partner?.name
   const partnerOptions = usePartnerOptions(partnerId, partnerName)
-  const eventOptions = eventName && !EVENT_OPTIONS.some((o) => o.value === eventName)
-    ? [...EVENT_OPTIONS, { value: eventName, label: eventDef(eventName).label }]
-    : EVENT_OPTIONS
-  const filtered = !!(eventName || partnerId)
+  const siteEvents = EVENT_OPTIONS[site]
+  const eventOptions = eventName && !siteEvents.some((o) => o.value === eventName)
+    ? [...siteEvents, { value: eventName, label: eventDef(eventName).label }]
+    : siteEvents
+  const filtered = !!(eventName || partnerId || tool)
   const total = data?.total ?? 0
 
   const filters = (
@@ -73,16 +97,28 @@ export function EventsTab({
         searchPlaceholder="Search events…"
         panelMinWidth={260}
       />
-      <Select
-        className={s.filterSelect}
-        size="sm"
-        value={partnerId || ALL}
-        onChange={(v) => onPartnerChange(v === ALL ? '' : v)}
-        options={partnerOptions}
-        searchable
-        searchPlaceholder="Search partner…"
-        panelMinWidth={260}
-      />
+      {site === 'web' ? (
+        <Select
+          className={s.filterSelect}
+          size="sm"
+          value={partnerId || ALL}
+          onChange={(v) => onPartnerChange(v === ALL ? '' : v)}
+          options={partnerOptions}
+          searchable
+          searchPlaceholder="Search partner…"
+          panelMinWidth={260}
+        />
+      ) : (
+        <Select
+          className={s.filterSelectSm}
+          size="sm"
+          value={tool || ALL}
+          onChange={(v) => onToolChange(v === ALL ? '' : v)}
+          options={TOOL_OPTIONS}
+          searchable={false}
+          panelMinWidth={200}
+        />
+      )}
       {filtered && (
         <Button variant="ghost" size="sm" onClick={onClearFilters}>
           <X size={13} /> Clear filters
@@ -146,7 +182,7 @@ export function EventsTab({
                 <Th>Time</Th>
                 <Th>Visitor</Th>
                 <Th>Event</Th>
-                <Th>Partner</Th>
+                {site === 'web' && <Th>Partner</Th>}
                 <Th>Page</Th>
                 <Th>Device · Country</Th>
                 <Th>Channel</Th>
@@ -170,11 +206,13 @@ export function EventsTab({
                         {ev.session.isInternal && <StaffTag />}
                       </div>
                     </Td>
-                    <Td>
-                      {ev.partner
-                        ? <span className={s.partnerLink} title={ev.partner.slug ?? undefined}>{ev.partner.name}</span>
-                        : <span className={s.cellMuted}>—</span>}
-                    </Td>
+                    {site === 'web' && (
+                      <Td>
+                        {ev.partner
+                          ? <span className={s.partnerLink} title={ev.partner.slug ?? undefined}>{ev.partner.name}</span>
+                          : <span className={s.cellMuted}>—</span>}
+                      </Td>
+                    )}
                     <Td>
                       <span className={s.path} title={ev.host ? `${ev.host}${ev.path ?? ''}` : (ev.path ?? undefined)}>
                         {ev.path || '—'}

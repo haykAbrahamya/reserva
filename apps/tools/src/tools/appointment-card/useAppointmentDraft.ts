@@ -1,11 +1,13 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import type { Locale } from '@/i18n'
+import { toolEvents } from '@/lib/analytics/pulse'
 import { addDays, today } from '@/lib/dates'
 import { useStoredDraft } from '@/lib/useStoredDraft'
 import { parseAppointment, type Appointment } from './model'
 import { sampleAppointment } from './samples'
 
 const STORAGE_KEY = 'reserva-tools:appointment-card:v1'
+const events = toolEvents('appointmentCard')
 
 /**
  * A stored draft for the editor. The salon, address and phone are what make
@@ -27,9 +29,14 @@ export type AppointmentField = keyof Appointment
 
 /** The appointment card draft and every edit to it, remembered in this browser. */
 export function useAppointmentDraft(locale: Locale) {
-  const [draft, setDraft] = useStoredDraft(STORAGE_KEY, parseDraft, () =>
+  const [draft, setStored] = useStoredDraft(STORAGE_KEY, parseDraft, () =>
     sampleAppointment(locale, addDays(today(), 1)),
   )
+  // Every change goes through here, so the first one in a page view is counted.
+  const setDraft: typeof setStored = useCallback((next) => {
+    events.edited()
+    setStored(next)
+  }, [setStored])
 
   const actions = useMemo(
     () => ({
