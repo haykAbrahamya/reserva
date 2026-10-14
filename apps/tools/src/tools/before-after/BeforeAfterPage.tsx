@@ -117,6 +117,7 @@ export function BeforeAfterPage() {
                   : t('beforeAfter.needPhotos')
               }
               details={{ fmt: `${draft.format}-${draft.arrangement}` }}
+              photosStay
             />
           </>
         }

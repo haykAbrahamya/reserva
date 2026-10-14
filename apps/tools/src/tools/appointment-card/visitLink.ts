@@ -1,5 +1,6 @@
 import type { IcsEvent } from '@reserva/shared'
 import { LOCALES, type Locale } from '@/i18n'
+import { fromBase64Url, toBase64Url } from '@/lib/base64url'
 import { parseAppointment, type Appointment } from './model'
 
 // ─────────────────────────────────────────────────────────────
@@ -20,12 +21,6 @@ export interface Visit extends Appointment {
   /** The language the card was made in — the client sees it in that one unless they chose another. */
   locale: Locale
 }
-
-const toBase64Url = (bytes: Uint8Array) =>
-  btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-
-const fromBase64Url = (text: string) =>
-  Uint8Array.from(atob(text.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0))
 
 /** The visit as a compact array, UTF-8, base64url — short enough for a messenger. */
 export function encodeVisit(visit: Visit): string {

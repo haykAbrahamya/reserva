@@ -82,6 +82,7 @@ export const EVENT_CATALOG: EventDef[] = [
   { name: 'tool_error', label: 'Tool error', group: 'tools', tone: 'danger' },
   { name: 'cta_click', label: 'Clicked to Reserva', group: 'tools', tone: 'accent' },
   { name: 'pref_change', label: 'Preference changed', group: 'tools', tone: 'neutral' },
+  { name: 'browser_open', label: 'Left the app’s browser', group: 'tools', tone: 'info' },
 
   { name: 'visit_action', label: 'Card used by client', group: 'visit', tone: 'accent' },
 ]
@@ -127,6 +128,8 @@ export const PROP_LABELS: Record<string, string> = {
   n: 'Items',
   lng: 'Language',
   what: 'Preference',
+  app: 'App',
+  how: 'How',
 }
 
 export const PAGE_TYPE_LABELS: Record<string, string> = {
@@ -224,6 +227,23 @@ export const EXPORT_VIA_LABELS: Record<string, string> = {
   whatsapp: 'WhatsApp',
   viber: 'Viber',
   copy: 'Copied link',
+  hold: 'Press and hold (in-app)',
+}
+
+/** Whose built-in browser a visit was in (browser_open `app`). */
+export const IN_APP_LABELS: Record<string, string> = {
+  instagram: 'Instagram',
+  facebook: 'Facebook',
+  tiktok: 'TikTok',
+  other: 'An app',
+}
+
+/** The way out of an app's browser (browser_open `how`, `from`). */
+export const BROWSER_OPEN_LABELS: Record<string, string> = {
+  chrome: 'Opened in Chrome',
+  copy: 'Copied the link',
+  notice: 'Top notice',
+  sheet: 'Save sheet',
 }
 
 /** Main actions inside a tool (tool_action `act`). */
@@ -374,6 +394,12 @@ export function eventSummary(name: string, props: Record<string, unknown>): stri
       return str(props.what) === 'lang'
         ? `Language: ${labelFrom(UI_LANGUAGE_LABELS, str(props.v))}`
         : `Theme: ${labelFrom({ dark: 'Dark', light: 'Light' }, str(props.v))}`
+    case 'browser_open':
+      return [
+        labelFrom(IN_APP_LABELS, str(props.app)),
+        labelFrom(BROWSER_OPEN_LABELS, str(props.how)),
+        str(props.tool) ? labelFrom(TOOL_LABELS, str(props.tool)) : null,
+      ].filter(Boolean).join(' · ')
     default:
       return null
   }

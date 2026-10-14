@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom'
 import { ArrowUpRight } from 'lucide-react'
-import { useT } from '@/i18n'
+import { useI18n, useT } from '@/i18n'
 import { ToolIcon } from '@/components/tools/ToolIcon/ToolIcon'
 import { track } from '@/lib/analytics/pulse'
-import { isLive, toolHueStyle, type Tool } from '@/tools/registry'
+import { useThemeContext } from '@/theme/ThemeProvider'
+import { exampleSrc, isLive, toolHueStyle, type Tool } from '@/tools/registry'
 import s from './ToolCard.module.scss'
 
 interface Props {
@@ -16,16 +17,33 @@ interface Props {
  * One tool on the home grid. A live tool is a single link — the whole card is
  * the tap target. A tool still being built renders the same card, muted and
  * inert, with a "soon" label instead of the call to action.
+ *
+ * The artwork is what the tool makes: its finished sample, in the visitor's
+ * language, so someone arriving from a reel sees the result before reading a
+ * word. A tool without one yet shows its icon.
  */
 export function ToolCard({ tool, pos }: Props) {
   const t = useT()
+  const { locale } = useI18n()
+  const { isDark } = useThemeContext()
   const live = isLive(tool)
 
   const body = (
     <>
       <div className={s.art} aria-hidden="true">
         <span className={s.rings} />
-        <ToolIcon tool={tool} />
+        {tool.example ? (
+          <img
+            className={[s.example, s[tool.example.shape]].join(' ')}
+            src={exampleSrc(tool, locale, isDark)}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            draggable={false}
+          />
+        ) : (
+          <ToolIcon tool={tool} />
+        )}
       </div>
 
       <div className={s.body}>

@@ -143,6 +143,29 @@
     "pdf": "Download PDF",
     "pdfSaved": "PDF saved"
   },
+  "inApp": {
+    "app": {
+      "instagram": "Instagram's",
+      "facebook": "Facebook's",
+      "tiktok": "TikTok's",
+      "other": "this app's"
+    },
+    "notice": "Images don't save in {app} built-in browser",
+    "carry": "Open the page in your phone's browser — what you've filled in comes along.",
+    "openChrome": "Open in Chrome",
+    "orMenu": "Or tap ⋮ at the top and open the page in your browser.",
+    "menuAndroid": "Tap ⋮ at the top and open the page in your browser.",
+    "menuIos": "Tap ··· at the top and open the page in your browser.",
+    "copyLink": "Copy link",
+    "copied": "Link copied. Paste it into your browser.",
+    "close": "Close",
+    "saveTitle": "Save the image",
+    "saveHold": "Press and hold the image, then save it to your phone.",
+    "saveElse": "Not working?",
+    "pdfTitle": "Save the PDF",
+    "pdfBody": "PDFs don't download in {app} built-in browser. Open the page in your phone's browser — what you've filled in comes along.",
+    "photosStay": "Photos stay behind: you'll pick them again there."
+  },
   "pitch": {
     "cta": "Create my booking page"
   },

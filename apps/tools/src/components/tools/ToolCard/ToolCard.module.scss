@@ -28,6 +28,8 @@ a.card:hover {
 
   .rings { transform: scale(1.08); opacity: 1; }
   .arrow { transform: translate(2px, -2px); }
+  /* The sample straightens and lifts toward the visitor. */
+  .example { transform: translateY(-5px) rotate(0deg); }
 }
 
 /* ── Artwork: the tool's hue as light falling on paper, rings radiating from
@@ -59,6 +61,50 @@ a.card:hover {
   );
   mask-image: radial-gradient(circle at 50% 50%, #000 12%, transparent 58%);
   transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.1, 1), opacity 0.3s ease;
+}
+
+/* ── The finished sample: what the tool makes, in the visitor's language
+   (public/examples, rendered from the tool itself). `translate` places it,
+   `transform` tilts it — so the hover can straighten it without moving it. ── */
+.example {
+  position: absolute;
+  left: 50%;
+  display: block;
+  height: auto;
+  border-radius: 9px;
+  /* A hairline keeps a dark sample apart from a dark card. */
+  outline: 1px solid $line-1;
+  outline-offset: -1px;
+  box-shadow:
+    0 1px 2px rgb(24 16 10 / 0.12),
+    0 14px 30px -10px rgb(24 16 10 / 0.38);
+  user-select: none;
+  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+
+/* Tall ones — a story, the client's screen — rise from the foot of the art,
+   with the part that says what they are above the edge. */
+.story,
+.screen {
+  bottom: 0;
+  width: 30%;
+  translate: -50% 22%;
+  transform: rotate(-4deg);
+}
+
+.screen {
+  width: 32%;
+  border-radius: 12px;
+}
+
+/* Wide ones — a gift card, a before & after post — lie in the middle, like a
+   print on a table. */
+.landscape {
+  top: 50%;
+  width: 62%;
+  translate: -50% -50%;
+  transform: rotate(-3deg);
+  border-radius: 6px;
 }
 
 .body {
@@ -150,7 +196,7 @@ a.card:hover {
   .art {
     --tool-icon-size: 48px;
 
-    width: 96px;
+    width: 104px;
     aspect-ratio: auto;
     flex-shrink: 0;
     border-bottom: 0;
@@ -158,6 +204,21 @@ a.card:hover {
   }
 
   .rings { inset: -60%; }
+
+  /* A narrow column: every sample whole, in its middle. */
+  .story,
+  .screen {
+    top: 50%;
+    bottom: auto;
+    width: 62%;
+    translate: -50% -50%;
+    border-radius: 6px;
+  }
+
+  .landscape {
+    width: 84%;
+    border-radius: 4px;
+  }
 
   .body {
     padding: 14px 16px;

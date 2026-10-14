@@ -2,25 +2,32 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 export type Theme = 'light' | 'dark'
 
-const STORAGE_KEY = 'reserva-tools-theme'
+/** A theme the visitor picked with the toggle — nothing is stored until they do. */
+const STORAGE_KEY = 'reserva-tools-theme-choice'
+/**
+ * The old key held whatever theme a visit ended on, chosen or not, so a
+ * "light" in it says nothing about a choice. Dropped on sight.
+ */
+const LEGACY_KEY = 'reserva-tools-theme'
 
 /**
- * Light unless the visitor has chosen otherwise — the same rule as the other
- * public Reserva sites. Someone arriving from a reel or a search result has no
- * relationship with the page yet, and light is the version designed hardest.
+ * Dark unless the visitor has picked light: the tools' look, and the first
+ * thing someone arriving from a reel sees. index.html paints dark before any
+ * script runs; this keeps a light choice from earlier visits.
  *
  * Read synchronously by main.tsx before React mounts, so the page never paints
  * one theme and then flips to the other.
  */
 export function initialTheme(): Theme {
-  if (typeof window === 'undefined') return 'light'
+  if (typeof window === 'undefined') return 'dark'
   try {
+    window.localStorage.removeItem(LEGACY_KEY)
     const saved = window.localStorage.getItem(STORAGE_KEY)
     if (saved === 'light' || saved === 'dark') return saved
   } catch {
-    // Blocked storage — light is still the right answer.
+    // Blocked storage — dark is still the right answer.
   }
-  return 'light'
+  return 'dark'
 }
 
 /** Keep the browser chrome (`theme-color`) in step with the live `--bg-0`. */
@@ -36,6 +43,8 @@ export function useTheme() {
 
   // Skips the first run: main.tsx already stamped the attribute before mount.
   const mounted = useRef(false)
+  /** Set by the toggle: only a choice is remembered, never the default. */
+  const chosen = useRef(false)
 
   useEffect(() => {
     const html = document.documentElement
@@ -53,6 +62,7 @@ export function useTheme() {
     html.setAttribute('data-theme', theme)
     syncBrowserChrome(html)
 
+    if (!chosen.current) return
     try {
       window.localStorage.setItem(STORAGE_KEY, theme)
     } catch {
@@ -61,6 +71,7 @@ export function useTheme() {
   }, [theme])
 
   const toggle = useCallback(() => {
+    chosen.current = true
     setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
   }, [])
 

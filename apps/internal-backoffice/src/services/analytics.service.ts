@@ -79,7 +79,11 @@ export interface AnalyticsSources {
 }
 
 /** How results left a tool, by tool_export `via`. */
-export interface ToolExportsBy { share: number; download: number; pdf: number; whatsapp: number; viber: number; copy: number }
+export interface ToolExportsBy {
+  share: number; download: number; pdf: number; whatsapp: number; viber: number; copy: number
+  /** Shown to press and hold inside an app's built-in browser — saving it cannot be confirmed. */
+  hold: number
+}
 
 export interface ToolRow {
   /** The tool's registry id, e.g. 'priceList'. */
@@ -120,6 +124,8 @@ export interface AnalyticsTools {
   /** Page views by interface language. */
   languages: { language: string; views: number }[]
   errors: { tool: string | null; code: string; count: number }[]
+  /** Visits inside an app's built-in browser (Instagram's, Facebook's…), and how many moved to a real browser. */
+  inApp: { sessions: Kpi; opened: Kpi }
   /** Booking-site sessions the tools sent (utm_source=reserva-tools), and their sign-ups (tracked). */
   toPlatform: {
     visits: Kpi; signupStarts: Kpi; signups: Kpi

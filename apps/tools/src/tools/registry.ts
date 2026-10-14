@@ -14,6 +14,9 @@ export type ToolId = 'priceList' | 'freeSlots' | 'beforeAfter' | 'appointmentCar
 /** Card artwork hue — see `--tool-*` in styles/theme.css. */
 export type ToolHue = 'rose' | 'sage' | 'sky' | 'sand' | 'plum'
 
+/** How a finished sample sits on the home card: a tall story, a wide card or post, a phone screen. */
+export type ExampleShape = 'story' | 'landscape' | 'screen'
+
 export interface Tool {
   id: ToolId
   /** Path on tools.reserva.am. Permanent once live: it gets shared and indexed. */
@@ -22,6 +25,11 @@ export interface Tool {
   hue: ToolHue
   /** The tool's page, code-split. Absent = shown on the grid as "soon", no route. */
   page?: LazyExoticComponent<ComponentType>
+  /**
+   * The finished sample its home card shows (see exampleSrc). `themed`: a page
+   * that follows the site's theme rather than an image, so kept in light and dark.
+   */
+  example?: { shape: ExampleShape; themed?: boolean }
 }
 
 export type LiveTool = Tool & { page: NonNullable<Tool['page']> }
@@ -33,6 +41,7 @@ export const TOOLS: readonly Tool[] = [
     icon: ReceiptText,
     hue: 'sand',
     page: lazy(() => import('./price-list/PriceListPage').then((m) => ({ default: m.PriceListPage }))),
+    example: { shape: 'story' },
   },
   {
     id: 'freeSlots',
@@ -40,6 +49,7 @@ export const TOOLS: readonly Tool[] = [
     icon: CalendarClock,
     hue: 'sage',
     page: lazy(() => import('./free-slots/FreeSlotsPage').then((m) => ({ default: m.FreeSlotsPage }))),
+    example: { shape: 'story' },
   },
   {
     id: 'beforeAfter',
@@ -47,6 +57,7 @@ export const TOOLS: readonly Tool[] = [
     icon: Columns2,
     hue: 'rose',
     page: lazy(() => import('./before-after/BeforeAfterPage').then((m) => ({ default: m.BeforeAfterPage }))),
+    example: { shape: 'landscape' },
   },
   {
     id: 'appointmentCard',
@@ -56,6 +67,7 @@ export const TOOLS: readonly Tool[] = [
     page: lazy(() =>
       import('./appointment-card/AppointmentCardPage').then((m) => ({ default: m.AppointmentCardPage })),
     ),
+    example: { shape: 'screen', themed: true },
   },
   {
     id: 'giftCertificate',
@@ -65,6 +77,7 @@ export const TOOLS: readonly Tool[] = [
     page: lazy(() =>
       import('./gift-certificate/GiftCertificatePage').then((m) => ({ default: m.GiftCertificatePage })),
     ),
+    example: { shape: 'landscape' },
   },
 ]
 
@@ -74,6 +87,15 @@ export function toolById(id: ToolId): Tool {
   const tool = TOOLS.find((t) => t.id === id)
   if (!tool) throw new Error(`Unknown tool: ${id}`)
   return tool
+}
+
+/**
+ * A tool's sample picture in a language (and theme, when it has both). Made
+ * by scripts/render-examples.mjs from the tool itself: re-run it after
+ * changing how a tool looks.
+ */
+export function exampleSrc(tool: Tool, locale: string, dark: boolean): string {
+  return `/examples/${tool.id}-${locale}${dark && tool.example?.themed ? '-dark' : ''}.webp`
 }
 
 /** The live tool at this path, if it is one ('/price-list' → the price list). */

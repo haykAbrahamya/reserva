@@ -1,5 +1,7 @@
 <!doctype html>
-<html lang="hy">
+<!-- Dark is the default: painted before any script, so nobody sees a light
+     flash first. main.tsx swaps it for a visitor who picked light. -->
+<html lang="hy" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <!-- The main Reserva icon set, same files as reserva.am. SVG for modern
@@ -12,9 +14,9 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <!-- --bg-0 in the light theme (styles/theme.css). useTheme rewrites it from
-         the live token on a theme change; this is what paints before React. -->
-    <meta name="theme-color" content="#F4F2ED" />
+    <!-- --bg-0 in the dark theme, the default (styles/theme.css). useTheme
+         rewrites it from the live token; this is what paints before React. -->
+    <meta name="theme-color" content="#0E0D0C" />
 
     <title>Անվճար գործիքներ գեղեցկության մասնագետների համար — Reserva</title>
     <meta

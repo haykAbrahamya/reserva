@@ -31,7 +31,7 @@ const CHART_COPY: Record<Granularity, string> = {
 }
 
 /** How a result left, in the order the table reads. */
-const VIA_ORDER = ['share', 'download', 'pdf', 'whatsapp', 'viber', 'copy'] as const
+const VIA_ORDER = ['share', 'download', 'pdf', 'whatsapp', 'viber', 'copy', 'hold'] as const
 
 /**
  * tools.reserva.am on its own: who came, which tools they opened, what they
@@ -75,6 +75,12 @@ export function ToolsOverview({ range, includeStaff, refreshKey, onOpenTool }: T
     { label: 'Signed up', kpi: p.signups, of: 'starts' },
   ]
 
+  const inAppFunnel: FunnelStep[] = [
+    { label: 'Visits', kpi: k.sessions, note: 'all' },
+    { label: 'In an app’s browser', kpi: data.inApp.sessions, of: 'visits', note: 'Instagram, Facebook…' },
+    { label: 'Moved to a real browser', kpi: data.inApp.opened, of: 'in-app visits' },
+  ]
+
   return (
     <div className={[s.tab, loading ? s.stale : s.fresh].join(' ')} aria-busy={loading}>
       <p className={s.caption}>
@@ -112,6 +118,13 @@ export function ToolsOverview({ range, includeStaff, refreshKey, onOpenTool }: T
             />
           </div>
         )}
+      </Panel>
+
+      <Panel
+        title="Inside apps’ browsers"
+        sub="A link in a reel or an ad opens in Instagram’s or Facebook’s own browser, which can’t save a file. How many visits started there, and how many moved to Chrome or copied the link to open elsewhere. Results shown there to press and hold are in “How results leave”."
+      >
+        <Funnel steps={inAppFunnel} baseline={baseline} />
       </Panel>
 
       <Panel
@@ -197,7 +210,10 @@ export function ToolsOverview({ range, includeStaff, refreshKey, onOpenTool }: T
       </Panel>
 
       <div className={s.split}>
-        <Panel title="How results leave" sub="Share sheet, download, PDF, WhatsApp, Viber or a copied link.">
+        <Panel
+          title="How results leave"
+          sub="Share sheet, download, PDF, WhatsApp, Viber or a copied link — or, inside an app’s browser, the image shown to press and hold."
+        >
           {data.exportsBy.length === 0 ? (
             <PanelEmpty icon={Download} title="Nothing exported yet" />
           ) : (
@@ -349,6 +365,7 @@ function ToolsSkeleton() {
         {Array.from({ length: 8 }, (_, i) => <Skeleton key={i} height={96} />)}
       </div>
       <Skeleton height={190} />
+      <Skeleton height={150} />
       <Skeleton height={372} />
       <Skeleton height={260} />
     </div>

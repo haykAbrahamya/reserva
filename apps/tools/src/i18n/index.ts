@@ -40,13 +40,30 @@ const withTools = (locale: Locale, app: Messages): Messages => ({
   ...Object.fromEntries(Object.entries(TOOL_COPY).map(([namespace, copy]) => [namespace, copy[locale]])),
 })
 
+const STORAGE_KEY = 'reserva-tools-locale'
+
 const i18n = createI18n<Locale>({
   locales: LOCALES,
   defaultLocale: 'hy',
   meta: LOCALE_META,
   bundled: { hy: withTools('hy', hy), en: withTools('en', en), ru: withTools('ru', ru) },
-  storageKey: 'reserva-tools-locale',
+  storageKey: STORAGE_KEY,
   remoteBaseUrl: '',
 })
 
 export const { I18nProvider, useI18n, useT, useLocalized, hasExplicitChoice } = i18n
+
+/**
+ * Armenian unless the visitor picked another language. The engine remembers
+ * whatever language a visit ended in — a client's card made in Russian
+ * switches its page to Russian — so a language nobody chose is forgotten on
+ * the next load. Called by main.tsx before anything renders.
+ */
+export function forgetUnchosenLocale(): void {
+  if (hasExplicitChoice()) return
+  try {
+    window.localStorage.removeItem(STORAGE_KEY)
+  } catch {
+    // Blocked storage: nothing was remembered either.
+  }
+}

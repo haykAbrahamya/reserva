@@ -10,13 +10,17 @@
 
 import { createPulse } from '@reserva/shared/pulse'
 import type { Locale } from '@/i18n'
+import type { InAppName } from '@/lib/inAppBrowser'
 import type { ToolId } from '@/tools/registry'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1'
 
 export type PageType = 'tools' | 'tool' | 'visit' | 'other'
-/** How a result left the page. */
-export type ExportVia = 'share' | 'download' | 'pdf' | 'whatsapp' | 'viber' | 'copy'
+/**
+ * How a result left the page. `hold`: inside an app's built-in browser, the
+ * image was shown to press and hold — whether it was then saved, no page can tell.
+ */
+export type ExportVia = 'share' | 'download' | 'pdf' | 'whatsapp' | 'viber' | 'copy' | 'hold'
 /** A main action inside a tool. */
 export type ToolAct =
   // A style, and the rows of a list
@@ -36,6 +40,8 @@ export type ToolErrorCode = 'share' | 'download' | 'pdf' | 'copy' | 'photo' | 'b
 export type CtaFrom = 'pitch' | 'header' | 'footer'
 /** What a client did on an appointment card's page. */
 export type VisitAct = 'calendar' | 'directions' | 'call' | 'made'
+/** Where an in-app visitor asked for their real browser: the notice at the top, or the save sheet. */
+export type BrowserOpenFrom = 'notice' | 'sheet'
 
 /** What a result was made with: its style, its layout, how many rows or slots. */
 export interface ExportDetails {
@@ -54,6 +60,8 @@ export interface ToolsEvents {
   cta_click: { from: CtaFrom; tool?: ToolId }
   visit_action: { act: VisitAct }
   pref_change: { what: 'lang' | 'theme'; v: string }
+  /** An app's built-in browser: the visitor took the page to Chrome, or copied its link to open elsewhere. */
+  browser_open: { app: InAppName; from: BrowserOpenFrom; how: 'chrome' | 'copy'; tool?: ToolId }
 }
 export type ToolsEventName = keyof ToolsEvents
 
@@ -66,7 +74,7 @@ const pulse = createPulse({
   // Each of these tends to hand the phone to another app — WhatsApp, Viber,
   // the share sheet, reserva.am, the dialer, maps — and a backgrounded tab may
   // never get another tick: they leave at once.
-  urgent: new Set(['tool_export', 'cta_click', 'visit_action']),
+  urgent: new Set(['tool_export', 'cta_click', 'visit_action', 'browser_open']),
 })
 
 /** Fire-and-forget: queues the event; it leaves within seconds, or as the page closes. */

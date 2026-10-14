@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { FileDown } from 'lucide-react'
 import { Button, useToast } from '@reserva/ui'
 import { useT } from '@/i18n'
+import { SaveSheet } from '@/components/tools/SaveSheet/SaveSheet'
 import type { ExportDetails } from '@/lib/analytics/pulse'
 import { useToolEvents } from '@/lib/analytics/useToolEvents'
 import { canvasToBlob, downloadFile, renderCanvas } from '@/lib/canvas/exportFile'
+import { inApp } from '@/lib/inAppBrowser'
 import { jpegToPdf } from '@/lib/pdf'
 import s from './PdfButton.module.scss'
 
@@ -26,14 +28,21 @@ interface Props {
  * Download the same drawing as a print-ready PDF at a real paper size — for
  * a salon that hands out printed gift cards rather than sending an image.
  * Rendered on demand: a PDF is the occasional export, not the common one.
+ * An app's built-in browser cannot keep a file at all, so there it explains
+ * and offers the way to a real browser instead.
  */
 export function PdfButton({ width, height, widthMm, heightMm, draw, prepare, fileName, details }: Props) {
   const t = useT()
   const toast = useToast()
   const events = useToolEvents()
   const [busy, setBusy] = useState(false)
+  const [blocked, setBlocked] = useState(false)
 
   const run = async () => {
+    if (inApp) {
+      setBlocked(true)
+      return
+    }
     setBusy(true)
     try {
       await prepare?.()
@@ -52,9 +61,12 @@ export function PdfButton({ width, height, widthMm, heightMm, draw, prepare, fil
   }
 
   return (
-    <Button className={s.button} disabled={busy} onClick={run}>
-      <FileDown size={16} />
-      {t('export.pdf')}
-    </Button>
+    <>
+      <Button className={s.button} disabled={busy} onClick={run}>
+        <FileDown size={16} />
+        {t('export.pdf')}
+      </Button>
+      {blocked && inApp && <SaveSheet browser={inApp} imageUrl={null} onClose={() => setBlocked(false)} />}
+    </>
   )
 }

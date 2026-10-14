@@ -1,6 +1,6 @@
 import {
   ArrowUpRight, BadgeCheck, CalendarCheck, CalendarClock, CalendarDays, CalendarPlus, ChevronsRight, Circle, Columns2,
-  Copy, Crop, Download, Eraser, ExternalLink, FileDown, FileText, Gift, Globe, GraduationCap, Hash, Home, ImageMinus,
+  Copy, Crop, Download, Eraser, ExternalLink, FileDown, FileText, Gift, Globe, GraduationCap, Hand, Hash, Home, ImageMinus,
   ImagePlus, Images, LayoutGrid, ListChecks, LogOut, MapPin, Maximize2, MessageCircle, MessageSquareHeart,
   MessageSquarePlus, MessageSquareWarning, Minus, MousePointerClick, Navigation, Palette, PenLine, Phone, Plus,
   ReceiptText, RectangleVertical, Search, Send, Share2, SlidersHorizontal, Smartphone, Sparkles, Star, Store, SunMoon,
@@ -8,8 +8,8 @@ import {
 } from 'lucide-react'
 import type { SessionEvent, SessionRow } from '@/services/analytics.service'
 import {
-  CTA_FROM_LABELS, SIGNUP_STEP_LABELS, TOOL_ERROR_LABELS, TOOL_LABELS, UI_LANGUAGE_LABELS, eventDef, humanize, labelFrom,
-  toolValueLabel, type EventTone,
+  CTA_FROM_LABELS, IN_APP_LABELS, SIGNUP_STEP_LABELS, TOOL_ERROR_LABELS, TOOL_LABELS, UI_LANGUAGE_LABELS, eventDef, humanize,
+  labelFrom, toolValueLabel, type EventTone,
 } from './catalog'
 import { ContactIcon } from './icons'
 import { isUuid } from './format'
@@ -54,6 +54,7 @@ const EXPORT_ICON: Record<string, LucideIcon> = {
   pdf: FileDown,
   viber: MessageCircle,
   copy: Copy,
+  hold: Hand,
 }
 
 const VISIT_ICON: Record<string, LucideIcon> = {
@@ -126,6 +127,7 @@ export function EventIcon({ name, props, size = 14 }: { name: string; props?: Re
       return <Icon size={size} />
     }
     case 'pref_change': return str(props?.what) === 'lang' ? <Globe size={size} /> : <SunMoon size={size} />
+    case 'browser_open': return str(props?.how) === 'copy' ? <Copy size={size} /> : <ExternalLink size={size} />
     default: return name.endsWith('_step') ? <ListChecks size={size} /> : <Circle size={size - 4} />
   }
 }
@@ -339,6 +341,7 @@ export function describeEvent(
         whatsapp: `Sent the ${tool} on WhatsApp`,
         viber: `Sent the ${tool} on Viber`,
         copy: `Copied the ${tool} link`,
+        hold: `Was shown the ${tool} to press and hold (in an app’s browser)`,
       }
       const style = str(p.theme) ? ` · ${toolValueLabel(str(p.theme))} style` : ''
       const items = typeof p.n === 'number' ? ` · ${p.n} ${p.n === 1 ? 'item' : 'items'}` : ''
@@ -360,6 +363,14 @@ export function describeEvent(
       return str(p.what) === 'lang'
         ? line(`Switched the language to ${labelFrom(UI_LANGUAGE_LABELS, str(p.v))}`)
         : line(`Switched to the ${str(p.v) ?? 'other'} theme`)
+    case 'browser_open': {
+      const named = str(p.app) && str(p.app) !== 'other' ? labelFrom(IN_APP_LABELS, str(p.app)) : null
+      const browser = named ? `${named}’s browser` : 'the app’s browser'
+      const where = str(p.from) === 'sheet' ? 'from the save sheet' : 'from the top notice'
+      return str(p.how) === 'copy'
+        ? line(`Copied the link to leave ${browser} — ${where}`)
+        : line(`Left ${browser} for Chrome — ${where}`)
+    }
     default:
       return line(humanize(ev.name))
   }
