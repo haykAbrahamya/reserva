@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { Download, Share2 } from 'lucide-react'
+import { Download, ImageDown, Share2 } from 'lucide-react'
 import { Button, useToast } from '@reserva/ui'
 import { useT } from '@/i18n'
 import { SaveSheet } from '@/components/tools/SaveSheet/SaveSheet'
 import type { ExportDetails } from '@/lib/analytics/pulse'
 import { useToolEvents } from '@/lib/analytics/useToolEvents'
-import { canShareFiles, downloadFile, shareFile } from '@/lib/canvas/exportFile'
+import { canShareFiles, downloadFile, savesToPhotosByShare, shareFile } from '@/lib/canvas/exportFile'
 import { inApp } from '@/lib/inAppBrowser'
 import s from './ExportActions.module.scss'
 
@@ -31,8 +31,12 @@ type Action = 'share' | 'download'
 /**
  * Share (where the phone can — that sheet is where Instagram Stories lives)
  * and Download. On a browser that cannot share files, Download is the primary.
- * Inside an app's built-in browser a download goes nowhere, so Download shows
- * the image to press and hold instead, with the way out to a real browser.
+ *
+ * Where a download would not land in the phone's photos, the second button
+ * goes where it does instead: on an iPhone it is "Save to Photos" and opens
+ * the share sheet at "Save Image"; inside an app's built-in browser, where a
+ * download goes nowhere, it shows the image to press and hold, with the way
+ * out to a real browser.
  */
 export function ExportActions({ getFile, ready, shareTitle, format, details, photosStay, children }: Props) {
   const t = useT()
@@ -42,6 +46,7 @@ export function ExportActions({ getFile, ready, shareTitle, format, details, pho
   /** The image in the save sheet, as an object URL; null while it is closed. */
   const [held, setHeld] = useState<string | null>(null)
   const sharable = useMemo(canShareFiles, [])
+  const toPhotos = useMemo(savesToPhotosByShare, [])
 
   useEffect(() => {
     if (!held) return
@@ -55,6 +60,8 @@ export function ExportActions({ getFile, ready, shareTitle, format, details, pho
       if (action === 'share') {
         // A dismissed share sheet is no export, and no error either.
         if (await shareFile(file, shareTitle)) events?.exported('share', details)
+      } else if (toPhotos) {
+        if (await shareFile(file, shareTitle)) events?.exported('download', details)
       } else if (inApp) {
         setHeld(URL.createObjectURL(file))
         events?.exported('hold', details)
@@ -88,8 +95,8 @@ export function ExportActions({ getFile, ready, shareTitle, format, details, pho
           disabled={disabled}
           onClick={() => run('download')}
         >
-          <Download size={16} />
-          {t('export.download')}
+          {toPhotos ? <ImageDown size={16} /> : <Download size={16} />}
+          {t(toPhotos ? 'export.toPhotos' : 'export.download')}
         </Button>
       </div>
       {children && <div className={s.more}>{children}</div>}

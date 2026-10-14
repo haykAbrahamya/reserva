@@ -42,6 +42,19 @@ export function canShareFiles(): boolean {
   }
 }
 
+/**
+ * An iPhone or iPad, where saving means the share sheet. iOS keeps a download
+ * in the Files app, never in Photos — and Photos is where a story has to be
+ * for Instagram to find it. No page can write to Photos itself; the share
+ * sheet's "Save Image" can. iPadOS presents itself as a Mac with a touch screen.
+ */
+export function savesToPhotosByShare(): boolean {
+  if (typeof navigator === 'undefined') return false
+  const ua = navigator.userAgent
+  const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)
+  return ios && canShareFiles()
+}
+
 /** Open the share sheet. Resolves false when the visitor dismissed it. */
 export async function shareFile(file: File, title?: string): Promise<boolean> {
   try {

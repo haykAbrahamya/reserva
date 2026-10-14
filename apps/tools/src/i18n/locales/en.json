@@ -138,6 +138,7 @@
   "export": {
     "share": "Share",
     "download": "Download",
+    "toPhotos": "Save image",
     "saved": "Image saved",
     "failed": "Couldn’t create the image. Please try again.",
     "pdf": "Download PDF",
