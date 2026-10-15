@@ -1457,5 +1457,22 @@
     "calendar": {
       "busyAt": "Busy · {branch}"
     }
+  },
+  "superAdmin": {
+    "link": "Reserva team? Sign in as super admin",
+    "title": "Super admin sign-in",
+    "subtitle": "For the Reserva team — your internal console email and password.",
+    "email": "Email",
+    "back": "Back to partner sign-in",
+    "chooseTitle": "Choose a partner",
+    "chooseSubtitle": "You will see and change everything as the partner’s admin.",
+    "search": "Search by name or page address…",
+    "inactive": "Disabled",
+    "noPartners": "No partners match",
+    "opening": "Opening…",
+    "bar": "Super admin",
+    "switch": "Switch partner",
+    "exit": "Exit",
+    "supportReadOnly": "View only for super admins — replies come from the partner’s own team."
   }
 }

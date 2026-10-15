@@ -1,4 +1,5 @@
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios'
+import { superSession } from './superSession'
 
 // ─────────────────────────────────────────────────────────────
 // Shared API client for the Reserva backend.
@@ -83,13 +84,22 @@ let refreshing: Promise<string | null> | null = null
 async function refreshAccessToken(): Promise<string | null> {
   const refresh = tokenStore.refresh
   if (!refresh) return null
+  // A super admin renews at their own endpoint — inside a partner, for that
+  // partner. The server re-checks the right each time.
+  const sup = superSession.get()
   try {
-    const res = await axios.post(`${API_URL}/auth/refresh`, { refreshToken: refresh })
+    const res = sup
+      ? await axios.post(`${API_URL}/auth/super/refresh`, {
+          refreshToken: refresh,
+          ...(sup.partner ? { partnerId: sup.partner.id } : {}),
+        })
+      : await axios.post(`${API_URL}/auth/refresh`, { refreshToken: refresh })
     const { accessToken, refreshToken } = res.data.data
     tokenStore.set(accessToken, refreshToken)
     return accessToken
   } catch {
     tokenStore.clear()
+    superSession.clear()
     return null
   }
 }
@@ -122,8 +132,10 @@ http.interceptors.response.use(
     const status = error.response?.status ?? 0
     const body = error.response?.data?.error
 
-    // Try one transparent refresh+retry on an expired/invalid access token.
-    const isAuthRoute = original?.url?.includes('/auth/')
+    // Try one transparent refresh+retry on an expired/invalid access token. The
+    // super admin's partner list and entry are sessions' calls like any other.
+    const url = original?.url ?? ''
+    const isAuthRoute = url.includes('/auth/') && !/\/auth\/super\/(partners|enter)/.test(url)
     if (status === 401 && !original?._retried && !isAuthRoute) {
       original._retried = true
 
@@ -142,9 +154,12 @@ http.interceptors.response.use(
         original.headers = { ...original.headers, Authorization: `Bearer ${newToken}` }
         return http(original)
       }
-      // Refresh failed → bounce to login.
+      // Refresh failed → bounce to login (a super admin to theirs).
+      const wasSuper = superSession.get() !== null
       tokenStore.clear()
-      if (!window.location.pathname.startsWith('/login')) window.location.href = '/login'
+      superSession.clear()
+      const signIn = wasSuper ? '/super-admin' : '/login'
+      if (!window.location.pathname.startsWith(signIn)) window.location.href = signIn
     }
 
     throw new ApiError(

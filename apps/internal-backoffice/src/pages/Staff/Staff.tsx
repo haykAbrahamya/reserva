@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Plus, Search, Users, Trash2 } from 'lucide-react'
 import {
-  Avatar, Badge, Button, Table, Th, Td, Tr, Empty, Pagination, Select, ConfirmDialog, useToast,
+  Avatar, Badge, Button, Table, Th, Td, Tr, Empty, Pagination, Select, ConfirmDialog, Toggle, useToast,
 } from '@/components/ui'
 import { useResource } from '@/store/useResource'
 import { staffService, type StaffMember } from '@/services/staff.service'
@@ -20,6 +20,8 @@ export function Staff() {
   const [debounced, setDebounced] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
   const [toDelete, setToDelete] = useState<StaffMember | null>(null)
+  // Granting super admin is confirmed; withdrawing it never waits.
+  const [toGrant, setToGrant] = useState<StaffMember | null>(null)
 
   useEffect(() => {
     const id = setTimeout(() => { setDebounced(search.trim()); setPage(1) }, 300)
@@ -38,9 +40,10 @@ export function Staff() {
   const to = Math.min(page * pageSize, total)
   const changePageSize = (n: number) => { setPageSize(n); setPage(1) }
 
-  const update = async (id: string, patch: { role?: PlatformRole; active?: boolean }) => {
+  const update = async (id: string, patch: { role?: PlatformRole; active?: boolean; superAdmin?: boolean }) => {
     try {
       await staffService.update(id, patch)
+      if (patch.superAdmin !== undefined) toast(patch.superAdmin ? 'Super admin access granted' : 'Super admin access withdrawn — effective now')
       await reload()
     } catch (err) {
       toast(errorMessage(err))
@@ -91,6 +94,7 @@ export function Staff() {
               <tr>
                 <Th>Member</Th>
                 <Th>Role</Th>
+                <Th>Super admin</Th>
                 <Th>Last login</Th>
                 <Th>Status</Th>
                 <Th></Th>
@@ -123,6 +127,13 @@ export function Staff() {
                           ]}
                         />
                       </div>
+                    </Td>
+                    <Td>
+                      <Toggle
+                        checked={!!m.superAdmin}
+                        ariaLabel={`Super admin: ${m.name}`}
+                        onChange={(on) => (on ? setToGrant(m) : update(m.id, { superAdmin: false }))}
+                      />
                     </Td>
                     <Td>
                       <span className={s.lastLogin}>
@@ -173,6 +184,20 @@ export function Staff() {
         confirmLabel="Remove"
         cancelLabel="Cancel"
         variant="danger"
+      />
+
+      <ConfirmDialog
+        open={!!toGrant}
+        onClose={() => setToGrant(null)}
+        onConfirm={async () => {
+          const m = toGrant
+          setToGrant(null)
+          if (m) await update(m.id, { superAdmin: true })
+        }}
+        title={`Make ${toGrant?.name} a super admin?`}
+        message="They can then sign in to the partner backoffice as ANY partner — see and change all of its data. Turn it off here at any time; it stops working at once."
+        confirmLabel="Make super admin"
+        cancelLabel="Cancel"
       />
     </div>
   )

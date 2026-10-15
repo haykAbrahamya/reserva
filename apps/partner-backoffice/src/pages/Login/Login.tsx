@@ -1,8 +1,9 @@
 import { useState, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { AtSign, Eye, EyeOff, AlertCircle, LayoutGrid, Users, Smartphone } from 'lucide-react'
 import { useAuthStore } from '@/store/auth.store'
 import { authService } from '@/services/auth.service'
+import { superAdminService } from '@/services/superAdmin.service'
 import { errorMessage } from '@/utils/errors'
 import { useT } from '@/i18n'
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher/LanguageSwitcher'
@@ -43,10 +44,15 @@ function LogoMark({ size = 20, light = false }: { size?: number; light?: boolean
   )
 }
 
-export function Login() {
+/**
+ * Sign-in. `super` is the Reserva team's door (/super-admin): internal-console
+ * credentials, then a partner to enter — same page, its own endpoint.
+ */
+export function Login({ mode = 'partner' }: { mode?: 'partner' | 'super' }) {
   const navigate = useNavigate()
   const login    = useAuthStore(s => s.login)
   const t        = useT()
+  const isSuper  = mode === 'super'
 
   const [email,       setEmail]       = useState('')
   const [password,    setPassword]    = useState('')
@@ -70,6 +76,11 @@ export function Login() {
     if (!validate()) return
     setLoading(true)
     try {
+      if (isSuper) {
+        await superAdminService.login(email, password)
+        navigate('/choose-partner', { replace: true })
+        return
+      }
       const { token, user } = await authService.login(email, password)
       login(token, user)
       navigate('/', { replace: true })
@@ -136,8 +147,8 @@ export function Login() {
 
         <div className={s.card}>
           <div className={s.heading}>
-            <h1 className={s.title}>{t('login.welcomeBack')}</h1>
-            <p className={s.subtitle}>{t('login.subtitle')}</p>
+            <h1 className={s.title}>{isSuper ? t('superAdmin.title') : t('login.welcomeBack')}</h1>
+            <p className={s.subtitle}>{isSuper ? t('superAdmin.subtitle') : t('login.subtitle')}</p>
           </div>
 
           <form className={s.form} onSubmit={handleSubmit} noValidate>
@@ -151,13 +162,13 @@ export function Login() {
 
             {/* Email or phone — login accepts either (see auth.findByLogin). */}
             <div className={s.field}>
-              <label className={s.label} htmlFor="login">{t('login.identifierLabel')}</label>
+              <label className={s.label} htmlFor="login">{isSuper ? t('superAdmin.email') : t('login.identifierLabel')}</label>
               <div className={s.inputWrap}>
                 <input
                   id="login"
-                  type="text"
+                  type={isSuper ? 'email' : 'text'}
                   autoComplete="username"
-                  placeholder={t('login.identifierPlaceholder')}
+                  placeholder={isSuper ? 'name@reserva.am' : t('login.identifierPlaceholder')}
                   value={email}
                   onChange={e => { setEmail(e.target.value); setEmailErr(null); setError(null) }}
                   onKeyDown={e => e.key === 'Enter' && passRef.current?.focus()}
@@ -209,6 +220,11 @@ export function Login() {
               {loading ? t('login.signingIn') : t('login.signIn')}
             </button>
           </form>
+
+          {/* The other door, kept quiet: partners rarely need it, the Reserva team knows it is there. */}
+          <Link to={isSuper ? '/login' : '/super-admin'} className={s.altLink}>
+            {isSuper ? t('superAdmin.back') : t('superAdmin.link')}
+          </Link>
         </div>
 
         <p className={s.footer}>{t('login.copyright', { year: new Date().getFullYear() })}</p>

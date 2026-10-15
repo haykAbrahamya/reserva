@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
-import { Modal, Button, Input, Select, useToast } from '@/components/ui'
+import { Modal, Button, Input, Select, Checkbox, useToast } from '@/components/ui'
 import { staffService, type CreateStaffResult } from '@/services/staff.service'
 import type { PlatformRole } from '@/store/auth.store'
 import { errorMessage } from '@/services/errors'
@@ -12,7 +12,7 @@ interface Props {
   onCreated: () => void
 }
 
-const EMPTY = { name: '', email: '', role: 'operator' as PlatformRole }
+const EMPTY = { name: '', email: '', role: 'operator' as PlatformRole, superAdmin: false }
 
 export function CreateStaffModal({ open, onClose, onCreated }: Props) {
   const toast = useToast()
@@ -35,6 +35,7 @@ export function CreateStaffModal({ open, onClose, onCreated }: Props) {
         name: form.name.trim(),
         email: form.email.trim(),
         role: form.role,
+        superAdmin: form.superAdmin,
       })
       onCreated()
       if (res.otp) setResult(res)
@@ -109,6 +110,13 @@ export function CreateStaffModal({ open, onClose, onCreated }: Props) {
             ]}
           />
         </div>
+        <label className={s.checkRow}>
+          <Checkbox checked={form.superAdmin} onChange={(v) => setForm((f) => ({ ...f, superAdmin: v }))} ariaLabel="Super admin" />
+          <span>
+            <span className={s.checkLabel}>Super admin</span>
+            <span className={s.checkHint}>Can sign in to the partner backoffice as any partner and change its data.</span>
+          </span>
+        </label>
       </div>
     </Modal>
   )

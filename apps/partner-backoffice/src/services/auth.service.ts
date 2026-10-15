@@ -2,6 +2,8 @@ import type { AuthUser } from '@/store/auth.store'
 import { apiPost, apiGet, tokenStore } from './http'
 import { disablePush } from './push.service'
 import { markStaffBrowser } from '@/lib/staffCookie'
+import { isSuperAdmin, superSession } from './superSession'
+import { superAdminService } from './superAdmin.service'
 
 // ── API response shapes ──
 interface ApiUser {
@@ -42,6 +44,8 @@ export const authService = {
   async login(login: string, password: string): Promise<LoginResult> {
     const res = await apiPost<AuthResult>('/auth/login', { login, password })
     tokenStore.set(res.accessToken, res.refreshToken)
+    // A partner signing in here ends any super admin session left in this browser.
+    superSession.clear()
     markStaffBrowser()
     return { token: res.accessToken, user: toAuthUser(res.user) }
   },
@@ -51,11 +55,15 @@ export const authService = {
   async activate(token: string): Promise<LoginResult> {
     const res = await apiPost<AuthResult>('/public/signup/activate', { token })
     tokenStore.set(res.accessToken, res.refreshToken)
+    superSession.clear()
     markStaffBrowser()
     return { token: res.accessToken, user: toAuthUser(res.user) }
   },
 
   async logout(): Promise<void> {
+    // A super admin never subscribed this device to the partner's pushes: just end their session.
+    if (isSuperAdmin()) return superAdminService.exit()
+
     // Remove this device's push subscription BEFORE clearing tokens — the
     // unsubscribe endpoint is authenticated, and we don't want booking
     // notifications to keep arriving on a logged-out phone.

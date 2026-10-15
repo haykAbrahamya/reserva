@@ -10,6 +10,8 @@ export interface StaffMember {
   active: boolean
   lastLogin: string | null
   mustChangePassword: boolean
+  /** May sign in to the partner backoffice as any partner (granted by an owner). */
+  superAdmin: boolean
   createdAt: string
 }
 
@@ -18,6 +20,7 @@ export interface CreateStaffInput {
   email: string
   role: PlatformRole
   password?: string
+  superAdmin?: boolean
 }
 
 export interface CreateStaffResult {
@@ -29,6 +32,7 @@ export interface UpdateStaffInput {
   name?: string
   role?: PlatformRole
   active?: boolean
+  superAdmin?: boolean
 }
 
 export const staffService = {

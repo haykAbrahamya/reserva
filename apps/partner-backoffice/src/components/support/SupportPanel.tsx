@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { X, Send, Loader2, LifeBuoy, Check, CheckCheck } from 'lucide-react'
 import { useT } from '@/i18n'
 import { supportService, type SupportMessage } from '@/services/support.service'
+import { isSuperAdmin } from '@/services/superSession'
 import {
   onSupportMessage,
   onSupportTyping,
@@ -239,6 +240,10 @@ export function SupportPanel({ onClose, mobile }: Props) {
         )}
       </div>
 
+      {/* The partner's own conversation with Reserva: a super admin reads it, never writes in it. */}
+      {isSuperAdmin() ? (
+        <div className={s.readOnly}>{t('superAdmin.supportReadOnly')}</div>
+      ) : (
       <div className={s.composer}>
         <textarea
           className={s.input}
@@ -253,6 +258,7 @@ export function SupportPanel({ onClose, mobile }: Props) {
           {sending ? <Loader2 size={17} className={s.spin} /> : <Send size={17} />}
         </button>
       </div>
+      )}
     </div>
   )
 }

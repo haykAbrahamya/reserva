@@ -153,6 +153,17 @@
 }
 
 /* ── Composer ── */
+/* In place of the composer while a super admin is looking in. */
+.readOnly {
+  padding: 12px 16px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: $fg-2;
+  text-align: center;
+  border-top: 1px solid $line-1;
+  background: $bg-2;
+}
+
 .composer {
   display: flex;
   align-items: flex-end;

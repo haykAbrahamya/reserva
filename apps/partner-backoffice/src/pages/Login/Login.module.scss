@@ -234,6 +234,18 @@
   gap: 16px;
 }
 
+/* The other door (partner ↔ Reserva team sign-in): present, never loud. */
+.altLink {
+  display: block;
+  margin-top: 22px;
+  text-align: center;
+  font-size: 12.5px;
+  color: $fg-3;
+  text-decoration: none;
+  transition: color 0.15s;
+  &:hover { color: $accent; text-decoration: underline; }
+}
+
 .field {
   display: flex;
   flex-direction: column;

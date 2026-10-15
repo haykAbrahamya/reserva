@@ -12,6 +12,7 @@ import {
   pushSupported, isSubscribed, enablePush, disablePush, resyncPush, notificationPermission, isIosSafari,
 } from '@/services/push.service'
 import { useDragDismiss } from '@/components/ui'
+import { isSuperAdmin } from '@/services/superSession'
 import s from './NotificationsBell.module.scss'
 
 function useIsMobile() {
@@ -103,7 +104,8 @@ export function NotificationsBell() {
   // Reflect push state + silently re-subscribe if permission was already granted
   // (so push "just works" again after re-login without making the user re-tap).
   useEffect(() => {
-    if (!pushSupported()) return
+    // A super admin's browser never takes the partner's push messages.
+    if (!pushSupported() || isSuperAdmin()) return
     resyncPush()
       .then((ok) => (ok ? setPushOn(true) : isSubscribed().then(setPushOn)))
       .catch(() => isSubscribed().then(setPushOn).catch(() => {}))
@@ -203,7 +205,7 @@ export function NotificationsBell() {
       </div>
 
       {/* Push enable row (when the browser supports web push). */}
-      {pushSupported() && (
+      {pushSupported() && !isSuperAdmin() && (
         <button className={s.pushRow} onClick={togglePush} disabled={pushBusy || denied}>
           {pushOn ? <BellRing size={15} /> : <BellOff size={15} />}
           <span className={s.pushText}>

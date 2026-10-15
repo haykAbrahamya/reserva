@@ -3,6 +3,7 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout/AppLayout'
 import { RequireAuth } from '@/components/auth/RequireAuth'
 import { Login } from '@/pages/Login/Login'
+import { ChoosePartner } from '@/pages/SuperAdmin/ChoosePartner'
 
 // ── Route-level code splitting ────────────────────────────────
 // One chunk per page, so the first paint downloads the shell and the landing
@@ -127,6 +128,9 @@ export default function App() {
         <Routes>
           {/* Public */}
           <Route path="/login" element={<Login />} />
+          {/* The Reserva team's sign-in, and the partner they enter. */}
+          <Route path="/super-admin" element={<Login mode="super" />} />
+          <Route path="/choose-partner" element={<ChoosePartner />} />
           {/* Self-serve signup activation (magic link from email) */}
           <Route path="/activate" element={<Suspense fallback={null}><Activate /></Suspense>} />
 

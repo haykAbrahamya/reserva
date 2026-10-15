@@ -6,6 +6,7 @@ import { authService } from '@/services/auth.service'
 import { Avatar } from '@/components/ui'
 import { ChangePasswordModal } from '@/components/account/ChangePasswordModal/ChangePasswordModal'
 import { useT } from '@/i18n'
+import { isSuperAdmin } from '@/services/superSession'
 import s from './UserMenu.module.scss'
 
 export function UserMenu() {
@@ -69,10 +70,13 @@ export function UserMenu() {
             </div>
           </div>
 
-          <button className={s.dropItem} role="menuitem" onClick={() => { setOpen(false); setPwOpen(true) }}>
-            <KeyRound size={15} />
-            {t('changePassword.title')}
-          </button>
+          {/* The partner admin's password is theirs: a super admin never changes it from here. */}
+          {!isSuperAdmin() && (
+            <button className={s.dropItem} role="menuitem" onClick={() => { setOpen(false); setPwOpen(true) }}>
+              <KeyRound size={15} />
+              {t('changePassword.title')}
+            </button>
+          )}
 
           <button className={s.dropItem} role="menuitem" onClick={() => { setOpen(false); navigate('/settings') }}>
             <Settings size={15} />

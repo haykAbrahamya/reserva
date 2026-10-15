@@ -8,6 +8,7 @@ import { MobileTabBar } from '../MobileTabBar/MobileTabBar'
 import { RouteFallback } from '../RouteFallback/RouteFallback'
 import { SupportProvider } from '@/components/support/SupportProvider'
 import { SupportWidget } from '@/components/support/SupportWidget'
+import { SuperBar } from '@/components/superAdmin/SuperBar'
 import s from './AppLayout.module.scss'
 
 export function AppLayout() {
@@ -25,6 +26,8 @@ export function AppLayout() {
         {/* Sidebar — hidden on mobile via CSS */}
         <Sidebar />
         <div className={s.main}>
+          {/* Only while a super admin is inside this partner. */}
+          <SuperBar />
           <Topbar />
           {/* Mobile product context. Hides itself on desktop, where the
               sidebar switcher owns this. */}
