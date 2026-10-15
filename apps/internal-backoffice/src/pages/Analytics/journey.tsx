@@ -345,7 +345,7 @@ export function describeEvent(
       }
       const style = str(p.theme) ? ` · ${toolValueLabel(str(p.theme))} style` : ''
       const items = typeof p.n === 'number' ? ` · ${p.n} ${p.n === 1 ? 'item' : 'items'}` : ''
-      const account = str(p.ig) ? ` · signed @${str(p.ig)}` : ''
+      const account = str(p.contact) ? ` · contact: ${str(p.contact)}` : str(p.ig) ? ` · signed @${str(p.ig)}` : ''
       return line(`${how[str(p.via) ?? ''] ?? `Took the ${tool} away`} ✓${style}${items}${account}`)
     }
     case 'tool_error':

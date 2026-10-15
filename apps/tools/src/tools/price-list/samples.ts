@@ -1,4 +1,5 @@
 import type { Locale } from '@/i18n'
+import { SAMPLE_INSTAGRAM } from '@/lib/instagram'
 import { DEFAULT_THEME_ID } from '@/lib/story/themes'
 import { newItem, type PriceListDraft } from './model'
 
@@ -45,7 +46,7 @@ export function sampleDraft(locale: Locale): PriceListDraft {
   return {
     heading: sample.heading,
     title: 'Anna Beauty',
-    contact: '@anna.beauty',
+    contact: `@${SAMPLE_INSTAGRAM}`,
     items: sample.items.map(([name, price]) => newItem(name, price)),
     themeId: DEFAULT_THEME_ID,
   }

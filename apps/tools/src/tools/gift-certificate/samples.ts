@@ -1,5 +1,6 @@
 import type { Locale } from '@/i18n'
 import { addDays } from '@/lib/dates'
+import { SAMPLE_INSTAGRAM } from '@/lib/instagram'
 import { DEFAULT_THEME_ID } from '@/lib/story/themes'
 import { newCode, type GiftDraft } from './model'
 
@@ -29,7 +30,7 @@ export function sampleDraft(locale: Locale, today: string): GiftDraft {
   return {
     ...SAMPLES[locale],
     title: 'Anna Beauty',
-    contact: '@anna.beauty',
+    contact: `@${SAMPLE_INSTAGRAM}`,
     value: '20000',
     validUntil: addDays(today, 90),
     code: newCode(),

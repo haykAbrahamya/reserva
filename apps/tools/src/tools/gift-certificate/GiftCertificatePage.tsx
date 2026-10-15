@@ -13,7 +13,7 @@ import { loadFonts } from '@/lib/canvas/fonts'
 import { useCanvasFile } from '@/lib/canvas/useCanvasFile'
 import { formatFullDate, useCalendarWords } from '@/lib/dates'
 import { fileNameFor } from '@/lib/fileName'
-import { instagramHandle } from '@/lib/instagram'
+import { contactText, instagramHandle } from '@/lib/instagram'
 import { themeById } from '@/lib/story/themes'
 import { toolById } from '@/tools/registry'
 import { GiftFields } from './components/GiftFields/GiftFields'
@@ -56,7 +56,7 @@ export function GiftCertificatePage() {
   })
 
   // The image and the PDF are the same card, reported the same way.
-  const exportDetails = { theme: draft.themeId, ig: instagramHandle(draft.contact) }
+  const exportDetails = { theme: draft.themeId, ig: instagramHandle(draft.contact), contact: contactText(draft.contact) }
 
   return (
     <ToolLayout tool={tool}>

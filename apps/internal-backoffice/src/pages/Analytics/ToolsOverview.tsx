@@ -215,7 +215,7 @@ export function ToolsOverview({ range, includeStaff, refreshKey, onOpenTool, onO
 
       <Panel
         title="Who made something"
-        sub="The Instagram accounts results were signed with — the @username on the story, card or post someone exported. Phone numbers are never recorded. Click a row for that visit."
+        sub="The Instagram accounts results were signed with — the @username on the story, card or post someone exported. Each export’s full contact line, as typed, is in Events. Click a row for that visit."
         flush
       >
         {data.accounts.length === 0 ? (

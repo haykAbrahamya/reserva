@@ -10,7 +10,7 @@ import { ToolWorkspace } from '@/layouts/ToolWorkspace/ToolWorkspace'
 import { loadFonts } from '@/lib/canvas/fonts'
 import { useCanvasFile } from '@/lib/canvas/useCanvasFile'
 import { fileNameFor } from '@/lib/fileName'
-import { instagramHandle } from '@/lib/instagram'
+import { contactText, instagramHandle } from '@/lib/instagram'
 import { toolById } from '@/tools/registry'
 import { LabelFields } from './components/LabelFields/LabelFields'
 import { LayoutOptions } from './components/LayoutOptions/LayoutOptions'
@@ -117,7 +117,7 @@ export function BeforeAfterPage() {
                     })
                   : t('beforeAfter.needPhotos')
               }
-              details={{ fmt: `${draft.format}-${draft.arrangement}`, ig: instagramHandle(draft.handle) }}
+              details={{ fmt: `${draft.format}-${draft.arrangement}`, ig: instagramHandle(draft.handle), contact: contactText(draft.handle) }}
               photosStay
             />
           </>
