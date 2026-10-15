@@ -1,11 +1,28 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Plus, Search, Building2 } from 'lucide-react'
-import { Avatar, Badge, Button, Table, Th, Td, Tr, Empty, Pagination } from '@/components/ui'
+import { Avatar, Badge, Button, Table, Th, Td, Tr, Empty, Pagination, SegmentedFilter } from '@/components/ui'
 import { useResource } from '@/store/useResource'
-import { partnersService } from '@/services/partners.service'
+import { partnersService, type BillingStatus, type PartnerBilling } from '@/services/partners.service'
 import { CreatePartnerModal } from './CreatePartnerModal'
+import { BILLING_BADGE, NO_BILLING, fmtDay } from './billing'
 import s from './Partners.module.scss'
+
+type BillingFilter = 'all' | BillingStatus
+const BILLING_FILTERS: BillingFilter[] = ['all', 'trial', 'due', 'paid', 'none']
+
+/** The billing cell: the state, and the one date that matters for it. */
+function BillingCell({ billing }: { billing: PartnerBilling }) {
+  if (billing.status === 'none') return <span className={s.lastLoginNever}>—</span>
+  const badge = BILLING_BADGE[billing.status]
+  const day = billing.status === 'due' ? billing.dueSince : billing.status === 'paid' ? billing.paidUntil : billing.trialEndsAt
+  return (
+    <span className={s.billing}>
+      <Badge variant={badge.variant} label={badge.label} />
+      {day && <span className={s.billingDay}>{billing.status === 'due' ? 'since' : 'until'} {fmtDay(day)}</span>}
+    </span>
+  )
+}
 
 /** "6 Jul, 14:05" — date + hour:minute, or "Never" if never active in the backoffice. */
 function fmtLastSeen(iso: string | null): string {
@@ -23,6 +40,14 @@ export function Partners() {
   const [search, setSearch] = useState('')
   const [debounced, setDebounced] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
+  // In the URL, so the Dashboard can link to "payment due" and a refresh keeps it.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const billingParam = searchParams.get('billing') as BillingFilter | null
+  const billing: BillingFilter = billingParam && BILLING_FILTERS.includes(billingParam) ? billingParam : 'all'
+  const changeBilling = (next: BillingFilter) => {
+    setSearchParams(next === 'all' ? {} : { billing: next }, { replace: true })
+    setPage(1)
+  }
 
   useEffect(() => {
     const id = setTimeout(() => { setDebounced(search.trim()); setPage(1) }, 300)
@@ -30,8 +55,8 @@ export function Partners() {
   }, [search])
 
   const { data: result, reload } = useResource(
-    () => partnersService.list({ page, pageSize, search: debounced || undefined }),
-    [page, pageSize, debounced],
+    () => partnersService.list({ page, pageSize, search: debounced || undefined, billing: billing === 'all' ? undefined : billing }),
+    [page, pageSize, debounced, billing],
   )
 
   const partners = result?.items ?? []
@@ -63,14 +88,30 @@ export function Partners() {
             placeholder="Search by name, slug or type…"
           />
         </div>
+        <SegmentedFilter<BillingFilter>
+          ariaLabel="Filter by billing"
+          value={billing}
+          onChange={changeBilling}
+          options={[
+            { value: 'all', label: 'All' },
+            { value: 'trial', label: 'Free trial' },
+            { value: 'due', label: 'Payment due' },
+            { value: 'paid', label: 'Paid' },
+            { value: 'none', label: 'Not tracked' },
+          ]}
+        />
       </div>
 
       {total === 0 ? (
         <Empty
           icon={Building2}
           title="No partners found"
-          description={debounced ? 'Try a different search.' : 'Provision your first partner to get started.'}
-          action={!debounced ? <Button variant="accent" onClick={() => setCreateOpen(true)}><Plus size={14} /> New partner</Button> : undefined}
+          description={
+            debounced ? 'Try a different search.'
+            : billing !== 'all' ? 'No partner is in this billing state right now.'
+            : 'Provision your first partner to get started.'
+          }
+          action={!debounced && billing === 'all' ? <Button variant="accent" onClick={() => setCreateOpen(true)}><Plus size={14} /> New partner</Button> : undefined}
         />
       ) : (
         <div className={s.tableWrap}>
@@ -83,6 +124,7 @@ export function Partners() {
                 <Th>Branches</Th>
                 <Th>Team</Th>
                 <Th>Last active</Th>
+                <Th>Billing</Th>
                 <Th>Status</Th>
               </tr>
             </thead>
@@ -104,6 +146,7 @@ export function Partners() {
                       {fmtLastSeen(p.lastSeenAt)}
                     </span>
                   </Td>
+                  <Td><BillingCell billing={p.billing ?? NO_BILLING} /></Td>
                   <Td><Badge variant={p.active ? 'active' : 'inactive'} label={p.active ? 'Active' : 'Inactive'} /></Td>
                 </Tr>
               ))}

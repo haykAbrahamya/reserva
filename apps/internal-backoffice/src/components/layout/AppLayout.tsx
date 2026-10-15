@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Building2, Users, ShieldCheck, LogOut, Menu, X, KeyRound, Inbox, UserPlus, LifeBuoy, Tags, MapPin,
-  ChartLine,
+  ChartLine, Target,
 } from 'lucide-react'
 import { Avatar } from '@/components/ui'
 import { ReservaMark } from '@/components/ReservaMark'
@@ -23,6 +23,7 @@ interface NavItem {
 
 const NAV: NavItem[] = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
+  { to: '/leads', label: 'Leads', icon: Target },
   { to: '/partners', label: 'Partners', icon: Building2 },
   { to: '/support', label: 'Support', icon: LifeBuoy },
   { to: '/pending-registrations', label: 'Pending Registrations', icon: UserPlus },

@@ -77,7 +77,33 @@ export interface PartnerListItem {
   /** Most-recent backoffice activity across this partner's users. Null = never active. */
   lastSeenAt: string | null
   counts: PartnerCounts
+  billing: PartnerBilling
 }
+
+/**
+ * Where a partner's billing stands today (Yerevan calendar), as staff keep it:
+ * `trial` — the free trial runs; `paid` — paid through today or later; `due` —
+ * what was covered ran out; `none` — not tracked. A reminder only: it never
+ * changes what the partner can use.
+ */
+export type BillingStatus = 'none' | 'trial' | 'paid' | 'due'
+
+export interface PartnerBilling {
+  status: BillingStatus
+  /** Calendar days, 'YYYY-MM-DD'; both ends of a period are covered. */
+  trialStartedAt: string | null
+  trialEndsAt: string | null
+  /** The last day paid for. */
+  paidUntil: string | null
+  /** The first day nothing covered, when payment is due. */
+  dueSince: string | null
+}
+
+/** Start the free trial (a month from today), mark a month paid, or set the dates by hand. */
+export type BillingChange =
+  | { action: 'startTrial' }
+  | { action: 'markPaid' }
+  | { action: 'set'; trialStartedAt: string | null; trialEndsAt: string | null; paidUntil: string | null }
 
 /** Public booking-page layout the partner's page renders. */
 export type PartnerTemplate = 'classic' | 'tabbed'
@@ -157,6 +183,7 @@ export interface UpdatePartnerInput {
 
 interface ListParams extends PageParams {
   active?: boolean
+  billing?: BillingStatus
 }
 
 export const partnersService = {
@@ -167,6 +194,7 @@ export const partnersService = {
         pageSize: params.pageSize ?? 5,
         ...(params.search ? { search: params.search } : {}),
         ...(params.active !== undefined ? { active: params.active } : {}),
+        ...(params.billing ? { billing: params.billing } : {}),
       },
     })
   },
@@ -185,6 +213,10 @@ export const partnersService = {
 
   setActive(id: string, active: boolean): Promise<PartnerDetail> {
     return apiPatch<PartnerDetail>(`/platform/partners/${id}/active`, { active })
+  },
+
+  setBilling(id: string, change: BillingChange): Promise<PartnerDetail> {
+    return apiPatch<PartnerDetail>(`/platform/partners/${id}/billing`, change)
   },
 
   /** Feature/unfeature a salon in the public marketplace (/salons). */

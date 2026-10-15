@@ -1,5 +1,5 @@
-import { useNavigate } from 'react-router-dom'
-import { Building2, CheckCircle2, PauseCircle, Users, MapPin, CalendarDays, TrendingUp } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Building2, CheckCircle2, PauseCircle, Users, MapPin, CalendarDays, TrendingUp, Target, CreditCard, Hourglass } from 'lucide-react'
 import { Avatar, Badge, Empty } from '@/components/ui'
 import { useResource } from '@/store/useResource'
 import { statsService } from '@/services/stats.service'
@@ -12,7 +12,11 @@ export function Dashboard() {
   const user = useAuthStore((st) => st.user)
   const { data, loading } = useResource(() => statsService.overview(), [])
 
-  const stats = [
+  const stats: { label: string; value: number; icon: typeof Building2; tone: 'accent' | 'success' | 'warn' | 'muted'; to?: string }[] = [
+    // What needs doing first — each opens its list.
+    { label: 'New leads', value: data?.leads?.new ?? 0, icon: Target, tone: 'accent', to: '/leads' },
+    { label: 'Payment due', value: data?.billing?.due ?? 0, icon: CreditCard, tone: 'warn', to: '/partners?billing=due' },
+    { label: 'On free trial', value: data?.billing?.trial ?? 0, icon: Hourglass, tone: 'success', to: '/partners?billing=trial' },
     { label: 'Partners', value: data?.partners.total ?? 0, icon: Building2, tone: 'accent' as const },
     { label: 'Active', value: data?.partners.active ?? 0, icon: CheckCircle2, tone: 'success' as const },
     { label: 'Inactive', value: data?.partners.inactive ?? 0, icon: PauseCircle, tone: 'warn' as const },
@@ -31,15 +35,22 @@ export function Dashboard() {
       </div>
 
       <div className={s.statGrid}>
-        {stats.map((st) => (
-          <div key={st.label} className={s.statCard}>
-            <span className={[s.statIcon, s[st.tone]].join(' ')}><st.icon size={18} /></span>
-            <div className={s.statBody}>
-              <div className={s.statValue}>{loading ? '—' : st.value.toLocaleString()}</div>
-              <div className={s.statLabel}>{st.label}</div>
-            </div>
-          </div>
-        ))}
+        {stats.map((st) => {
+          const body = (
+            <>
+              <span className={[s.statIcon, s[st.tone]].join(' ')}><st.icon size={18} /></span>
+              <div className={s.statBody}>
+                <div className={s.statValue}>{loading ? '—' : st.value.toLocaleString()}</div>
+                <div className={s.statLabel}>{st.label}</div>
+              </div>
+            </>
+          )
+          return st.to ? (
+            <Link key={st.label} to={st.to} className={[s.statCard, s.statLink].join(' ')}>{body}</Link>
+          ) : (
+            <div key={st.label} className={s.statCard}>{body}</div>
+          )
+        })}
       </div>
 
       <div className={s.section}>

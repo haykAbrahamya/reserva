@@ -2,6 +2,10 @@ import { apiGet } from './http'
 
 export interface PlatformOverview {
   partners: { total: number; active: number; inactive: number; recent: number }
+  /** Partners on a free trial, and those whose payment is due. */
+  billing: { trial: number; due: number }
+  /** Leads nobody has contacted yet. */
+  leads: { new: number }
   catalog: { locations: number; specialists: number; bookings: number }
   staff: number
   recentPartners: {

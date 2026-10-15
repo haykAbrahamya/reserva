@@ -14,8 +14,17 @@
 .h1 { font-family: $font-serif; font-size: 30px; letter-spacing: -0.022em; margin: 0 0 4px; }
 .sub { font-size: 13px; color: $fg-2; margin: 0; }
 
-.toolbar { margin-bottom: 16px; }
-.searchWrap { position: relative; max-width: 360px; }
+.toolbar {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  justify-content: space-between;
+}
+.searchWrap { position: relative; max-width: 360px; flex: 1 1 260px; }
+.billing { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.billingDay { font-size: 12.5px; color: $fg-2; }
 .searchIcon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: $fg-3; }
 .searchInput {
   width: 100%;

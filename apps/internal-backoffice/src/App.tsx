@@ -14,6 +14,7 @@ import { Partners } from '@/pages/Partners/Partners'
 import { PartnerDetailPage } from '@/pages/Partners/PartnerDetail'
 import { Staff } from '@/pages/Staff/Staff'
 import { DemoRequests } from '@/pages/DemoRequests/DemoRequests'
+import { Leads } from '@/pages/Leads/Leads'
 import { PendingRegistrations } from '@/pages/PendingRegistrations/PendingRegistrations'
 import { Analytics } from '@/pages/Analytics/Analytics'
 import { Specialties } from '@/pages/Specialties/Specialties'
@@ -56,6 +57,7 @@ export default function App() {
 
           <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
             <Route index element={<Dashboard />} />
+            <Route path="leads" element={<Leads />} />
             <Route path="partners" element={<Partners />} />
             <Route path="partners/:id" element={<PartnerDetailPage />} />
             <Route path="support" element={<Support />} />

@@ -9,6 +9,8 @@ import { errorMessage } from '@/services/errors'
 import { PartnerUsers } from './PartnerUsers'
 import { PartnerProducts } from './PartnerProducts'
 import { PartnerBookings } from './PartnerBookings'
+import { PartnerBilling } from './PartnerBilling'
+import { BILLING_BADGE, NO_BILLING } from './billing'
 import s from './PartnerDetail.module.scss'
 
 /** The page is long enough that one scroll buries things — split by intent:
@@ -143,6 +145,8 @@ export function PartnerDetailPage() {
     }
   }
 
+  const billing = partner.billing ?? NO_BILLING
+
   const counts = [
     { label: 'Branches', value: partner.counts.locations, icon: MapPin },
     { label: 'Services', value: partner.counts.services, icon: CalendarDays },
@@ -167,6 +171,9 @@ export function PartnerDetailPage() {
           </div>
         </div>
         <div className={s.headRight}>
+          {billing.status !== 'none' && (
+            <Badge variant={BILLING_BADGE[billing.status].variant} label={BILLING_BADGE[billing.status].label} />
+          )}
           <Badge variant={partner.active ? 'active' : 'inactive'} label={partner.active ? 'Active' : 'Inactive'} />
           <Button variant={partner.active ? 'ghost' : 'accent'} size="sm" onClick={toggleActive}>
             {partner.active ? 'Disable' : 'Enable'}
@@ -198,6 +205,8 @@ export function PartnerDetailPage() {
           </div>
         ))}
       </div>
+
+      <PartnerBilling partnerId={id} billing={billing} onChanged={reload} />
 
       <PartnerProducts partnerId={id} products={partner.products ?? []} onChanged={reload} />
 
