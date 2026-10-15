@@ -485,12 +485,12 @@
     },
     "photo": {
       "title": "Profile photo",
-      "hint": "A square photo works best. Up to 8 MB.",
+      "hint": "A square photo works best. Up to 50 MB.",
       "upload": "Upload photo",
       "change": "Change",
       "remove": "Remove",
       "notImage": "Please choose an image.",
-      "tooLarge": "That image is too large. Up to 8 MB."
+      "tooLarge": "That image is too large. Up to 50 MB."
     },
     "portfolio": {
       "sub": "Show what you can do. Up to {max} photos.",

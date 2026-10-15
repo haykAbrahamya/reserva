@@ -533,12 +533,12 @@
       "active": "Active",
       "avatar": {
         "title": "Profile photo",
-        "hint": "JPG or PNG, up to 8 MB",
+        "hint": "JPG or PNG, up to 50 MB",
         "upload": "Upload photo",
         "change": "Change photo",
         "remove": "Remove",
         "notImage": "Please choose an image file",
-        "tooLarge": "Image is too large (max 8 MB)"
+        "tooLarge": "Image is too large (max 50 MB)"
       }
     }
   },
@@ -1055,9 +1055,9 @@
       "upload": "Upload cover",
       "change": "Change cover",
       "remove": "Remove",
-      "hint": "Landscape image, up to 8 MB",
+      "hint": "Landscape image, up to 50 MB",
       "notImage": "Please choose an image file",
-      "tooLarge": "Image is too large (max 8 MB)"
+      "tooLarge": "Image is too large (max 50 MB)"
     },
     "editor": {
       "newTitle": "New course",

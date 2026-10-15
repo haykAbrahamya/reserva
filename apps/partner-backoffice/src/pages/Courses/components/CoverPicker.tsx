@@ -3,8 +3,8 @@ import { ImagePlus, Trash2 } from 'lucide-react'
 import { useI18n } from '@/i18n'
 import s from './CoverPicker.module.scss'
 
-// Mirror the backend guard (8 MB, image/* only) for instant feedback.
-const MAX_BYTES = 8 * 1024 * 1024
+// Mirror the backend guard (50 MB, image/* only) for instant feedback.
+const MAX_BYTES = 50 * 1024 * 1024
 
 interface Props {
   /** Committed cover URL from the server (empty until one is uploaded). */

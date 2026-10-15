@@ -4,10 +4,10 @@ import { initials } from '@reserva/shared'
 import s from './AvatarPicker.module.scss'
 
 /**
- * Client-side guard mirroring the backend (8 MB, image/* only) so the user gets
+ * Client-side guard mirroring the backend (50 MB, image/* only) so the user gets
  * instant feedback instead of a round trip that ends in a rejection.
  */
-export const AVATAR_MAX_BYTES = 8 * 1024 * 1024
+export const AVATAR_MAX_BYTES = 50 * 1024 * 1024
 
 /**
  * Every string this control shows.
