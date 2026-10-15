@@ -1,10 +1,12 @@
-import { useMemo, useState, type ReactNode } from 'react'
-import { Download, ImageDown, Share2 } from 'lucide-react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { Download, Share2 } from 'lucide-react'
 import { Button, useToast } from '@reserva/ui'
 import { useT } from '@/i18n'
 import type { ExportDetails } from '@/lib/analytics/pulse'
 import { useToolEvents } from '@/lib/analytics/useToolEvents'
 import { canShareFiles, downloadFile, savesToPhotosByShare, shareFile } from '@/lib/canvas/exportFile'
+import { saveInChrome, takeArrivalSave } from '@/lib/handoff'
+import { inApp } from '@/lib/inAppBrowser'
 import s from './ExportActions.module.scss'
 
 interface Props {
@@ -28,8 +30,10 @@ type Action = 'share' | 'download'
  * Share (where the phone can — that sheet is where Instagram Stories lives)
  * and Download. On a browser that cannot share files, Download is the primary.
  *
- * On an iPhone a download lands in Files, not Photos, so there the second
- * button is "Save" and opens the share sheet at "Save Image".
+ * Download lands in the phone's gallery everywhere. On an iPhone, where a
+ * download goes to Files, it opens the share sheet at "Save Image". In an
+ * app's built-in browser on Android, where a download goes nowhere, it opens
+ * the page in Chrome, which saves the image as soon as it is drawn.
  */
 export function ExportActions({ getFile, ready, shareTitle, format, details, children }: Props) {
   const t = useT()
@@ -40,6 +44,10 @@ export function ExportActions({ getFile, ready, shareTitle, format, details, chi
   const toPhotos = useMemo(savesToPhotosByShare, [])
 
   const run = async (action: Action) => {
+    if (action === 'download' && inApp) {
+      events?.toChrome(inApp, 'download')
+      return saveInChrome('image')
+    }
     setBusy(action)
     try {
       const file = await getFile()
@@ -61,6 +69,11 @@ export function ExportActions({ getFile, ready, shareTitle, format, details, chi
     }
   }
 
+  // Opened in Chrome from an app's browser to save this: saved once it is drawn.
+  useEffect(() => {
+    if (ready && takeArrivalSave('image')) void run('download')
+  }, [ready])
+
   const disabled = !ready || busy !== null
 
   return (
@@ -78,8 +91,8 @@ export function ExportActions({ getFile, ready, shareTitle, format, details, chi
           disabled={disabled}
           onClick={() => run('download')}
         >
-          {toPhotos ? <ImageDown size={16} /> : <Download size={16} />}
-          {t(toPhotos ? 'export.toPhotos' : 'export.download')}
+          <Download size={16} />
+          {t('export.download')}
         </Button>
       </div>
       {children && <div className={s.more}>{children}</div>}

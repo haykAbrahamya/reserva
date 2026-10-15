@@ -12,6 +12,7 @@
 
 import { createPulse } from '@reserva/shared/pulse'
 import type { Locale } from '@/i18n'
+import type { InAppName } from '@/lib/inAppBrowser'
 import type { ToolId } from '@/tools/registry'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1'
@@ -60,6 +61,8 @@ export interface ToolsEvents {
   cta_click: { from: CtaFrom; tool?: ToolId }
   visit_action: { act: VisitAct }
   pref_change: { what: 'lang' | 'theme'; v: string }
+  /** An app's built-in browser on Android: Download (or the PDF) took the page to Chrome, to save there. */
+  browser_open: { app: InAppName; from: 'download' | 'pdf'; how: 'chrome'; tool?: ToolId }
 }
 export type ToolsEventName = keyof ToolsEvents
 
@@ -72,7 +75,7 @@ const pulse = createPulse({
   // Each of these tends to hand the phone to another app — WhatsApp, Viber,
   // the share sheet, reserva.am, the dialer, maps — and a backgrounded tab may
   // never get another tick: they leave at once.
-  urgent: new Set(['tool_export', 'cta_click', 'visit_action']),
+  urgent: new Set(['tool_export', 'cta_click', 'visit_action', 'browser_open']),
 })
 
 /** Fire-and-forget: queues the event; it leaves within seconds, or as the page closes. */
@@ -118,6 +121,10 @@ export function toolEvents(tool: ToolId) {
     },
     failed(code: ToolErrorCode) {
       track('tool_error', { tool, code })
+    },
+    /** In an app's browser on Android: saving went on in Chrome. */
+    toChrome(app: InAppName, from: 'download' | 'pdf') {
+      track('browser_open', { app, from, how: 'chrome', tool })
     },
   }
 }

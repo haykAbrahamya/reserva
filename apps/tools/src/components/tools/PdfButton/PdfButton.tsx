@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FileDown } from 'lucide-react'
 import { Button, useToast } from '@reserva/ui'
 import { useT } from '@/i18n'
 import type { ExportDetails } from '@/lib/analytics/pulse'
 import { useToolEvents } from '@/lib/analytics/useToolEvents'
 import { canvasToBlob, downloadFile, renderCanvas } from '@/lib/canvas/exportFile'
+import { saveInChrome, takeArrivalSave } from '@/lib/handoff'
+import { inApp } from '@/lib/inAppBrowser'
 import { jpegToPdf } from '@/lib/pdf'
 import s from './PdfButton.module.scss'
 
@@ -25,7 +27,9 @@ interface Props {
 /**
  * Download the same drawing as a print-ready PDF at a real paper size — for
  * a salon that hands out printed gift cards rather than sending an image.
- * Rendered on demand: a PDF is the occasional export, not the common one.
+ * Rendered on demand: a PDF is the occasional export, not the common one. In
+ * an app's built-in browser on Android, which keeps no file, it is saved in
+ * Chrome instead (lib/handoff).
  */
 export function PdfButton({ width, height, widthMm, heightMm, draw, prepare, fileName, details }: Props) {
   const t = useT()
@@ -34,6 +38,10 @@ export function PdfButton({ width, height, widthMm, heightMm, draw, prepare, fil
   const [busy, setBusy] = useState(false)
 
   const run = async () => {
+    if (inApp) {
+      events?.toChrome(inApp, 'pdf')
+      return saveInChrome('pdf')
+    }
     setBusy(true)
     try {
       await prepare?.()
@@ -50,6 +58,11 @@ export function PdfButton({ width, height, widthMm, heightMm, draw, prepare, fil
       setBusy(false)
     }
   }
+
+  // Opened in Chrome from an app's browser to save the PDF: saved at once.
+  useEffect(() => {
+    if (takeArrivalSave('pdf')) void run()
+  }, [])
 
   return (
     <Button className={s.button} disabled={busy} onClick={run}>
