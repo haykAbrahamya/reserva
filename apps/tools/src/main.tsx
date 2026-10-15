@@ -11,13 +11,9 @@ import '@/styles/global.scss'
 
 import App from './App'
 import { I18nProvider, forgetUnchosenLocale } from '@/i18n'
-import { receiveHandoff } from '@/lib/handoff'
 import { ThemeProvider } from '@/theme/ThemeProvider'
 import { initialTheme } from '@/theme/useTheme'
 
-// A visit carried over from an app's built-in browser goes back into storage
-// before anything reads it: the theme just below, the language, the drafts.
-receiveHandoff()
 // Armenian first, for everyone who has not picked another language.
 forgetUnchosenLocale()
 
