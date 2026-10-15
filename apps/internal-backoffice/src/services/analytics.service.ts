@@ -99,6 +99,19 @@ export interface ToolRow {
   errors: number
 }
 
+/** Someone who made something on the tools, by the Instagram account their result was signed with. */
+export interface ToolAccount {
+  /** Bare username, lower-case: instagram.com/<handle>. */
+  handle: string
+  exports: number
+  /** Registry ids of the tools it exported from. */
+  tools: string[]
+  /** ISO time of its latest export in range. */
+  lastAt: string
+  /** The visit of that latest export. */
+  sessionId: string
+}
+
 /** GET /platform/analytics/tools — tools.reserva.am on its own. */
 export interface AnalyticsTools {
   range: Range
@@ -126,6 +139,8 @@ export interface AnalyticsTools {
   errors: { tool: string | null; code: string; count: number }[]
   /** Visits inside an app's built-in browser (Instagram's, Facebook's…), and how many moved to a real browser. */
   inApp: { sessions: Kpi; opened: Kpi }
+  /** Instagram accounts results were signed with, latest first (top 100). */
+  accounts: ToolAccount[]
   /** Booking-site sessions the tools sent (utm_source=reserva-tools), and their sign-ups (tracked). */
   toPlatform: {
     visits: Kpi; signupStarts: Kpi; signups: Kpi

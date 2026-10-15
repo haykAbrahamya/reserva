@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react'
-import { CalendarCheck, ChartLine, ChevronRight, Download, Languages, ListChecks, Palette, TriangleAlert, Wrench } from 'lucide-react'
+import {
+  CalendarCheck, ChartLine, ChevronRight, Download, Instagram, Languages, ListChecks, Palette, TriangleAlert, Wrench,
+} from 'lucide-react'
 import { SegmentedFilter, Table, Th, Td, Tr } from '@/components/ui'
 import { useResource } from '@/store/useResource'
-import { analyticsService, type ToolRow } from '@/services/analytics.service'
+import { analyticsService, type ToolAccount, type ToolRow } from '@/services/analytics.service'
 import { TrafficChart, TrafficLegend, type TrafficLabels } from './TrafficChart'
 import { bucketSeries, granularityFor, type ChartPoint, type Granularity } from './buckets'
 import { BarList, ErrorState, Funnel, KpiTile, Panel, PanelEmpty, Skeleton, type FunnelStep } from './parts'
@@ -11,7 +13,7 @@ import {
   VISIT_ACT_LABELS, labelFrom, toolValueLabel,
 } from './catalog'
 import { EventIcon } from './journey'
-import { fmtInt, fmtPct } from './format'
+import { fmtEventTime, fmtEventTimeFull, fmtInt, fmtPct } from './format'
 import { fmtSpan, prevPeriodName } from './range'
 import type { TabProps } from './OverviewTab'
 import s from './Analytics.module.scss'
@@ -39,9 +41,11 @@ const VIA_ORDER = ['share', 'download', 'pdf', 'whatsapp', 'viber', 'copy', 'hol
  * how many went on to reserva.am and signed up. Nothing here moves the
  * booking site's numbers.
  */
-export function ToolsOverview({ range, includeStaff, refreshKey, onOpenTool }: TabProps & {
+export function ToolsOverview({ range, includeStaff, refreshKey, onOpenTool, onOpenSession }: TabProps & {
   /** Drill into one tool's raw events. */
   onOpenTool: (tool: string) => void
+  /** One visit, as a journey. */
+  onOpenSession: (sessionId: string) => void
 }) {
   const [view, setView] = useState<'chart' | 'table'>('chart')
   const { data, loading, error, reload } = useResource(
@@ -209,6 +213,20 @@ export function ToolsOverview({ range, includeStaff, refreshKey, onOpenTool }: T
         )}
       </Panel>
 
+      <Panel
+        title="Who made something"
+        sub="The Instagram accounts results were signed with — the @username on the story, card or post someone exported. Phone numbers are never recorded. Click a row for that visit."
+        flush
+      >
+        {data.accounts.length === 0 ? (
+          <PanelEmpty icon={Instagram} title="No Instagram account yet">
+            An account shows up here once someone exports a result with their @username on it.
+          </PanelEmpty>
+        ) : (
+          <AccountsTable accounts={data.accounts} onOpenSession={onOpenSession} />
+        )}
+      </Panel>
+
       <div className={s.split}>
         <Panel
           title="How results leave"
@@ -304,6 +322,48 @@ export function ToolsOverview({ range, includeStaff, refreshKey, onOpenTool }: T
           )}
         </Panel>
       </div>
+    </div>
+  )
+}
+
+/** The accounts behind the exports, latest first: the profile on Instagram, the visit here. */
+function AccountsTable({ accounts, onOpenSession }: { accounts: ToolAccount[]; onOpenSession: (sessionId: string) => void }) {
+  return (
+    <div className={s.tableScroll}>
+      <Table className={s.tbl}>
+        <thead>
+          <tr>
+            <Th>Account</Th>
+            <Th className={s.num}>Exports</Th>
+            <Th>Tools</Th>
+            <Th>Last export</Th>
+            <Th />
+          </tr>
+        </thead>
+        <tbody>
+          {accounts.map((a) => (
+            <Tr key={a.handle} onClick={() => onOpenSession(a.sessionId)} title="Show the visit of this export">
+              <Td>
+                {/* Its own target: the profile opens in a new tab, the row stays put. */}
+                <a
+                  className={s.accountLink}
+                  href={`https://www.instagram.com/${a.handle}/`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  title={`Open @${a.handle} on Instagram`}
+                >
+                  <Instagram size={14} />@{a.handle}
+                </a>
+              </Td>
+              <Td className={`${s.num} ${s.strong}`}>{fmtInt(a.exports)}</Td>
+              <Td><span className={s.cellMuted}>{a.tools.map((t) => labelFrom(TOOL_LABELS, t)).join(' · ')}</span></Td>
+              <Td><span title={fmtEventTimeFull(a.lastAt)}>{fmtEventTime(a.lastAt)}</span></Td>
+              <Td className={s.num}><ChevronRight size={14} className={s.rowGo} /></Td>
+            </Tr>
+          ))}
+        </tbody>
+      </Table>
     </div>
   )
 }

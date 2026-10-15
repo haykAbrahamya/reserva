@@ -13,6 +13,7 @@ import { loadFonts } from '@/lib/canvas/fonts'
 import { useCanvasFile } from '@/lib/canvas/useCanvasFile'
 import { formatFullDate, useCalendarWords } from '@/lib/dates'
 import { fileNameFor } from '@/lib/fileName'
+import { instagramHandle } from '@/lib/instagram'
 import { themeById } from '@/lib/story/themes'
 import { toolById } from '@/tools/registry'
 import { GiftFields } from './components/GiftFields/GiftFields'
@@ -54,6 +55,9 @@ export function GiftCertificatePage() {
     fileName: fileNameFor('gift-certificate', draft.title),
   })
 
+  // The image and the PDF are the same card, reported the same way.
+  const exportDetails = { theme: draft.themeId, ig: instagramHandle(draft.contact) }
+
   return (
     <ToolLayout tool={tool}>
       <ToolWorkspace
@@ -92,7 +96,7 @@ export function GiftCertificatePage() {
               ready={ready}
               shareTitle={draft.heading.trim() || t('tools.giftCertificate.title')}
               format={t('giftCertificate.format')}
-              details={{ theme: draft.themeId }}
+              details={exportDetails}
             >
               <PdfButton
                 width={GIFT_CARD.width}
@@ -102,7 +106,7 @@ export function GiftCertificatePage() {
                 draw={draw}
                 prepare={prepare}
                 fileName={fileNameFor('gift-certificate', draft.title, 'pdf')}
-                details={{ theme: draft.themeId }}
+                details={exportDetails}
               />
             </ExportActions>
           </>

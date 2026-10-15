@@ -11,6 +11,7 @@ import { ToolWorkspace } from '@/layouts/ToolWorkspace/ToolWorkspace'
 import { loadFonts } from '@/lib/canvas/fonts'
 import { useCanvasFile } from '@/lib/canvas/useCanvasFile'
 import { fileNameFor } from '@/lib/fileName'
+import { instagramHandle } from '@/lib/instagram'
 import { STORY } from '@/lib/story/size'
 import { themeById } from '@/lib/story/themes'
 import { toolById } from '@/tools/registry'
@@ -84,7 +85,11 @@ export function PriceListPage() {
               ready={ready}
               shareTitle={draft.title.trim() || t('tools.priceList.title')}
               format={t('priceList.format')}
-              details={{ theme: draft.themeId, n: draft.items.filter(isFilled).length }}
+              details={{
+                theme: draft.themeId,
+                n: draft.items.filter(isFilled).length,
+                ig: instagramHandle(draft.contact),
+              }}
             />
           </>
         }

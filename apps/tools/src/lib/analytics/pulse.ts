@@ -4,8 +4,10 @@
 // as reserva.am, filed under the site "tools", so the console reads them on
 // their own and they never move the booking site's numbers.
 //
-// Choices and counts only — never what was typed: no salon names, prices,
-// phones, notes or photos. Like the page it measures, it must never throw.
+// Choices and counts — and of everything typed, only the Instagram username a
+// result is signed with, so the console can tell who made it. Never salon
+// names, prices, phones, notes or photos. Like the page it measures, it must
+// never throw.
 // ─────────────────────────────────────────────────────────────
 
 import { createPulse } from '@reserva/shared/pulse'
@@ -48,6 +50,8 @@ export interface ExportDetails {
   theme?: string
   fmt?: string
   n?: number
+  /** The Instagram username on the result (lib/instagram), when its contact line holds one. */
+  ig?: string
 }
 
 export interface ToolsEvents {
@@ -70,7 +74,7 @@ const pulse = createPulse({
   key: import.meta.env.VITE_SITE_PULSE_KEY,
   site: 'tools',
   // The backend's limits for these props.
-  maxLen: { act: 24, v: 40, theme: 24, fmt: 24, code: 40, from: 24 },
+  maxLen: { act: 24, v: 40, theme: 24, fmt: 24, code: 40, from: 24, ig: 30 },
   // Each of these tends to hand the phone to another app — WhatsApp, Viber,
   // the share sheet, reserva.am, the dialer, maps — and a backgrounded tab may
   // never get another tick: they leave at once.

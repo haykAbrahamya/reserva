@@ -190,7 +190,7 @@ function AnalyticsScreen() {
           ) : !common ? (
             <Skeleton height={420} />
           ) : p.tab === 'overview' && p.site === 'tools' ? (
-            <ToolsOverview {...common} onOpenTool={p.openToolEvents} />
+            <ToolsOverview {...common} onOpenTool={p.openToolEvents} onOpenSession={p.openSession} />
           ) : p.tab === 'overview' ? (
             <OverviewTab {...common} onOpenPartner={p.openPartnerEvents} onShowPartners={() => p.goToTab('partners')} />
           ) : p.tab === 'partners' ? (

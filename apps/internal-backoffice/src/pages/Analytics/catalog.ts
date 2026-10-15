@@ -130,6 +130,7 @@ export const PROP_LABELS: Record<string, string> = {
   what: 'Preference',
   app: 'App',
   how: 'How',
+  ig: 'Instagram',
 }
 
 export const PAGE_TYPE_LABELS: Record<string, string> = {
@@ -381,7 +382,11 @@ export function eventSummary(name: string, props: Record<string, unknown>): stri
       return `${labelFrom(TOOL_LABELS, str(props.tool))} · ${labelFrom(TOOL_ACT_LABELS, str(props.act))}${v ? `: ${toolValueLabel(v)}` : ''}`
     }
     case 'tool_export':
-      return `${labelFrom(TOOL_LABELS, str(props.tool))} · ${labelFrom(EXPORT_VIA_LABELS, str(props.via))}`
+      return [
+        labelFrom(TOOL_LABELS, str(props.tool)),
+        labelFrom(EXPORT_VIA_LABELS, str(props.via)),
+        str(props.ig) ? `@${str(props.ig)}` : null,
+      ].filter(Boolean).join(' · ')
     case 'tool_error':
       return [str(props.tool) ? labelFrom(TOOL_LABELS, str(props.tool)) : null, labelFrom(TOOL_ERROR_LABELS, str(props.code))]
         .filter(Boolean).join(' · ')
