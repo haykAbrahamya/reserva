@@ -310,8 +310,19 @@ export const analyticsService = {
   },
 
   /** tools.reserva.am: what was opened, made and sent, and the sign-ups it led to. */
-  tools(q: AnalyticsQuery): Promise<AnalyticsTools> {
-    return apiGet<AnalyticsTools>('/platform/analytics/tools', { params: windowParams({ ...q, site: undefined }) })
+  /**
+   * Blocks added after the report first shipped default to empty when the API
+   * is older than this console, so releasing the console first never breaks
+   * the page — the block just fills in once the backend is out.
+   */
+  async tools(q: AnalyticsQuery): Promise<AnalyticsTools> {
+    const report = await apiGet<AnalyticsTools>('/platform/analytics/tools', { params: windowParams({ ...q, site: undefined }) })
+    const none: Kpi = { value: 0, prev: 0 }
+    return {
+      ...report,
+      inApp: report.inApp ?? { sessions: none, opened: none },
+      accounts: report.accounts ?? [],
+    }
   },
 
   /** `partnerId` narrows to sessions that had an event on that partner. */
