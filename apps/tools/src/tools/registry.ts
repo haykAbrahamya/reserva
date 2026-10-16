@@ -1,5 +1,15 @@
 import { lazy, type ComponentType, type CSSProperties, type LazyExoticComponent } from 'react'
-import { CalendarCheck, CalendarClock, Columns2, Gift, ReceiptText, type LucideIcon } from 'lucide-react'
+import {
+  BadgePercent,
+  CalendarCheck,
+  CalendarClock,
+  Columns2,
+  Gift,
+  GraduationCap,
+  IdCard,
+  ReceiptText,
+  type LucideIcon,
+} from 'lucide-react'
 
 // ─────────────────────────────────────────────────────────────
 // The tool registry — the ONE place a tool is declared.
@@ -9,13 +19,21 @@ import { CalendarCheck, CalendarClock, Columns2, Gift, ReceiptText, type LucideI
 // Copy (title, tag, description) lives in i18n under `tools.<id>`.
 // ─────────────────────────────────────────────────────────────
 
-export type ToolId = 'priceList' | 'freeSlots' | 'beforeAfter' | 'appointmentCard' | 'giftCertificate'
+export type ToolId =
+  | 'priceList'
+  | 'promo'
+  | 'freeSlots'
+  | 'beforeAfter'
+  | 'appointmentCard'
+  | 'giftCertificate'
+  | 'businessCard'
+  | 'courseCertificate'
 
 /** Card artwork hue — see `--tool-*` in styles/theme.css. */
-export type ToolHue = 'rose' | 'sage' | 'sky' | 'sand' | 'plum'
+export type ToolHue = 'rose' | 'sage' | 'sky' | 'sand' | 'plum' | 'coral' | 'ink' | 'gold'
 
-/** How a finished sample sits on the home card: a tall story, a wide card or post, a phone screen. */
-export type ExampleShape = 'story' | 'landscape' | 'screen'
+/** How a finished sample sits on the home card: a tall story, a 4:5 post, a wide card or post, a phone screen. */
+export type ExampleShape = 'story' | 'post' | 'landscape' | 'screen'
 
 export interface Tool {
   id: ToolId
@@ -44,12 +62,38 @@ export const TOOLS: readonly Tool[] = [
     example: { shape: 'story' },
   },
   {
+    id: 'promo',
+    path: '/promo',
+    icon: BadgePercent,
+    hue: 'coral',
+    page: lazy(() => import('./promo/PromoPage').then((m) => ({ default: m.PromoPage }))),
+    example: { shape: 'story' },
+  },
+  {
+    id: 'courseCertificate',
+    path: '/course-certificate',
+    icon: GraduationCap,
+    hue: 'gold',
+    page: lazy(() => import('./course-certificate/CertificatePage').then((m) => ({ default: m.CertificatePage }))),
+    example: { shape: 'landscape' },
+  },
+  {
     id: 'freeSlots',
     path: '/free-slots',
     icon: CalendarClock,
     hue: 'sage',
     page: lazy(() => import('./free-slots/FreeSlotsPage').then((m) => ({ default: m.FreeSlotsPage }))),
     example: { shape: 'story' },
+  },
+  {
+    id: 'giftCertificate',
+    path: '/gift-certificate',
+    icon: Gift,
+    hue: 'plum',
+    page: lazy(() =>
+      import('./gift-certificate/GiftCertificatePage').then((m) => ({ default: m.GiftCertificatePage })),
+    ),
+    example: { shape: 'landscape' },
   },
   {
     id: 'beforeAfter',
@@ -70,14 +114,12 @@ export const TOOLS: readonly Tool[] = [
     example: { shape: 'screen', themed: true },
   },
   {
-    id: 'giftCertificate',
-    path: '/gift-certificate',
-    icon: Gift,
-    hue: 'plum',
-    page: lazy(() =>
-      import('./gift-certificate/GiftCertificatePage').then((m) => ({ default: m.GiftCertificatePage })),
-    ),
-    example: { shape: 'landscape' },
+    id: 'businessCard',
+    path: '/business-card',
+    icon: IdCard,
+    hue: 'ink',
+    page: lazy(() => import('./business-card/BusinessCardPage').then((m) => ({ default: m.BusinessCardPage }))),
+    example: { shape: 'post' },
   },
 ]
 

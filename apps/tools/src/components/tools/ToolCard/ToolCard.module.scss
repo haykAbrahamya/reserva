@@ -82,10 +82,11 @@ a.card:hover {
   transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.1, 1);
 }
 
-/* Tall ones — a story, the client's screen — rise from the foot of the art,
-   with the part that says what they are above the edge. */
+/* Tall ones — a story, the client's screen, a 4:5 post — rise from the foot
+   of the art, with the part that says what they are above the edge. */
 .story,
-.screen {
+.screen,
+.post {
   bottom: 0;
   width: 30%;
   translate: -50% 22%;
@@ -95,6 +96,12 @@ a.card:hover {
 .screen {
   width: 32%;
   border-radius: 12px;
+}
+
+/* Shorter than a story, so wider, and less of it below the edge. */
+.post {
+  width: 40%;
+  translate: -50% 14%;
 }
 
 /* Wide ones — a gift card, a before & after post — lie in the middle, like a
@@ -207,13 +214,16 @@ a.card:hover {
 
   /* A narrow column: every sample whole, in its middle. */
   .story,
-  .screen {
+  .screen,
+  .post {
     top: 50%;
     bottom: auto;
     width: 62%;
     translate: -50% -50%;
     border-radius: 6px;
   }
+
+  .post { width: 76%; }
 
   .landscape {
     width: 84%;

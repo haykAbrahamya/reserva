@@ -1,9 +1,9 @@
 import {
-  ArrowUpRight, BadgeCheck, CalendarCheck, CalendarClock, CalendarDays, CalendarPlus, ChevronsRight, Circle, Columns2,
-  Copy, Crop, Download, Eraser, ExternalLink, FileDown, FileText, Gift, Globe, GraduationCap, Hand, Hash, Home, ImageMinus,
+  ArrowUpRight, BadgeCheck, BadgePercent, CalendarCheck, CalendarClock, CalendarDays, CalendarPlus, ChevronsRight, Circle, Columns2,
+  Copy, Crop, Download, Eraser, ExternalLink, FileDown, FileText, Gift, Globe, GraduationCap, Hand, Hash, Home, IdCard, ImageMinus,
   ImagePlus, Images, LayoutGrid, ListChecks, LogOut, MapPin, Maximize2, MessageCircle, MessageSquareHeart,
   MessageSquarePlus, MessageSquareWarning, Minus, MousePointerClick, Navigation, Palette, PenLine, Phone, Plus,
-  ReceiptText, RectangleVertical, Search, Send, Share2, SlidersHorizontal, Smartphone, Sparkles, Star, Store, SunMoon,
+  QrCode, ReceiptText, RectangleVertical, Search, Send, Share2, SlidersHorizontal, Smartphone, Sparkles, Star, Store, SunMoon,
   Tag, TriangleAlert, UserPlus, UserRound, Wrench, type LucideIcon,
 } from 'lucide-react'
 import type { SessionEvent, SessionRow } from '@/services/analytics.service'
@@ -25,10 +25,13 @@ const str = (v: unknown): string | null => (typeof v === 'string' && v.trim() ? 
 /** Each tool's own glyph — the one its card wears on tools.reserva.am. */
 const TOOL_ICON: Record<string, LucideIcon> = {
   priceList: ReceiptText,
+  promo: BadgePercent,
   freeSlots: CalendarClock,
   beforeAfter: Columns2,
   appointmentCard: CalendarCheck,
   giftCertificate: Gift,
+  businessCard: IdCard,
+  courseCertificate: GraduationCap,
 }
 
 const TOOL_ACT_ICON: Record<string, LucideIcon> = {
@@ -43,6 +46,9 @@ const TOOL_ACT_ICON: Record<string, LucideIcon> = {
   format: RectangleVertical,
   layout: Columns2,
   code: Hash,
+  qr: QrCode,
+  size: RectangleVertical,
+  logo: ImagePlus,
   open: ExternalLink,
   preview: Smartphone,
   zoom: Maximize2,

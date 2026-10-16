@@ -7,7 +7,9 @@
  * tool no longer makes. Re-run after changing how a tool looks:
  *
  *   pnpm dev:tools                                   (another terminal)
- *   pnpm --filter @reserva/tools examples [--base http://localhost:5177]
+ *   pnpm --filter @reserva/tools examples [--base http://localhost:5177] [--only promo]
+ *
+ * `--only <tool id>` renders that one tool's samples and leaves the rest as they are.
  *
  * Needs Node 22+ (built-in WebSocket) and Google Chrome; set CHROME to use
  * another binary. The before & after sample uses the two photos next to this
@@ -24,22 +26,27 @@ const OUT = path.resolve(HERE, '../public/examples')
 const PHOTOS = [path.join(HERE, 'examples/before.jpg'), path.join(HERE, 'examples/after.jpg')]
 const LOCALES = ['hy', 'ru', 'en']
 const BASE = argValue('--base') ?? 'http://localhost:5177'
+const ONLY = argValue('--only')
 const PORT = 9411
 /** Kept small: a card shows them at 100–180px wide, on screens up to 3× dense. */
 const QUALITY = 0.82
 
 /**
  * Each tool's sample, and the width its picture is kept at. A `style` is the
- * story style shown instead of the default — the one matching the card's hue,
- * so the grid shows the range rather than five brown pictures. The visit card
- * is a page that follows the site's theme, so it is kept in both.
+ * story style shown instead of the default — mostly the one matching the
+ * card's hue, so the grid shows the range rather than five brown pictures —
+ * and a `layout`, for a tool that has several. The visit card is a page that
+ * follows the site's theme, so it is kept in both.
  */
 const TOOLS = [
   { id: 'priceList', path: '/price-list', width: 400 },
+  { id: 'promo', path: '/promo', width: 400, style: 'cream', layout: 'poster', draftKey: 'reserva-tools:promo:v1' },
   { id: 'freeSlots', path: '/free-slots', width: 400, style: 'sage', draftKey: 'reserva-tools:free-slots:v1' },
   { id: 'beforeAfter', path: '/before-after', width: 480, photos: true },
   { id: 'appointmentCard', path: '/appointment-card', width: 400, visit: true, themes: ['light', 'dark'] },
   { id: 'giftCertificate', path: '/gift-certificate', width: 480, style: 'lavender', draftKey: 'reserva-tools:gift-certificate:v1' },
+  { id: 'businessCard', path: '/business-card', width: 440, style: 'noir', layout: 'split', draftKey: 'reserva-tools:business-card:v1' },
+  { id: 'courseCertificate', path: '/course-certificate', width: 480, style: 'noir', layout: 'classic', draftKey: 'reserva-tools:course-certificate:v1' },
 ]
 
 /** Before & after starts empty: it gets the photos, and a handle like the other samples. */
@@ -159,12 +166,13 @@ async function settle(page) {
   await page.evaluate(`document.fonts.ready.then(() => new Promise((r) => setTimeout(r, 700)))`)
 }
 
-/** The sample the tool opened on, in another story style: its stored draft, restyled, reloaded. */
+/** The sample the tool opened on, in another story style (and layout): its stored draft, restyled, reloaded. */
 async function restyle(page, tool) {
+  const patch = { themeId: tool.style, ...(tool.layout ? { layout: tool.layout } : {}) }
   const done = await page.evaluate(`(() => {
     const draft = JSON.parse(localStorage.getItem(${JSON.stringify(tool.draftKey)}) ?? 'null')
     if (!draft) return false
-    localStorage.setItem(${JSON.stringify(tool.draftKey)}, JSON.stringify({ ...draft, themeId: ${JSON.stringify(tool.style)} }))
+    localStorage.setItem(${JSON.stringify(tool.draftKey)}, JSON.stringify({ ...draft, ...${JSON.stringify(patch)} }))
     return true
   })()`)
   if (!done) throw new Error(`${tool.id}: no stored draft under ${tool.draftKey} to restyle`)
@@ -246,8 +254,10 @@ async function main() {
       fs.writeFileSync(file, Buffer.from(base64, 'base64'))
       console.log(`${path.relative(process.cwd(), file)}  ${(fs.statSync(file).size / 1024).toFixed(1)} KB`)
     }
+    const tools = ONLY ? TOOLS.filter((tool) => tool.id === ONLY) : TOOLS
+    if (!tools.length) throw new Error(`No tool "${ONLY}" — one of: ${TOOLS.map((tool) => tool.id).join(', ')}`)
     for (const locale of LOCALES) {
-      for (const tool of TOOLS) {
+      for (const tool of tools) {
         if (tool.visit) {
           for (const theme of tool.themes) {
             save(`${tool.id}-${locale}${theme === 'dark' ? '-dark' : ''}`, await visitCard(page, locale, tool, theme))

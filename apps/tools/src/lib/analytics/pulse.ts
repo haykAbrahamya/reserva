@@ -30,6 +30,10 @@ export type ToolAct =
   | 'photo' | 'photo_remove' | 'adjust' | 'format' | 'layout'
   // Gift certificate: a new number for the next card
   | 'code'
+  // Business card: what the QR code opens
+  | 'qr'
+  // Course certificate: the paper size, a logo added
+  | 'size' | 'logo'
   // Appointment card: opened the page the client will see
   | 'open'
   // Looked at the result: the phone's Preview tab, the image full size

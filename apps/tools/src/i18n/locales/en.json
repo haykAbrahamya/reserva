@@ -34,6 +34,11 @@
       "tag": "Instagram story",
       "description": "Turn your services and prices into a beautiful story image in your brand colours."
     },
+    "promo": {
+      "title": "Promo story",
+      "tag": "Instagram story",
+      "description": "Announce a discount in style: the percent off, old and new prices, and until when."
+    },
     "freeSlots": {
       "title": "Free slots story",
       "tag": "Instagram story",
@@ -53,6 +58,16 @@
       "title": "Gift certificate",
       "tag": "Image · PDF",
       "description": "Design gift cards for the holidays and send them in seconds."
+    },
+    "businessCard": {
+      "title": "Business card",
+      "tag": "Image · PDF",
+      "description": "A refined card with your name, contacts and a QR code — to send, post or print."
+    },
+    "courseCertificate": {
+      "title": "Course certificate",
+      "tag": "PDF · A4 / A5",
+      "description": "Certificates for your students: your logo, the course, signatures and a place for the stamp — ready to print."
     }
   },
   "workspace": {

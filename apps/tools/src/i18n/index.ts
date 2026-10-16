@@ -1,9 +1,12 @@
 import { createI18n, type LocaleMeta, type Messages } from '@reserva/i18n'
 import { appointmentCardCopy } from '@/tools/appointment-card/locales'
 import { beforeAfterCopy } from '@/tools/before-after/locales'
+import { businessCardCopy } from '@/tools/business-card/locales'
+import { courseCertificateCopy } from '@/tools/course-certificate/locales'
 import { freeSlotsCopy } from '@/tools/free-slots/locales'
 import { giftCertificateCopy } from '@/tools/gift-certificate/locales'
 import { priceListCopy } from '@/tools/price-list/locales'
+import { promoCopy } from '@/tools/promo/locales'
 import en from './locales/en.json'
 import hy from './locales/hy.json'
 import ru from './locales/ru.json'
@@ -29,10 +32,13 @@ export const LOCALE_META: Record<Locale, LocaleMeta> = {
 
 const TOOL_COPY: Record<string, Record<Locale, Messages>> = {
   priceList: priceListCopy,
+  promo: promoCopy,
   freeSlots: freeSlotsCopy,
   giftCertificate: giftCertificateCopy,
   beforeAfter: beforeAfterCopy,
   appointmentCard: appointmentCardCopy,
+  businessCard: businessCardCopy,
+  courseCertificate: courseCertificateCopy,
 }
 
 const withTools = (locale: Locale, app: Messages): Messages => ({

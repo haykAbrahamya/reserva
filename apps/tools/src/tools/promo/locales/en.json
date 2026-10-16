@@ -1,0 +1,59 @@
+{
+  "headingPlaceholder": "Special offer",
+  "sections": {
+    "design": "Design",
+    "offer": "The offer",
+    "services": "Services"
+  },
+  "layouts": {
+    "classic": "Classic",
+    "sticker": "Sticker",
+    "coupon": "Coupon",
+    "poster": "Poster"
+  },
+  "fields": {
+    "discount": "Discount",
+    "less": "Smaller discount",
+    "more": "Bigger discount",
+    "offer": "What it's on",
+    "offerPlaceholder": "e.g. On all manicure services",
+    "until": "Until",
+    "untilPlaceholder": "No end date",
+    "today": "Today",
+    "noEnd": "No end date",
+    "serviceName": "Service",
+    "serviceNamePlaceholder": "Service name",
+    "servicePrice": "Usual price",
+    "servicePricePlaceholder": "8000",
+    "newPrice": "With discount",
+    "autoHint": "Worked out from the discount. Type your own to change it.",
+    "backToAuto": "Back to the worked-out price, {price}",
+    "backToAutoShort": "Back to the worked-out price",
+    "clearSale": "Clear your price",
+    "note": "How to book",
+    "notePlaceholder": "DM to book"
+  },
+  "services": {
+    "count": "{count} of {max}",
+    "add": "Add service",
+    "remove": "Remove {name}",
+    "removeUnnamed": "Remove service",
+    "limit": "That's the most a promo shows: {max} services.",
+    "hint": "Type the usual price and the discounted one is worked out for you, rounded down to 100 ֏. Or type your own.",
+    "clear": "Clear list",
+    "clearTitle": "Clear the list?",
+    "clearBody": "All services will be removed. Your discount and details stay.",
+    "clearConfirm": "Clear",
+    "cancel": "Cancel"
+  },
+  "card": {
+    "until": "Until {day} {month}",
+    "off": "off"
+  },
+  "preview": "Your promo as an Instagram story",
+  "format": "Instagram story · 1080 × 1920 · PNG",
+  "pitch": {
+    "title": "Turn this offer into bookings",
+    "body": "On a Reserva booking page clients see your prices and book a time themselves in a few taps — day or night, with no messages back and forth."
+  }
+}

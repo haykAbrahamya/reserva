@@ -35,6 +35,12 @@
   --tool-sand-soft: rgba(168, 120, 75, 0.13);
   --tool-plum: #7D5F8E;
   --tool-plum-soft: rgba(125, 95, 142, 0.13);
+  --tool-coral: #BF6B52;
+  --tool-coral-soft: rgba(191, 107, 82, 0.13);
+  --tool-ink: #56606E;
+  --tool-ink-soft: rgba(86, 96, 110, 0.13);
+  --tool-gold: #A88A2E;
+  --tool-gold-soft: rgba(168, 138, 46, 0.13);
 
   /* ── Layout ── */
   --page-max: 1180px;
@@ -74,4 +80,10 @@
   --tool-sand-soft: rgba(214, 169, 114, 0.15);
   --tool-plum: #B79AC8;
   --tool-plum-soft: rgba(183, 154, 200, 0.15);
+  --tool-coral: #E39A82;
+  --tool-coral-soft: rgba(227, 154, 130, 0.15);
+  --tool-ink: #AAB4C2;
+  --tool-ink-soft: rgba(170, 180, 194, 0.15);
+  --tool-gold: #DDBF62;
+  --tool-gold-soft: rgba(221, 191, 98, 0.15);
 }

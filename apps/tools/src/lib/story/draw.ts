@@ -57,20 +57,30 @@ export function drawBackground(ctx: CanvasRenderingContext2D, theme: StoryTheme,
 
   glow(ctx, theme.accent, width * 0.95, height * 0.04, unit * 0.76, theme.glow)
   glow(ctx, theme.accent, width * 0.02, height * 0.98, unit * 0.63, theme.glow * 0.75)
+  drawRings(ctx, theme.accent, width * 0.97, height * 0.035, { from: unit * 0.148, step: unit * 0.07, count: 9, alpha: 0.18 })
+}
 
-  const [cx, cy] = [width * 0.97, height * 0.035]
-  ctx.strokeStyle = theme.accent
+/** Hairline rings around a point, fading outwards — the tools' own motif. */
+export function drawRings(
+  ctx: CanvasRenderingContext2D,
+  color: string,
+  x: number,
+  y: number,
+  { from, step, count, alpha }: { from: number; step: number; count: number; alpha: number },
+) {
+  ctx.strokeStyle = color
   ctx.lineWidth = 2
-  for (let i = 0; i < 9; i++) {
-    ctx.globalAlpha = 0.18 * (1 - i / 9)
+  for (let i = 0; i < count; i++) {
+    ctx.globalAlpha = alpha * (1 - i / count)
     ctx.beginPath()
-    ctx.arc(cx, cy, unit * 0.148 + i * unit * 0.07, 0, Math.PI * 2)
+    ctx.arc(x, y, from + i * step, 0, Math.PI * 2)
     ctx.stroke()
   }
   ctx.globalAlpha = 1
 }
 
-function glow(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, radius: number, alpha: number) {
+/** A soft round glow of `color`, fading to nothing at `radius`. */
+export function glow(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, radius: number, alpha: number) {
   const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius)
   gradient.addColorStop(0, withAlpha(color, alpha))
   gradient.addColorStop(1, withAlpha(color, 0))

@@ -7,17 +7,20 @@ import { useToolEvents } from '@/lib/analytics/useToolEvents'
 import { canvasToBlob, downloadFile, renderCanvas } from '@/lib/canvas/exportFile'
 import { saveInChrome, takeArrivalSave } from '@/lib/handoff'
 import { inApp } from '@/lib/inAppBrowser'
-import { jpegToPdf } from '@/lib/pdf'
+import { jpegsToPdf } from '@/lib/pdf'
 import s from './PdfButton.module.scss'
 
+type Draw = (ctx: CanvasRenderingContext2D) => void
+
 interface Props {
-  /** Pixel size to render at. */
+  /** Pixel size to render at — every page the same. */
   width: number
   height: number
   /** Print size; the image fills the page. */
   widthMm: number
   heightMm: number
-  draw: (ctx: CanvasRenderingContext2D) => void
+  /** The page, or the pages in order (a business card's front, then its back). */
+  draw: Draw | readonly Draw[]
   prepare?: () => Promise<void>
   fileName: string
   /** What the result was made with, for analytics. */
@@ -45,9 +48,14 @@ export function PdfButton({ width, height, widthMm, heightMm, draw, prepare, fil
     setBusy(true)
     try {
       await prepare?.()
-      const jpegBlob = await canvasToBlob(renderCanvas(width, height, draw), 'image/jpeg', 0.92)
-      const jpeg = new Uint8Array(await jpegBlob.arrayBuffer())
-      const pdf = jpegToPdf({ jpeg, pixelWidth: width, pixelHeight: height, widthMm, heightMm })
+      const draws = typeof draw === 'function' ? [draw] : draw
+      const pages = []
+      for (const drawPage of draws) {
+        const jpegBlob = await canvasToBlob(renderCanvas(width, height, drawPage), 'image/jpeg', 0.92)
+        const jpeg = new Uint8Array(await jpegBlob.arrayBuffer())
+        pages.push({ jpeg, pixelWidth: width, pixelHeight: height, widthMm, heightMm })
+      }
+      const pdf = jpegsToPdf(pages)
       downloadFile(new File([pdf], fileName, { type: 'application/pdf' }))
       events?.exported('pdf', details)
       toast(t('export.pdfSaved'))

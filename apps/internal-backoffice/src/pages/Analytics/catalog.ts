@@ -215,10 +215,13 @@ const BOOKING_STEP_LABELS: Record<string, string> = {
 /** The tools, by registry id. */
 export const TOOL_LABELS: Record<string, string> = {
   priceList: 'Price list',
+  promo: 'Promo',
   freeSlots: 'Free slots',
   beforeAfter: 'Before & after',
   appointmentCard: 'Appointment card',
   giftCertificate: 'Gift certificate',
+  businessCard: 'Business card',
+  courseCertificate: 'Course certificate',
 }
 
 /** How a result left (tool_export `via`). */
@@ -261,6 +264,9 @@ export const TOOL_ACT_LABELS: Record<string, string> = {
   format: 'Format picked',
   layout: 'Layout picked',
   code: 'New card number',
+  qr: 'QR target picked',
+  size: 'Paper size picked',
+  logo: 'Logo added',
   open: 'Opened the client’s card',
   preview: 'Preview tab (phone)',
   zoom: 'Opened full size',
@@ -273,6 +279,11 @@ export const TOOL_VALUE_LABELS: Record<string, string> = {
   before: 'Before', after: 'After',
   post: 'Post', story: 'Story',
   side: 'Side by side', stacked: 'Stacked',
+  classic: 'Classic', sticker: 'Sticker', coupon: 'Coupon', poster: 'Poster',
+  split: 'Two-tone', arch: 'Arch', minimal: 'Minimal',
+  band: 'Band', luxe: 'Luxe', a4: 'A4', a5: 'A5',
+  aura: 'Aura', medallion: 'Medallion',
+  instagram: 'Instagram', whatsapp: 'WhatsApp', website: 'Website', none: 'No QR',
 }
 
 /** 'post-side' → 'Post · Side by side'. */
@@ -301,10 +312,13 @@ export const TOOLS_SPOT_LABELS: Record<string, string> = {
   header: 'Header',
   footer: 'Footer',
   'price-list': 'Price list · pitch',
+  promo: 'Promo · pitch',
   'free-slots': 'Free slots · pitch',
   'before-after': 'Before & after · pitch',
   'appointment-card': 'Appointment card · pitch',
   'gift-certificate': 'Gift certificate · pitch',
+  'business-card': 'Business card · pitch',
+  'course-certificate': 'Course certificate · pitch',
   other: 'Other',
 }
 

@@ -18,6 +18,10 @@ export interface StoryTheme {
   line: string
   /** Strength of the accent glow in the corners. */
   glow: number
+  /** Text on an accent fill (a sticker, a colour block), picked per palette to stay legible. */
+  onAccent: string
+  /** A card on the ground (a coupon, a panel of rows), a step lighter in every palette. */
+  surface: string
 }
 
 export const STORY_THEMES: readonly StoryTheme[] = [
@@ -29,6 +33,8 @@ export const STORY_THEMES: readonly StoryTheme[] = [
     accent: '#E6B98C',
     line: 'rgba(247, 236, 225, 0.3)',
     glow: 0.22,
+    onAccent: '#2A1C15',
+    surface: 'rgba(247, 236, 225, 0.07)',
   },
   {
     id: 'cream',
@@ -38,6 +44,8 @@ export const STORY_THEMES: readonly StoryTheme[] = [
     accent: '#A8784B',
     line: 'rgba(42, 32, 25, 0.28)',
     glow: 0.2,
+    onAccent: '#FFFDF9',
+    surface: 'rgba(255, 255, 255, 0.62)',
   },
   {
     id: 'noir',
@@ -47,6 +55,8 @@ export const STORY_THEMES: readonly StoryTheme[] = [
     accent: '#D6A972',
     line: 'rgba(246, 238, 228, 0.3)',
     glow: 0.22,
+    onAccent: '#14110E',
+    surface: 'rgba(246, 238, 228, 0.06)',
   },
   {
     id: 'blush',
@@ -56,6 +66,8 @@ export const STORY_THEMES: readonly StoryTheme[] = [
     accent: '#B0566E',
     line: 'rgba(59, 32, 39, 0.26)',
     glow: 0.2,
+    onAccent: '#FFF8F9',
+    surface: 'rgba(255, 255, 255, 0.58)',
   },
   {
     id: 'sage',
@@ -65,6 +77,8 @@ export const STORY_THEMES: readonly StoryTheme[] = [
     accent: '#4E7A5A',
     line: 'rgba(30, 42, 33, 0.26)',
     glow: 0.2,
+    onAccent: '#F8FBF6',
+    surface: 'rgba(255, 255, 255, 0.58)',
   },
   {
     id: 'lavender',
@@ -74,6 +88,8 @@ export const STORY_THEMES: readonly StoryTheme[] = [
     accent: '#7A5A9E',
     line: 'rgba(37, 30, 51, 0.26)',
     glow: 0.2,
+    onAccent: '#FCFAFE',
+    surface: 'rgba(255, 255, 255, 0.58)',
   },
 ]
 

@@ -1,0 +1,71 @@
+{
+  "sections": {
+    "design": "Design",
+    "certificate": "The certificate",
+    "school": "Your school",
+    "signatures": "Signatures"
+  },
+  "layouts": {
+    "classic": "Classic",
+    "minimal": "Minimal",
+    "band": "Band",
+    "luxe": "Luxe",
+    "aura": "Aura",
+    "medallion": "Medallion"
+  },
+  "size": {
+    "label": "Paper size",
+    "a4": "A4",
+    "a5": "A5",
+    "mm": "mm"
+  },
+  "fields": {
+    "recipient": "Student's name",
+    "recipientPlaceholder": "e.g. Mariam Hakobyan",
+    "course": "Course",
+    "coursePlaceholder": "e.g. Manicure & nail design",
+    "wording": "Wording",
+    "wordingPlaceholder": "for successfully completing the course",
+    "details": "Hours or dates",
+    "detailsPlaceholder": "e.g. 24 academic hours",
+    "heading": "Title",
+    "headingPlaceholder": "Certificate",
+    "date": "Date of issue",
+    "today": "Today",
+    "noDate": "No date",
+    "city": "City",
+    "cityPlaceholder": "e.g. Yerevan",
+    "number": "Number",
+    "nextNumber": "Next number",
+    "school": "School or academy",
+    "schoolPlaceholder": "e.g. Anna Beauty Academy",
+    "link": "Instagram or website",
+    "linkPlaceholder": "@yourschool"
+  },
+  "logo": {
+    "label": "Logo",
+    "upload": "Upload your logo",
+    "hint": "Optional. A PNG with a transparent background looks best; without a logo, your initials are used.",
+    "replace": "Replace",
+    "remove": "Remove",
+    "failed": "That file couldn't be opened as an image."
+  },
+  "signatures": {
+    "signer": "Signature {n}",
+    "name": "Name",
+    "namePlaceholder": "Full name",
+    "title": "Title",
+    "titlePlaceholder1": "e.g. Instructor",
+    "titlePlaceholder2": "e.g. Director",
+    "hint": "Each signature gets a line to sign by hand. Leave both of its fields empty to remove it.",
+    "seal": "Place for a stamp",
+    "sealHint": "A dashed circle where the school's stamp goes."
+  },
+  "seal": "SEAL",
+  "preview": "Your course certificate",
+  "format": "PNG to send, or PDF to print on {size} ({mm} mm)",
+  "pitch": {
+    "title": "Sell your courses with Reserva",
+    "body": "Put your courses on your Reserva page: students see the dates, the price and the programme, and sign up online in a minute."
+  }
+}

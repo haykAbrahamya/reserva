@@ -1,0 +1,141 @@
+@use '../../../../styles/vars' as *;
+@use '../../../../styles/app' as a;
+
+/*
+  The price list's rows, with the price on offer beside the usual one. Laid
+  out by the width of the FORM, not the window:
+
+    wide    [ name ........... ][ 8000 ] → [ 6400 ✦ ][×]
+    narrow  [ name ............................. ][×]
+            [ 8000 ........ ] → [ 6400 ......... ✦ ]
+*/
+.container {
+  container-type: inline-size;
+}
+
+.columns,
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 104px 14px 122px 30px;
+  gap: 8px;
+}
+
+.columns {
+  margin-bottom: 6px;
+
+  span {
+    @include a.eyebrow;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* "Usual price" may run on over the arrow: in Armenian it is the longest label. */
+.wideLabel {
+  grid-column: span 2;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  grid-template-areas: 'name price arrow sale remove';
+  align-items: center;
+}
+
+.name { grid-area: name; min-width: 0; }
+.price { grid-area: price; min-width: 0; }
+.sale { grid-area: sale; min-width: 0; }
+.remove { grid-area: remove; }
+
+.arrow {
+  grid-area: arrow;
+  display: grid;
+  place-items: center;
+  color: $fg-3;
+}
+
+/* Worked out from the discount: in the accent, as the new price is on the story. */
+.sale input {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: $accent-contrast;
+}
+
+/* The salon's own figure: an ordinary value, with the way back beside it. */
+.own input {
+  color: $fg-0;
+}
+
+/* A mark, not a control: a tap on it lands in the field. */
+.auto {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: $accent-contrast;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.reset {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: $fg-2;
+  cursor: pointer;
+  transition: color 0.14s ease, background 0.14s ease;
+
+  &:hover {
+    color: $accent;
+    background: $accent-soft;
+  }
+
+  @include a.focus-ring;
+}
+
+@container (max-width: 420px) {
+  .columns { display: none; }
+
+  .row {
+    grid-template-columns: minmax(0, 1fr) 14px minmax(0, 1fr) 30px;
+    grid-template-areas:
+      'name name name remove'
+      'price arrow sale .';
+    gap: 6px 8px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid $line-1;
+  }
+
+  .row:last-child { border-bottom: 0; padding-bottom: 0; }
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-top: 14px;
+}
+
+.add { gap: 6px; }
+
+.hint {
+  flex: 1;
+  min-width: 200px;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: $fg-3;
+}

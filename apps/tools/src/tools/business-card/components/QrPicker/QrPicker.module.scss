@@ -1,0 +1,85 @@
+@use '../../../../styles/vars' as *;
+@use '../../../../styles/app' as a;
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Four in a row where they fit; two by two on a phone. */
+.container {
+  container-type: inline-size;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@container (min-width: 480px) {
+  .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.option {
+  position: relative;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.input {
+  @include a.sr-only;
+}
+
+.tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid $line-2;
+  border-radius: 12px;
+  background: $bg-1;
+  color: $fg-2;
+  transition: border-color 0.14s ease, background 0.14s ease, color 0.14s ease;
+}
+
+.name {
+  font-size: 13px;
+  font-weight: 600;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.option:hover .tile {
+  border-color: $line-strong;
+  color: $fg-0;
+}
+
+.input:checked + .tile {
+  border-color: $accent;
+  background: $accent-soft;
+  color: $accent-contrast;
+}
+
+.input:focus-visible + .tile {
+  outline: 2px solid $accent;
+  outline-offset: 3px;
+}
+
+.hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: $fg-3;
+  overflow-wrap: anywhere;
+}
+
+/* Waiting on a field: said in the accent, so it is noticed. */
+.missing {
+  color: $accent-contrast;
+}

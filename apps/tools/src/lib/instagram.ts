@@ -20,8 +20,9 @@ export const SAMPLE_INSTAGRAM = 'anna.beauty'
  * The bare, lower-case username in `text`, or undefined when it holds none:
  * a profile link (instagram.com/mane.nails), an "@mane.nails" anywhere — but
  * not an e-mail's "@gmail.com" — or one bare word that is not a number.
+ * Any account, the sample's too: what a card shows and its QR opens.
  */
-export function instagramHandle(text: string): string | undefined {
+export function parseInstagram(text: string): string | undefined {
   const value = text.trim()
   const candidate =
     /instagram\.com\/([A-Za-z0-9._]+)/i.exec(value)?.[1] ??
@@ -30,5 +31,11 @@ export function instagramHandle(text: string): string | undefined {
   // A sentence's full stop is not part of a username; Instagram's never end in one.
   const handle = candidate?.toLowerCase().replace(/\.+$/, '')
   if (!handle || !USERNAME.test(handle) || handle.startsWith('.') || handle.includes('..')) return undefined
+  return handle
+}
+
+/** The username a result is signed with, for the analytics — never the sample's. */
+export function instagramHandle(text: string): string | undefined {
+  const handle = parseInstagram(text)
   return handle === SAMPLE_INSTAGRAM ? undefined : handle
 }

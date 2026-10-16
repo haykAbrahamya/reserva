@@ -1,0 +1,103 @@
+@use '../../../../styles/vars' as *;
+@use '../../../../styles/app' as a;
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: $fg-1;
+}
+
+/* Empty: a dashed drop zone that is also the button. */
+.drop {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px dashed $line-strong;
+  border-radius: 14px;
+  background: transparent;
+  color: $fg-1;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.14s ease, background 0.14s ease;
+
+  &:hover,
+  &.dragging {
+    border-color: $accent;
+    background: $accent-soft;
+  }
+
+  @include a.focus-ring;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: $bg-2;
+  color: $accent-contrast;
+}
+
+.dropText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dropTitle {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dropHint {
+  font-size: 12px;
+  line-height: 1.45;
+  color: $fg-3;
+}
+
+/* Chosen: the logo on a checkerboard, and the two things to do with it. */
+.current {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.thumb {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 64px;
+  flex-shrink: 0;
+  padding: 6px;
+  border: 1px solid $line-2;
+  border-radius: 12px;
+  background:
+    conic-gradient(#ececec 25%, #fff 0 50%, #ececec 0 75%, #fff 0) 0 0 / 12px 12px;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.file {
+  display: none;
+}

@@ -1,0 +1,50 @@
+{
+  "sections": {
+    "design": "Design",
+    "you": "About you",
+    "contacts": "Contacts",
+    "qr": "QR code"
+  },
+  "layouts": {
+    "classic": "Classic",
+    "split": "Two-tone",
+    "arch": "Arch",
+    "minimal": "Minimal"
+  },
+  "fields": {
+    "name": "Your name or salon",
+    "namePlaceholder": "e.g. Anna Petrosyan",
+    "role": "Profession",
+    "rolePlaceholder": "e.g. Nail artist",
+    "phone": "Phone",
+    "messengers": "This number is on",
+    "address": "Address",
+    "addressPlaceholder": "Street, building, city",
+    "website": "Website or link",
+    "websitePlaceholder": "e.g. reserva.am/anna"
+  },
+  "qr": {
+    "instagram": "Instagram",
+    "whatsapp": "WhatsApp",
+    "website": "Website",
+    "none": "No QR",
+    "opens": "Scanning opens {link}",
+    "noneHint": "The back keeps just your contacts.",
+    "missing": {
+      "instagram": "Add your Instagram above, and the code will open it.",
+      "whatsapp": "Add your phone number above, and the code will open a WhatsApp chat with you.",
+      "website": "Add your website above, and the code will open it."
+    }
+  },
+  "card": {
+    "phone": "Phone",
+    "address": "Address",
+    "website": "Website"
+  },
+  "preview": "Your business card, front and back",
+  "format": "1080 × 1350 · PNG, or PDF to print: 90 × 50 mm, both sides, 2 mm bleed",
+  "pitch": {
+    "title": "Let the QR code open your booking page",
+    "body": "With Reserva, the code on your card can lead straight to your booking page: clients scan it and pick a time themselves, day or night."
+  }
+}
