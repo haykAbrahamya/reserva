@@ -1,4 +1,5 @@
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios'
+import { useAuthStore } from '@/store/auth.store'
 import { superSession } from './superSession'
 
 // ─────────────────────────────────────────────────────────────
@@ -80,6 +81,13 @@ http.interceptors.request.use((config) => {
 
 // ── Transparent refresh on 401 ──
 let refreshing: Promise<string | null> | null = null
+/**
+ * Where an ended session sends the visitor, decided by the first request to
+ * find it ended. A page's requests fail together, and that first one clears the
+ * super admin marker the rest would decide by: they sent super admins to the
+ * partner sign-in.
+ */
+let endedTo: string | null = null
 
 async function refreshAccessToken(): Promise<string | null> {
   const refresh = tokenStore.refresh
@@ -98,8 +106,9 @@ async function refreshAccessToken(): Promise<string | null> {
     tokenStore.set(accessToken, refreshToken)
     return accessToken
   } catch {
+    // The super admin marker stays: the caller still needs it to send them back
+    // to their own sign-in page, and clears it then.
     tokenStore.clear()
-    superSession.clear()
     return null
   }
 }
@@ -154,12 +163,19 @@ http.interceptors.response.use(
         original.headers = { ...original.headers, Authorization: `Bearer ${newToken}` }
         return http(original)
       }
-      // Refresh failed → bounce to login (a super admin to theirs).
-      const wasSuper = superSession.get() !== null
+      // Refresh failed → the session is over. Forget all of it, the persisted
+      // "signed in" flag too: left set, every later page load would ask again,
+      // fail again and bounce, which kept /super-admin out of reach once a
+      // super admin's 12-hour session ran out. Then to sign in (a super admin
+      // to theirs), unless already on a sign-in page or an activation link.
+      endedTo ??= superSession.get() ? '/super-admin' : '/login'
       tokenStore.clear()
       superSession.clear()
-      const signIn = wasSuper ? '/super-admin' : '/login'
-      if (!window.location.pathname.startsWith(signIn)) window.location.href = signIn
+      useAuthStore.getState().logout()
+      const stay = ['/login', '/super-admin', '/activate'].some((p) => window.location.pathname.startsWith(p))
+      if (!stay) window.location.href = endedTo
+      // Nothing to leave: a session started on this page decides afresh.
+      else endedTo = null
     }
 
     throw new ApiError(
